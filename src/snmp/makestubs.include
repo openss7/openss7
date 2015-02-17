@@ -3124,3 +3124,28 @@ ptopoMIB_openss7.c ptopoMIB_openss7.h: mib2c mib2c.conf ../mibs/PTOPO-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ptopoMIB_openss7 PTOPO-MIB::ptopoMIB
 	indent -nhnl ptopoMIB_openss7.[ch]
 
+# root = tlmMIB
+
+MIBPREFIXES += tlmMIB
+
+tlmMIB.mib: ../mibs/OPENSS7-TLM-MIB.mib
+	smidump -k ../mibs/OPENSS7-TLM-MIB.mib>$@ || :
+
+tlmMIB.lint: ../mibs/OPENSS7-TLM-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-TLM-MIB.mib>$@ 2>&1 || :
+
+tlmMIB.tree: ../mibs/OPENSS7-TLM-MIB.mib
+	snmptranslate -Tp OPENSS7-TLM-MIB::tlmMIB>$@ || :
+
+tlmMIB_simple.c tlmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-TLM-MIB.mib
+	./mib2c -c ./mib2c.conf -f tlmMIB_simple OPENSS7-TLM-MIB::tlmMIB
+	indent -nhnl tlmMIB_simple.[ch]
+
+tlmMIB_storage.c tlmMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-TLM-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f tlmMIB_storage OPENSS7-TLM-MIB::tlmMIB
+	indent -nhnl tlmMIB_storage.[ch]
+
+tlmMIB_openss7.c tlmMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-TLM-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f tlmMIB_openss7 OPENSS7-TLM-MIB::tlmMIB
+	indent -nhnl tlmMIB_openss7.[ch]
+

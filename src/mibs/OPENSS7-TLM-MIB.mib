@@ -1,0 +1,2415 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) src/mibs/OPENSS7-TLM-MIB.mib
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- =============================================================================
+
+OPENSS7-TLM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MilliSeconds
+        FROM OPENSS7-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Counter64, Gauge32, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowPointer, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+tlmMIB MODULE-IDENTITY
+    LAST-UPDATED "201502170534Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Cresecent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "This MIB provides configuration and status information 
+         of an OSI CLTS/COTS subsystem, where the CLTS is in 
+         accordance with ITU-T, and COTS is in accordance with 
+         ITU-T.
+         
+         Copyright (c) 2008-2015  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201502170534Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 41 }
+
+ -- top level organization of the MIB
+
+-- tlmNotifications    OBJECT IDENTIFIER ::= { tlmMIB         0 }
+-- tlmObjects          OBJECT IDENTIFIER ::= { tlmMIB         1 }
+-- tlmConformance      OBJECT IDENTIFIER ::= { tlmMIB         2 }
+
+-- tlmTables           OBJECT IDENTIFIER ::= { tlmObjects     1 }
+-- tlmScalars          OBJECT IDENTIFIER ::= { tlmObjects     2 }
+-- tlmNotifs           OBJECT IDENTIFIER ::= { tlmObjects     3 }
+-- tlmOids             OBJECT IDENTIFIER ::= { tlmObjects     4 }
+
+-- tlmCompliances      OBJECT IDENTIFIER ::= { tlmConformance 1 }
+-- tlmGroups           OBJECT IDENTIFIER ::= { tlmConformance 2 }
+
+ConnectionDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the direction of the connection.  The value 
+         incoming(1) means that it was initiated by the remote 
+         Transport Entity, the value outgoing(0) means the it 
+         was initiated by the local Transport Entity."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.ConnectionDirectionSyntax"
+    SYNTAX      INTEGER { outgoing(0), incoming(1) }
+
+DeletionCause ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Reason why the Transport Connection Object is being 
+         deleted."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.DelettionCauseSyntax"
+    SYNTAX      INTEGER { protocolError(0), networkServiceProvider(1), 
+                    remoteCongestion(3), localCongestion(4) }
+
+NCCOL ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the collision algorithm as defined in Annex 
+         B of ITU-T Rec. X.224 | ISO/IEC 8073.  In NCCIV managed 
+         object, indicates the collision algorithm to be used.  
+         In NCC managed object, indicates the collision 
+         algorithm in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.NC-COLSyntax"
+    SYNTAX      INTEGER { nc-COL0(0) }
+
+NCPREF ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the preference the initiator has to keep the 
+         network connection as defined in Annex B or ITU-T Rec. 
+         X.224 | ISO/IEC 8073.  In NCCIV managed object, 
+         indicates the preference to be used.  In NCC managed 
+         object, indicates the preference in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.NC-PREFSyntax"
+    SYNTAX      INTEGER { highest(0), medium(1), lowest(3) }
+
+NCREC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the recovery optimization option as defined 
+         in Annex B of ITU-T Rec. X.224 | ISO/IEC 8073.  In 
+         NCCIV managed object, indicates the recovery 
+         optimization option to be used.  In NCC managed object, 
+         indicates the recover optimization option in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.NC-RECSyntax"
+    SYNTAX      INTEGER { pleaseDoNotRecover(0), pleaseRecover(1) }
+
+NCREF ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the nc-reference as defined in Annex B of 
+         ITU-T Rec. X.224 | ISO/IEC 8073."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.NC-REFSyntax"
+    SYNTAX      Integer32
+
+NCRight ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the type of right of use as defined in Annex 
+         B of ITU-T Rec. X.224 | ISO/IEC 8073.  In NCCIV managed 
+         object, indicates the type of right of use to be used.  
+         Namely, the value my-side(1) means 'SA', remote-side(2) 
+         means 'RA' and both-sides(3) means 'RR'.  In NCC 
+         managed object, indicates the type of right of use in 
+         use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.NC-RightSyntax"
+    SYNTAX      INTEGER { my-side(1), remote-side(2), both-sides(3) }
+
+ProtocolClass ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The protocol class in used on the connection, as 
+         negotiated during connection establishment.  During 
+         connection establishment (before the connection reaches 
+         the OPEN state) this indicates what is currently 
+         preferred and not necessarily the ultimate class that 
+         will be used for the connection."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.ProtocolClassSyntax"
+    SYNTAX      INTEGER { class0(0), class1(1), class2(2), class3(3), 
+                    class4(4) }
+
+ProtocolClasses ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The preferred/alternate set of protocol classes that 
+         may be stated at connection establishment.  The default 
+         value is implementation dependent, but must be 
+         consistent with the class negotiation rules of ITU-T 
+         Rec. X.224 | ISO/IEC 8073."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.ProtocolClassesSyntax"
+    SYNTAX      BITS { class0(0), class1(1), class2(2), class3(3), 
+                    class4(4) }
+
+PDUHeader ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Header of a PDU causing an event.  Returned in the 
+         problemData field of a communicationsAlarm 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.PDUHeaderSyntax"
+    SYNTAX      OCTET STRING (SIZE(1..255))
+
+ReasonCode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Reason why the PDU is in error as placed in the 
+         corresponding parameter of the ER TPDU.  Returned in 
+         the problemData field of a communicationsAlarm 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.ReasonCodeSyntax"
+    SYNTAX      Integer32
+
+SourceAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Source N-Address.  Returned in the problemData field 
+         of a communicationsAlarm notification."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.SourceAddressSyntax"
+    SYNTAX      OCTET STRING
+
+SourceOfAllocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the transport entity that established the 
+         network connection at the first time during the life 
+         time of an NC reference."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): TLM.SourceOfAllocationSyntax"
+    SYNTAX      INTEGER { local(0), remote(1) }
+
+-- FIXME: this should be imported from OPENSS7-NLM-MIB
+
+NSAPAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      OCTET STRING (SIZE(0..20))
+
+TSelector ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      OCTET STRING (SIZE(0 | 2))
+
+TReference ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      Integer32 (0..65535)
+
+NetworkConnectionIDs ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      OCTET STRING (SIZE(0..256))
+
+-- tlmTransportSusbsytem (X.723:subsystem)
+-- tlmEntity (X.723:communicationsEntity)
+-- tlmClModeTPM (X.723:clProtocolMachine)
+-- tlmCoModeTPM (X.723:coProtocolMachine)
+-- tlmConnection (X.723:singlePeerConnection)
+-- tlmConnectionIVMO (initial values)
+-- tlmTSAP (X.723:sap1)
+-- tlmNcmsPM
+-- tlmNcc
+-- tlmNccIVMO (initial values)
+
+-- tlmSubsystem       OBJECT IDENTIFIER ::= { tlmTables  1 }
+-- tlmEntity          OBJECT IDENTIFIER ::= { tlmTables  2 }
+-- tlmClModeTPM       OBJECT IDENTIFIER ::= { tlmTables  3 }
+-- tlmCoModeTPM       OBJECT IDENTIFIER ::= { tlmTables  4 }
+-- tlmConnection      OBJECT IDENTIFIER ::= { tlmTables  5 }
+-- tlmConnectionIVMO  OBJECT IDENTIFIER ::= { tlmTables  6 }
+-- tlmTSAP            OBJECT IDENTIFIER ::= { tlmTables  7 }
+-- tlmNcmsPM          OBJECT IDENTIFIER ::= { tlmTables  8 }
+-- tlmNcc             OBJECT IDENTIFIER ::= { tlmTables  9 }
+-- tlmNccIVMO         OBJECT IDENTIFIER ::= { tlmTables 10 }
+
+tlmNotifications OBJECT IDENTIFIER
+    ::= { tlmMIB 0 }
+
+tlmObjects OBJECT IDENTIFIER
+    ::= { tlmMIB 1 }
+
+tlmTables OBJECT IDENTIFIER
+    ::= { tlmObjects 1 }
+
+tlmSubsystem OBJECT IDENTIFIER
+    ::= { tlmTables 1 }
+
+tlmSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportSubsystem MOC"
+    ::= { tlmSubsystem 1 }
+
+tlmSubsystemEntry OBJECT-TYPE
+    SYNTAX      TlmSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Transport subsystem managed object.  Managed object for 
+         transport layer subsystem.  There is exactly one of 
+         these MOs within a system.  It exists to provide 
+         a container for the layer entity MOs.
+         
+         The transportSubsystem managed object cannot be created 
+         or deleted explicitly by management operation.  It 
+         exists inherently in a system; created and deleted as 
+         part of system operation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportSubsystem MO"
+    INDEX       { tlmSubsystemId }
+    ::= { tlmSubsystemTable 1 }
+
+TlmSubsystemEntry ::= SEQUENCE {
+    tlmSubsystemId  SnmpAdminString
+}
+
+tlmSubsystemId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               subsystemId"
+    DEFVAL      { "TransportSubsystem" }
+    ::= { tlmSubsystemEntry 1 }
+
+tlmEntity OBJECT IDENTIFIER
+    ::= { tlmTables 2 }
+
+tlmEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportEntity MOC"
+    ::= { tlmEntity 1 }
+
+tlmEntityEntry OBJECT-TYPE
+    SYNTAX      TlmEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "There may be multiple instances of these MOs within 
+         a system.  Its definition permits it to be deleted and 
+         created explicitly by management operation, or to be 
+         created and deleted automatically as part of system 
+         operation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportEntity MO"
+    INDEX       { tlmEntityId }
+    ::= { tlmEntityTable 1 }
+
+TlmEntityEntry ::= SEQUENCE {
+    tlmEntityId                         SimpleNameType,
+    tlmEntityLocalSapNames              SnmpAdminString,
+    tlmEntityOperationalState           OperationalState,
+    tlmEntityActualNSAP                 RowPointer,
+    tlmEntityChecksumErrorsDetected     Counter64,
+    tlmEntityProtocolErrors             Counter64,
+    tlmEntityTargetNSAP                 RowPointer,
+    tlmEntityUndecodedNSDUs             Counter64,
+    tlmEntityRowStatus                  RowStatus
+}
+
+tlmEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a simple name for the communications entity as 
+         an index into the tlmEntityTable."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               communicationsEntityId"
+    ::= { tlmEntityEntry 1 }
+
+tlmEntityLocalSapNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a list of local SAP names provided by the 
+         transport entity."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               localSapNames"
+    ::= { tlmEntityEntry 2 }
+
+tlmEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the transport entity 
+         in accordance with X.721 and the OperationalState 
+         textual convention of the OPENSS7-SMI-MIB."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState"
+    ::= { tlmEntityEntry 3 }
+
+tlmEntityActualNSAP OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The actual MO name(s) of the NSAP(s) in use by this 
+         transport entity."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), actualNSAP"
+    ::= { tlmEntityEntry 4 }
+
+tlmEntityChecksumErrorsDetected OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of PDUs received by this transport entity 
+         with an incorrect checksum."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), checksumErrorsDetected"
+    ::= { tlmEntityEntry 5 }
+
+tlmEntityProtocolErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter associated to protocol errors."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), protocolErrors"
+    ::= { tlmEntityEntry 6 }
+
+tlmEntityTargetNSAP OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MO name(s) of the NSAP(s) to be used by this 
+         transport entity.  The value of this attribute cannot 
+         be changed unless the operational state of the entity 
+         is Off.  An implementation may permit it to be set only 
+         at creation of the transport entity MO.  An 
+         implementation may permit the size of the set to be 
+         restricted to 1.  An implementation may permit a null 
+         value (empty set) to be specified, in which case some 
+         system dependent autoconfiguration takes place."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), targetNSAP"
+    ::= { tlmEntityEntry 7 }
+
+tlmEntityUndecodedNSDUs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of (valid) NSDUs that cannot be attributed to 
+         any protocol machines."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), undecodedNSDUs"
+    ::= { tlmEntityEntry 8 }
+
+tlmEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations can 
+         create or delete conceptual rows in this table.  An 
+         implementation might not permit more than one row to be 
+         created.  Other implementations might not permit the 
+         last row to be deleted.  Not all implementations need 
+         support the addition or deletion of rows in this table.  
+         Rows in this table must persist across management 
+         system restart/reboot."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), 
+               transportEntity-transportSubsystem-Management 
+               NAME BINDING"
+    ::= { tlmEntityEntry 9 }
+
+tlmClModeTPM OBJECT IDENTIFIER
+    ::= { tlmTables 3 }
+
+tlmClModeTPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmClModeTPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): clmodeTPM MOC"
+    ::= { tlmClModeTPM 1 }
+
+tlmClModeTPMEntry OBJECT-TYPE
+    SYNTAX      TlmClModeTPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Connectionless-mode transport protocol machine managed 
+         object.  There is no more than one of these MOs per 
+         Transport Entity.  Its definition permits it to be 
+         created and deleted explicitly by management operation, 
+         but in some systems it will exist inherently and 
+         neither creation nor deletetion by management operation 
+         will be possible.  Name bindings are defined for both 
+         cases.
+         
+         When the protocol machine is operable, the 
+         operationalState shall have the value enabled(); 
+         otherwise, it shall have the value disabled().
+         
+         Transitions of operationalState shall be reported using 
+         the stateChange notification.  An clmodeTPM MO may be 
+         created in the enabled() operational state."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): clmodeTPM MOC"
+    INDEX       { tlmEntityId }
+    ::= { tlmClModeTPMTable 1 }
+
+TlmClModeTPMEntry ::= SEQUENCE {
+    tlmClModeTPMClProtocolMachineId     SnmpAdminString,
+    tlmClModeTPMOperationalState        OperationalState,
+    tlmClModeTPMAdministrativeState     AdministrativeState,
+    tlmClModeClChecksumOption           TruthValue,
+    tlmClModeTPMTotalRemoteSAPs         Counter64,
+    tlmClModeOctetsSentCounter          Counter64,
+    tlmClModeOctetsReceivedCounter      Counter64,
+    tlmClModePdusSentCounter            Counter64,
+    tlmClModePdusReceivedCounter        Counter64,
+    tlmClModeUndeliverablePDUsCounter   Counter64,
+    tlmClModeRowStatus                  RowStatus
+}
+
+tlmClModeTPMClProtocolMachineId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of this connectionless protocol 
+         machine.  Connectionless transport only has one 
+         connectionless protocol machine per transport entity 
+         and the name is always 'CLTPM'."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), clProtocolMachineId"
+    DEFVAL      { "CLTPM" }
+    ::= { tlmClModeTPMEntry 1 }
+
+tlmClModeTPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the connectionless 
+         transport protocol machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState"
+    ::= { tlmClModeTPMEntry 2 }
+
+tlmClModeTPMAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of the connectionless 
+         transport protocol machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState"
+    ::= { tlmClModeTPMEntry 3 }
+
+tlmClModeClChecksumOption OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables use of the checksum option in ITU-T Rec. X.234 
+         | ISO/IEC 8602 PDUs (in the absense of over-riding 
+         local controls)."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), clChecksumOption ATTRIBUTE"
+    ::= { tlmClModeTPMEntry 4 }
+
+tlmClModeTPMTotalRemoteSAPs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counts the number of remote (N) SAPs that the 
+         containing clProtocolMachine has communicated with.  
+         Incremented by 1 every time communication with a remote 
+         (N) SAP is achieved."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               totalRemoteSAPs ATTRIBUTE"
+    ::= { tlmClModeTPMEntry 5 }
+
+tlmClModeOctetsSentCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets sent by 
+         the connectionless transport protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsSentCounter"
+    ::= { tlmClModeTPMEntry 6 }
+
+tlmClModeOctetsReceivedCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets received 
+         by the connectionless transport protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsReceivedCounter"
+    ::= { tlmClModeTPMEntry 7 }
+
+tlmClModePdusSentCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of PDUs sent by the 
+         connectionless transport protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               pdusSentCounter"
+    ::= { tlmClModeTPMEntry 8 }
+
+tlmClModePdusReceivedCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of PDUs received by the 
+         connectionless transport protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               pdusReceivedCounter"
+    ::= { tlmClModeTPMEntry 9 }
+
+tlmClModeUndeliverablePDUsCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter associated with the notification as recommended 
+         in GDMO 9.8.5 (the notification may be suppressed)."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), undeliverablePDUsCounter"
+    ::= { tlmClModeTPMEntry 10 }
+
+tlmClModeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby managements stations can 
+         create and destroy conceptual rows in this table.  
+         Entries in this table must survive management system 
+         restart and reboot."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), 
+               clmodeTPM-transportEntity-Management NAME BINDING"
+    ::= { tlmClModeTPMEntry 11 }
+
+tlmCoModeTPM OBJECT IDENTIFIER
+    ::= { tlmTables 4 }
+
+tlmCoModeTPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmCoModeTPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): comodeTPM MOC"
+    ::= { tlmCoModeTPM 1 }
+
+tlmCoModeTPMEntry OBJECT-TYPE
+    SYNTAX      TlmCoModeTPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Connection-oriented transport protocol machine managed 
+         object.  Thre is no more than one of these MOs per 
+         Transport Entity.  Its definition permits it to be 
+         created and deleted expliclity by management operation, 
+         but in some systems it will exist inherently and 
+         neither creation nor deletion by management operation 
+         will be possible.  Name bindings are defined for both 
+         cases.
+         
+         When the protocol machine is operable, the 
+         operationalState shall have the value enabled(); 
+         otherwise, it shall have the value disabled().
+         
+         Transitions of operationalState shall be reported using 
+         stateChange notification.  A comodeTPM MO may be 
+         created in the enabled() operational state."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): comodeTPM MO"
+    INDEX       { tlmEntityId }
+    ::= { tlmCoModeTPMTable 1 }
+
+TlmCoModeTPMEntry ::= SEQUENCE {
+    tlmCoModeTPMCoProtocolMachineId             SnmpAdminString,
+    tlmCoModeTPMOperationalState                OperationalState,
+    tlmCoModeTPMAdministrativeState             AdministrativeState,
+    tlmCoModeTPMOctetsReceivedCounter           Counter64,
+    tlmCoModeTPMOctetsSentCounter               Counter64,
+    tlmCoModeTPMLocalErrorDisconnects           Counter64,
+    tlmCoModeTPMLocalSuccessfulConnections      Counter64,
+    tlmCoModeTPMLocalUnsuccessfulConnections    Counter64,
+    tlmCoModeTPMMaxConnections                  Integer32,
+    tlmCoModeTPMMaxOpenConnections              Gauge32,
+    tlmCoModeTPMOpenConnections                 Gauge32,
+    tlmCoModeTPMRemoteErrorDisconnects          Counter64,
+    tlmCoModeTPMRemoteSuccessfulConnections     Counter64,
+    tlmCoModeTPMRemoteUnsuccessfulConnections   Counter64,
+    tlmCoModeTPMUnassociatedTPDUs               Counter64,
+    tlmCoModeTPMRowStatus                       RowStatus
+}
+
+tlmCoModeTPMCoProtocolMachineId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the name of this connection-oriented protocol 
+         machine.  Connection-oriented transport only has one 
+         connection-oriented protocol machine per transport 
+         entity and the name is always 'COTPM'."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), coProtocolMachineId"
+    ::= { tlmCoModeTPMEntry 1 }
+
+tlmCoModeTPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the 
+         connection-oriented transport protocol machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState"
+    ::= { tlmCoModeTPMEntry 2 }
+
+tlmCoModeTPMAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the administrative state of the 
+         connection-oriented transport protocol machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState"
+    ::= { tlmCoModeTPMEntry 3 }
+
+tlmCoModeTPMOctetsReceivedCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets received 
+         by the connection-oriented transport protocol state 
+         machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsReceivedCounter"
+    ::= { tlmCoModeTPMEntry 4 }
+
+tlmCoModeTPMOctetsSentCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets sent by 
+         the connection-oriented transport protocol state 
+         machine."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsSentCounter"
+    ::= { tlmCoModeTPMEntry 5 }
+
+tlmCoModeTPMLocalErrorDisconnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transport disconnects initiated by the 
+         local entity upon issuing a DR TPDU with an error code 
+         other than 'Normal disconnect initiated by Service 
+         User', or upon issuing an ER TPDU."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), localErrorDisconnects"
+    ::= { tlmCoModeTPMEntry 6 }
+
+tlmCoModeTPMLocalSuccessfulConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of transport connections initiated by the local 
+         entity that have reached the Open state."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), localSuccessfulConnections"
+    ::= { tlmCoModeTPMEntry 7 }
+
+tlmCoModeTPMLocalUnsuccessfulConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of (local) unsuccessful transport 
+         connections initiated by the local Transport Entity 
+         that failed to reach the Open State.  (Retransmission 
+         of CR TPDUs is not included in this counter.)"
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), localUnsuccessfulConnections"
+    ::= { tlmCoModeTPMEntry 8 }
+
+tlmCoModeTPMMaxConnections OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of simultaneously open transport 
+         connections allowed by the Transport Entity.  There may 
+         be a period during which the openConnections attribute 
+         has a value that is greater than maxConnections.  
+         During this period, it shall not be permitted to 
+         initiated or accept new connections.  It is a local 
+         matter whether action is taken to reduce the number of 
+         open connections to a value less than or equal to 
+         maxConnections by terminating connections chosen in an 
+         implementation-dependent manner.  Whether or not such 
+         action is taken, there may be a period during which the 
+         openConnections attribute has a value which is greater 
+         than maxConnections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxConnections"
+    ::= { tlmCoModeTPMEntry 9 }
+
+tlmCoModeTPMMaxOpenConnections OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The highest number of simultaneously open transport 
+         connections that has occured since the last write 
+         operation.  The effect of this operation is to set the 
+         attribute to the number of currently open connections.  
+         Multiple managers need to coordinate their actions to 
+         avoid confusion."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxOpenConnections"
+    DEFVAL      { 0 }
+    ::= { tlmCoModeTPMEntry 10 }
+
+tlmCoModeTPMOpenConnections OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of transport connections that are in the 
+         Open state as defined in the state tables for ITU-T 
+         Rec. X.224 | ISO/IEC 8073.  Updated upon each 
+         connection establishment and release."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), openConnections"
+    ::= { tlmCoModeTPMEntry 11 }
+
+tlmCoModeTPMRemoteErrorDisconnects OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of disconnects initiated by a peer Transport 
+         Entity upon issuing a DR TPDU with an error code other 
+         than 'Normal disconnect initiated by Session Entity' or 
+         upon issuing an ER TPDU."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), remoteErrorDisconnects"
+    ::= { tlmCoModeTPMEntry 12 }
+
+tlmCoModeTPMRemoteSuccessfulConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of transport connections initiated by a remote 
+         entity that have reached the Open state."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), remoteSuccessfulConnections"
+    ::= { tlmCoModeTPMEntry 13 }
+
+tlmCoModeTPMRemoteUnsuccessfulConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of (remote) unsuccessful transport 
+         connections initiated by a remote Transport Entity that 
+         failed to reach the open state."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), remoteUnsuccessfulConnections"
+    ::= { tlmCoModeTPMEntry 14 }
+
+tlmCoModeTPMUnassociatedTPDUs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of TPDUs received that could not be 
+         associated with a Transport Connection.  This counter 
+         is incremented only for such TPDUs received over the 
+         CONS."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), unassociatedTPDUs"
+    ::= { tlmCoModeTPMEntry 15 }
+
+tlmCoModeTPMRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations can 
+         create and destroy conceptual rows in this table.  
+         Conceptual rows must survive management system restart 
+         and reboot."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), 
+               comodeTPM-transportEntity-Management NAME BINDING"
+    ::= { tlmCoModeTPMEntry 16 }
+
+tlmConnection OBJECT IDENTIFIER
+    ::= { tlmTables 5 }
+
+tlmConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportConnection MOC"
+    ::= { tlmConnection 1 }
+
+tlmConnectionEntry OBJECT-TYPE
+    SYNTAX      TlmConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Transport connection managed object: there may be 
+         multiple instances of these managed objects within 
+         a connection-oriented protocol machine.  Each 
+         corresponds to a transport connection.  
+         A transportConnection is created automatically as 
+         a part of system operation.  A transportConnection may 
+         be deleted automatically as part of system operation or 
+         may be deleted as a result of the deactivate management 
+         operation.  A transportConnectionIVMO may be used as 
+         the source of initial values of attributes of 
+         a transportConnection.
+         
+         This object contains the set of attributes 
+         characterizing the manageable aspects of a transport 
+         layer protocol connection.
+         
+         A MO of this class exists corresponding to each active 
+         transport connection, i.e. for which a CR TPDU has been 
+         sent or received and which has not yet been terminated.  
+         An MO may also exist prior to transmission of a CR 
+         TPDU, corresponding to interactions across the service 
+         interface.  The precise synchronization of the creation 
+         and deletion of the MO with the protocol exchanges 
+         corresponding to the transport connection is not, 
+         however, defined by the standard.  For example, there 
+         may be a visible delay after transmission or reception 
+         of a CR TPDU or interaction at the service interface 
+         before the MO is created and becomes visible to 
+         management.  A transport connection MO is not required 
+         for terminated connections whose references have been 
+         placed in the frozen state (for Class 4 operation), 
+         although according to the above, the MO may remain 
+         visible for some time after the connection has in other 
+         resp[ectes been terminated."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportConnection MO"
+    INDEX       { tlmEntityId, tlmConnectionId }
+    ::= { tlmConnectionTable 1 }
+
+TlmConnectionEntry ::= SEQUENCE {
+    tlmConnectionId                             SimpleNameType,
+    tlmConnectionUnderlyingConnectionNames      SnmpAdminString,
+    tlmConnectionSupportedConnectionNames       SnmpAdminString,
+    tlmConnectionOctetsReceivedCounter          Counter64,
+    tlmConnectionOctetsSentCounter              Counter64,
+    tlmConnectionPdusReceivedCounter            Counter64,
+    tlmConnectionPdusRetransmittedErrorCounter  Counter64,
+    tlmConnectionPdusSentCounter                Counter64,
+    tlmConnectionCalledNSAPAddress              NSAPAddress,
+    tlmConnectionCalledTSelector                TSelector,
+    tlmConnectionCallingNSAPAddress             NSAPAddress,
+    tlmConnectionCallingTSelector               TSelector,
+    tlmConnectionConnectionDirection            ConnectionDirection,
+    tlmConnectionLocalReference                 TReference,
+    tlmConnectionMaxTPDUSize                    Integer32,
+    tlmConnectionNetworkConnectionIDs           NetworkConnectionIDs,
+    tlmConnectionProtocolClass                  ProtocolClass,
+    tlmConnectionProtocolErrors                 Counter64,
+    tlmConnectionRemoteReference                TReference,
+    tlmConnectionRespondingNSAPAddress          NSAPAddress,
+-- transportConnectionClass1-P PACKAGE
+    tlmConnectionNetworkExpeditedData           TruthValue,
+    tlmConnectionReassignmentsAfterFailure      Counter64,
+    tlmConnectionReassignmentTime               MilliSeconds,
+    tlmConnectionReceiptConfirmation            TruthValue,
+    tlmConnectionTransportExpeditedService      TruthValue,
+-- transportConnectionClass2-P PACKAGE
+    tlmConnectionExtendedFormat                 TruthValue,
+    tlmConnectionExplicitFlowControl            TruthValue,
+--  tlmConnectionTransportExpeditedService      TruthValue,
+-- transportConnectionClass3-P PACKAGE
+--  tlmConnectionExtendedFormat                 TruthValue,
+--  tlmConnectionReassignmentTime               MilliSeconds,
+--  tlmConnectionReassignmentsAfterFailure      Counter64,
+--  tlmConnectionTransportExpeditedService      TruthValue,
+-- transportConnectionClass4-P PACKAGE
+    tlmConnectionAcknowledgeTime                MilliSeconds,
+    tlmConnectionChecksumNonuse                 TruthValue,
+--  tlmConnectionExtendedFormat                 TruthValue,
+    tlmConnectionInactivityTime                 MilliSeconds,
+    tlmConnectionMaxTransmissions               Integer32,
+    tlmConnectionRetransmissionTime             MilliSeconds,
+--  tlmConnectionTransportExpeditedService      TruthValue,
+    tlmConnectionWindowTimer                    MilliSeconds,
+-- transportConnectionNCMS-P PACKAGE
+    tlmConnectionRelatingNCCMONames             SnmpAdminString
+}
+
+tlmConnectionId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name or number of the connection."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               connectionId ATTRIBUTE"
+    ::= { tlmConnectionEntry 1 }
+
+tlmConnectionUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the distinguished names of 
+         managed objects that represent connections that are 
+         employed by the connection that has this attribute."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               underlyingConnectionNames ATTRIBUTE"
+    ::= { tlmConnectionEntry 2 }
+
+tlmConnectionSupportedConnectionNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the distinguished names of 
+         managed objects that represent connections that are 
+         supported by the connection that has this attribute."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               supportedConnectionNames ATTRIBUTE"
+    ::= { tlmConnectionEntry 3 }
+
+tlmConnectionOctetsReceivedCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets received 
+         by the transport connection."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsReceivedCounter"
+    ::= { tlmConnectionEntry 4 }
+
+tlmConnectionOctetsSentCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of user data octets sent by 
+         the transport connection."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               octetsSentCounter"
+    ::= { tlmConnectionEntry 5 }
+
+tlmConnectionPdusReceivedCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of PDUs received by the 
+         transport connection."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               pdusReceivedCounter"
+    ::= { tlmConnectionEntry 6 }
+
+tlmConnectionPdusRetransmittedErrorCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of PDUs retransmitted by the 
+         transport connection."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               pdusRetransmittedErrorCounter"
+    ::= { tlmConnectionEntry 7 }
+
+tlmConnectionPdusSentCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the total number of PDUs sent by the 
+         transport connection."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               pdusSentCounter"
+    ::= { tlmConnectionEntry 8 }
+
+tlmConnectionCalledNSAPAddress OBJECT-TYPE
+    SYNTAX      NSAPAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The called NSAP address received at the network service 
+         interface at NS, or with the N-Unitdata indication that 
+         conveyed the CR TPDU when operating over the CLNS."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), calledNSAPAddress"
+    ::= { tlmConnectionEntry 9 }
+
+tlmConnectionCalledTSelector OBJECT-TYPE
+    SYNTAX      TSelector
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 'Called TSAP Identifier' specified at connection 
+         establishment."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), calledTSelector"
+    ::= { tlmConnectionEntry 10 }
+
+tlmConnectionCallingNSAPAddress OBJECT-TYPE
+    SYNTAX      NSAPAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The calling NSAP address specified at the network 
+         service interface at N-connection establishment when 
+         operating over the CONS, or for each N-Unitdata.request 
+         interaction when operating over the CLNS."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), callingNSAPAddress"
+    ::= { tlmConnectionEntry 11 }
+
+tlmConnectionCallingTSelector OBJECT-TYPE
+    SYNTAX      TSelector
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 'Calling TSAP Identifier' specified at connection 
+         establishment."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), callingTSelector"
+    ::= { tlmConnectionEntry 12 }
+
+tlmConnectionConnectionDirection OBJECT-TYPE
+    SYNTAX      ConnectionDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the direction of the connection.  The value 
+         incoming(0) means that it was initiated by the remote 
+         transport entity, the value of outgoing(1) means that 
+         it was initiated by the local transport entity."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), connectionDirection"
+    ::= { tlmConnectionEntry 13 }
+
+tlmConnectionLocalReference OBJECT-TYPE
+    SYNTAX      TReference
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The local reference number (as defined in ITU-T Rec. 
+         X.224 | ISO/IEC 8073) in use for the connection."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), localReference"
+    ::= { tlmConnectionEntry 14 }
+
+tlmConnectionMaxTPDUSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum TPDU size negotiated for the connection.  
+         Implementation constraints or policies, or relating to 
+         the remote NSAP or transport entity, may cause 
+         a smaller value to be used as an initial value for 
+         negotiation.  During connection establishment, this 
+         attribute represents the desired value and not 
+         necessarily the value that will ultimately be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxTPDUSize"
+    ::= { tlmConnectionEntry 15 }
+
+tlmConnectionNetworkConnectionIDs OBJECT-TYPE
+    SYNTAX      NetworkConnectionIDs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The network connections that support the transport 
+         connection.  If the TC is running over the CLNS, this 
+         attribute has the value of the empty set."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), networkConnectionIDs"
+    ::= { tlmConnectionEntry 16 }
+
+tlmConnectionProtocolClass OBJECT-TYPE
+    SYNTAX      ProtocolClass
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The protocol class in use on the connection, as 
+         negotiated during connection establishment.  During 
+         connection establishment (before the connection reaches 
+         the OPEN state) this indicates what is currently 
+         preferred and not necessarily the ultimate class that 
+         will be used for the connection."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), protocolClass"
+    ::= { tlmConnectionEntry 17 }
+
+tlmConnectionProtocolErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter associated to protocol errors."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), protocolErrors"
+    ::= { tlmConnectionEntry 18 }
+
+tlmConnectionRemoteReference OBJECT-TYPE
+    SYNTAX      TReference
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The remote reference number (as deifned in ITU-T Rec. 
+         X.224 | ISO/IEC 8073) in use for the connection."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), remoteReference"
+    ::= { tlmConnectionEntry 19 }
+
+tlmConnectionRespondingNSAPAddress OBJECT-TYPE
+    SYNTAX      NSAPAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The responding NSAP address received at network service 
+         interface at N-connection establishment.  The value of 
+         this attribute is only meaningful when operating over 
+         the CONS, and when the N-connection was initiated by 
+         Transport Entity.  Otherwise, the value is not 
+         meaningful and no constraints are applied to the value."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), respondingNSAPAddress"
+    ::= { tlmConnectionEntry 20 }
+
+-- transportConnectionClass1-P PACKAGE
+tlmConnectionNetworkExpeditedData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates (for Class 1 only) whether Network Expedited 
+         Data is in use, true(1), or not, false(2).  For 
+         connections not using Class 1, the value will always be 
+         false(2).  During connection establishment, this 
+         attribute represents the desired value and not 
+         necessarily the value that will ultimately be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), networkExpeditedData"
+    ::= { tlmConnectionEntry 21 }
+
+tlmConnectionReassignmentsAfterFailure OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of times the transport connection has been 
+         reassigned to a network connection.  For connections 
+         not using Class 1 or 3, this attribute will always be 
+         zero (0)."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), reassignmentsAfterFailure"
+    ::= { tlmConnectionEntry 22 }
+
+tlmConnectionReassignmentTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of the Reassignment Time (as defined in ITU-T 
+         Rec. X.224 | ISO/IEC 8073) to be conveyed or 
+         established during connection establishment.  This is 
+         only applicable to protocol classes 1 and 3.  Unit in 
+         ITU-T Rec. X.284 is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), reassignmentTime"
+    ::= { tlmConnectionEntry 23 }
+
+tlmConnectionReceiptConfirmation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether use of network receipt confirmation 
+         has been selected for the connection, true(1), or not, 
+         false(2).  For connections not using Class 1 of the 
+         protocol, this attribute has the value false(2)."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), receiptConfirmation"
+    ::= { tlmConnectionEntry 24 }
+
+tlmConnectionTransportExpeditedService OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the Transport Expedite Service is 
+         provided, true(1), or not false(2)."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportExpeditedService"
+    ::= { tlmConnectionEntry 25 }
+
+-- transportConnectionClass2-P PACKAGE
+tlmConnectionExtendedFormat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of extended TPDU 
+         format.  Indicates whether extended TPDU format is in 
+         use, true(1), or not, false(2).  For connections using 
+         Class 1 of the protocol, this attribute will be 
+         false(2).  During connection establishment, this 
+         attribute represents the desired value and not 
+         necessarily the value that will ultimately be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), extendedFormat"
+    ::= { tlmConnectionEntry 26 }
+
+tlmConnectionExplicitFlowControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of explicit Flow 
+         Control.  Indicates whether non-use of explicit flow 
+         control has been selected for the connection, true(1), 
+         or not false(2).  For connections not using Class 2 of 
+         the protocol, this attribute has the value false(2).  
+         During connection establishment, this attribute 
+         represents the desired value and not necessarily the 
+         value that will ultimately be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), explicitFlowControl"
+    ::= { tlmConnectionEntry 27 }
+
+--  tlmConnectionTransportExpeditedService      TruthValue
+-- transportConnectionClass3-P PACKAGE
+--  tlmConnectionExtendedFormat                 TruthValue
+--  tlmConnectionReassignmentTime               MilliSeconds
+--  tlmConnectionReassignmentsAfterFailure      Counter64
+--  tlmConnectionTransportExpeditedService      TruthValue
+-- transportConnectionClass4-P PACKAGE
+tlmConnectionAcknowledgeTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of the local Acknowledge Timer (as defined in 
+         ITU-T Rec. X.224 | ISO/IEC 8073) in use for the 
+         connection.  For connections not using Class 4 of the 
+         protocol, this attribute has an undefined value.  ITU-T 
+         Rec. X.284 unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), acknowledgeTime"
+    ::= { tlmConnectionEntry 28 }
+
+tlmConnectionChecksumNonuse OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether checksum non-use has been selected 
+         for the connection, true(1), or not, false(2).  For 
+         connections not using Class 4 of the protocol, this 
+         attribute has the value false(2).  During connection 
+         esatablishment, this attribute represents the desired 
+         value and not necessarily the value that will 
+         ultimately be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), checksumNonuse"
+    ::= { tlmConnectionEntry 29 }
+
+--  tlmConnectionExtendedFormat                 TruthValue
+tlmConnectionInactivityTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of inactivity time (as defined in ITU-T Rec. 
+         X.224 | ISO/IEC 8073) in use for the connection.  For 
+         connections not using Class 4 of the protocol, this 
+         attribute has an undefined value.  ITU-T Rec. X.284 
+         unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), inactivityTime"
+    ::= { tlmConnectionEntry 30 }
+
+tlmConnectionMaxTransmissions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of transmissions as defined (for 
+         Class 4 only) as the parameter N in ITU-T Rec. X.224 
+         | ISO/IEC 8073.  For connections not using Class 4 of 
+         the protocol, this attribute has an undefined value."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxTransmissions"
+    ::= { tlmConnectionEntry 31 }
+
+tlmConnectionRetransmissionTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current value for the Local 
+         Retransmission Time (as defined in ITU-T Rec. X.224 
+         | ISO/IEC 8073).  Another value may be adopted 
+         initially based on knowledge concerning the remote 
+         system.  The current value may change during the 
+         lifetime of the connection, based on observations of 
+         traffic on the connection or other information 
+         concerning the remote Transport Entity.  The value of 
+         this attribute is used in the absence of other 
+         information.  For connections not using Class 4 of the 
+         protocol, this attribute has an undefined value.  ITU-T 
+         Rec. X.284 unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), retransmissionTime"
+    ::= { tlmConnectionEntry 32 }
+
+--  tlmConnectionTransportExpeditedService      TruthValue
+tlmConnectionWindowTimer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of Window Timer as defined in ITU-T Rec. X.224 
+         | ISO/IEC 8073.  The value of this attribute is 
+         meaningful only for connections using Class 4 of the 
+         protocol.  For other connections no constraint is 
+         placed on the value to be returned.  ITU-T Rec. X.284 
+         unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), windowTimer"
+    ::= { tlmConnectionEntry 33 }
+
+-- transportConnectionNCMS-P PACKAGE
+tlmConnectionRelatingNCCMONames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the tlmNccTable rows (list of tlmNccId's) 
+         that are associated with this connection.  Only used 
+         when NCMS is implemented, otherwise a null string is 
+         returned."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), relatingNCCMONames"
+    ::= { tlmConnectionEntry 34 }
+
+tlmConnectionIVMO OBJECT IDENTIFIER
+    ::= { tlmTables 6 }
+
+tlmConnectionIVMOTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmConnectionIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportConnectionIVMO MOC"
+    ::= { tlmConnectionIVMO 1 }
+
+tlmConnectionIVMOEntry OBJECT-TYPE
+    SYNTAX      TlmConnectionIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Transport connection initial value managed object.  
+         There may be multiple instances of the 
+         transportConnectionIVMO in a system.  
+         A transportConnectionIVMO may be used to supply initial 
+         values for the attributes of automatically created 
+         transportConnection MOs.
+         
+         The values supplied in an IVMO may be overridden by 
+         values supplied by an implementation-specific manner 
+         across the service interface.
+         
+         Its definition permits it to be created and deleted 
+         explicitly by management operation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportConnectionIVMO MO"
+    INDEX       { tlmConnectionIVMOId }
+    ::= { tlmConnectionIVMOTable 1 }
+
+TlmConnectionIVMOEntry ::= SEQUENCE {
+    tlmConnectionIVMOId                             SimpleNameType,
+    tlmConnectionIVMOProtocolClasses                ProtocolClasses,
+    tlmConnectionIVMOMaxTPDUSize                    Integer32,
+-- transportConnectionIVMOClass1-P PACKAGE
+    tlmConnectionIVMONetworkExpeditedData           TruthValue,
+    tlmConnectionIVMOReceiptConfirmation            TruthValue,
+    tlmConnectionIVMOReassignmentTime1              MilliSeconds,
+    tlmConnectionIVMOTransportExpeditedService1     TruthValue,
+-- transportConnectionIVMOClass2-P PACKAGE
+    tlmConnectionIVMOExplicitFlowControl            TruthValue,
+    tlmConnectionIVMOExtendedFormat2                TruthValue,
+    tlmConnectionIVMOMaximumWindow2                 Integer32,
+    tlmConnectionIVMOTransportExpeditedService2     TruthValue,
+-- transportConnectionIVMOClass3-P PACKAGE
+    tlmConnectionIVMOExtendedFormat3                TruthValue,
+    tlmConnectionIVMOReassignmentTime3              MilliSeconds,
+    tlmConnectionIVMOMaximumWindow3                 Integer32,
+    tlmConnectionIVMOTransportExpeditedService3     TruthValue,
+-- transportConnectionIVMOClass4-P PACKAGE
+    tlmConnectionIVMOChecksumNonuse                 TruthValue,
+    tlmConnectionIVMOExtendedFormat4                TruthValue,
+    tlmConnectionIVMOInactivityTime                 MilliSeconds,
+    tlmConnectionIVMOMaxTransmissions               Integer32,
+    tlmConnectionIVMORetransmissionTime             MilliSeconds,
+    tlmConnectionIVMOWindowTimer                    MilliSeconds,
+    tlmConnectionIVMOMaximumWindow4                 Integer32,
+    tlmConnectionIVMOTransportExpeditedService4     TruthValue,
+    tlmConnectionIVMORowStatus                      RowStatus
+}
+
+tlmConnectionIVMOId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Name for this instance of initial values applicable to 
+         automatic creation of transport connections.  There is 
+         always a row named 'Default'."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportConnectionIVMOId"
+    DEFVAL      { "Default" }
+    ::= { tlmConnectionIVMOEntry 1 }
+
+tlmConnectionIVMOProtocolClasses OBJECT-TYPE
+    SYNTAX      ProtocolClasses
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The preferred/alternate set of protocol classes that 
+         may be stated at connection establishment.  The default 
+         value is implementation-dependent, but must be 
+         consistent with the class negotiation rules of ITU-T 
+         Rec. X.224 | ISO/IEC 8073."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), protocolClasses"
+    DEFVAL      { {class0, class1, class2, class3, class4} }
+    ::= { tlmConnectionIVMOEntry 2 }
+
+tlmConnectionIVMOMaxTPDUSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum TPDU size negotiated for the connection.  
+         Implementation constraints or policies, or relating to 
+         the remote NSAP or transport entity, may cause 
+         a smaller value to be used as an initial vlaue for 
+         negotiation.  During connection establishment, this 
+         attribute represents the desired value and not 
+         necessarily the value that will ultimatedly be used."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxTPDUSize"
+    DEFVAL      { 1024 }
+    ::= { tlmConnectionIVMOEntry 3 }
+
+-- transportConnectionIVMOClass1-P PACKAGE
+tlmConnectionIVMONetworkExpeditedData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of Network Expedited 
+         Data.  Enables the negotiation of use or non-use of 
+         Network Expedited Data (for Class 1 only) during 
+         transport connection establishment.  true(1) enables 
+         use of Network Expedited Data, false(2) disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), networkExpeditedData"
+    DEFVAL      { false }
+    ::= { tlmConnectionIVMOEntry 4 }
+
+tlmConnectionIVMOReceiptConfirmation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of receipt 
+         confirmation.  Enables negotiation of use of network 
+         receipt confirmation (Class 1 only) during transport 
+         connection establishment.  true(1) enables use, 
+         false(2) enables non-use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), receiptConfirmation"
+    DEFVAL      { false }
+    ::= { tlmConnectionIVMOEntry 5 }
+
+tlmConnectionIVMOReassignmentTime1 OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the Reassignment Time (as defined in ITU-T 
+         Rec. X.224 | ISO/IEC 8073) to be conveyed or 
+         established during connection establishment.  This 
+         value applies only to protocol Class 1 connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), reassignmentTime"
+    ::= { tlmConnectionIVMOEntry 6 }
+
+tlmConnectionIVMOTransportExpeditedService1 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether Transport Expedited Service is 
+         provided, true(1), or not, false(1), for protocol Class 
+         1 transport connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportExpeditedService"
+    DEFVAL      { true }
+    ::= { tlmConnectionIVMOEntry 7 }
+
+-- transportConnectionIVMOClass2-P PACKAGE
+tlmConnectionIVMOExplicitFlowControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of explicit Flow 
+         Control.  Enables negotiation of non-use of explicit 
+         flow control (Class 2 only) during connection 
+         establishment.  true(1) enables non-use, false(2) 
+         disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), explicitFlowControl"
+    ::= { tlmConnectionIVMOEntry 8 }
+
+tlmConnectionIVMOExtendedFormat2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of extended TPDU 
+         format.  Enables negotiation of extended TPDU format 
+         (for protocol Class 2) during transport connection 
+         establishment.  true(1) enables use of extended format, 
+         false(2) disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), extendedFormat"
+    ::= { tlmConnectionIVMOEntry 9 }
+
+tlmConnectionIVMOMaximumWindow2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum window permitted to be given on the 
+         connection at any time.  Buffering or other 
+         implementation constraints or policies may cause 
+         a smaller value to be used.  This value applies only to 
+         protocol Class 2 connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maximumWindow"
+    ::= { tlmConnectionIVMOEntry 10 }
+
+tlmConnectionIVMOTransportExpeditedService2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether Transport Expedited Service is 
+         provided, true(1), or not, false(1), for protocol Class 
+         2 transport connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportExpeditedService"
+    DEFVAL      { true }
+    ::= { tlmConnectionIVMOEntry 11 }
+
+-- transportConnectionIVMOClass3-P PACKAGE
+tlmConnectionIVMOExtendedFormat3 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of extended TPDU 
+         format.  Enables negotiation of extended TPDU format 
+         (for protocol Class 3) during transport connection 
+         establishment.  true(1) enables use of extended format, 
+         false(2) disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), extendedFormat"
+    ::= { tlmConnectionIVMOEntry 12 }
+
+tlmConnectionIVMOReassignmentTime3 OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the Reassignment Time (as defined in ITU-T 
+         Rec. X.224 | ISO/IEC 8073) to be conveyed or 
+         established during connection establishment.  This 
+         value applies only to protocol Class 3 connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), reassignmentTime"
+    ::= { tlmConnectionIVMOEntry 13 }
+
+tlmConnectionIVMOMaximumWindow3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum window permitted to be given on the 
+         connection at any time.  Buffering or other 
+         implementation constraints or policies may cause 
+         a smaller value to be used.  This value applies only to 
+         protocol Class 3 connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maximumWindow"
+    ::= { tlmConnectionIVMOEntry 14 }
+
+tlmConnectionIVMOTransportExpeditedService3 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether Transport Expedited Service is 
+         provided, true(1), or not, false(1), for protocol Class 
+         3 transport connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportExpeditedService"
+    ::= { tlmConnectionIVMOEntry 15 }
+
+-- transportConnectionIVMOClass4-P PACKAGE
+tlmConnectionIVMOChecksumNonuse OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates non-use of checksum.  
+         Enables negotiation of checksum non-use (Class 4 only) 
+         during connection establishment.  true(1) enables 
+         non-use, false(2) disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), checksumNonuse"
+    ::= { tlmConnectionIVMOEntry 16 }
+
+tlmConnectionIVMOExtendedFormat4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enables negotiation/indicates use of extended TPDU 
+         format.  Enables negotiation of extended TPDU format 
+         (for protocol Class 4) during transport connection 
+         establishment.  true(1) enables use of extended format, 
+         false(2) disables it."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), extendedFormat"
+    ::= { tlmConnectionIVMOEntry 17 }
+
+tlmConnectionIVMOInactivityTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the inactivity time (as defined in ITU-T Rec. 
+         X.224 | ISO/IEC 8073) in use for the connection.  ITU-T 
+         Rec. X.284 unit is in seconds.  This value is 
+         applicable to Class 4 only."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), inactivityTime"
+    ::= { tlmConnectionIVMOEntry 18 }
+
+tlmConnectionIVMOMaxTransmissions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of transmissions as defined (for 
+         Class 4 only) as the parameter N in ITU-T Rec. X.224 
+         | ISO/IEC 8073."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maxTransmissions"
+    ::= { tlmConnectionIVMOEntry 19 }
+
+tlmConnectionIVMORetransmissionTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Initial or current value for the Local Retransmission 
+         Time as defined  (for Class 4 only) in ITU-T Rec. X.224 
+         | ISO/IEC 8073.  Another value may be adopted initially 
+         based on knowledge concerning the remote system.  The 
+         current value may change during the lifetime of the 
+         connection, based on observations of traffic on the 
+         connection or other information concerning the remote 
+         Transport Entity.  The value of this attribute is used 
+         in the absence of other information.  ITU-T Rec. X.284 
+         unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), retransmissionTime"
+    ::= { tlmConnectionIVMOEntry 20 }
+
+tlmConnectionIVMOWindowTimer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of Window Timer as defined in ITU-T Rec. X.224 
+         | ISO/IEC 8073.  The value of this attribute is 
+         meaningful only for connections using Class 4 of the 
+         protocol.  For other connections no constraint is 
+         placed on the value to be returned.  ITU-T Rec. X.284 
+         unit is in seconds."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), windowTimer"
+    ::= { tlmConnectionIVMOEntry 21 }
+
+tlmConnectionIVMOMaximumWindow4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum window permitted to be given on the 
+         connection at any time.  Buffering or other 
+         implementation constraints or policies may cause 
+         a smaller value to be used.  This value applies only to 
+         protocol Class 4 connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), maximumWindow"
+    ::= { tlmConnectionIVMOEntry 22 }
+
+tlmConnectionIVMOTransportExpeditedService4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether Transport Expedited Service is 
+         provided, true(1), or not, false(1), for protocol Class 
+         4 transport connections."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), transportExpeditedService"
+    ::= { tlmConnectionIVMOEntry 23 }
+
+tlmConnectionIVMORowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and destroy rows in this table.  The default row 
+         named 'Default' is always present and cannot be 
+         deleted.  Rows must persist across management system 
+         restart/reboots."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), 
+               transportConnectionIVMO-comodeTPM NAME BINDING"
+    ::= { tlmConnectionIVMOEntry 24 }
+
+tlmTSAP OBJECT IDENTIFIER
+    ::= { tlmTables 7 }
+
+tlmTSAPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmTSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "TSAP managed object class."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): tSAP MOC"
+    ::= { tlmTSAP 1 }
+
+tlmTSAPEntry OBJECT-TYPE
+    SYNTAX      TlmTSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "TSAP managed object: there is one tSAP MO for each TSAP 
+         currently recognized by the containing Transport 
+         Entity.  Its definition permits it to be created and 
+         deleted by Management operation or to be created and 
+         deleted automatically as part of system operation.  
+         Some implementations may required TSAP MOs to be 
+         created explicitly through management before they can 
+         be used.  Others may create them automatically when 
+         a user entity attaches itself to them (in some 
+         implementation-dependent fashion).  In this case, it is 
+         recommended that the naming convention be used whereby 
+         the name of the Managed Object is the representation in 
+         hexadecimal of the Transport Selector of the TSAP, so 
+         that it is possible to configure Transport Users 
+         without system specific knowledge."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): tSAP MO"
+    INDEX       { tlmTSAPSapId }
+    ::= { tlmTSAPTable 1 }
+
+TlmTSAPEntry ::= SEQUENCE {
+    tlmTSAPSapId            SimpleNameType,
+    tlmTSAPSap1Address      Integer32,
+    tlmTSAPUserEntityNames  SnmpAdminString,
+    tlmTSAPRowStatus        RowStatus
+}
+
+tlmTSAPSapId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "If the object is created automatically, it is 
+         recommended that the naming convention be used whereby 
+         the name of the MO is the representation in Hexadecimal 
+         of the Transport Selector of the TSAP.  If the package 
+         is created by a management station, the initial value 
+         shall be specified during creation."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, sapId 
+               ATTRIBUTE"
+    ::= { tlmTSAPEntry 1 }
+
+tlmTSAPSap1Address OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If the object is created automatically, it is 
+         recommended that the naming convention be used whereby 
+         the name of the MO is the representation in Hexadecimal 
+         of the Transport Selector of the TSAP.  If the package 
+         is created by a management station, the initial value 
+         shall be specified during creation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), tSAPAddress ATTRIBUTE"
+    ::= { tlmTSAPEntry 2 }
+
+tlmTSAPUserEntityNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This should really be a side-table..."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               userEntityNames ATTRIBUTE"
+    ::= { tlmTSAPEntry 3 }
+
+tlmTSAPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This Name Binding corresponds to the use of TSAPs that 
+         are explicitly created by management.  The value of the 
+         tsapID attribute shall be included int he Create 
+         operation, otherwise the create operation will fail."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997), 
+               tSAP-transportEntity-Management NAME BINDING"
+    ::= { tlmTSAPEntry 4 }
+
+tlmNcmsPM OBJECT IDENTIFIER
+    ::= { tlmTables 8 }
+
+tlmNcmsPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmNcmsPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This managed object class represents the part of 
+         transport entity that perform the NCMS protocol.  Only 
+         one instance of this managed object class max exist 
+         within a TEMO instance."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncmsPM MOC"
+    ::= { tlmNcmsPM 1 }
+
+tlmNcmsPMEntry OBJECT-TYPE
+    SYNTAX      TlmNcmsPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncmsPM MO"
+    INDEX       { tlmEntityId }
+    ::= { tlmNcmsPMTable 1 }
+
+TlmNcmsPMEntry ::= SEQUENCE {
+    tlmNcmsPMId                     SimpleNameType,
+    tlmNcmsPMAdministrativeState    AdministrativeState,
+    tlmNcmsPMOperationalState       OperationalState,
+    tlmNcsmPmRowStatus              RowStatus
+}
+
+tlmNcmsPMId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that is used in naming instances of the 
+         ncsm Protocol Machine managed object class."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncmsPM.ncmsPMId ATTRIBUTE"
+    ::= { tlmNcmsPMEntry 1 }
+
+tlmNcmsPMAdministrativeState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncmsPM.administrativeState ATTRIBUTE"
+    ::= { tlmNcmsPMEntry 2 }
+
+tlmNcmsPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncmsPM.operationalState ATTRIBUTE"
+    ::= { tlmNcmsPMEntry 3 }
+
+tlmNcsmPmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name binding that applies when the ncmsPM managed 
+         object is explicitly created by management, or that 
+         applies when the ncmsPM managed object can not be 
+         explicitly created by management."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): 
+               ncmsPM-transportEntity-Management NAME BINDING"
+    ::= { tlmNcmsPMEntry 4 }
+
+tlmNcc OBJECT IDENTIFIER
+    ::= { tlmTables 9 }
+
+tlmNccTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlmNccEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This msnaged object class represents the management 
+         apsect of the information needed to control the network 
+         connections by NCMS.  Multiple instances of this 
+         managed object class may exist within a NCMSPM MO 
+         instance.  This MO is created and deleted as a result 
+         of NCMS operation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncc MOC"
+    ::= { tlmNcc 1 }
+
+tlmNccEntry OBJECT-TYPE
+    SYNTAX      TlmNccEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This managed object class represents the management 
+         apsect of the information needed to control the network 
+         connections by NCMS.  Multiple instances of this 
+         managed object class may exist within a NCMSPM MO 
+         instance.  This MO is created and deleted as a result 
+         of NCMS operation."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncc MO"
+    INDEX       { tlmNcmsPMId }
+    ::= { tlmNccTable 1 }
+
+TlmNccEntry ::= SEQUENCE {
+    tlmNccId                            SimpleNameType,
+    tlmNccNcCOL                         NCCOL,
+    tlmNccNcREC                         NCREC,
+    tlmNccNcREF                         NCREF,
+    tlmNccNcPREF                        NCPREF,
+    tlmNccNcRight                       NCRight,
+    tlmNccNcRecoveries                  Counter64,
+    tlmNccTtrNcTime                     MilliSeconds,
+    tlmNccTpdNcTime                     MilliSeconds,
+    tlmNccTfrNcTime                     MilliSeconds,
+    tlmNccSourceOfAllocation            SourceOfAllocation,
+    tlmNccUnderlyingConnectionNames     SnmpAdminString
+}
+
+tlmNccId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that is used in naming instances of the 
+         network connection control managed object class."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nccId ATTRIBUTE"
+    ::= { tlmNccEntry 1 }
+
+tlmNccNcCOL OBJECT-TYPE
+    SYNTAX      NCCOL
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the collision algorithm as 
+         defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 8073.  
+         Indicates the collision algorithm in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nc-COL ATTRIBUTE"
+    ::= { tlmNccEntry 2 }
+
+tlmNccNcREC OBJECT-TYPE
+    SYNTAX      NCREC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the recovery optimization 
+         option as defined in Annex B of ITU-T Rec. X.224 
+         | ISO/IEC 8073.  Indicates the recovery optimization 
+         option in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nc-REC ATTRIBUTE"
+    ::= { tlmNccEntry 3 }
+
+tlmNccNcREF OBJECT-TYPE
+    SYNTAX      NCREF
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the nc-reference as 
+         defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 8073."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nc-REF ATTRIBUTE"
+    ::= { tlmNccEntry 4 }
+
+tlmNccNcPREF OBJECT-TYPE
+    SYNTAX      NCPREF
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the preference the 
+         initiator has to keep the network connection as defined 
+         in Annex B or ITU-T Rec. X.224 | ISO/IEC 8073.  
+         Indicates the preference in use."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nc-PREF ATTRIBUTE"
+    ::= { tlmNccEntry 5 }
+
+tlmNccNcRight OBJECT-TYPE
+    SYNTAX      NCRight
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the type of right of use 
+         as defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 
+         8073.  Indicates the type of right of use in use.
+         
+         my-side(0), 
+            the local transport entity has assignment right;
+         
+         remote-side(1),
+            the remote transport entity has assignment right;
+         
+         both-sides(3),
+            all transport entities have assignment right."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): nc-Right ATTRIBUTE"
+    ::= { tlmNccEntry 6 }
+
+tlmNccNcRecoveries OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the total number of 
+         network connection successful recoveries."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ncRecoveries ATTRIBUTE"
+    ::= { tlmNccEntry 7 }
+
+tlmNccTtrNcTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of the TTR-NC timer as defined in Annex B of 
+         ITU-T Rec. X.224 | ISO/IEC 8073.  The time to try to 
+         repopen a network connection using a given NC-REF."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): ttrNCTime ATTRIBUTE"
+    ::= { tlmNccEntry 8 }
+
+tlmNccTpdNcTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of the TPD-NC timer as defined in Annex B of 
+         ITU-T Rec. X.224 | ISO/IEC 8073.  The time to consider 
+         a given NC-REF as pending."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): tpdNCTime ATTRIBUTE"
+    ::= { tlmNccEntry 9 }
+
+tlmNccTfrNcTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of the TFR-NC timer as defined in Annex B of 
+         ITU-T Rec. X.224 | ISO/IEC 8073.  The time to consider 
+         a given NC-REF as as frozen."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): tfrNCTime ATTRIBUTE"
+    ::= { tlmNccEntry 10 }
+
+tlmNccSourceOfAllocation OBJECT-TYPE
+    SYNTAX      SourceOfAllocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The attribute that indicates the transport entity that 
+         established the network connection at the first time 
+         during the life time of an NC reference."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): sourceOfAllocation ATTRIBUTE"
+    ::= { tlmNccEntry 11 }
+
+tlmNccUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The underlying connection names of the network 
+         connection.  This identifies the network protocol 
+         module that provides this network connection."
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): GMI:underlyingConnectionNames ATTRIBUTE"
+    ::= { tlmNccEntry 12 }
+
+tlmNccIVMO OBJECT IDENTIFIER
+    ::= { tlmTables 10 }
+
+tlmScalars OBJECT IDENTIFIER
+    ::= { tlmObjects 2 }
+
+tlmNotifs OBJECT IDENTIFIER
+    ::= { tlmObjects 3 }
+
+tlmOids OBJECT IDENTIFIER
+    ::= { tlmObjects 4 }
+
+successfulConnectionEstablishment OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): 
+               TLM.successfulConnectionEstablishment"
+    ::= { tlmOids 1 }
+    -- { joint-iso-ccitt(2) transport-layer(14) management(0) 
+    --   standardSpecificExtension(0) informationtype(4) 
+    --   successfulConnectionEstablishment(1) }
+
+incomingConnectionRejectedType OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.284 (1997): 
+               TLM.incomingConnectionRejectedType"
+    ::= { tlmOids 2 }
+    -- { joint-iso-ccitt(2) transport-layer(14) management(0) 
+    --   standardSpecificExtension(0) informationtype(4) 
+    --   incomingConnectionRejectedType(1) }
+
+tlmConformance OBJECT IDENTIFIER
+    ::= { tlmMIB 2 }
+
+tlmCompliances OBJECT IDENTIFIER
+    ::= { tlmConformance 1 }
+
+tlmGroups OBJECT IDENTIFIER
+    ::= { tlmConformance 2 }
+
+END -- end of module OPENSS7-TLM-MIB.
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
