@@ -79,7 +79,7 @@ cLNS-MIB MODULE-IDENTITY
         "Brian Bidulock
          OpenSS7 Corporation
          1469 Jefferys Crescent
-         Edmonton, ALberta T6L 6T1
+         Edmonton, Alberta T6L 6T1
          CANADA
          Tel: +1 780 490 1141
          Fax: +1 780 490 1241
@@ -88,13 +88,14 @@ cLNS-MIB MODULE-IDENTITY
     DESCRIPTION 
         "This MIB provides configuration and status information 
          of an OSI CLNS subsystem, where the CLNS is in 
-         accordance with ITU-T Rec. X.233 | ISO/IEC 8473-1, 
-         ISO/IEC 8473-2, ITU-T Rec. X.622 | ISO/IEC 8473-3, 
-         ITU-T Rec. X.623 | ISO/IEC 8473-4 and also ES-IS in 
-         accordance with ISO/IEC 9542, IS-IS in accordance with 
-         ISO/IEC 10589 and IDRP in accordance with ISO/IEC 
-         10747.  Accordingly, the CLNS can be provided by an 
-         IEEE 802.2 subnetwork, X.25 PLP, or an OSI datalink.
+         accordance with ITU-T Rec. X.233 (1997) | ISO/IEC 
+         8473-1 : 1998, ISO/IEC 8473-2, ITU-T Rec. X.622 
+         | ISO/IEC 8473-3, ITU-T Rec. X.623 | ISO/IEC 8473-4 and 
+         also ES-IS in accordance with ISO/IEC 9542, IS-IS in 
+         accordance with ISO/IEC 10589 and IDRP in accordance 
+         with ISO/IEC 10747.  Accordingly, the CLNS can be 
+         provided by an IEEE 802.2 subnetwork, X.25 PLP, or an 
+         OSI datalink.
          
          Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation

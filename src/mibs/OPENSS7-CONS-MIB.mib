@@ -84,7 +84,7 @@ cONS-MIB MODULE-IDENTITY
          Mob: +1 780 953 0557
          mailto:bidulock@openss7.org"
     DESCRIPTION 
-	"This MIB provides configuraion and status information for an 
+	"This MIB provides configuration and status information for an 
 	 OSI CONS subsystem, where the CONS is in accordance with ITU-T 
 	 Rec. X.622 | ISO/IEC 8881 and management information from ITU-T 
 	 Rec. X.283 | ISO/IEC 10733.  In addition, this MIB supports 
