@@ -3149,3 +3149,79 @@ tlmMIB_openss7.c tlmMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-TLM-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f tlmMIB_openss7 OPENSS7-TLM-MIB::tlmMIB
 	indent -nhnl tlmMIB_openss7.[ch]
 
+# root = Counter64,
+# root = nlmMIB
+
+MIBPREFIXES += nlmMIB
+
+nlmMIB.mib: ../mibs/OPENSS7-NLM-MIB.mib
+	smidump -k ../mibs/OPENSS7-NLM-MIB.mib>$@ || :
+
+nlmMIB.lint: ../mibs/OPENSS7-NLM-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-NLM-MIB.mib>$@ 2>&1 || :
+
+nlmMIB.tree: ../mibs/OPENSS7-NLM-MIB.mib
+	snmptranslate -Tp OPENSS7-NLM-MIB::nlmMIB>$@ || :
+
+nlmMIB_simple.c nlmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-NLM-MIB.mib
+	./mib2c -c ./mib2c.conf -f nlmMIB_simple OPENSS7-NLM-MIB::nlmMIB
+	indent -nhnl nlmMIB_simple.[ch]
+
+nlmMIB_storage.c nlmMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-NLM-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f nlmMIB_storage OPENSS7-NLM-MIB::nlmMIB
+	indent -nhnl nlmMIB_storage.[ch]
+
+nlmMIB_openss7.c nlmMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-NLM-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f nlmMIB_openss7 OPENSS7-NLM-MIB::nlmMIB
+	indent -nhnl nlmMIB_openss7.[ch]
+
+# root = dlmMIB
+
+MIBPREFIXES += dlmMIB
+
+dlmMIB.mib: ../mibs/OPENSS7-DLM-MIB.mib
+	smidump -k ../mibs/OPENSS7-DLM-MIB.mib>$@ || :
+
+dlmMIB.lint: ../mibs/OPENSS7-DLM-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-DLM-MIB.mib>$@ 2>&1 || :
+
+dlmMIB.tree: ../mibs/OPENSS7-DLM-MIB.mib
+	snmptranslate -Tp OPENSS7-DLM-MIB::dlmMIB>$@ || :
+
+dlmMIB_simple.c dlmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-DLM-MIB.mib
+	./mib2c -c ./mib2c.conf -f dlmMIB_simple OPENSS7-DLM-MIB::dlmMIB
+	indent -nhnl dlmMIB_simple.[ch]
+
+dlmMIB_storage.c dlmMIB_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-DLM-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f dlmMIB_storage OPENSS7-DLM-MIB::dlmMIB
+	indent -nhnl dlmMIB_storage.[ch]
+
+dlmMIB_openss7.c dlmMIB_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-DLM-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f dlmMIB_openss7 OPENSS7-DLM-MIB::dlmMIB
+	indent -nhnl dlmMIB_openss7.[ch]
+
+# root = isisMib
+
+MIBPREFIXES += isisMib
+
+isisMib.mib: ../mibs/OPENSS7-ISIS-MIB.mib
+	smidump -k ../mibs/OPENSS7-ISIS-MIB.mib>$@ || :
+
+isisMib.lint: ../mibs/OPENSS7-ISIS-MIB.mib
+	smilint $(SMILINTIGNORES) -ms ../mibs/OPENSS7-ISIS-MIB.mib>$@ 2>&1 || :
+
+isisMib.tree: ../mibs/OPENSS7-ISIS-MIB.mib
+	snmptranslate -Tp OPENSS7-ISIS-MIB::isisMib>$@ || :
+
+isisMib_simple.c isisMib_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-ISIS-MIB.mib
+	./mib2c -c ./mib2c.conf -f isisMib_simple OPENSS7-ISIS-MIB::isisMib
+	indent -nhnl isisMib_simple.[ch]
+
+isisMib_storage.c isisMib_storage.h: mib2c mib2c.conf ../mibs/OPENSS7-ISIS-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f isisMib_storage OPENSS7-ISIS-MIB::isisMib
+	indent -nhnl isisMib_storage.[ch]
+
+isisMib_openss7.c isisMib_openss7.h: mib2c mib2c.conf ../mibs/OPENSS7-ISIS-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f isisMib_openss7 OPENSS7-ISIS-MIB::isisMib
+	indent -nhnl isisMib_openss7.[ch]
+
