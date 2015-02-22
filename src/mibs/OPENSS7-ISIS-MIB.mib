@@ -1,0 +1,2578 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) src/mibs/OPENSS7-TLM-MIB.mib
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- =============================================================================
+
+OPENSS7-ISIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    LocalDistinguishedNames, NAddress, SNPAAddress, nlmCLNSEntry, 
+    nlmEntityId, nlmLinkageEntry, nlmLinkageId
+        FROM OPENSS7-NLM-MIB
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MilliSeconds
+        FROM OPENSS7-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Counter64, Gauge32, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowPointer, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+isisMib MODULE-IDENTITY
+    LAST-UPDATED "201502211540Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "This MIB provides configuration and status information 
+         of an OSI CLNS/CONS subsystem, where the CLNS is in 
+         accordance with ITU-T Rec. X.233 (1997) | ISO/IEC 
+         8473-1 : 1998, ISO/IEC 8473-2, ITU-T Rec. X.622 
+         | ISO/IEC 8473-3, ITU-T Rec. X.623 | ISO/IEC 8473-4 and 
+         also ES-IS in accordance with ISO/IEC 9542, IS-IS in 
+         accordance with ISO/IEC 10589 and IDRP in accordance 
+         with ISO/IEC 10747.  Accordingly, the CLNS can be 
+         provided by an IEEE 802.2 subnetwork, X.25 PLP, or an 
+         OSI datalink.
+         
+         Copyright (c) 2008-2015  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201502211540Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 35 }
+
+ -- top level organization of the MIB
+
+-- isisNotifications    OBJECT IDENTIFIER ::= { isisMIB         0 }
+-- isisObjects          OBJECT IDENTIFIER ::= { isisMIB         1 }
+-- isisConformance      OBJECT IDENTIFIER ::= { isisMIB         2 }
+
+-- isisTables           OBJECT IDENTIFIER ::= { isisObjects     1 }
+-- isisScalars          OBJECT IDENTIFIER ::= { isisObjects     2 }
+-- isisNotifs           OBJECT IDENTIFIER ::= { isisObjects     3 }
+-- isisOids             OBJECT IDENTIFIER ::= { isisObjects     4 }
+
+-- isisCompliances      OBJECT IDENTIFIER ::= { isisConformance 1 }
+-- isisGroups           OBJECT IDENTIFIER ::= { isisConformance 2 }
+
+-- isisAdjacency          OBJECT IDENTIFIER ::= { isisTables  1 }
+-- isisVirtualAdjacency   OBJECT IDENTIFIER ::= { isisTables  2 }
+-- isisDestination        OBJECT IDENTIFIER ::= { isisTables  3 }
+-- isisReachableAddress   OBJECT IDENTIFIER ::= { isisTables  4 }
+-- isisLinkage            OBJECT IDENTIFIER ::= { isisTables  5 }
+-- isisCLNS               OBJECT IDENTIFIER ::= { isisTables  6 }
+
+CircuitType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.CircuitType"
+    SYNTAX      INTEGER { broadcast(0), ptToPt(1), staticIn(2), 
+                    staticOut(3), dA(4) }
+
+HopMetric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.HopMetric"
+    SYNTAX      Integer32 (0..63)
+
+Password ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.Password"
+    SYNTAX      OCTET STRING (SIZE(0..254))
+
+Passwords ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.Passwords"
+    SYNTAX      OCTET STRING (SIZE(0..254))
+
+IntermediateSystemPriority ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.IntermediateSystemPriority"
+    SYNTAX      Integer32 (0..127)
+
+CircuitID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.CircuitID"
+    SYNTAX      OCTET STRING (SIZE(2..9))
+
+SystemId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.SystemId"
+    SYNTAX      OCTET STRING (SIZE(0..8))
+
+SystemIds ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.SystemIds"
+    SYNTAX      OCTET STRING (SIZE(0..256))
+
+ISType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.ISType"
+    SYNTAX      INTEGER { level1IS(1), level2IS(2) }
+
+AreaAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.AreaAddress"
+    SYNTAX      OCTET STRING (SIZE(1..20))
+
+AreaAddresses ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.AreaAddresses"
+    SYNTAX      OCTET STRING (SIZE(2..252))
+
+DatabaseState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.DatabaseState"
+    SYNTAX      INTEGER { off(0), on(1), waiting(2) }
+
+AdjacencyState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.AdjacencyState"
+    SYNTAX      INTEGER { initializing(0), up(1), failed(2), down(3) }
+
+NeighbourSystemType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.NeighbourSystemType"
+    SYNTAX      INTEGER { unknown(0), endSystem(1), 
+                    intermediateSystem(2), l1IntermediateSystem(3), 
+                    l2IntermediateSystem(4) }
+
+AdjacencyUsage ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.AdjacencyUsage"
+    SYNTAX      INTEGER { undefined(0), level1(1), level2(2), 
+                    level1and2(3) }
+
+PathMetric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.PathMetric"
+    SYNTAX      Integer32 (0..1023)
+
+AddressPrefix ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The size shall be a multiple of four, since the 
+         protocol represents these as semi-octets."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.AddressPrefix"
+    SYNTAX      OCTET STRING (SIZE(0..160))
+
+SNPAPrefix ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This octet string is interpreted as a bit string:
+         BIT STRING(SIZE(0..120))."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.SNPAPrefix"
+    SYNTAX      OCTET STRING (SIZE(0..15))
+
+MetricType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.MetricType"
+    SYNTAX      INTEGER { internal(0), external(1) }
+
+MappingType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.MappingType"
+    SYNTAX      INTEGER { none(0), explicit(1), extractIDI(2), 
+                    extractDSP(3) }
+
+SNPAAddresses ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "SET OF SNPAAddress"
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ISIS.SNPAAddresses"
+    SYNTAX      OCTET STRING (SIZE(0..256))
+
+isisNotifications OBJECT IDENTIFIER
+    ::= { isisMib 0 }
+
+isisObjects OBJECT IDENTIFIER
+    ::= { isisMib 1 }
+
+isisTables OBJECT IDENTIFIER
+    ::= { isisObjects 1 }
+
+-- ======================================
+
+isisAdjacency OBJECT IDENTIFIER
+    ::= { isisTables 1 }
+
+isisAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacency MANAGED OBJECT CLASS"
+    ::= { isisAdjacency 1 }
+
+isisAdjacencyEntry OBJECT-TYPE
+    SYNTAX      IsisAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "11.2.6 Adjacency managed object
+         
+         Created either through the adjacency-linkage Name 
+         binding for adjacencies instantiated by protocol 
+         operation, or the adjacency-linkage-management name 
+         binding for adjacencies created via explicit system 
+         management operation."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacency MANAGED OBJECT"
+    INDEX       { nlmLinkageId, isisAdjacencyId }
+    ::= { isisAdjacencyTable 1 }
+
+IsisAdjacencyEntry ::= SEQUENCE {
+    isisAdjacencyId                         SimpleNameType,
+    isisAdjacencyState                      AdjacencyState,
+    isisAdjacencyNeighbourSNPAAddress       SNPAAddress,
+    isisAdjacencyNeighbourSystemType        NeighbourSystemType,
+    isisAdjacencyNeighbourSystemIds         SystemIds,
+-- iSAdjacency-P PACKAGE
+    isisAdjacencyUsage                      AdjacencyUsage,
+    isisAdjacencyAreaAddressesOfNeighbour   AreaAddresses,
+    isisAdjacencyHoldingTimer               MilliSeconds,
+-- broadcastISAdjacency-P PACKAGE
+    isisAdjacencyPriorityOfNeighbour        IntermediateSystemPriority,
+-- adjacency-linkage-management NAME BINDING
+    isisAdjacencyRowStatus                  RowStatus
+}
+
+isisAdjacencyId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A string which is the Identifier for the Adjacency and 
+         which is unique amongst the set of Adjacencies 
+         maintained for this linkage. If this is an adjacency 
+         created by system management, it is set by the System 
+         Manager when the Adjacency is created, otherwise it is 
+         generated by the implementation such that it is unique. 
+         The set of identifiers containing the leading string 
+         'Auto' are reserved for Automatic Adjacencies. An 
+         attempt by system management to create an adjacency 
+         with such an identifier will cause a reserved name 
+         violation!"
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacencyId ATTRIBUTE"
+    ::= { isisAdjacencyEntry 1 }
+
+isisAdjacencyState OBJECT-TYPE
+    SYNTAX      AdjacencyState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state of the adjacency."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacencyState ATTRIBUTE"
+    ::= { isisAdjacencyEntry 2 }
+
+isisAdjacencyNeighbourSNPAAddress OBJECT-TYPE
+    SYNTAX      SNPAAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The SNPA address of the neighbour system.
+         
+         Value is supplied either by the protocol machine if the 
+         MO is automatically created, or supplied via the CREATE 
+         Operation. The value cannot be changed thereafter.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, neighbourSNPAAddress ATTRIBUTE"
+    ::= { isisAdjacencyEntry 3 }
+
+isisAdjacencyNeighbourSystemType OBJECT-TYPE
+    SYNTAX      NeighbourSystemType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of the neighbour system one of: Unknown, End 
+         system, Intermediate system, L1 Intermediate system, L2 
+         Intermediate system."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, neighbourSystemType ATTRIBUTE"
+    ::= { isisAdjacencyEntry 4 }
+
+isisAdjacencyNeighbourSystemIds OBJECT-TYPE
+    SYNTAX      SystemIds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "For Intermediate system neighbours: Contains the single 
+         SystemId of the neighbouring Intermediate system 
+         obtained from the Source ID field of the neighbour's 
+         IIH PDU. For End system neighbours: Contains the set of 
+         system ID(s) of a neighbour End system.
+         
+         Value is supplied either by the protocol machine if the 
+         MO is automatically created, or supplied via the CREATE 
+         Operation. The value cannot be changed thereafter."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, neighbourSystemIds ATTRIBUTE"
+    ::= { isisAdjacencyEntry 5 }
+
+-- iSAdjacency-P PACKAGE
+isisAdjacencyUsage OBJECT-TYPE
+    SYNTAX      AdjacencyUsage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The usage of the Adjacency. An Adjacency of type Level 
+         1 will be used for Level 1 traffic only. An adjacency 
+         of type Level 2 will be used for Level 2 traffic only. 
+         An adjacency of type Level 1 and 2 will be used for 
+         both Level 1 and Level 2 traffic. There may be two 
+         adjacencies (of types Level 1 and Level 2 between the 
+         same pair of Intermediate Systems."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacencyUsage ATTRIBUTE"
+    ::= { isisAdjacencyEntry 6 }
+
+isisAdjacencyAreaAddressesOfNeighbour OBJECT-TYPE
+    SYNTAX      AreaAddresses
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This contains the Area Addresses of a neighbour 
+         Intermediate System from the IIH PDU."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, areaAddressesOfNeighbour ATTRIBUTE"
+    ::= { isisAdjacencyEntry 7 }
+
+isisAdjacencyHoldingTimer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Holding time for this adjacency updated from the IIH 
+         PDUs."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, holdingTimer ATTRIBUTE"
+    ::= { isisAdjacencyEntry 8 }
+
+-- broadcastISAdjacency-P PACKAGE
+isisAdjacencyPriorityOfNeighbour OBJECT-TYPE
+    SYNTAX      IntermediateSystemPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Priority of neighbour on this adjacency for becoming 
+         LAN Level 1 Designated Intermediate System if 
+         adjacencyType is L1 Intermediate System or LAN Level 
+         2 Designated Intermediate System if adjacencyType is L2 
+         Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, priorityOfNeighbour ATTRIBUTE"
+    ::= { isisAdjacencyEntry 9 }
+
+-- adjacency-linkage-management NAME BINDING
+isisAdjacencyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This Name Binding is used for adjacencies created 
+         automatically by operation of the ISO/IEC 10589 
+         protocol machine.
+         
+         This Name Binding is used for adjacencies created by 
+         system management."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, adjacency-linkage-management NAME 
+             BINDING"
+    ::= { isisAdjacencyEntry 10 }
+
+
+-- ======================================
+
+isisVirtualAdjacency OBJECT IDENTIFIER
+    ::= { isisTables 2 }
+
+isisVirtualAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisVirtualAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, virtualAdjacency MANAGED OBJECT 
+             CLASS"
+    ::= { isisVirtualAdjacency 1 }
+
+isisVirtualAdjacencyEntry OBJECT-TYPE
+    SYNTAX      IsisVirtualAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "11.2.7 Virtual adjacency managed object"
+    REFERENCE   
+        "ISO/IEC 10589: 2001, virtualAdjacency MANAGED OBJECT"
+    INDEX       { nlmEntityId, isisVirtualAdjacencyNetworkEntityTitle }
+    ::= { isisVirtualAdjacencyTable 1 }
+
+IsisVirtualAdjacencyEntry ::= SEQUENCE {
+    isisVirtualAdjacencyNetworkEntityTitle  NAddress,
+    isisVirtualAdjacencyMetric              PathMetric,
+    isisVirtualAdjacencyRowStatus           RowStatus
+}
+
+isisVirtualAdjacencyNetworkEntityTitle OBJECT-TYPE
+    SYNTAX      NAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Entity Title of virtual adjacency."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, networkEntityTitle ATTRIBUTE"
+    ::= { isisVirtualAdjacencyEntry 1 }
+
+isisVirtualAdjacencyMetric OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost L2 path(s) to destination area based 
+         on the default metric."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, metric ATTRIBUTE"
+    ::= { isisVirtualAdjacencyEntry 2 }
+
+isisVirtualAdjacencyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This name binding is only applicable where the superior 
+         object has an iSType of Level2."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, virtualAdjacency-cLNS NAME 
+             BINDING"
+    ::= { isisVirtualAdjacencyEntry 3 }
+
+-- ======================================
+
+isisDestination OBJECT IDENTIFIER
+    ::= { isisTables 3 }
+
+-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+isisDestinationSystem OBJECT IDENTIFIER
+    ::= { isisDestination 1 }
+
+isisDestinationSystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisDestinationSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, desintationSystem MANAGED OBJECT 
+             CLASS"
+    ::= { isisDestinationSystem 1 }
+
+isisDestinationSystemEntry OBJECT-TYPE
+    SYNTAX      IsisDestinationSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, desintationSystem MANAGED OBJECT"
+    INDEX       { nlmEntityId, isisDestinationSystemNetworkEntityTitle }
+    ::= { isisDestinationSystemTable 1 }
+
+IsisDestinationSystemEntry ::= SEQUENCE {
+    isisDestinationSystemNetworkEntityTitle                 NAddress,
+    isisDestinationSystemDefaultMetricPathCost              PathMetric,
+    isisDestinationSystemDefaultMetricOutputAdjacencies     LocalDistinguishedNames,
+    isisDestinationSystemDelayMetricPathCost                PathMetric,
+    isisDestinationSystemDelayMetricOutputAdjacencies       LocalDistinguishedNames,
+    isisDestinationSystemExpenseMetricPathCost              PathMetric,
+    isisDestinationSystemExpenseMetricOutputAdjacencies     LocalDistinguishedNames,
+    isisDestinationSystemErrorMetricPathCost                PathMetric,
+    isisDestinationSystemErrorMetricOutputAdjacencies       LocalDistinguishedNames
+}
+
+isisDestinationSystemNetworkEntityTitle OBJECT-TYPE
+    SYNTAX      NAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Entity Title of the destination system."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, networkEntityTitle ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 1 }
+
+isisDestinationSystemDefaultMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the default metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 2 }
+
+isisDestinationSystemDefaultMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the default metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 3 }
+
+isisDestinationSystemDelayMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the delay metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 4 }
+
+isisDestinationSystemDelayMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the delay metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 5 }
+
+isisDestinationSystemExpenseMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the expense metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 6 }
+
+isisDestinationSystemExpenseMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the expense metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 7 }
+
+isisDestinationSystemErrorMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the error metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 8 }
+
+isisDestinationSystemErrorMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the error metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationSystemEntry 9 }
+
+
+-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+isisDestinationArea OBJECT IDENTIFIER
+    ::= { isisDestination 2 }
+
+isisDestinationAreaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisDestinationAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, destinationArea MANAGED OBJECT 
+             CLASS"
+    ::= { isisDestinationArea 1 }
+
+isisDestinationAreaEntry OBJECT-TYPE
+    SYNTAX      IsisDestinationAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, destinationArea MANAGED OBJECT"
+    INDEX       { nlmEntityId, isisDestinationAreaAddressPrefix }
+    ::= { isisDestinationAreaTable 1 }
+
+IsisDestinationAreaEntry ::= SEQUENCE {
+    isisDestinationAreaAddressPrefix                    AddressPrefix,
+    isisDestinationAreaDefaultMetricPathCost            PathMetric,
+    isisDestinationAreaDefaultMetricOutputAdjacencies   LocalDistinguishedNames,
+    isisDestinationAreaDelayMetricPathCost              PathMetric,
+    isisDestinationAreaDelayMetricOutputAdjacencies     LocalDistinguishedNames,
+    isisDestinationAreaExpenseMetricPathCost            PathMetric,
+    isisDestinationAreaExpenseMetricOutputAdjacencies   LocalDistinguishedNames,
+    isisDestinationAreaErrorMetricPathCost              PathMetric,
+    isisDestinationAreaErrorMetricOutputAdjacencies     LocalDistinguishedNames
+}
+
+isisDestinationAreaAddressPrefix OBJECT-TYPE
+    SYNTAX      AddressPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An Area Address of a destination area or a prefix for 
+         a reachable address."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, addressPrefix ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 1 }
+
+isisDestinationAreaDefaultMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the default metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 2 }
+
+isisDestinationAreaDefaultMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the default metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 3 }
+
+isisDestinationAreaDelayMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the delay metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 4 }
+
+isisDestinationAreaDelayMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the delay metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 5 }
+
+isisDestinationAreaExpenseMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the expense metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 6 }
+
+isisDestinationAreaExpenseMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the expense metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 7 }
+
+isisDestinationAreaErrorMetricPathCost OBJECT-TYPE
+    SYNTAX      PathMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cost of least cost path(s) using the error metric to 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetricPathCost ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 8 }
+
+isisDestinationAreaErrorMetricOutputAdjacencies OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set of Adjacency (or Reachable Address) managed 
+         object identifiers representing the forwarding 
+         decisions based upon the error metric for the 
+         destination."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetricOutputAdjacencies ATTRIBUTE"
+    ::= { isisDestinationAreaEntry 9 }
+
+-- ======================================
+
+isisReachableAddress OBJECT IDENTIFIER
+    ::= { isisTables 4 }
+
+isisReachableAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisReachableAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ISO/IEC 10589: 2001, reachableAddress MANAGED OBJECT 
+             CLASS"
+    ::= { isisReachableAddress 1 }
+
+isisReachableAddressEntry OBJECT-TYPE
+    SYNTAX      IsisReachableAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "11.2.12 Reachable address managed object
+         
+         Created either through the 
+         reachableAddress-linkage-imported Name binding for 
+         reachable addresses instantiated by the importation of 
+         routeing information from another routeing protocol 
+         (such as the interdomain routeing protocol), or the 
+         reachableAddress-linkage-management name binding for 
+         adjacencies created via explicit system management 
+         operation."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, reachableAddress MANAGED OBJECT"
+    INDEX       { nlmLinkageId, isisReachableAddressId }
+    ::= { isisReachableAddressTable 1 }
+
+IsisReachableAddressEntry ::= SEQUENCE {
+    isisReachableAddressId                  SimpleNameType,
+    isisReachableAddressAddressPrefix       AddressPrefix,
+    isisReachableAddressMappingType         MappingType,
+    isisReachableAddressDefaultMetric       HopMetric,
+    isisReachableAddressDelayMetric         HopMetric,
+    isisReachableAddressExpenseMetric       HopMetric,
+    isisReachableAddressErrorMetric         HopMetric,
+    isisReachableAddressDefaultMetricType   MetricType,
+    isisReachableAddressDelayMetricType     MetricType,
+    isisReachableAddressExpenseMetricType   MetricType,
+    isisReachableAddressErrorMetricType     MetricType,
+    isisReachableAddressOperationalState    OperationalState,
+-- explicitSNPA-P PACKAGE
+    isisReachableAddressSNPAAddress         SNPAAddresses,
+-- extractDSP-P PACKAGE
+    isisReachableAddressSNPAMask            NAddress,
+    isisReachableAddressSNPAPrefix          SNPAPrefix,
+-- reachableAddress-linkage-management NAME BINDING
+    isisReachableAddressRowStatus           RowStatus
+}
+
+isisReachableAddressId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A string which is the Identifier for the 
+         ReachableAddress and which is unique amongst the set of 
+         reachable addresses maintained for this linkage. If 
+         this is a reachableAddress created by system 
+         management, it is set by the System Manager when the 
+         ReachableAddress is created, otherwise it is generated 
+         by the implementation such that it is unique. The set 
+         of identifiers containing the leading string 'Auto' are 
+         reserved for reachable addresses imported from other 
+         routeing protocols. An attempt by system management to 
+         create a reachableAddress with such an identifier will 
+         cause a reserved name violation."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, reachableAddressId ATTRIBUTE"
+    ::= { isisReachableAddressEntry 1 }
+
+isisReachableAddressAddressPrefix OBJECT-TYPE
+    SYNTAX      AddressPrefix
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "An Area Address of a destination area or a prefix for 
+         a reachable address.
+         
+         Value is supplied either by the protocol machine if the 
+         MO is automatically created, or supplied via the CREATE 
+         Operation. The value cannot be changed thereafter."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, addressPrefix ATTRIBUTE"
+    ::= { isisReachableAddressEntry 2 }
+
+isisReachableAddressMappingType OBJECT-TYPE
+    SYNTAX      MappingType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of mapping to be employed to ascertain the 
+         SNPA Address which should be used in forwarding NPDUs 
+         for this Reachable Address Prefix. The following values 
+         of mappingType are defined:
+         
+         none(0), The mapping is null because the neighbour SNPA 
+             is implicit by nature of the subnetwork (e.g.  
+             a point-to-point linkage).
+         
+         explicit(1), The set of subnetwork addresses in the 
+             sNPAAddresses attribute are to be used.
+         
+         extractIDI(2), The SNPA is embedded in the IDI of the 
+             destination NSAP address. The mapping algorithm 
+             extracts the SNPA to be used according to the 
+             format and encoding rules of ISO8348/Add2. This 
+             SNPA extraction algorithm can be used in 
+             conjunction with Reachable Address Prefixes from 
+             the X.121, F.69, E.163, and E.164 addressing 
+             subdomains.
+         
+         extractDSP(3), All, or a suffix, of the SNPA is 
+             embedded in the DSP of the destination address.  
+             This SNPA extraction algorithm extracts the 
+             embedded subnetwork addressing information by 
+             performing a logical AND of the sNPAMask attribute 
+             with the destinaition address. The part of the SNPA 
+             extracted from the destination NSAP is appended to 
+             the sNPAPrefix to form the next hop subnetwork 
+             addressing information.
+         
+         Value is supplied either by the protocol machine if the 
+         MO is automatically created, or supplied via the CREATE 
+         Operation. The value cannot be changed thereafter."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, mappingType ATTRIBUTE"
+    ::= { isisReachableAddressEntry 3 }
+
+isisReachableAddressDefaultMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default metric value for reaching the specified 
+         prefix over this Circuit. If this attribute is changed 
+         while both the Reachable Address and the linkage are 
+         Enabled (i.e. state On), the actions described in 
+         clause 8.3.5.4 must be taken."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetric ATTRIBUTE"
+    DEFVAL      { 20 }
+    ::= { isisReachableAddressEntry 4 }
+
+isisReachableAddressDelayMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The delay metric value for reaching the specified 
+         prefix over this Circuit. If this attribute is changed 
+         while both the Reachable Address and the linkage are 
+         Enabled (i.e. state On), the actions described in 
+         clause 8.3.5.4 must be taken.  The value of zero is 
+         reserved to indicate that this metric is not 
+         supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisReachableAddressEntry 5 }
+
+isisReachableAddressExpenseMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The expense metric value for reaching the specified 
+         prefix over this Circuit. If this attribute is changed 
+         while both the Reachable Address and the linkage are 
+         Enabled (i.e. state On), the actions described in 
+         clause 8.3.5.4 must be taken.  The value of zero is 
+         reserved to indicate that this metric is not 
+         supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisReachableAddressEntry 6 }
+
+isisReachableAddressErrorMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The error metric value for reaching the specified 
+         prefix over this Circuit. If this attribute is changed 
+         while both the Reachable Address and the linkage are 
+         Enabled (i.e. state On), the actions described in 
+         clause 8.3.5.4 must be taken.  The value of zero is 
+         reserved to indicate that this metric is not 
+         supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisReachableAddressEntry 7 }
+
+isisReachableAddressDefaultMetricType OBJECT-TYPE
+    SYNTAX      MetricType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the default metric is internal or 
+         external."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, defaultMetricType ATTRIBUTE"
+    DEFVAL      { internal }
+    ::= { isisReachableAddressEntry 8 }
+
+isisReachableAddressDelayMetricType OBJECT-TYPE
+    SYNTAX      MetricType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the delay metric is internal or 
+         external."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, delayMetricType ATTRIBUTE"
+    DEFVAL      { internal }
+    ::= { isisReachableAddressEntry 9 }
+
+isisReachableAddressExpenseMetricType OBJECT-TYPE
+    SYNTAX      MetricType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the expense metric is internal or 
+         external."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, expenseMetricType ATTRIBUTE"
+    DEFVAL      { internal }
+    ::= { isisReachableAddressEntry 10 }
+
+isisReachableAddressErrorMetricType OBJECT-TYPE
+    SYNTAX      MetricType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the error metric is internal or 
+         external."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, errorMetricType ATTRIBUTE"
+    DEFVAL      { internal }
+    ::= { isisReachableAddressEntry 11 }
+
+isisReachableAddressOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the reachable address 
+         in accordance with the OperationalState textual 
+         convention of the OPENSS7-SMI-MIB."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState ATTRIBUTE"
+    ::= { isisReachableAddressEntry 12 }
+
+-- explicitSNPA-P PACKAGE
+isisReachableAddressSNPAAddress OBJECT-TYPE
+    SYNTAX      SNPAAddresses
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A set of SNPA addresses to which pdu may be forwarded 
+         in order to reach an address which matches the address 
+         prefix of the Reachable Address."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, sNPAAddresses ATTRIBUTE"
+    ::= { isisReachableAddressEntry 13 }
+
+-- extractDSP-P PACKAGE
+isisReachableAddressSNPAMask OBJECT-TYPE
+    SYNTAX      NAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A Bit mask with 1 bits indicating the positions in the 
+         effective destination address from which embedded SNPA 
+         information is to be extracted. For the extraction the 
+         first octect of the sNPAMask is aligned with the first 
+         octet (AFI) of the NSAP Address. If the sNPAMask and 
+         NSAP Address are of different lengths, the shorter of 
+         the two is logically padded with zeros before 
+         performing the extraction."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, sNPAMask ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisReachableAddressEntry 14 }
+
+isisReachableAddressSNPAPrefix OBJECT-TYPE
+    SYNTAX      SNPAPrefix
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A fixed SNPA prefix manually configured as an attribute 
+         of a Reachable Address with mappingType extractDSP. The 
+         SNPA address to use is formed by concatenating the 
+         fixed sNPAPrefix with a variable SNPA part that is 
+         extracted from the effective destination address. For 
+         Reachable Address Prefixes in which then entire SNPA is 
+         embedded in the DSP the sNPAPrefix shall be null."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, sNPAPrefix ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisReachableAddressEntry 15 }
+
+-- reachableAddress-linkage-management NAME BINDING
+isisReachableAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This name binding is only applicable where the superior 
+         object of the linkage instance is an object with iSType 
+         level2IS It is used for the automatic creation of 
+         reachable address MOs. This is useful when injecting 
+         intra-domain routes obtained through the operation of 
+         an interdomain routeing protocol.
+         
+         This name binding is only applicable where the superior 
+         object of the linkage instance is an object with iSType 
+         level2IS It is used for the manual creation of 
+         reachable address MOs by system management."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+             reachableAddress-linkage-management NAME BINDING"
+    ::= { isisReachableAddressEntry 16 }
+
+-- ======================================
+
+isisLinkage OBJECT IDENTIFIER
+    ::= { isisTables 5 }
+
+isisLinkageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               linkage MANAGED OBJECT CLASS"
+    ::= { isisLinkage 1 }
+
+isisLinkageEntry OBJECT-TYPE
+    SYNTAX      IsisLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               linkage MANAGED OBJECT"
+    AUGMENTS    { nlmLinkageEntry }
+    ::= { isisLinkageTable 1 }
+
+IsisLinkageEntry ::= SEQUENCE {
+-- "ISO/IEC 10589":linkageISISBasic-P PACKAGE
+    isisLinkageType                                         CircuitType,
+    isisLinkageISISHelloTimer                               MilliSeconds,
+    isisLinkageL1DefaultMetric                              HopMetric,
+    isisLinkageL1DelayMetric                                HopMetric,
+    isisLinkageL1ExpenseMetric                              HopMetric,
+    isisLinkageL1ErrorMetric                                HopMetric,
+    isisLinkageExternalDomain                               TruthValue,
+    isisLinkageChangesInAdjacencyState                      Counter64,
+    isisLinkageInitialisationFailures                       Counter64,
+    isisLinkageRejectedAdjacencies                          Counter64,
+    isisLinkageISISControlPDUsSent                          Counter64,
+    isisLinkageISISControlPDUsReceived                      Counter64,
+    isisLinkageIDFieldLengthMismatches                      Counter64,
+    isisLinkageMaximumAreaAdressesMismatches                Counter64,
+-- "ISO/IEC 10589":linkageISISAuthentication-P
+    isisLinkageCircuitTransmitPassword                      Password,
+    isisLinkageCircuitReceivePasswords                      Passwords,
+    isisLinkageAuthenticationFailures                       Counter64,
+-- "ISO/IEC 10589":linkageISISBroadcast-P
+    isisLinkageL1IntermediateSystemPriority                 IntermediateSystemPriority,
+    isisLinkageL1CircuitID                                  CircuitID,
+    isisLinkageL1DesignatedIntermediateSystem               SystemId,
+    isisLinkageLanL1DesignatedIntermediateSystemChanges     Counter64,
+-- "ISO/IEC 10589":linkageISISDACallEstablishmentMetricIncrement-P
+    isisLinkageCallEstablishmentDefaultMetricIncrement      HopMetric,
+    isisLinkageCallEstablishmentDelayMetricIncrement        HopMetric,
+    isisLinkageCallEstablishmentExpenseMetricIncrement      HopMetric,
+    isisLinkageCallEstablishmentErrorMetricIncrement        HopMetric,
+-- "ISO/IEC 10589":linkageISISPtToPt-P
+    isisLinkagePtPtCircuitID                                CircuitID,
+-- "ISO/IEC 10589":linkageISISStatic-P
+    isisLinkageOutgoingCallIVMO                             SimpleNameType,
+--  isisLinkagePtPtCircuitID                                CircuitID,
+    isisLinkageNeighbourSNPAAdress                          SNPAAddress,
+-- "ISO/IEC 10589":linkageISISLevel2-P
+    isisLinkageL2DefaultMetric                              HopMetric,
+    isisLinkageL2DelayMetric                                HopMetric,
+    isisLinkageL2ExpenseMetric                              HopMetric,
+    isisLinkageL2ErrorMetric                                HopMetric,
+    isisLinkageManualL2OnlyMode                             TruthValue,
+-- "ISO/IEC 10589":linkageISISLevel2Broadcast-P
+    isisLinkageL2IntermediateSystemPriority                 IntermediateSystemPriority,
+    isisLinkageL2CircuitID                                  CircuitID,
+    isisLinkageL2DesignatedIntermediateSystem               SystemId,
+    isisLinkageLanL2DesignatedIntermediateSystemChanges     Counter64,
+--
+    isisLinkageRowStatus                                    RowStatus
+}
+
+-- "ISO/IEC 10589":linkageISISBasic-P PACKAGE
+isisLinkageType OBJECT-TYPE
+    SYNTAX      CircuitType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of the circuit. This attribute may only be set 
+         when the linkage MO is created. Subsequently it is 
+         read-only."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, type ATTRIBUTE"
+    ::= { isisLinkageEntry 1 }
+
+isisLinkageISISHelloTimer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The period between IIH PDUs. It is also used as the 
+         period between ISH PDUs when polling the ES 
+         configuration.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of that interval takes place no later than 
+         the expiration of the interval in progress or the 
+         specified interval, whichever is sooner. The precision 
+         with which this time shall be implemented shall be the 
+         same as that associated with the basic operation of the 
+         timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iSISHelloTimer ATTRIBUTE"
+    DEFVAL      { 3000 } -- 3 seconds
+    ::= { isisLinkageEntry 2 }
+
+isisLinkageL1DefaultMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default metric value of this circuit for Level 1 traffic."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1DefaultMetric ATTRIBUTE"
+    DEFVAL      { 20 }
+    ::= { isisLinkageEntry 3 }
+
+isisLinkageL1DelayMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The delay metric value of this circuit for Level 
+         1 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1DelayMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 4 }
+
+isisLinkageL1ExpenseMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The expense metric value of this circuit for Level 
+         1 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1ExpenseMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 5 }
+
+isisLinkageL1ErrorMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The error metric value of this circuit for Level 
+         1 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1ErrorMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 6 }
+
+isisLinkageExternalDomain OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If TRUE, suppress normal transmission of and 
+         interpretation of Intra-domain ISIS PDUs on this 
+         circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, externalDomain ATTRIBUTE"
+    DEFVAL      { true }
+    ::= { isisLinkageEntry 7 }
+
+isisLinkageChangesInAdjacencyState OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of Adjacency State Change events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, changesInAdjacencyState ATTRIBUTE"
+    ::= { isisLinkageEntry 8 }
+
+isisLinkageInitialisationFailures OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of Initialisation Failure events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, initialisationFailures ATTRIBUTE"
+    ::= { isisLinkageEntry 9 }
+
+isisLinkageRejectedAdjacencies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of Rejected Adjacency events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, rejectedAdjacencies ATTRIBUTE"
+    ::= { isisLinkageEntry 10 }
+
+isisLinkageISISControlPDUsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of control PDUs sent on this circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iSISControlPDUsSent ATTRIBUTE"
+    ::= { isisLinkageEntry 11 }
+
+isisLinkageISISControlPDUsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of control PDUs received on this circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iSISControlPDUsReceived ATTRIBUTE"
+    ::= { isisLinkageEntry 12 }
+
+isisLinkageIDFieldLengthMismatches OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the iDFieldLengthMismatch event has 
+         been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iDFieldLengthMismatches ATTRIBUTE"
+    ::= { isisLinkageEntry 13 }
+
+isisLinkageMaximumAreaAdressesMismatches OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of maximumAreaAddressesMismatch events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumAreaAddressesMismatches ATTRIBUTE"
+    ::= { isisLinkageEntry 14 }
+
+-- "ISO/IEC 10589":linkageISISAuthentication-P
+isisLinkageCircuitTransmitPassword OBJECT-TYPE
+    SYNTAX      Password
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value to be used as a transmit password in IIH PDUs 
+         transmitted by this Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, circuitTransmitPassword ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisLinkageEntry 15 }
+
+isisLinkageCircuitReceivePasswords OBJECT-TYPE
+    SYNTAX      Passwords
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The values to be used as receive passwords to check the 
+         receipt of IIH PDUs."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, circuitReceivePasswords ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisLinkageEntry 16 }
+
+isisLinkageAuthenticationFailures OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of authentication Failure events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, authenticationFailures ATTRIBUTE"
+    ::= { isisLinkageEntry 17 }
+
+-- "ISO/IEC 10589":linkageISISBroadcast-P
+isisLinkageL1IntermediateSystemPriority OBJECT-TYPE
+    SYNTAX      IntermediateSystemPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Priority for becoming LAN Level 1 Designated Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1IntermediateSystemPriority ATTRIBUTE"
+    DEFVAL      { 64 }
+    ::= { isisLinkageEntry 18 }
+
+isisLinkageL1CircuitID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The LAN ID allocated by the LAN Level 1 Designated 
+         Intermediate System. Where this system is not aware of 
+         the value (because it is not participating in the Level 
+         1 Designated Intermediate System election), this 
+         attribute has the value which would be proposed for 
+         this circuit. (i.e. the concatenation of the local 
+         system ID and the one octet local Circuit ID for this 
+         circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1CircuitID ATTRIBUTE"
+    ::= { isisLinkageEntry 19 }
+
+isisLinkageL1DesignatedIntermediateSystem OBJECT-TYPE
+    SYNTAX      SystemId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the LAN Level 1 Designated Intermediate 
+         System on this circuit.  If, for any reason this system 
+         is not partaking in the relevant Designated 
+         Intermediate System election process, then the value 
+         returned is the zero length OCTET STRING."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1DesignatedIntermediateSsytem ATTRIBUTE"
+    ::= { isisLinkageEntry 20 }
+
+isisLinkageLanL1DesignatedIntermediateSystemChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of LAN L1 Designated Intermediate System Change 
+         events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         lanL1DesignatedIntermediateSystemChanges ATTRIBUTE"
+    ::= { isisLinkageEntry 21 }
+
+-- "ISO/IEC 10589":linkageISISDACallEstablishmentMetricIncrement-P
+isisLinkageCallEstablishmentDefaultMetricIncrement OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Additional value to be reported for the default metric 
+         value of unestablished DA adjacencies."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         callEstablishmentDefaultMetricIncrement ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 22 }
+
+isisLinkageCallEstablishmentDelayMetricIncrement OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Additional value to be reported for the delay metric 
+         value of unestablished DA adjacencies."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         callEstablishmentDelayMetricIncrement ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 23 }
+
+isisLinkageCallEstablishmentExpenseMetricIncrement OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Additional value to be reported for the Expense metric 
+         value of unestablished DA adjacencies."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         callEstablishmentExpenseMetricIncrement ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 24 }
+
+isisLinkageCallEstablishmentErrorMetricIncrement OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Additional value to be reported for the Error metric 
+         value of unestablished DA adjacencies."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         callEstablishmentErrorMetricIncrement ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 25 }
+
+-- "ISO/IEC 10589":linkageISISPtToPt-P
+isisLinkagePtPtCircuitID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the circuit allocated during initialisation. 
+         If no value has been negotiated (either because the 
+         adjacency is to an End system, or because 
+         initialisation has not yet successfully completed), 
+         this attribute has the value which would be proposed 
+         for this circuit. (i.e. the concatenation of the local 
+         system ID and the one octet local Circuit ID for this 
+         circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ptPtCircuitID ATTRIBUTE"
+    ::= { isisLinkageEntry 26 }
+
+-- "ISO/IEC 10589":linkageISISStatic-P
+isisLinkageOutgoingCallIVMO OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Reference to the virtualCallIVMO to be used to 
+         establish communication with a neighbour over this 
+         circuit. This IVMO contains, among other things,the 
+         SNPA Address to use as the called address."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, outgoingCallIVMO ATTRIBUTE"
+    DEFVAL      { "Default" }
+    ::= { isisLinkageEntry 27 }
+
+--  isisLinkagePtPtCircuitID                     CircuitID
+isisLinkageNeighbourSNPAAdress OBJECT-TYPE
+    SYNTAX      SNPAAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The SNPA address of the neighbour system."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, neighbourSNPAAddress ATTRIBUTE"
+    DEFVAL      { "\x00" }
+    ::= { isisLinkageEntry 28 }
+
+-- "ISO/IEC 10589":linkageISISLevel2-P
+isisLinkageL2DefaultMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default metric value of this circuit for Level 
+         2 traffic."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2DefaultMetric ATTRIBUTE"
+    DEFVAL      { 20 }
+    ::= { isisLinkageEntry 29 }
+
+isisLinkageL2DelayMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The delay metric value of this circuit for Level 
+         2 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2DelayMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 30 }
+
+isisLinkageL2ExpenseMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The expense metric value of this circuit for Level 
+         2 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2ExpenseMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 31 }
+
+isisLinkageL2ErrorMetric OBJECT-TYPE
+    SYNTAX      HopMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The error metric value of this circuit for Level 
+         2 traffic. The value of zero is reserved to indicate 
+         that this metric is not supported."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2ErrorMetric ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { isisLinkageEntry 32 }
+
+isisLinkageManualL2OnlyMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "When True, indicates that this Circuit is to be used 
+         only for Level 2.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, manualL2OnlyMode ATTRIBUTE"
+    DEFVAL      { false }
+    ::= { isisLinkageEntry 33 }
+
+-- "ISO/IEC 10589":linkageISISLevel2Broadcast-P
+isisLinkageL2IntermediateSystemPriority OBJECT-TYPE
+    SYNTAX      IntermediateSystemPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Priority for becoming LAN Level 2 Designated 
+         Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2IntermediateSystemPriority ATTRIBUTE"
+    DEFVAL      { 64 }
+    ::= { isisLinkageEntry 34 }
+
+isisLinkageL2CircuitID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The LAN ID allocated by the LAN Level 2 Designated 
+         Intermediate System. Where this system is not aware of 
+         the value (because it is not participating in the Level 
+         2 Designated Intermediate System election), this 
+         attribute has the value which would be proposed for 
+         this circuit. (i.e. the concatenation of the local 
+         system ID and the one octet local Circuit ID for this 
+         circuit."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2CircuitID ATTRIBUTE"
+    ::= { isisLinkageEntry 35 }
+
+isisLinkageL2DesignatedIntermediateSystem OBJECT-TYPE
+    SYNTAX      SystemId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the LAN Level 2 Designated Intermediate 
+         System on this circuit. If, for any reason this system 
+         is not partaking in the relevant Designated 
+         Intermediate System election process, then the value 
+         returned is the zero length OCTET STRING."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2DesignatedIntermediateSystem ATTRIBUTE"
+    ::= { isisLinkageEntry 36 }
+
+isisLinkageLanL2DesignatedIntermediateSystemChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of LAN L2 Designated Intermediate System Change 
+         events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         lanL2DesignatedIntermediateSystemChanges ATTRIBUTE"
+    ::= { isisLinkageEntry 37 }
+
+--
+isisLinkageRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete linkages in this table.  The contents 
+         of this table must persist across agent 
+         restart/reboot."
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               linkage-cLNS, linkage-cONS NAME BINDING"
+    ::= { isisLinkageEntry 38 }
+
+-- ======================================
+
+isisCLNS OBJECT IDENTIFIER
+    ::= { isisTables 6 }
+
+isisCLNSTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IsisCLNSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               cLNS MANAGED OBJECT CLASS"
+    ::= { isisCLNS 1 }
+
+isisCLNSEntry OBJECT-TYPE
+    SYNTAX      IsisCLNSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               cLNS MANAGED OBJECT"
+    AUGMENTS    { nlmCLNSEntry }
+    ::= { isisCLNSTable 1 }
+
+IsisCLNSEntry ::= SEQUENCE {
+-- "ISO/IEC 10589":cLNSISISBasic-P PACKAGE
+    isisCLNSversion                                     SnmpAdminString,
+    isisCLNSiSType                                      ISType,
+    isisCLNSsystemId                                    SystemId,
+    isisCLNSmaximumPathSplits                           Integer32,
+    isisCLNSminimumLSPTransmissionInterval              MilliSeconds,
+    isisCLNSmaximumLSPGenerationInterval                MilliSeconds,
+    isisCLNSminimumBroadcastLSPTransmissionInterval     MilliSeconds,
+    isisCLNScompleteSNPInterval                         MilliSeconds,
+    isisCLNSoriginatingL1LSPBufferSize                  Integer32,
+    isisCLNSmanualAreaAddresses                         AreaAddresses,
+    isisCLNSmaximumAreaAddresses                        Integer32,
+    isisCLNSminimumLSPGenerationInterval                MilliSeconds,
+    isisCLNSpollESHelloRate                             MilliSeconds,
+    isisCLNSpartialSNPInterval                          MilliSeconds,
+    isisCLNSwaitingTime                                 MilliSeconds,
+    isisCLNSdRISISHelloTimer                            MilliSeconds,
+    isisCLNSl1State                                     DatabaseState,
+    isisCLNSareaAddresses                               AreaAddresses,
+    isisCLNScorruptedLSPsDetected                       Counter64,
+    isisCLNSlSPL1DatabaseOverloads                      Counter64,
+    isisCLNSmanualAddressesDroppedFromArea              Counter64,
+    isisCLNSattemptsToExceedMaximumSequenceNumber       Counter64,
+    isisCLNSsequenceNumberSkips                         Counter64,
+    isisCLNSownLSPPurges                                Counter64,
+    isisCLNSiDFieldLengthMismatches                     Counter64,
+    isisCLNSmaximumAreaAddressesMismatches              Counter64,
+    isisCLNSoriginatingLSPBufferSizeMismatches          Counter64,
+    isisCLNSlSPTooLargeToPropagate                      Counter64,
+-- "ISO/IEC 10589":cLNSISISAuthentication-P PACKAGE
+    isisCLNSareaTransmitPassword                        Password,
+    isisCLNSareaReceivePasswords                        Passwords,
+    isisCLNSauthenticationFailures                      Counter64,
+-- "ISO/IEC 10589":cLNSISISPartitionRepair-P PACKAGE
+    isisCLNSmaximumVirtualAdjacencies                   Integer32,
+    isisCLNSpartitionAreaAddresses                      AreaAddresses,
+    isisCLNSpartitionDesignatedL2IntermediateSystem     SystemId,
+    isisCLNSpartitionVirtualLinkChanges                 Counter64,
+-- "ISO/IEC 10589":cLNSISISLevel2-P PACKAGE
+    isisCLNSoriginatingL2LSPBufferSize                  Integer32,
+    isisCLNSl2State                                     DatabaseState,
+    isisCLNSlSPL2DatabaseOverloads                      Counter64,
+-- "ISO/IEC 10589":cLNSISISLevel2Authentication-P PACKAGE
+    isisCLNSdomainTransmitPassword                      Password,
+    isisCLNSdomainReceivePasswords                      Passwords,
+-- cLNS-networkEntity-Management NAME BINDING
+    isisCLNSRowStatus                                   RowStatus
+}
+
+-- "ISO/IEC 10589":cLNSISISBasic-P PACKAGE
+isisCLNSversion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The edition of this International Standard to which the 
+         implementation conforms."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, version ATTRIBUTE"
+    ::= { isisCLNSEntry 1 }
+
+isisCLNSiSType OBJECT-TYPE
+    SYNTAX      ISType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of this Intermediate System. The value of this 
+         attribute is only settable via the create parameter.
+         
+         Value is supplied either by the protocol machine if the 
+         MO is automatically created, or supplied via the CREATE 
+         Operation. The value cannot be changed thereafter."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iSType ATTRIBUTE"
+    ::= { isisCLNSEntry 2 }
+
+isisCLNSsystemId OBJECT-TYPE
+    SYNTAX      SystemId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ID for the local system, to be appended to each of 
+         the system's area address(es) to form the Network 
+         Entity Titles valid for this IS. The derivation of 
+         a value for SystemId is a local matter."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, systemId ATTRIBUTE"
+    ::= { isisCLNSEntry 3 }
+
+isisCLNSmaximumPathSplits OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of paths which it is permitted to split 
+         traffic between.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumPathSplits ATTRIBUTE"
+    DEFVAL      { 2 }
+    ::= { isisCLNSEntry 4 }
+
+isisCLNSminimumLSPTransmissionInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval between retransmissions of an LSP.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, minimumLSPTransmissionInterval ATTRIBUTE"
+    DEFVAL      { 5000 } -- 5 seconds
+    ::= { isisCLNSEntry 5 }
+
+isisCLNSmaximumLSPGenerationInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum interval between generated LSPs by this system.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumLSPGenerationInterval ATTRIBUTE"
+    DEFVAL      { 900000 } -- 900 seconds
+    ::= { isisCLNSEntry 6 }
+
+isisCLNSminimumBroadcastLSPTransmissionInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval between transmission of LSPs on 
+         a broadcast circuit (See clause 7.3.15.6). This timer 
+         shall be capable of a resolution not coarser than 10 
+         ms.
+         
+         Note: this is defined for all Circuits, but would only 
+         be required if one of them were a broadcast Circuit.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         minimumBroadcastLSPTransmissionInterval ATTRIBUTE"
+    DEFVAL      { 33 } -- 33 milliseconds
+    ::= { isisCLNSEntry 7 }
+
+isisCLNScompleteSNPInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Interval between generation of Complete Sequence 
+         Numbers PDUs by a Designated Intermediate System on 
+         a broadcast circuit.
+         
+         Note: this is defined for all linkages, but would only 
+         be required if one of them were a broadcast linkage.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, completeSNPInterval ATTRIBUTE"
+    DEFVAL      { 10000 } -- 10 seconds
+    ::= { isisCLNSEntry 8 }
+
+isisCLNSoriginatingL1LSPBufferSize OBJECT-TYPE
+    SYNTAX      Integer32 (512..1492)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum size of Level 1 LSPs and SNPs originated by 
+         this system.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, originatingL1LSPBufferSize ATTRIBUTE"
+    DEFVAL      { 512 } -- ??
+    ::= { isisCLNSEntry 9 }
+
+isisCLNSmanualAreaAddresses OBJECT-TYPE
+    SYNTAX      AreaAddresses
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The union of the sets of manualAreaAddresses reported 
+         in all Level 1 Link State PDUs received by this 
+         Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, manualAreaAddresses ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisCLNSEntry 10 }
+
+isisCLNSmaximumAreaAddresses OBJECT-TYPE
+    SYNTAX      Integer32 (0..254)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of area addresses to be permitted for 
+         this ISs area. Note that all ISs in the area must have 
+         the same value configured for this attribute if correct 
+         operation is to be assured.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumAreaAddresses ATTRIBUTE"
+    DEFVAL      { 3 }
+    ::= { isisCLNSEntry 11 }
+
+isisCLNSminimumLSPGenerationInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval between successive generation of LSPs 
+         with the same LSPID by this IS.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, minimumLSPGenerationInterval ATTRIBUTE"
+    DEFVAL      { 30000 } -- 30 seconds
+    ::= { isisCLNSEntry 12 }
+
+isisCLNSpollESHelloRate OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value to be used for the suggested ES configuration 
+         timer in ISH PDUs when soliciting the ES 
+         configuration."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, pollESHelloRate ATTRIBUTE"
+    DEFVAL      { 50000 } -- 50 seconds
+    ::= { isisCLNSEntry 13 }
+
+isisCLNSpartialSNPInterval OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval between sending Partial Sequence 
+         Number PDUs.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, partialSNPInterval ATTRIBUTE"
+    DEFVAL      { 2000 } -- 2 seconds
+    ::= { isisCLNSEntry 14 }
+
+isisCLNSwaitingTime OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Amount of time to delay in waiting state before 
+         entering On state.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of the that interval takes place the 
+         specified time after the original start of that 
+         interval, or immediately, whichever is later. The 
+         precision with which this time shall be implemented 
+         shall be the same as that associated with the basic 
+         operation of the timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, waitingTime ATTRIBUTE"
+    DEFVAL      { 60000 } -- 60 seconds
+    ::= { isisCLNSEntry 15 }
+
+isisCLNSdRISISHelloTimer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The interval between the generation of IIH PDUs by the 
+         designated IS on a LAN.
+         
+         This attribute specifies the interval between certain 
+         events in the operation of the protocol state machine. 
+         If the value of this attribute is changed to a new 
+         value while the protocol state machine is in operation, 
+         the implementation shall take the necessary steps to 
+         ensure that for any time interval which was in progress 
+         when the corresponding attribute was changed, the next 
+         expiration of that interval takes place no later than 
+         the expiration of the interval in progress or the 
+         specified interval, whichever is sooner. The precision 
+         with which this time shall be implemented shall be the 
+         same as that associated with the basic operation of the 
+         timer attribute."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, dRISISHelloTimer ATTRIBUTE"
+    DEFVAL      { 1000 } -- 1 second
+    ::= { isisCLNSEntry 16 }
+
+isisCLNSl1State OBJECT-TYPE
+    SYNTAX      DatabaseState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state of the Level 1 database."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l1State ATTRIBUTE"
+    ::= { isisCLNSEntry 17 }
+
+isisCLNSareaAddresses OBJECT-TYPE
+    SYNTAX      AreaAddresses
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The union of the sets of manualAreaAddresses reported 
+         in all Level 1 Link State PDUs received by this 
+         Intermediate System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, areaAddresses ATTRIBUTE"
+    ::= { isisCLNSEntry 18 }
+
+isisCLNScorruptedLSPsDetected OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of Corrupted LSP Detected events generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, corruptedLSPsDetected ATTRIBUTE"
+    ::= { isisCLNSEntry 19 }
+
+isisCLNSlSPL1DatabaseOverloads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the l1LSPDatabaseOverload event has 
+         been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, lSPL1DatabaseOverloads ATTRIBUTE"
+    ::= { isisCLNSEntry 20 }
+
+isisCLNSmanualAddressesDroppedFromArea OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the manualAddressesDroppedFromArea 
+         event has been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, manualAddressesDroppedFromArea ATTRIBUTE"
+    ::= { isisCLNSEntry 21 }
+
+isisCLNSattemptsToExceedMaximumSequenceNumber OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the 
+         attemptToExceedMaximumSequenceNumber event has been 
+         generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         attemptsToExceedMaximumSequenceNumber ATTRIBUTE"
+    ::= { isisCLNSEntry 22 }
+
+isisCLNSsequenceNumberSkips OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the sequenceNumberSkipped event has 
+         been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, sequenceNumberSkips ATTRIBUTE"
+    ::= { isisCLNSEntry 23 }
+
+isisCLNSownLSPPurges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the ownLSPPurged event has been 
+         generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, ownLSPPurges ATTRIBUTE"
+    ::= { isisCLNSEntry 24 }
+
+isisCLNSiDFieldLengthMismatches OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the iDFieldLengthMismatch event has 
+         been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, iDFieldLengthMismatches ATTRIBUTE"
+    ::= { isisCLNSEntry 25 }
+
+isisCLNSmaximumAreaAddressesMismatches OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of maximumAreaAddressesMismatch events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumAreaAddressesMismatches ATTRIBUTE"
+    ::= { isisCLNSEntry 26 }
+
+isisCLNSoriginatingLSPBufferSizeMismatches OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of originatingLSPBufferSizeMismatch events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, originatingLSPBufferSizeMismatches ATTRIBUTE"
+    ::= { isisCLNSEntry 27 }
+
+isisCLNSlSPTooLargeToPropagate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of lSPTooLargeToPropagate events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, lSPTooLargeToPropagate ATTRIBUTE"
+    ::= { isisCLNSEntry 28 }
+
+-- "ISO/IEC 10589":cLNSISISAuthentication-P PACKAGE
+isisCLNSareaTransmitPassword OBJECT-TYPE
+    SYNTAX      Password
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value to be used as a transmit password in Level 
+         1 LSP, and SNP PDUs transmitted by this Intermediate 
+         System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, areaTransmitPassword ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisCLNSEntry 29 }
+
+isisCLNSareaReceivePasswords OBJECT-TYPE
+    SYNTAX      Passwords
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The values to be used as receive passwords to check the 
+         receipt of Level 1 LSP, and SNP PDUs."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, areaReceivePasswords ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisCLNSEntry 30 }
+
+isisCLNSauthenticationFailures OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of authentication Failure events."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, authenticationFailures ATTRIBUTE"
+    ::= { isisCLNSEntry 31 }
+
+-- "ISO/IEC 10589":cLNSISISPartitionRepair-P PACKAGE
+isisCLNSmaximumVirtualAdjacencies OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of Virtual Adjacencies which may be 
+         created to repair partitioned Level 1 domains.
+         
+         This attribute places limits on some 'resource'. In 
+         general implementations may allocate resources up to 
+         this limit when the managed object is enabled and it 
+         may be impossible to change the allocation without 
+         first disabling and re-enabling the managed object. 
+         Therefore this International Standard only requires 
+         that it shall be possible to perform a REPLACE 
+         operation on this attribute while the MO is disabled. 
+         However some implementations may be able to change the 
+         allocation of resources without first disabling the MO. 
+         In this case it is permitted to increase the value of 
+         the attribute at any time, but it shall not be 
+         decreased below the currently 'used' value of the 
+         resource. Where an attempt to perform a REPLACE 
+         operation fails either because the MO is enabled, or 
+         because an attempt has been made to decrease the value, 
+         the REPLACE operation shall fail with the generation of 
+         the constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, maximumVirtualAdjacencies ATTRIBUTE"
+    DEFVAL      { 2 }
+    ::= { isisCLNSEntry 32 }
+
+isisCLNSpartitionAreaAddresses OBJECT-TYPE
+    SYNTAX      AreaAddresses
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The set union of all manualAreaAddresses of all 
+         Intermediate systems in the partition reachable by 
+         non-virtual links (calculated from their Level 
+         1 LSPs)."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, partitionAreaAddresses ATTRIBUTE"
+    ::= { isisCLNSEntry 33 }
+
+isisCLNSpartitionDesignatedL2IntermediateSystem OBJECT-TYPE
+    SYNTAX      SystemId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the Partition Designated Level 2 Intermediate 
+         System for this system."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, 
+         partitionDesignatedL2IntermediateSystem ATTRIBUTE"
+    ::= { isisCLNSEntry 34 }
+
+isisCLNSpartitionVirtualLinkChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the partitionVirtualLink hange event 
+         has been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, partitionVirtualLinkChanges ATTRIBUTE"
+    ::= { isisCLNSEntry 35 }
+
+-- "ISO/IEC 10589":cLNSISISLevel2-P PACKAGE
+isisCLNSoriginatingL2LSPBufferSize OBJECT-TYPE
+    SYNTAX      Integer32 (512..1492)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum size of Level 2 LSPs and SNPs originated by 
+         this system.
+         
+         This attribute shall only permit the REPLACE operation 
+         to be performed on it while the MO is in the Disabled 
+         Operational State. An attempt to perform a REPLACE 
+         operation while the MO is in the Enabled Operation 
+         State shall fail with the generation of the 
+         constraintViolation specific error."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, originatingL2LSPBufferSize ATTRIBUTE"
+    DEFVAL      { 512 } -- ??
+    ::= { isisCLNSEntry 36 }
+
+isisCLNSl2State OBJECT-TYPE
+    SYNTAX      DatabaseState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state of the Level 2 database."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, l2State ATTRIBUTE"
+    ::= { isisCLNSEntry 37 }
+
+isisCLNSlSPL2DatabaseOverloads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times the l2LSPDatabaseOverload event has 
+         been generated."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, lSPL2DatabaseOverloads ATTRIBUTE"
+    ::= { isisCLNSEntry 38 }
+
+-- "ISO/IEC 10589":cLNSISISLevel2Authentication-P PACKAGE
+isisCLNSdomainTransmitPassword OBJECT-TYPE
+    SYNTAX      Password
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value to be used as a transmit password in Level 
+         2 LSP, and SNP PDUs transmitted by this Intermediate 
+         System."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, domainTransmitPassword ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisCLNSEntry 39 }
+
+isisCLNSdomainReceivePasswords OBJECT-TYPE
+    SYNTAX      Passwords
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The values to be used as receive passwords to check the 
+         receipt of Level 2 LSP, and SNP PDUs."
+    REFERENCE   
+        "ISO/IEC 10589: 2001, domainReceivePasswords ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { isisCLNSEntry 40 }
+
+-- cLNS-networkEntity-Management NAME BINDING
+isisCLNSRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create or delete protocol machines in this table.  The 
+         contents of this table must persist across management 
+         system restart/reboot."
+    REFERENCE   
+        "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998, 
+               cLNS-networkEntity-Management NAME BINDING"
+    ::= { isisCLNSEntry 41 }
+
+-- ======================================
+
+isisScalars OBJECT IDENTIFIER
+    ::= { isisObjects 2 }
+
+isisNotifs OBJECT IDENTIFIER
+    ::= { isisObjects 3 }
+
+isisOids OBJECT IDENTIFIER
+    ::= { isisObjects 4 }
+
+isisConformance OBJECT IDENTIFIER
+    ::= { isisMib 2 }
+
+isisCompliances OBJECT IDENTIFIER
+    ::= { isisConformance 1 }
+
+isisGroups OBJECT IDENTIFIER
+    ::= { isisConformance 2 }
+
+END -- end of module OPENSS7-ISIS-MIB.
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
