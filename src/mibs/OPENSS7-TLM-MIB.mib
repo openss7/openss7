@@ -89,8 +89,9 @@ tlmMIB MODULE-IDENTITY
     DESCRIPTION 
         "This MIB provides configuration and status information 
          of an OSI CLTS/COTS subsystem, where the CLTS is in 
-         accordance with ITU-T, and COTS is in accordance with 
-         ITU-T.
+         accordance with ITU-T Rec. X.234 (1994) | ISO/IEC 8602 
+         : 1995, and COTS is in accordance with ITU-T Rec. X.224 
+         (1995) | ISO/IEC 8073 : 1997
          
          Copyright (c) 2008-2015  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
@@ -1896,6 +1897,7 @@ tlmConnectionIVMOInactivityTime OBJECT-TYPE
          applicable to Class 4 only."
     REFERENCE   
         "ITU-T Rec. X.284 (1997), inactivityTime"
+    DEFVAL      { 400000 } -- 6 minutes, 40 seconds
     ::= { tlmConnectionIVMOEntry 18 }
 
 tlmConnectionIVMOMaxTransmissions OBJECT-TYPE
@@ -1927,6 +1929,7 @@ tlmConnectionIVMORetransmissionTime OBJECT-TYPE
          unit is in seconds."
     REFERENCE   
         "ITU-T Rec. X.284 (1997), retransmissionTime"
+    DEFVAL      { 2000 } -- 2 seconds
     ::= { tlmConnectionIVMOEntry 20 }
 
 tlmConnectionIVMOWindowTimer OBJECT-TYPE
@@ -1942,6 +1945,7 @@ tlmConnectionIVMOWindowTimer OBJECT-TYPE
          unit is in seconds."
     REFERENCE   
         "ITU-T Rec. X.284 (1997), windowTimer"
+    DEFVAL      { 120000 }
     ::= { tlmConnectionIVMOEntry 21 }
 
 tlmConnectionIVMOMaximumWindow4 OBJECT-TYPE
