@@ -1024,7 +1024,7 @@ iSConfigurationTimer ATTRIBUTE
 	BEHAVIOUR
 		iSConfigurationTimer-B BEHAVIOUR
 			DEFINED AS
-				Value for the ISO 9542 IS configuration timer. It is used to determine how often 
+				Value for the ISO 9542 IS configuration timer.  It is used to determine how often 
 				an IS reports configuration information to ESs;;
 REGISTERED AS { NLM.aoi iSConfigurationTimer(24) };
 
