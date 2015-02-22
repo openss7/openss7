@@ -1,0 +1,1581 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) src/mibs/OPENSS7-TLM-MIB.mib
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- =============================================================================
+
+OPENSS7-DLM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    LocalDistinguishedName, LocalDistinguishedNames
+        FROM OPENSS7-NLM-MIB
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, SimpleNameType
+        FROM OPENSS7-SMI-MIB
+    MilliSeconds
+        FROM OPENSS7-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Counter64, Gauge32, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowPointer, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+dlmMIB MODULE-IDENTITY
+    LAST-UPDATED "201502210709Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         Copyright (c) 2008-2015  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201502210709Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 24 }
+
+ -- top level organization of the MIB
+
+-- dlmNotifications        OBJECT IDENTIFIER ::= { dlmMIB           0 }
+-- dlmObjects              OBJECT IDENTIFIER ::= { dlmMIB           1 }
+-- dlmConformance          OBJECT IDENTIFIER ::= { dlmMIB           2 }
+
+-- dlmTables               OBJECT IDENTIFIER ::= { dlmObjects       1 }
+-- dlmScalars              OBJECT IDENTIFIER ::= { dlmObjects       1 }
+-- dlmNotifs               OBJECT IDENTIFIER ::= { dlmObjects       1 }
+-- dlmOids                 OBJECT IDENTIFIER ::= { dlmObjects       1 }
+
+-- dlmCompliances          OBJECT IDENTIFIER ::= { dlmConformance   1 }
+-- dlmGroups               OBJECT IDENTIFIER ::= { dlmConformance   2 }
+
+-- dlmSubsystem            OBJECT IDENTIFIER ::= { dlmTables        1 }
+-- dlmEntity               OBJECT IDENTIFIER ::= { dlmTables        2 }
+-- dlmDLSAP                OBJECT IDENTIFIER ::= { dlmTables        3 }
+-- dlmLAPBDLE              OBJECT IDENTIFIER ::= { dlmTables        4 }
+-- dlmSLPPM                OBJECT IDENTIFIER ::= { dlmTables        5 }
+-- dlmSLPConnection        OBJECT IDENTIFIER ::= { dlmTables        6 }
+-- dlmSLPConnectionIVMO    OBJECT IDENTIFIER ::= { dlmTables        7 }
+-- dlmMACDLE               OBJECT IDENTIFIER ::= { dlmTables        8 }
+-- dlmMAC                  OBJECT IDENTIFIER ::= { dlmTables        9 }
+-- dlmLLCDLE               OBJECT IDENTIFIER ::= { dlmTables       10 }
+-- dlmLLCCLPM              OBJECT IDENTIFIER ::= { dlmTables       11 }
+-- dlmLLCCOPM              OBJECT IDENTIFIER ::= { dlmTables       12 }
+
+DLSap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               DLM.Sap1Address"
+    SYNTAX      Integer32 (0..255)
+
+WindowSize ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The MLP window size.  When a modulo 8 window is in 
+         effect, the syntax has the range (1..7).  When a modulo 
+         128 window is in effect, the syntax has the range 
+         (1..127)."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               DLM.WindowSize"
+    SYNTAX      Integer32 (1..127)
+
+GuardRegion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Send or receive LP window in the guard region."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               DLM.MX"
+    SYNTAX      Integer32 (0..4095)
+
+dlmNotifications OBJECT IDENTIFIER
+    ::= { dlmMIB 0 }
+
+dlmObjects OBJECT IDENTIFIER
+    ::= { dlmMIB 1 }
+
+dlmTables OBJECT IDENTIFIER
+    ::= { dlmObjects 1 }
+
+-- ==========================================
+
+dlmSubsystem OBJECT IDENTIFIER
+    ::= { dlmTables 1 }
+
+dlmSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. x.282 (1999) | ISO/IEC 10742 : 1994, 
+               datalinkSubsystem MANAGED OBJECT CLASS"
+    ::= { dlmSubsystem 1 }
+
+dlmSubsystemEntry OBJECT-TYPE
+    SYNTAX      DlmSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.3 The Data Link Subsystem managed object
+         
+         There shall be exactly one of these managed objects 
+         within a system.  It exists to provide a container for 
+         all managed objects in a system, that relate to the 
+         operation of the Datalink layer.
+         
+         The datalinkSubsystem managed object cannot be created 
+         or deleted explicitly by management operation. It 
+         exists inherently in a system; created and deleted as 
+         part of system operation."
+    REFERENCE   
+        "ITU-T Rec. x.282 (1999) | ISO/IEC 10742 : 1994, 
+               datalinkSubsystem MANAGED OBJECT"
+    INDEX       { dlmSubsystemId }
+    ::= { dlmSubsystemTable 1 }
+
+DlmSubsystemEntry ::= SEQUENCE {
+    dlmSubsystemId  SnmpAdminString
+}
+
+dlmSubsystemId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               subsystemId"
+    DEFVAL      { "DatalinkSubsystem" }
+    ::= { dlmSubsystemEntry 1 }
+
+-- ==========================================
+
+dlmEntity OBJECT IDENTIFIER
+    ::= { dlmTables 2 }
+
+dlmEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               datalinkEntity MANAGED OBJECT CLASS"
+    ::= { dlmEntity 1 }
+
+dlmEntityEntry OBJECT-TYPE
+    SYNTAX      DlmEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.4 The Data Link Entity managed object
+         
+         The generic DLE MO from which protocol- and 
+         media-specific DLE MOs may be derived."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               datalinkEntity MANAGED OBJECT"
+    INDEX       { dlmEntityId }
+    ::= { dlmEntityTable 1 }
+
+DlmEntityEntry ::= SEQUENCE {
+    dlmEntityId                     SimpleNameType,
+    dlmLocalSapNames                SnmpAdminString,
+    dlmEntityOperationalState       OperationalState,
+    dlmEntityProviderEntityNames    OCTET STRING,
+    dlmEntityRowStatus              RowStatus
+}
+
+dlmEntityId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a simple name type for the datalink entity 
+         that acts as an index into the datalink entity table."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993_ | ISO/IEC 10165-5 : 1993, 
+               communicationsEntityId"
+    ::= { dlmEntityEntry 1 }
+
+dlmLocalSapNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The local SAP names are represented as a list of 
+         strings, separated by commas.  Under OpenSS7 OSI stack, 
+         the local SAP names identify the filesystem path to the 
+         STREAMS characer device that provides the datalink user 
+         interface to the local SAP.  For example: /dev/dl1."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               localSapNames"
+    ::= { dlmEntityEntry 2 }
+
+dlmEntityOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the datalink entity in 
+         accordance with the OperationalState textual 
+         convention of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 
+         (1992) | ISO/IEC 10165-2 : 1992."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState"
+    ::= { dlmEntityEntry 3 }
+
+dlmEntityProviderEntityNames OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The distinguished names of provider entity managed 
+         objects. The managed objects that represent the 
+         entities to be used to provide services to this 
+         entity."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               providerEntityNames ATTRIBUTE"
+    ::= { dlmEntityEntry 4 }
+
+dlmEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when a datalinkEntity 
+         managed object (or an instance of a subclass of the 
+         datalinkEntity MO class) can be created by management 
+         as a subordinate object of the datalinkSubsystem 
+         managed object (or subclass), and deleted by 
+         management."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               datalinkEntity-datalinkSubsystem-Management NAME 
+               BINDING"
+    ::= { dlmEntityEntry 5 }
+
+-- ==========================================
+
+dlmDLSAP OBJECT IDENTIFIER
+    ::= { dlmTables 3 }
+
+dlmDLSAPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmDLSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               dLSAP MANAGED OBJECT CLASS"
+    ::= { dlmDLSAP 1 }
+
+dlmDLSAPEntry OBJECT-TYPE
+    SYNTAX      DlmDLSAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.5 The Data Link Service Access Point managed object
+         
+         The dLSAP managed object class is used to represent 
+         a service access point at which services are provided 
+         by a DLE to the user entity.  Instances of the dLSAP 
+         managed object class are contained within instances of 
+         subclasses derived from the datalinkEntity managed 
+         object class. Constraints on the number of contained 
+         dLSAP MOs and any specific semantics of the attributes 
+         are given as part of the definition of the containing 
+         DLE managed object class.
+         
+         A dLSAP managed object may be created and deleted 
+         explicitly by management operation or created and 
+         deleted automatically as part of system operation, e.g. 
+         when a user of the Data Link layer service requests and 
+         is granted use of the service. The mechanism by which 
+         this happens is a local matter and not subject to OSI 
+         standardization."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               dLSAP MANAGED OBJECT"
+    INDEX       { dlmEntityId, dlmDLSAPSapId }
+    ::= { dlmDLSAPTable 1 }
+
+DlmDLSAPEntry ::= SEQUENCE {
+    dlmDLSAPSapId               SimpleNameType,
+    dlmDLSAPSap1Address         DLSap,
+    dlmDLSAPUserEntityNames     LocalDistinguishedNames,
+    dlmDLSAPRowStatus           RowStatus
+}
+
+dlmDLSAPSapId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a simple name for this DLSAP for a datalink 
+         entity."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               sapId ATTRIBUTE"
+    ::= { dlmDLSAPEntry 1 }
+
+dlmDLSAPSap1Address OBJECT-TYPE
+    SYNTAX      DLSap
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the DLSAP LSAP on the datalink entity.  This 
+         object cannot be changed while the corresponding row 
+         status is active(1)."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               sap1Address ATTRIBUTE"
+    ::= { dlmDLSAPEntry 2 }
+
+dlmDLSAPUserEntityNames OBJECT-TYPE
+    SYNTAX      LocalDistinguishedNames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The user entity names utilizing this DLSAP.  Note that 
+         at most one network entity can be associated with 
+         a given DLSAP.  When no network entity is associated 
+         with this DLSAP, this object will be a null string."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               userEntityNames ATTRIBUTE"
+    DEFVAL      { "" }
+    ::= { dlmDLSAPEntry 3 }
+
+dlmDLSAPRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create or delete DLSAPs.  Rows created by management 
+         action in this table must persist across management 
+         system restart/reboot."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+               sap1-communicationsEntity NAME BINDING"
+    ::= { dlmDLSAPEntry 4 }
+
+-- ==========================================
+
+dlmLAPBDLE OBJECT IDENTIFIER
+    ::= { dlmTables 4 }
+
+dlmLAPBDLETable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmLAPBDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lAPBDLE MANAGED OBJECT CLASS"
+    ::= { dlmLAPBDLE 1 }
+
+dlmLAPBDLEEntry OBJECT-TYPE
+    SYNTAX      DlmLAPBDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.6 The LAPB Data Link Entity managed object
+         
+         There may be multiple instances of the lAPBDLE managed 
+         object in a system. Systems not supporting the LAPB 
+         Data Link procedures defined in ISO/IEC 7776 are not 
+         required to support the lAPBDLE and contained managed 
+         objects.
+         
+         The lAPBDLE managed object has a conditional mlp 
+         Package. There may be multiple instances of lAPBDLE MO 
+         in a system, both with and without the mlp Package. For 
+         those instances in which the package is absent, the mlp 
+         procedures do not apply and the lAPBDLE MO may contain 
+         at most one sLPPM MO. For those instances in which the 
+         package is present, the mlp procedures do apply and the 
+         lAPBDLE MO may contain multiple instances of sLPPM MO.
+         
+         A lAPBDLE MO may contain at most one dLSAP MO. The 
+         value of the sap1Address attribute is of no 
+         significance. The cardinality of the userEntityNames 
+         attribute is limited to one.
+         
+         A lAPBDLE MO may be created and deleted explicitly by 
+         management operation or created and deleted 
+         automatically as part of system operation.
+         
+         When the lAPBDLE MO is operable, the operationalState 
+         shall have the value 'enabled'; otherwise it shall have 
+         the value 'disabled'.  Transitions of operationalState 
+         shall be reported using the stateChange notification."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lAPBDLE MANAGED OBJECT"
+    AUGMENTS    { dlmEntityEntry }
+    ::= { dlmLAPBDLETable 1 }
+
+DlmLAPBDLEEntry ::= SEQUENCE {
+-- mLP-P PACKAGE
+    dlmLAPBDLEmT1Timer                          MilliSeconds,
+    dlmLAPBDLEmT3Timer                          MilliSeconds,
+    dlmLAPBDLEmW                                WindowSize,
+    dlmLAPBDLEmXSend                            GuardRegion,
+    dlmLAPBDLEmXReceive                         GuardRegion,
+-- mT2-P PACKAGE
+    dlmLAPBDLEmT2Timer                          MilliSeconds,
+-- mLP-Counters-P PACKAGE
+    dlmLAPBDLEReceivedMlpResets                 Counter64,
+    dlmLAPBDLETimesMT1Expired                   Counter64,
+    dlmLAPBDLEiFramesReassignments              Counter64,
+    dlmLAPBDLEmlpFramesReceived                 Counter64,
+    dlmLAPBDLEmlpFramesSent                     Counter64,
+    dlmLAPBDLEmlpFramesOutsideWindowGuard       Counter64,
+    dlmLAPBDLEReceivedMlpFramesInGuardRegion    Counter64
+}
+
+-- mLP-P PACKAGE
+dlmLAPBDLEmT1Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "ms"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 parameter MT1 (lost frame 
+         timer). Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mT1Timer ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 1 }
+
+dlmLAPBDLEmT3Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "ms"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 parameter MT3 (mlp reset 
+         confirmation timer). Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mT3Timer ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 2 }
+
+dlmLAPBDLEmW OBJECT-TYPE
+    SYNTAX      WindowSize
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "MLP window size."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mW ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 3 }
+
+dlmLAPBDLEmXSend OBJECT-TYPE
+    SYNTAX      GuardRegion
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Receive MLP window in the Guard Region."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mX ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 4 }
+
+dlmLAPBDLEmXReceive OBJECT-TYPE
+    SYNTAX      GuardRegion
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Receive MLP window in the Guard Region."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mX ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 5 }
+
+-- mT2-P PACKAGE
+dlmLAPBDLEmT2Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    UNITS       "ms"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 parameter MT2 (group busy 
+         timer). Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mT2Timer ATTRIBUTE"
+    ::= { dlmLAPBDLEEntry 6 }
+
+-- mLP-Counters-P PACKAGE
+dlmLAPBDLEReceivedMlpResets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Number of received MLP Resets.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               receivedMlpResets ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 7 }
+
+dlmLAPBDLETimesMT1Expired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Lost multilink frames.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               timesMT1Expired ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 8 }
+
+dlmLAPBDLEiFramesReassignments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Number of reassignments of IFrames on another slp.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               iFramesReassignments ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 9 }
+
+dlmLAPBDLEmlpFramesReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of mlp frames received.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mlpFramesReceived ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 10 }
+
+dlmLAPBDLEmlpFramesSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of mlp frames Sent.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mlpFramesSent ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 11 }
+
+dlmLAPBDLEmlpFramesOutsideWindowGuard OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of mlp frames outside the window 
+         guard that have been received.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mlpFramesOutsideWindowGuard ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 12 }
+
+dlmLAPBDLEReceivedMlpFramesInGuardRegion OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Number of MLP Frames received in the Guard Region.
+         
+         This is a non-wrapping 64-bit counter that can be reset 
+         by writing a zero (0) to the object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               receivedMlpFramesInGuardRegion ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLAPBDLEEntry 13 }
+
+
+-- ==========================================
+
+dlmSLPPM OBJECT IDENTIFIER
+    ::= { dlmTables 5 }
+
+dlmSLPPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmSLPPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPPM MANAGED OBJECT CLASS"
+    ::= { dlmSLPPM 1 }
+
+dlmSLPPMEntry OBJECT-TYPE
+    SYNTAX      DlmSLPPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.7 The LAPB Single Link Protocol Machine managed 
+           object
+         
+         The sLPPM managed object represents the operation of 
+         the LAPB Data Link layer protocol machine described in 
+         ISO/IEC 7776 over a single physical link.  An sLPPM 
+         managed object may contain at most one sLPConnection MO 
+         and one or more sLPConnectionIVMO.
+         
+         An sLPPM MO may be created and deleted explicitly by 
+         management operation or created and deleted 
+         automatically as part of system operation.
+         
+         When the sLPPM MO is operable, the operationalState 
+         shall have the value 'enabled'; otherwise it shall have 
+         the value 'disabled'.  Transitions of operationalState 
+         shall be reported using the stateChange notification."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPPM MANAGED OBJECT CLASS"
+    INDEX       { dlmEntityId, dlmSLPPMprotocolMachineId }
+    ::= { dlmSLPPMTable 1 }
+
+DlmSLPPMEntry ::= SEQUENCE {
+    dlmSLPPMprotocolMachineId   SimpleNameType,
+    dlmSLPPMOperationalState    OperationalState,
+    dlmSLPPMRowStatus           RowStatus
+}
+
+dlmSLPPMprotocolMachineId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               protocolMachineId ATTRIBUTE"
+    ::= { dlmSLPPMEntry 1 }
+
+dlmSLPPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the connection-mode 
+         protocol machine in accordance with the 
+         OperationalState textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 (1992) | ISO/IEC 
+         10165-2 : 1992."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               operationalState ATTRIBUTE"
+    ::= { dlmSLPPMEntry 2 }
+
+dlmSLPPMRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               coProtocolMachine-entity NAME BINDING"
+    ::= { dlmSLPPMEntry 3 }
+
+-- ==========================================
+
+dlmSLPConnection OBJECT IDENTIFIER
+    ::= { dlmTables 6 }
+
+dlmSLPConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmSLPConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnection MANAGED OBJECT CLASS"
+    ::= { dlmSLPConnection 1 }
+
+dlmSLPConnectionEntry OBJECT-TYPE
+    SYNTAX      DlmSLPConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnection MANAGED OBJECT"
+    INDEX       { dlmEntityId, dlmSLPPMprotocolMachineId, 
+                  dlmSLPConnectionId }
+    ::= { dlmSLPConnectionTable 1 }
+
+DlmSLPConnectionEntry ::= SEQUENCE {
+    dlmSLPConnectionId                                  SimpleNameType,
+    dlmSLPConnectionUnderlyingConnectionNames           SnmpAdminString,
+-- singlePeerConnectionP2 PACKAGE
+    dlmSLPConnectionSupportedConnectionNames            SnmpAdminString,
+-- t3-P PACKAGE
+    dlmSLPConnectionT3Timer                             MilliSeconds,
+    dlmSLPConnectionTimesT3Expired                      Counter64,
+-- t4-P PACKAGE
+    dlmSLPConnectionT4Timer                             MilliSeconds,
+    dlmSLPConnectionTimesT4Expired                      Counter64,
+-- link-reset-disconnect-n2-P PACKAGE
+    dlmSLPConnectionAbnormalLinkDisconnectsReceived     Counter64,
+    dlmSLPConnectionAbnormalLinkDisconnectsSent         Counter64,
+    dlmSLPConnectionLinkResetsReceived                  Counter64,
+    dlmSLPConnectionLinkResetsSent                      Counter64,
+    dlmSLPConnectionTimesN2Reached                      Counter64,
+--
+    dlmSLPConnectionRowStatus                           RowStatus
+}
+
+dlmSLPConnectionId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name or number of the connection."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               connectionId ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 1 }
+
+dlmSLPConnectionUnderlyingConnectionNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the distinguished names of 
+         managed objects that represent connections that are 
+         employed by the connection that has this attribute."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               underlyingConnectionNames ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 2 }
+
+-- singlePeerConnectionP2 PACKAGE
+dlmSLPConnectionSupportedConnectionNames OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the distinguished names of 
+         managed objects that represent connections that are 
+         supported by the connection that has this attribute."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               supportedConnectionNames ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 3 }
+
+-- t3-P PACKAGE
+dlmSLPConnectionT3Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 optional parameter or ITU-T 
+         X.25 mandatory parameter T3. Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               t3Timer ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 4 }
+
+dlmSLPConnectionTimesT3Expired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of times local Timer T3 expired."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               timesT3Expired ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 5 }
+
+-- t4-P PACKAGE
+dlmSLPConnectionT4Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 parameter T4. The maximum 
+         time a DTE or a DCE will allow without frames being 
+         exchanged on the data link. Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               t4Timer ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 6 }
+
+dlmSLPConnectionTimesT4Expired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of times local Timer T4 expired."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               timesT4Expired ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 7 }
+
+-- link-reset-disconnect-n2-P PACKAGE
+dlmSLPConnectionAbnormalLinkDisconnectsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of received abnormal Link 
+         Disconnects."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               abnormalLinkDisconnectsReceived ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 8 }
+
+dlmSLPConnectionAbnormalLinkDisconnectsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of sent abnormal Link 
+         Disconnects."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               abnormalLinkDisconnectsSent ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 9 }
+
+dlmSLPConnectionLinkResetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of received Link Resets."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               linkResetsReceived ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 10 }
+
+dlmSLPConnectionLinkResetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of sent Link Resets."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               linkResetsSent ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 11 }
+
+dlmSLPConnectionTimesN2Reached OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of times N2 was Reached."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               timesN2Reached ATTRIBUTE"
+    ::= { dlmSLPConnectionEntry 12 }
+
+--
+dlmSLPConnectionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when an sLPConnection 
+         managed object (or an instance of a subclass of the 
+         sLPConnection MO class) which is a subordinate object 
+         of an sLPPM managed object (or subclass), can be 
+         deleted by management.;
+         
+         The name binding which applies when an sLPConnection 
+         managed object (or an instance of a subclass of the 
+         sLPConnection MO class) is created automatically by the 
+         operation of the system as a subordinate object of an 
+         sLPPM managed object (or subclass), and deleted 
+         automatically.
+         
+         The creation of an instance of an sLPConnection MO (or 
+         subclass) using this name binding may reference an 
+         instance of the sLPConnectionIVMO (or subclass). The 
+         means by which an instance (if any) of the 
+         sLPConnectionIVMO are identified are a local matter. 
+         When this occurs, some of the initial values of the 
+         attributes of the instance of the sLPConnection MO may 
+         be supplied by the values of the attributes in the 
+         specified instance of sLPConnectionIVMO.
+         
+         However, any such value may be overridden by a value 
+         supplied by local means (for example across an internal 
+         interface). Where values are supplied by the IVMO, the 
+         initial value of an attribute of the sLPConnection MO 
+         shall be the value of the corresponding attribute in 
+         the sLPConnectionIVMO (that is, which has the same 
+         attribute template label). The naming attribute of the 
+         sLPConnection MO is assigned a value according to local 
+         mechanisms."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnection-sLPPM-Management NAME BINDING"
+    ::= { dlmSLPConnectionEntry 13 }
+
+-- ==========================================
+
+dlmSLPConnectionIVMO OBJECT IDENTIFIER
+    ::= { dlmTables 7 }
+
+dlmSLPConnectionIVMOTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmSLPConnectionIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnnectionIVMO MANAGED OBJECT CLASS"
+    ::= { dlmSLPConnectionIVMO 1 }
+
+dlmSLPConnectionIVMOEntry OBJECT-TYPE
+    SYNTAX      DlmSLPConnectionIVMOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.9 The LAPB Single Link Protocol Connection Initial 
+           Values managed object
+         
+         An sLPConnectionIVMO may be used to supply initial 
+         values for the attributes of sLPConnection MOs. 
+         Different instances of sLPConnectionIVMO may contain 
+         different initial values.
+         
+         An sLPConnectionIVMO may be created and deleted 
+         explicitly by management operation."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnnectionIVMO MANAGED OBJECT"
+    INDEX       { dlmEntityId, dlmSLPPMprotocolMachineId, 
+                  dlmSLPConnectionIVMOId }
+    ::= { dlmSLPConnectionIVMOTable 1 }
+
+DlmSLPConnectionIVMOEntry ::= SEQUENCE {
+    dlmSLPConnectionIVMOId              SimpleNameType,
+-- t3IVMO-P PACKAGE
+    dlmSLPConnectionIVMOt3Timer         MilliSeconds,
+-- t4IVMO-P PACKAGE
+    dlmSLPConnectionIVMOt4Timer         MilliSeconds,
+    dlmSLPConnectionIVMOtimesT4Expired  Counter64,
+--
+    dlmSLPConnectionIVMORowStatus       RowStatus
+}
+
+dlmSLPConnectionIVMOId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Naming attribute for the sLPConnectionIVMO managed 
+         object."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnectionIVMOId ATTRIBUTE"
+    ::= { dlmSLPConnectionIVMOEntry 1 }
+
+-- t3IVMO-P PACKAGE
+dlmSLPConnectionIVMOt3Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 optional parameter or ITU-T 
+         X.25 mandatory parameter T3. Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               t3Timer ATTRIBUTE"
+    ::= { dlmSLPConnectionIVMOEntry 2 }
+
+-- t4IVMO-P PACKAGE
+dlmSLPConnectionIVMOt4Timer OBJECT-TYPE
+    SYNTAX      MilliSeconds
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value of the ISO/IEC 7776 parameter T4. The maximum 
+         time a DTE or a DCE will allow without frames being 
+         exchanged on the data link. Unit is seconds."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               t4Timer ATTRIBUTE"
+    ::= { dlmSLPConnectionIVMOEntry 3 }
+
+dlmSLPConnectionIVMOtimesT4Expired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Counter. Total number of times local Timer T4 expired."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               timesT4Expired ATTRIBUTE"
+    ::= { dlmSLPConnectionIVMOEntry 4 }
+
+--
+dlmSLPConnectionIVMORowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when an 
+         sLPConnectionIVMO managed object (or an instance of 
+         a subclass of the sLPConnectionIVMO MO class) can be 
+         created by management as a subordinate object of 
+         a sLPPM managed object (or subclass), and deleted by 
+         management."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               sLPConnectionIVMO-sLPPM-Management NAME BINDING"
+    ::= { dlmSLPConnectionIVMOEntry 5 }
+
+
+-- ==========================================
+
+dlmMACDLE OBJECT IDENTIFIER
+    ::= { dlmTables 8 }
+
+dlmMACDLETable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmMACDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mACDLE MANAGED OBJECT CLASS"
+    ::= { dlmMACDLE 1 }
+
+dlmMACDLEEntry OBJECT-TYPE
+    SYNTAX      DlmMACDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.10 The MAC Data Link Entity managed object
+         
+         There may be multiple instances of the mACDLE managed 
+         object in a system.  Systems not supporting connections 
+         to LAN media are not required to support the mACDLE and 
+         contained managed objects.
+         
+         A mACDLE managed object may contain at most one 
+         instance of a mac-specific MO derived from the generic 
+         mAC MO.  A mACDLE MO may contain at most one dLSAP MO.  
+         The value of the sap1Address attribute is of no 
+         significance.  The cardinality of the userEntityNames 
+         attribute is limited to one.
+         
+         A mACDLE MO may be created and deleted explicitly by 
+         management operation or created and deleted 
+         automatically as part of system operation.
+         
+         When the mACDLE MO is operable, the operationalSate 
+         shall have the value 'enabled'; otherwise it shall have 
+         the value 'disabled'.  Transitions of operationalState 
+         shall be reported using the stateChange notification."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mACDLE MANAGED OBJECT"
+    AUGMENTS    { dlmEntityEntry }
+    ::= { dlmMACDLETable 1 }
+
+DlmMACDLEEntry ::= SEQUENCE {
+    dlmMACDLERowStatus  RowStatus
+}
+
+dlmMACDLERowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        ""
+    ::= { dlmMACDLEEntry 1 }
+
+-- ==========================================
+
+dlmMAC OBJECT IDENTIFIER
+    ::= { dlmTables 9 }
+
+dlmMACTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmMACEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mAC MANAGED OBJECT CLASS"
+    ::= { dlmMAC 1 }
+
+dlmMACEntry OBJECT-TYPE
+    SYNTAX      DlmMACEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.10 The MAC Data Link Entity managed object
+         
+         There may be multiple instances of the mACDLE managed 
+         object in a system.  Systems not supporting connections 
+         to LAN media are not required to support the mACDLE and 
+         contained managed objects.
+         
+         A mACDLE managed object may contain at most one 
+         instance of a mac-specific MO derived from the generic 
+         mAC MO.  A mACDLE MO may contain at most one dLSAP MO.  
+         The value of the sap1Address attribute is of no 
+         significance.  The cardinality of the userEntityNames 
+         attribute is limited to one.
+         
+         A mACDLE MO may be created and deleted explicitly by 
+         management operation or created and deleted 
+         automatically as part of system operation.
+         
+         When the mACDLE MO is operable, the operationalSate 
+         shall have the value 'enabled'; otherwise it shall have 
+         the value 'disabled'.  Transitions of operationalState 
+         shall be reported using the stateChange notification."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mAC MANAGED OBJECT"
+    INDEX       { dlmEntityId, dlmMACId }
+    ::= { dlmMACTable 1 }
+
+DlmMACEntry ::= SEQUENCE {
+    dlmMACId                SimpleNameType,
+    dlmMACOperationalState  OperationalState,
+    dlmMACRowStatus         RowStatus
+}
+
+dlmMACId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The naming attribute for the mAC MO."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mACId ATTRIBUTE"
+    ::= { dlmMACEntry 1 }
+
+dlmMACOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the MAC in accordance 
+         with the OperationalState textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 (1992) | ISO/IEC 
+         10165-2 : 1992."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState"
+    ::= { dlmMACEntry 2 }
+
+dlmMACRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when a mAC managed 
+         object (or an instance of a subclass of the mAC MO 
+         class) can be created by management as a subordinate 
+         object of a mACDLE managed object (or subclass), and 
+         deleted by management.
+         
+         The name binding which applies when a mAC managed 
+         object (or an instance of a subclass of the mAC MO 
+         class) is created automatically by the operation of the 
+         system as a subordinate object of a mACDLE managed 
+         object (or subclass), and deleted automatically."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               mAC-mACDLE-Management NAME BINDING"
+    ::= { dlmMACEntry 3 }
+
+
+-- ==========================================
+
+dlmLLCDLE OBJECT IDENTIFIER
+    ::= { dlmTables 10 }
+
+dlmLLCDLETable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmLLCDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCDLE MANAGED OBJECT CLASS"
+    ::= { dlmLLCDLE 1 }
+
+dlmLLCDLEEntry OBJECT-TYPE
+    SYNTAX      DlmLLCDLEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.12 The LLC Data Link Entity managed object
+         
+         There may be multiple instances of the lLCDLE managed 
+         object in a system.  Systems not supporting LLC 
+         procedures are not required to support the lLCDLE and 
+         contained managed objects.
+         
+         An lLCDLE managed object may contain instances of 
+         llc-specific connectionless and connection-mode 
+         protocol machine MOs derived form the generic lLCCOPM 
+         and lLCCLPM MO.  An lLCDLE MO may contain multiple 
+         dLSAP MOs.  The cardinality of the userEntityNames 
+         attribute is limited to one.
+         
+         An lLCDLE MO may be created and deleted explicity by 
+         management operation or created and deleted 
+         automatically as part of ssytem operation.
+         
+         When the lLCDLE MO is operable, the operationalState 
+         shall have the value 'enabled'; otherwise it shall have 
+         the value 'disabled'.  Transitions of operationalState 
+         shall be reported using the stateChange notification."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCDLE MANAGED OBJECT"
+    AUGMENTS    { dlmEntityEntry }
+    ::= { dlmLLCDLETable 1 }
+
+DlmLLCDLEEntry ::= SEQUENCE {
+    dlmLLCDLERowStatus  RowStatus
+}
+
+dlmLLCDLERowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        ""
+    ::= { dlmLLCDLEEntry 1 }
+
+-- ==========================================
+
+dlmLLCCLPM OBJECT IDENTIFIER
+    ::= { dlmTables 11 }
+
+dlmLLCCLPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmLLCCLPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCCLPM MANAGED OBJECT CLASS"
+    ::= { dlmLLCCLPM 1 }
+
+dlmLLCCLPMEntry OBJECT-TYPE
+    SYNTAX      DlmLLCCLPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.13 The LLC Connectionless Protocol Machine managed 
+           object
+         
+         The generic LLC Connectionless PM MO form which 
+         protocol-specific LLC PM MOs may be derived."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCCLPM MANAGED OBJECT"
+    INDEX       { dlEntityId, dlmLLCCLPMClProtocolMachineId }
+    ::= { dlmLLCCLPMTable 1 }
+
+DlmLLCCLPMEntry ::= SEQUENCE {
+    dlmLLCCLPMClProtocolMachineId   SimpleNameType,
+    dlmLLCCLPMOperationalState      OperationalState,
+    dlmLLCCLPMTotalRemoteSAPs       Counter64,
+    dlmLLCCLPMRowStatus             RowStatus
+}
+
+dlmLLCCLPMClProtocolMachineId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a simple name for this connectionless-mode 
+         protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               clProtocolMachineId ATTRIBUTE"
+    DEFVAL      { "LLC1" }
+    ::= { dlmLLCCLPMEntry 1 }
+
+dlmLLCCLPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the 
+         connectionless-mode protocol machine in accordance with 
+         the OperationalState textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 (1992) | ISO/IEC 
+         10165-2 : 1992."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState ATTRIBUTE"
+    DEFVAL      { enabled }
+    ::= { dlmLLCCLPMEntry 2 }
+
+dlmLLCCLPMTotalRemoteSAPs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counts the number of remote (N) SAPs that the 
+         containing clProtocolMachine has communicated with. 
+         Incremented by 1 every time communication with a remote 
+         (N) SAP is achieved."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               totalRemoteSAPs ATTRIBUTE"
+    DEFVAL      { 0 }
+    ::= { dlmLLCCLPMEntry 3 }
+
+dlmLLCCLPMRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when an lLCCLPM managed 
+         object (or an instance of a subclass of the lLCCLPM MO 
+         class) can be created by management as a subordinate 
+         object of a lLCDLE managed object (or subclasses), and 
+         deleted by management."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCLPM-lLCDLE-Management NAME BINDING"
+    ::= { dlmLLCCLPMEntry 4 }
+
+-- ==========================================
+
+dlmLLCCOPM OBJECT IDENTIFIER
+    ::= { dlmTables 12 }
+
+dlmLLCCOPMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DlmLLCCOPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCOPM MANAGED OBJECT CLASS"
+    ::= { dlmLLCCOPM 1 }
+
+dlmLLCCOPMEntry OBJECT-TYPE
+    SYNTAX      DlmLLCCOPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "5.14 The LLC Connection-mode Protocol Machine managed object
+         
+         The generic LLC Connection-mode PM MO from which 
+         protocol specific LLC PM MOs may be derived."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCOPM MANAGED OBJECT"
+    INDEX       { dlmEntityId, dlmLLCCOPMClProtocolMachineId }
+    ::= { dlmLLCCOPMTable 1 }
+
+DlmLLCCOPMEntry ::= SEQUENCE {
+    dlmLLCCOPMCoProtocolMachineId   SimpleNameType,
+    dlmLLCCOPMOperationalState      OperationalState,
+    dlmLLCCOPMRowStatus             RowStatus
+}
+
+dlmLLCCOPMCoProtocolMachineId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a simple name for this connection-mode 
+         protocol state machine."
+    REFERENCE   
+        "ITU-T Rec. X.723 (1993) : ISO/IEC 10165-5 : 1993, 
+               coProtocolMachineId ATTRIBUTE"
+    DEFVAL      { "LLC2" }
+    ::= { dlmLLCCOPMEntry 1 }
+
+dlmLLCCOPMOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the connection-mode 
+         protocol machine in accordance with the 
+         OperationalState textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 (1992) | ISO/IEC 
+         10165-2 : 1992."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState ATTRIBUTE"
+    DEFVAL      { enabled }
+    ::= { dlmLLCCOPMEntry 2 }
+
+dlmLLCCOPMRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name binding which applies when a lLCCOPM managed 
+         object (or an instance of a subclass of the lLCCOPM MO 
+         class) can be created by management as a subordinate 
+         object of a lLCDLE managed object (or subclass), and 
+         deleted by management."
+    REFERENCE   
+        "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
+               lLCCOPM-lLCDLE-Management NAME BINDING"
+    ::= { dlmLLCCOPMEntry 3 }
+
+-- ==========================================
+
+dlmConformance OBJECT IDENTIFIER
+    ::= { dlmMIB 2 }
+
+dlmCompliances OBJECT IDENTIFIER
+    ::= { dlmConformance 1 }
+
+dlmGroups OBJECT IDENTIFIER
+    ::= { dlmConformance 2 }
+
+END -- end of module OPENSS7-DLM-MIB.
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
