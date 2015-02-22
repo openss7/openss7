@@ -55,6 +55,8 @@
 --
 -- =============================================================================
 
+OPENSS7-ISO10733-MIB DEFINITIONS ::= BEGIN
+
 nlmMIB MODULE-IDENTITY
 
 SystemType ::= TEXTUAL-CONVENTION
@@ -1974,4 +1976,5 @@ linkageManagedObjectCompliance MODULE-COMPLIANCE
                  on an ISO 10589 level 2 IS."
 
 
+END -- end of module OPENSS7-ISO10733-MIB.
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
