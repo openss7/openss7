@@ -71,7 +71,7 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-static char filename[BUFSIZ + 1] = "";
+static char filename[BUFSIZ + 1] = "/etc/osid.conf";
 
 static void
 do_osid(int argc, char *argv[], int start)
