@@ -2133,12 +2133,12 @@ dle_set_phys_addr_req(struct dl *dl, struct dle_set_phys_addr_req *ep)
  *  0x09    Q.2931 (Broadband ISDN Signalling Protocol)
  *  0x44    G.764
  *  0x80    IEEE SNAP
- *  0x81    X.233 | ISO/IEC 8473-1 (exclusing the inactive subset)
- *  0x82    ISO/IEC 9542
- *  0x83    ISO/IEC 10589
+ *  0x81    X.233 | ISO/IEC 8473-1 (excluding the inactive subset)
+ *  0x82    ISO/IEC 9542 (ESIS)
+ *  0x83    ISO/IEC 10589 (ISIS)
  *  0x84    ISO/IEC 8878 Annex A (SPI only)
- *  0x85    ISO/IEC 10747 (not used, coverd by X.233 | ISO/IEC 8473-1 IPI)
- *  0x8A    ISO/IEC 10030
+ *  0x85    ISO/IEC 10747 (IRDP) (not used, covered by X.233 | ISO/IEC 8473-1 IPI)
+ *  0x8A    ISO/IEC 10030 (SNARE)
  *  0x8B    X.273 | ISO/IEC 11577
  *  0xA0    X.37 (SPI only)
  *  0xA1    X.39 (SPI only)
