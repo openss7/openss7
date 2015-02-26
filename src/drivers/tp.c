@@ -321,15 +321,15 @@ struct tp_options {
  *    it.  An analogous procedure applies for the other options.  See also The Use of Options in
  *    XTI.
  *
- *  - If, in a call to t_accept(), the called transport user tried to negotiate an optoin of higher
+ *  - If, in a call to t_accept(), the called transport user tried to negotiate an option of higher
  *    quality than proposed, the option is rejected and the connection establishment fails (see
  *    Responding to a Negotiation Proposal).
  *
  *  - The values of the QOS options T_TCO_THROUGHPUT, T_TCO_TRANSDEL, T_TCO_RESERRRATE,
  *    T_TCO_TRANSFFAILPROB, T_TCO_ESTFAILPROB, T_TCO_RELFAILPROB, T_TCO_ESTDELAY, T_TCO_RELDELAY and
  *    T_TCO_CONNRESIL have a structured format.  A user requesting one of these options might leave
- *    a field of the structure unspecified by setting it to T_UNSPEC.  The transport provide is then
- *    free to select an appropriate value for this field.  The transport provider may return
+ *    a field of the structure unspecified by setting it to T_UNSPEC.  The transport provider is
+ *    then free to select an appropriate value for this field.  The transport provider may return
  *    T_UNSPEC in a field of the structure to the user to indicate that it has not yet decided on a
  *    definite value for this field.
  *
@@ -994,13 +994,18 @@ tp_size_opts(ulong *flags)
 }
 
 /**
- * tp_size_conn_opts - wize connection indication or confirmation options
+ * tp_size_conn_opts - size connection indication or confirmation options
  * @tp: transport endpoint
  */
 STATIC int
 tp_size_conn_opts(struct tp *tp)
 {
-	return tp_size_opts(&tp->tp_options.req.flags | &tp->tp_options.res.flags);
+	unsigned long flags[3] = { 0, 0, 0 };
+	int byte;
+
+	for (byte = 0; byte < 3; byte++)
+		flags[byte] = tp->tp_options.req.flags[byte] | tp->tp_options.res.flags[byte];
+	return tp_size_opts(flags);
 }
 
 /**
@@ -1035,7 +1040,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 		  size_t olen, int indication)
 {
 	struct t_opthdr *oh;
-	unsigned long flags[4], toggles[4];
+	unsigned long flags[3] = { 0, }, toggles[3] = { 0, };
 
 	if (op == NULL || olen == 0)
 		return (0);
@@ -1044,7 +1049,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 	{
 		int i;
 
-		for (i = 0; i < 4; i++) {
+		for (i = 0; i < 3; i++) {
 			flags[i] = rem->flags[i] | rsp->flags[i];
 			toggles[i] = rem->flags[i] ^ rsp->flags[i];
 		}
@@ -1587,7 +1592,7 @@ t_parse_conn_opts(struct tp *tp, const uchar *ip, size_t ilen, int request)
 	const struct t_opthdr *ih;
 
 	/* clear flags, these flags will be used when sending a connection confirmation to
-	   determine which options to include in the confirmstion. */
+	   determine which options to include in the confirmation. */
 	bzero(tp->tp_options.flags, sizeof(tp->tp_options.flags));
 	if (ip == NULL || ilen == 0)
 		return (0);
