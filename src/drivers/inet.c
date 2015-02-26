@@ -54,7 +54,7 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
    provider (NPI).  It provides a STREAMS-based encapsulation of the Linux IP stack. 
  */
 
-#define _DEBUG 1
+//#define _DEBUG 1
 //#undef _DEBUG
 
 #define _SVR4_SOURCE	1
@@ -15763,7 +15763,7 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		if ((add_len = p->ADDR_length) == 0) {
 			if (ss->p.prot.type == SOCK_RAW)
 				goto noaddr;
-			bzero(add, sizeof(add));
+			bzero(add, sizeof(*add));
 			add_len = sizeof(struct sockaddr_in);
 			add->sa_family = AF_INET;
 		} else {
@@ -15812,7 +15812,7 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		struct sockaddr_un *add_un;
 
 		if ((add_len = p->ADDR_length) == 0) {
-			bzero(add, sizeof(add));
+			bzero(add, sizeof(*add));
 			add_len = sizeof(struct sockaddr_un);
 			add->sa_family = AF_UNIX;
 		} else {
@@ -16150,7 +16150,6 @@ t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
  */
 static inline fastcall __hot_out int
 t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
-
 {
 	long mlen, mmax;
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
