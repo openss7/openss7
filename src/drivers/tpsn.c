@@ -354,14 +354,19 @@ struct tp_options {
 		t_uscalar_t sndlowat;	/* XTI_SNDLOWAT */
 	} xti;
 	struct {
-		struct thrpt throughput;	/* T_TCO_THROUGHPUT */
+		struct thrpt tco_throughput;	/* T_TCO_THROUGHPUT */
+		struct transdel tco_transdel;	/* T_TCO_TRANSDEL */
+		struct rate reserrorrate;	/* T_TCO_RESERRORRATE */
 		struct rate transffailprob;	/* T_TCO_TRANSFFAILPROB */
 		struct rate estfailprob;	/* T_TCO_ESTFAILPROB */
 		struct rate relfailprob;	/* T_TCO_RELFAILPROB */
 		struct rate estdelay;	/* T_TCO_ESTDELAY */
 		struct rate reldelay;	/* T_TCO_RELDELAY */
 		struct rate connresil;	/* T_TCO_CONNRESIL */
+		t_uscalar_t protection;	/* T_TCO_PROTECTION */
+		t_uscalar_t priority;	/* T_TCO_PRIORITY */
 		t_uscalar_t expd;	/* T_TCO_EXPD */
+
 		t_uscalar_t ltpdu;	/* T_TCO_LTPDU */
 		t_uscalar_t acktime;	/* T_TCO_ACKTIME */
 		t_uscalar_t reastime;	/* T_TCO_REASTIME */
@@ -372,15 +377,17 @@ struct tp_options {
 		t_uscalar_t altclass4;	/* T_TCO_ALTCLASS4 */
 		t_uscalar_t extform;	/* T_TCO_EXTFORM */
 		t_uscalar_t flowctrl;	/* T_TCO_FLOWCTRL */
+		t_uscalar_t checksum;	/* T_TCO_CHECKSUM */
 		t_uscalar_t netexp;	/* T_TCO_NETEXP */
 		t_uscalar_t netrecptcf;	/* T_TCO_NETRECPTCF */
-
-		struct transdel transdel;	/* T_TC[OL]_TRANSDEL */
-		struct rate reserrorrate;	/* T_TC[OL]_RESERRORRATE */
-		t_uscalar_t protection;	/* T_TC[OL]_PROTECTION */
-		t_uscalar_t priority;	/* T_TC[OL]_PRIORITY */
-		t_uscalar_t checksum;	/* T_TC[OL]_CHECKSUM */
-	} osi;
+	} tco;
+	struct {
+		struct transdel tcl_transdel;	/* T_TCL_TRANSDEL */
+		struct rate reserrorrate;	/* T_TCL_RESERRORRATE */
+		t_uscalar_t protection;	/* T_TCL_PROTECTION */
+		t_uscalar_t priority;	/* T_TCL_PRIORITY */
+		t_uscalar_t checksum;	/* T_TCL_CHECKSUM */
+	} tcl;
 	struct {
 		unsigned char options[40];	/* T_IP_OPTIONS */
 		unsigned char tos;	/* T_IP_TOS */
@@ -507,31 +514,36 @@ enum {
 	_T_BIT_IP_ADDR,
 	_T_BIT_IP_RETOPTS,
 	_T_BIT_UDP_CHECKSUM,
-	_T_BIT_OSI_THROUGHPUT,
-	_T_BIT_OSI_TRANSFFAILPROB,
-	_T_BIT_OSI_ESTFAILPROB,
-	_T_BIT_OSI_RELFAILPROB,
-	_T_BIT_OSI_ESTDELAY,
-	_T_BIT_OSI_RELDELAY,
-	_T_BIT_OSI_CONNRESIL,
-	_T_BIT_OSI_EXPD,
-	_T_BIT_OSI_LTPDU,
-	_T_BIT_OSI_ACKTIME,
-	_T_BIT_OSI_REASTIME,
-	_T_BIT_OSI_PREFCLASS,
-	_T_BIT_OSI_ALTCLASS1,
-	_T_BIT_OSI_ALTCLASS2,
-	_T_BIT_OSI_ALTCLASS3,
-	_T_BIT_OSI_ALTCLASS4,
-	_T_BIT_OSI_EXTFORM,
-	_T_BIT_OSI_FLOWCTRL,
-	_T_BIT_OSI_NETEXP,
-	_T_BIT_OSI_NETRECPTCF,
-	_T_BIT_OSI_TRANSDEL,
-	_T_BIT_OSI_RESERRORRATE,
-	_T_BIT_OSI_PROTECTION,
-	_T_BIT_OSI_PRIORITY,
-	_T_BIT_OSI_CHECKSUM,
+	_T_BIT_TCO_THROUGHPUT,
+	_T_BIT_TCO_TRANSFFAILPROB,
+	_T_BIT_TCO_ESTFAILPROB,
+	_T_BIT_TCO_RELFAILPROB,
+	_T_BIT_TCO_ESTDELAY,
+	_T_BIT_TCO_RELDELAY,
+	_T_BIT_TCO_CONNRESIL,
+	_T_BIT_TCO_EXPD,
+	_T_BIT_TCO_LTPDU,
+	_T_BIT_TCO_ACKTIME,
+	_T_BIT_TCO_REASTIME,
+	_T_BIT_TCO_PREFCLASS,
+	_T_BIT_TCO_ALTCLASS1,
+	_T_BIT_TCO_ALTCLASS2,
+	_T_BIT_TCO_ALTCLASS3,
+	_T_BIT_TCO_ALTCLASS4,
+	_T_BIT_TCO_EXTFORM,
+	_T_BIT_TCO_FLOWCTRL,
+	_T_BIT_TCO_NETEXP,
+	_T_BIT_TCO_NETRECPTCF,
+	_T_BIT_TCO_TRANSDEL,
+	_T_BIT_TCO_RESERRORRATE,
+	_T_BIT_TCO_PROTECTION,
+	_T_BIT_TCO_PRIORITY,
+	_T_BIT_TCO_CHECKSUM,
+	_T_BIT_TCL_TRANSDEL,
+	_T_BIT_TCL_RESERRORRATE,
+	_T_BIT_TCL_PROTECTION,
+	_T_BIT_TCL_PRIORITY,
+	_T_BIT_TCL_CHECKSUM,
 };
 
 #if	defined DEFINE_RWLOCK
@@ -900,59 +912,69 @@ tp_size_conn_opts(struct tp *tp)
 	switch (tp->p.prot.type) {
 	case TP_CMINOR_COTS:
 	case TP_CMINOR_COTS_OSI:
-		if (t_tst_bit(_T_BIT_OSI_THROUGHPUT, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.throughput);
-		if (t_tst_bit(_T_BIT_OSI_TRANSFFAILPROB, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.transffailprob);
-		if (t_tst_bit(_T_BIT_OSI_ESTFAILPROB, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.estfailprob);
-		if (t_tst_bit(_T_BIT_OSI_RELFAILPROB, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.relfailprob);
-		if (t_tst_bit(_T_BIT_OSI_ESTDELAY, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.estdelay);
-		if (t_tst_bit(_T_BIT_OSI_RELDELAY, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.reldelay);
-		if (t_tst_bit(_T_BIT_OSI_CONNRESIL, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.connresil);
-		if (t_tst_bit(_T_BIT_OSI_EXPD, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.expd);
-		if (t_tst_bit(_T_BIT_OSI_LTPDU, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.ltpdu);
-		if (t_tst_bit(_T_BIT_OSI_ACKTIME, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.acktime);
-		if (t_tst_bit(_T_BIT_OSI_REASTIME, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.reastime);
-		if (t_tst_bit(_T_BIT_OSI_PREFCLASS, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.prefclass);
-		if (t_tst_bit(_T_BIT_OSI_ALTCLASS1, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.altclass1);
-		if (t_tst_bit(_T_BIT_OSI_ALTCLASS2, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.altclass2);
-		if (t_tst_bit(_T_BIT_OSI_ALTCLASS3, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.altclass3);
-		if (t_tst_bit(_T_BIT_OSI_ALTCLASS4, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.altclass4);
-		if (t_tst_bit(_T_BIT_OSI_EXTFORM, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.extform);
-		if (t_tst_bit(_T_BIT_OSI_FLOWCTRL, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.flowctrl);
-		if (t_tst_bit(_T_BIT_OSI_NETEXP, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.netexp);
-		if (t_tst_bit(_T_BIT_OSI_NETRECPTCF, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.netrecptcf);
-		/* fall through */
+		if (t_tst_bit(_T_BIT_TCO_THROUGHPUT, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_throughput);
+		if (t_tst_bit(_T_BIT_TCO_TRANSFFAILPROB, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_transffailprob);
+		if (t_tst_bit(_T_BIT_TCO_ESTFAILPROB, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_estfailprob);
+		if (t_tst_bit(_T_BIT_TCO_RELFAILPROB, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_relfailprob);
+		if (t_tst_bit(_T_BIT_TCO_ESTDELAY, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_estdelay);
+		if (t_tst_bit(_T_BIT_TCO_RELDELAY, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_reldelay);
+		if (t_tst_bit(_T_BIT_TCO_CONNRESIL, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_connresil);
+		if (t_tst_bit(_T_BIT_TCO_EXPD, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_expd);
+		if (t_tst_bit(_T_BIT_TCO_LTPDU, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_ltpdu);
+		if (t_tst_bit(_T_BIT_TCO_ACKTIME, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_acktime);
+		if (t_tst_bit(_T_BIT_TCO_REASTIME, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_reastime);
+		if (t_tst_bit(_T_BIT_TCO_PREFCLASS, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_prefclass);
+		if (t_tst_bit(_T_BIT_TCO_ALTCLASS1, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_altclass1);
+		if (t_tst_bit(_T_BIT_TCO_ALTCLASS2, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_altclass2);
+		if (t_tst_bit(_T_BIT_TCO_ALTCLASS3, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_altclass3);
+		if (t_tst_bit(_T_BIT_TCO_ALTCLASS4, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_altclass4);
+		if (t_tst_bit(_T_BIT_TCO_EXTFORM, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_extform);
+		if (t_tst_bit(_T_BIT_TCO_FLOWCTRL, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_flowctrl);
+		if (t_tst_bit(_T_BIT_TCO_NETEXP, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_netexp);
+		if (t_tst_bit(_T_BIT_TCO_NETRECPTCF, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_netrecptcf);
+		if (t_tst_bit(_T_BIT_TCO_TRANSDEL, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_transdel);
+		if (t_tst_bit(_T_BIT_TCO_RESERRORRATE, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_reserrorrate);
+		if (t_tst_bit(_T_BIT_TCO_PROTECTION, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_protection);
+		if (t_tst_bit(_T_BIT_TCO_PRIORITY, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_priority);
+		if (t_tst_bit(_T_BIT_TCO_CHECKSUM, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tco.tco_checksum);
+		break;
 	case TP_CMINOR_CLTS:
 	case TP_CMINOR_CLTS_OSI:
-		if (t_tst_bit(_T_BIT_OSI_TRANSDEL, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.transdel);
-		if (t_tst_bit(_T_BIT_OSI_RESERRORRATE, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.reserrorrate);
-		if (t_tst_bit(_T_BIT_OSI_PROTECTION, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.protection);
-		if (t_tst_bit(_T_BIT_OSI_PRIORITY, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.priority);
-		if (t_tst_bit(_T_BIT_OSI_CHECKSUM, tp->options.flags))
-			size += _T_SPACE_SIZEOF(tp->options.osi.checksum);
+		if (t_tst_bit(_T_BIT_TCL_TRANSDEL, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tcl.tcl_transdel);
+		if (t_tst_bit(_T_BIT_TCL_RESERRORRATE, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tcl.tcl_reserrorrate);
+		if (t_tst_bit(_T_BIT_TCL_PROTECTION, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tcl.tcl_protection);
+		if (t_tst_bit(_T_BIT_TCL_PRIORITY, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tcl.tcl_priority);
+		if (t_tst_bit(_T_BIT_TCL_CHECKSUM, tp->options.flags))
+			size += _T_SPACE_SIZEOF(tp->options.tcl.tcl_checksum);
 		break;
 	}
 	switch (tp->p.prot.type) {
@@ -1893,382 +1915,458 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 			}
 			continue;
 		case T_ISO_TP:
-			switch (ih->name) {
-			case T_TCO_THROUGHPUT:
-			{
-				struct thrpt *valp = (typeof(valp)) T_OPT_DATA(ih);
+			switch (tp->p.info.SERV_type) {
+			case T_COTS:
+				switch (ih->name) {
+				case T_TCO_THROUGHPUT:
+				{
+					struct thrpt *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.throughput = *valp;
-				t_set_bit(_T_BIT_OSI_THROUGHPUT, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_throughput = *valp;
+					t_set_bit(_T_BIT_TCO_THROUGHPUT, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_TRANSFFAILPROB:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_TRANSDEL:
+				{
+					struct transdel *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.transffailprob = *valp;
-				t_set_bit(_T_BIT_OSI_TRANSFFAILPROB, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_transdel = *valp;
+					t_set_bit(_T_BIT_TCO_TRANSDEL, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_ESTFAILPROB:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_RESERRORRATE:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.estfailprob = *valp;
-				t_set_bit(_T_BIT_OSI_ESTFAILPROB, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_reserrorrate = *valp;
+					t_set_bit(_T_BIT_TCO_RESERRORRATE, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_RELFAILPROB:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_TRANSFFAILPROB:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.relfailprob = *valp;
-				t_set_bit(_T_BIT_OSI_RELFAILPROB, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_transffailprob = *valp;
+					t_set_bit(_T_BIT_TCO_TRANSFFAILPROB, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_ESTDELAY:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ESTFAILPROB:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.estdelay = *valp;
-				t_set_bit(_T_BIT_OSI_ESTDELAY, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_estfailprob = *valp;
+					t_set_bit(_T_BIT_TCO_ESTFAILPROB, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_RELDELAY:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_RELFAILPROB:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.reldelay = *valp;
-				t_set_bit(_T_BIT_OSI_RELDELAY, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_relfailprob = *valp;
+					t_set_bit(_T_BIT_TCO_RELFAILPROB, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_CONNRESIL:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ESTDELAY:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.connresil = *valp;
-				t_set_bit(_T_BIT_OSI_CONNRESIL, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_estdelay = *valp;
+					t_set_bit(_T_BIT_TCO_ESTDELAY, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_EXPD:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_RELDELAY:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO)
-					goto einval;
-				tp->options.osi.expd = *valp;
-				t_set_bit(_T_BIT_OSI_EXPD, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_reldelay = *valp;
+					t_set_bit(_T_BIT_TCO_RELDELAY, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_LTPDU:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_CONNRESIL:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.ltpdu = *valp;
-				t_set_bit(_T_BIT_OSI_LTPDU, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_connresil = *valp;
+					t_set_bit(_T_BIT_TCO_CONNRESIL, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_ACKTIME:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_PROTECTION:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.acktime = *valp;
-				t_set_bit(_T_BIT_OSI_ACKTIME, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_NOPROTECT && *valp != T_PASSIVEPROTECT
+					    && *valp != T_ACTIVEPROTECT)
+						goto einval;
+					if (*valp != T_NOPROTECT)
+						goto eacces;
+					tp->options.tco.tco_protection = *valp;
+					t_set_bit(_T_BIT_TCO_PROTECTION, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				if (*valp < 10)
-					*valp = 10;
-				if (*valp > INT_MAX)
-					*valp = INT_MAX;
-				continue;
-			}
-			case T_TCO_REASTIME:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_PRIORITY:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.reastime = *valp;
-				t_set_bit(_T_BIT_OSI_REASTIME, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_PRITOP && *valp != T_PRIHIGH && *valp != T_PRIMID
+					    && *valp != T_PRILOW && *valp != T_PRIDFLT)
+						goto einval;
+					tp->options.tco.tco_priority = *valp;
+					t_set_bit(_T_BIT_TCO_PRIORITY, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				if (*valp < 10)
-					*valp = 10;
-				if (*valp > INT_MAX)
-					*valp = INT_MAX;
-				continue;
-			}
-			case T_TCO_PREFCLASS:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_EXPD:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_CLASS0 && *valp != T_CLASS1 && *valp != T_CLASS2
-				    && *valp != T_CLASS3 && *valp != T_CLASS4)
-					goto einval;
-				if (*valp != T_CLASS4)
-					goto einval;
-				tp->options.osi.prefclass = *valp;
-				t_set_bit(_T_BIT_OSI_PREFCLASS, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO)
+						goto einval;
+					tp->options.tco.tco_expd = *valp;
+					t_set_bit(_T_BIT_TCO_EXPD, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_ALTCLASS1:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_LTPDU:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
-				    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					goto einval;
-				tp->options.osi.altclass1 = *valp;
-				t_set_bit(_T_BIT_OSI_ALTCLASS1, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_ltpdu = *valp;
+					t_set_bit(_T_BIT_TCO_LTPDU, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_ALTCLASS2:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ACKTIME:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
-				    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					goto einval;
-				tp->options.osi.altclass2 = *valp;
-				t_set_bit(_T_BIT_OSI_ALTCLASS2, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_acktime = *valp;
+					t_set_bit(_T_BIT_TCO_ACKTIME, tp->options.flags);
+					if (!request)
+						continue;
+					if (*valp < 10)
+						*valp = 10;
+					if (*valp > INT_MAX)
+						*valp = INT_MAX;
 					continue;
-				continue;
-			}
-			case T_TCO_ALTCLASS3:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_REASTIME:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
-				    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					goto einval;
-				tp->options.osi.altclass3 = *valp;
-				t_set_bit(_T_BIT_OSI_ALTCLASS3, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tco.tco_reastime = *valp;
+					t_set_bit(_T_BIT_TCO_REASTIME, tp->options.flags);
+					if (!request)
+						continue;
+					if (*valp < 10)
+						*valp = 10;
+					if (*valp > INT_MAX)
+						*valp = INT_MAX;
 					continue;
-				continue;
-			}
-			case T_TCO_ALTCLASS4:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_PREFCLASS:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
-				    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					goto einval;
-				tp->options.osi.altclass4 = *valp;
-				t_set_bit(_T_BIT_OSI_ALTCLASS4, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_CLASS0 && *valp != T_CLASS1 && *valp != T_CLASS2
+					    && *valp != T_CLASS3 && *valp != T_CLASS4)
+						goto einval;
+					if (*valp != T_CLASS4)
+						goto einval;
+					tp->options.tco.tco_prefclass = *valp;
+					t_set_bit(_T_BIT_TCO_PREFCLASS, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_EXTFORM:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ALTCLASS1:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					tp->options.osi.extform = *valp;
-				t_set_bit(_T_BIT_OSI_EXTFORM, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
+					    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						goto einval;
+					tp->options.tco.tco_altclass1 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS1, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_FLOWCTRL:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ALTCLASS2:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					tp->options.osi.flowctrl = *valp;
-				t_set_bit(_T_BIT_OSI_FLOWCTRL, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
+					    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						goto einval;
+					tp->options.tco.tco_altclass2 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS2, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_NETEXP:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ALTCLASS3:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					tp->options.osi.netexp = *valp;
-				t_set_bit(_T_BIT_OSI_NETEXP, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
+					    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						goto einval;
+					tp->options.tco.tco_altclass3 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS3, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_NETRECPTCF:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_ALTCLASS4:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					tp->options.osi.netrecptcf = *valp;
-				t_set_bit(_T_BIT_OSI_NETRECPTCF, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_UNSPEC && *valp != T_CLASS0 && *valp != T_CLASS1
+					    && *valp != T_CLASS2 && *valp != T_CLASS3 && *valp != T_CLASS4)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						goto einval;
+					tp->options.tco.tco_altclass4 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS4, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_TRANSDEL:
-			case T_TCL_TRANSDEL:
-			{
-				struct transdel *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_EXTFORM:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.transdel = *valp;
-				t_set_bit(_T_BIT_OSI_TRANSDEL, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tco.tco_extform = *valp;
+					t_set_bit(_T_BIT_TCO_EXTFORM, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_RESERRORRATE:
-			case T_TCL_RESERRORRATE:
-			{
-				struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_FLOWCTRL:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				/* FIXME: check values */
-				tp->options.osi.reserrorrate = *valp;
-				t_set_bit(_T_BIT_OSI_RESERRORRATE, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tco.tco_flowctrl = *valp;
+					t_set_bit(_T_BIT_TCO_FLOWCTRL, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_PROTECTION:
-			case T_TCL_PROTECTION:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_CHECKSUM:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_NOPROTECT && *valp != T_PASSIVEPROTECT
-				    && *valp != T_ACTIVEPROTECT)
-					goto einval;
-				if (*valp != T_NOPROTECT)
-					goto eacces;
-				tp->options.osi.protection = *valp;
-				t_set_bit(_T_BIT_OSI_PROTECTION, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tco.tco_checksum = *valp;
+					t_set_bit(_T_BIT_TCO_CHECKSUM, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_PRIORITY:
-			case T_TCL_PRIORITY:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_NETEXP:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_PRITOP && *valp != T_PRIHIGH && *valp != T_PRIMID
-				    && *valp != T_PRILOW && *valp != T_PRIDFLT)
-					goto einval;
-				tp->options.osi.priority = *valp;
-				t_set_bit(_T_BIT_OSI_PRIORITY, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tco.tco_netexp = *valp;
+					t_set_bit(_T_BIT_TCO_NETEXP, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
-				continue;
-			}
-			case T_TCO_CHECKSUM:
-			case T_TCL_CHECKSUM:
-			{
-				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+				}
+				case T_TCO_NETRECPTCF:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
 
-				if (ih->len - sizeof(*ih) != sizeof(*valp))
-					goto einval;
-				if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
-					goto einval;
-				if (*valp != T_UNSPEC)
-					tp->options.osi.checksum = *valp;
-				t_set_bit(_T_BIT_OSI_CHECKSUM, tp->options.flags);
-				if (!request)
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tco.tco_netrecptcf = *valp;
+					t_set_bit(_T_BIT_TCO_NETRECPTCF, tp->options.flags);
+					if (!request)
+						continue;
 					continue;
+				}
+				}
 				continue;
-			}
+			case T_CLTS:
+				switch (ih->name) {
+				case T_TCL_TRANSDEL:
+				{
+					struct transdel *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tcl.tcl_transdel = *valp;
+					t_set_bit(_T_BIT_TCL_TRANSDEL, tp->options.flags);
+					if (!request)
+						continue;
+					continue;
+				}
+				case T_TCL_RESERRORRATE:
+				{
+					struct rate *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					/* FIXME: check values */
+					tp->options.tcl.tcl_reserrorrate = *valp;
+					t_set_bit(_T_BIT_TCL_RESERRORRATE, tp->options.flags);
+					if (!request)
+						continue;
+					continue;
+				}
+				case T_TCL_PROTECTION:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_NOPROTECT && *valp != T_PASSIVEPROTECT
+					    && *valp != T_ACTIVEPROTECT)
+						goto einval;
+					if (*valp != T_NOPROTECT)
+						goto eacces;
+					tp->options.tcl.tcl_protection = *valp;
+					t_set_bit(_T_BIT_TCL_PROTECTION, tp->options.flags);
+					if (!request)
+						continue;
+					continue;
+				}
+				case T_TCL_PRIORITY:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_PRITOP && *valp != T_PRIHIGH && *valp != T_PRIMID
+					    && *valp != T_PRILOW && *valp != T_PRIDFLT)
+						goto einval;
+					tp->options.tcl.tcl_priority = *valp;
+					t_set_bit(_T_BIT_TCL_PRIORITY, tp->options.flags);
+					if (!request)
+						continue;
+					continue;
+				}
+				case T_TCL_CHECKSUM:
+				{
+					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(ih);
+
+					if (ih->len - sizeof(*ih) != sizeof(*valp))
+						goto einval;
+					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
+						goto einval;
+					if (*valp != T_UNSPEC)
+						tp->options.tcl.tcl_checksum = *valp;
+					t_set_bit(_T_BIT_TCL_CHECKSUM, tp->options.flags);
+					if (!request)
+						continue;
+					continue;
+				}
+				}
+				continue;
 			}
 			continue;
 		case T_INET_IP:
@@ -2477,216 +2575,143 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			case T_CMINOR_CLTS:
 			case T_CMINOR_COTS_OSI:
 			case T_CMINOR_CLTS_OSI:
-				switch (ih->name) {
-				default:
-					olen += T_SPACE(0);
-					continue;
-				case T_ALLOPT:
-				case T_TCO_THROUGHPUT:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.throughput);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSFFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.transffailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.estfailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.relfailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.estdelay);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.reldelay);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_CONNRESIL:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.connresil);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXPD:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.expd);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_LTPDU:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.ltpdu);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ACKTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.acktime);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_REASTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.reastime);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_PREFCLASS:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.prefclass);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS1:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.altclass1);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS2:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.altclass2);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS3:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.altclass3);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS4:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.altclass4);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXTFORM:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.extform);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_FLOWCTRL:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.flowctrl);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETEXP:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.netexp);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETRECPTCF:
-					if (t->p.info.SERV_type == T_COTS) {
-						olen += _T_SPACE_SIZEOF(t_defaults.osi.netrecptcf);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSDEL:
-				case T_TCL_TRANSDEL:
-					olen += _T_SPACE_SIZEOF(t_defaults.osi.transdel);
-					if (ih->name != T_ALLOPT)
+				switch (t->p.info.SERV_type) {
+				case T_COTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(0);
 						continue;
-				case T_TCO_RESERRORRATE:
-				case T_TCL_RESERRORRATE:
-					olen += _T_SPACE_SIZEOF(t_defaults.osi.reserrorrate);
-					if (ih->name != T_ALLOPT)
+					case T_ALLOPT:
+					case T_TCO_THROUGHPUT:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_throughput);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSDEL:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_transdel);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RESERRORRATE:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_reserrorrate);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSFFAILPROB:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_transffailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTFAILPROB:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_estfailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELFAILPROB:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_relfailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTDELAY:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_estdelay);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELDELAY:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_reldelay);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CONNRESIL:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_connresil);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PROTECTION:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_protection);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PRIORITY:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_priority);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXPD:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_expd);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_LTPDU:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_ltpdu);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ACKTIME:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_acktime);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_REASTIME:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_reastime);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PREFCLASS:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_prefclass);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS1:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_altclass1);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS2:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_altclass2);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS3:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_altclass3);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS4:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_altclass4);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXTFORM:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_extform);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_FLOWCTRL:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_flowctrl);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CHECKSUM:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_checksum);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETEXP:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_netexp);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETRECPTCF:
+						olen += _T_SPACE_SIZEOF(t_defaults.tco.tco_netrecptcf);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
+				case T_CLTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(0);
 						continue;
-				case T_TCO_PROTECTION:
-				case T_TCL_PROTECTION:
-					olen += _T_SPACE_SIZEOF(t_defaults.osi.protection);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_PRIORITY:
-				case T_TCL_PRIORITY:
-					olen += _T_SPACE_SIZEOF(t_defaults.osi.priority);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_CHECKSUM:
-				case T_TCL_CHECKSUM:
-					olen += _T_SPACE_SIZEOF(t_defaults.osi.checksum);
-					if (ih->name != T_ALLOPT)
-						continue;
+					case T_ALLOPT:
+					case T_TCL_TRANSDEL:
+						olen += _T_SPACE_SIZEOF(t_defaults.tcl.tcl_transdel);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_RESERRORRATE:
+						olen += _T_SPACE_SIZEOF(t_defaults.tcl.tcl_reserrorrate);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PROTECTION:
+						olen += _T_SPACE_SIZEOF(t_defaults.tcl.tcl_protection);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PRIORITY:
+						olen += _T_SPACE_SIZEOF(t_defaults.tcl.tcl_priority);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_CHECKSUM:
+						olen += _T_SPACE_SIZEOF(t_defaults.tcl.tcl_checksum);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
@@ -2892,266 +2917,203 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			case T_CMINOR_CLTS:
 			case T_CMINOR_COTS_OSI:
 			case T_CMINOR_CLTS_OSI:
-				switch (ih->name) {
-				default:
-					olen += T_SPACE(0);
-					continue;
-				case T_ALLOPT:
-				case T_TCO_THROUGHPUT:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.throughput))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSFFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.transffailprob))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.estfailprob))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.relfailprob))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.estdelay))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.reldealy))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_CONNRESIL:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.connresil))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXPD:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.expd))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_LTPDU:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.ltpdu))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ACKTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.acktime))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_REASTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.reastime))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_PREFCLASS:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.prefclass))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS1:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.altclass1))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS2:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.altclass2))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS3:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.altclass3))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS4:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.altclass4))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXTFORM:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.extform))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_FLOWCTRL:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.flowctrl))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETEXP:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.netexp))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETRECPTCF:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (optlen && optlen != sizeof(t->options.osi.netrecptcf))
-							goto einval;
-						olen += T_SPACE(optlen);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSDEL:
-				case T_TCL_TRANSDEL:
-					if (optlen && optlen != sizeof(t->options.osi.transdel))
-						goto einval;
-					olen += T_SPACE(optlen);
-					if (ih->name != T_ALLOPT)
+				switch (t->p.info.SERV_type) {
+				case T_COTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(0);
 						continue;
-				case T_TCO_RESERRORRATE:
-				case T_TCL_RESERRORRATE:
-					if (optlen && optlen != sizeof(t->options.osi.reserrorrate))
-						goto einval;
-					olen += T_SPACE(optlen);
-					if (ih->name != T_ALLOPT)
+					case T_ALLOPT:
+					case T_TCO_THROUGHPUT:
+						if (optlen && optlen != sizeof(t->options.tco.tco_throughput))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSDEL:
+						if (optlen && optlen != sizeof(t->options.tco.tco_transdel))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RESERRORRATE:
+						if (optlen && optlen != sizeof(t->options.tco.tco_reserrorrate))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSFFAILPROB:
+						if (optlen && optlen != sizeof(t->options.tco.tco_transffailprob))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTFAILPROB:
+						if (optlen && optlen != sizeof(t->options.tco.tco_estfailprob))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELFAILPROB:
+						if (optlen && optlen != sizeof(t->options.tco.tco_relfailprob))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTDELAY:
+						if (optlen && optlen != sizeof(t->options.tco.tco_estdelay))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELDELAY:
+						if (optlen && optlen != sizeof(t->options.tco.tco_reldealy))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CONNRESIL:
+						if (optlen && optlen != sizeof(t->options.tco.tco_connresil))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PROTECTION:
+						if (optlen && optlen != sizeof(t->options.tco.tco_protection))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PRIORITY:
+						if (optlen && optlen != sizeof(t->options.tco.tco_priority))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXPD:
+						if (optlen && optlen != sizeof(t->options.tco.tco_expd))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_LTPDU:
+						if (optlen && optlen != sizeof(t->options.tco.tco_ltpdu))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ACKTIME:
+						if (optlen && optlen != sizeof(t->options.tco.tco_acktime))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_REASTIME:
+						if (optlen && optlen != sizeof(t->options.tco.tco_reastime))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PREFCLASS:
+						if (optlen && optlen != sizeof(t->options.tco.tco_prefclass))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS1:
+						if (optlen && optlen != sizeof(t->options.tco.tco_altclass1))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS2:
+						if (optlen && optlen != sizeof(t->options.tco.tco_altclass2))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS3:
+						if (optlen && optlen != sizeof(t->options.tco.tco_altclass3))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS4:
+						if (optlen && optlen != sizeof(t->options.tco.tco_altclass4))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXTFORM:
+						if (optlen && optlen != sizeof(t->options.tco.tco_extform))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_FLOWCTRL:
+						if (optlen && optlen != sizeof(t->options.tco.tco_flowctrl))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CHECKSUM:
+						if (optlen && optlen != sizeof(t->options.tco.tco_checksum))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETEXP:
+						if (optlen && optlen != sizeof(t->options.tco.tco_netexp))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETRECPTCF:
+						if (optlen && optlen != sizeof(t->options.tco.tco_netrecptcf))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
+				case T_CLTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(0);
 						continue;
-				case T_TCO_PROTECTION:
-				case T_TCL_PROTECTION:
-					if (optlen && optlen != sizeof(t->options.osi.protection))
-						goto einval;
-					olen += T_SPACE(optlen);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_PRIORITY:
-				case T_TCL_PRIORITY:
-					if (optlen && optlen != sizeof(t->options.osi.priority))
-						goto einval;
-					olen += T_SPACE(optlen);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_CHECKSUM:
-				case T_TCL_CHECKSUM:
-					if (optlen && optlen != sizeof(t->options.osi.checksum))
-						goto einval;
-					olen += T_SPACE(optlen);
-					if (ih->name != T_ALLOPT)
-						continue;
+					case T_ALLOPT:
+					case T_TCL_TRANSDEL:
+						if (optlen && optlen != sizeof(t->options.tcl.tcl_transdel))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_RESERRORRATE:
+						if (optlen && optlen != sizeof(t->options.tcl.tcl_reserrorrate))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PROTECTION:
+						if (optlen && optlen != sizeof(t->options.tcl.tcl_protection))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PRIORITY:
+						if (optlen && optlen != sizeof(t->options.tcl.tcl_priority))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_CHECKSUM:
+						if (optlen && optlen != sizeof(t->options.tcl.tcl_checksum))
+							goto einval;
+						olen += T_SPACE(optlen);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
@@ -3353,288 +3315,233 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 			case TP_CMINOR_CLTS:
 			case TP_CMINOR_COTS_ISO:
 			case TP_CMINOR_CLTS_ISO:
-				switch (ih->name) {
-				default:
-					olen += T_SPACE(optlen);
-					continue;
-				case T_ALLOPT:
-				case T_TCO_THROUGHPUT:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.throughput))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.throughput);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSFFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.transffailprob))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.transffailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.estfailprob))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.estfailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELFAILPROB:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.relfailprob))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.relfailprob);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ESTDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.estdelay))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.estdelay);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_RELDELAY:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.reldelay))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.reldelay);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_CONNRESIL:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.connresil))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.connresil);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXPD:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.expd))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.expd);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_LTPDU:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.ltpdu))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.ltpdu);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ACKTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.acktime))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.acktime);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_REASTIME:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.reastime))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.reastime);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_PREFCLASS:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.prefclass))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.prefclass);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS1:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.altclass1))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.altclass1);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS2:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.altclass2))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.altclass2);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS3:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.altclass3))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.altclass3);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_ALTCLASS4:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.altclass4))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.altclass4);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_EXTFORM:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.extform))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.extform);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_FLOWCTRL:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.flowctrl))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.flowctrl);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETEXP:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.netexp))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.netexp);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_NETRECPTCF:
-					if (t->p.info.SERV_type == T_COTS) {
-						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.osi.netrecptcf))
-							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.osi.netrecptcf);
-						if (ih->name != T_ALLOPT)
-							continue;
-					} else {
-						if (ih->name != T_ALLOPT)
-							goto einval;
-					}
-				case T_TCO_TRANSDEL:
-				case T_TCL_TRANSDEL:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.osi.transdel))
-						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.osi.transdel);
-					if (ih->name != T_ALLOPT)
+				switch (t->p.info.SERV_type) {
+				case T_COTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(optlen);
 						continue;
-				case T_TCO_RESERRORRATE:
-				case T_TCL_RESERRORRATE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(t->options.osi.reserrorrate))
-						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.osi.reserrorrate);
-					if (ih->name != T_ALLOPT)
+					case T_ALLOPT:
+					case T_TCO_THROUGHPUT:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_throughput))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_throughput);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSDEL:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_transdel))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_transdel);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RESERRORRATE:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_reserrorrate))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reserrorrate);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_TRANSFFAILPROB:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_transffailprob))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_transffailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTFAILPROB:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_estfailprob))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_estfailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELFAILPROB:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_relfailprob))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_relfailprob);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ESTDELAY:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_estdelay))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_estdelay);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_RELDELAY:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_reldelay))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reldelay);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CONNRESIL:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_connresil))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_connresil);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PROTECTION:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_protection))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_protection);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PRIORITY:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_priority))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_priority);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXPD:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_expd))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_expd);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_LTPDU:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_ltpdu))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_ltpdu);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ACKTIME:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_acktime))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_acktime);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_REASTIME:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_reastime))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reastime);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_PREFCLASS:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_prefclass))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_prefclass);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS1:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_altclass1))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass1);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS2:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_altclass2))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass2);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS3:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_altclass3))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass3);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_ALTCLASS4:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_altclass4))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass4);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_EXTFORM:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_extform))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_extform);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_FLOWCTRL:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_flowctrl))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_flowctrl);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_CHECKSUM:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_checksum))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_checksum);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETEXP:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_netexp))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_netexp);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCO_NETRECPTCF:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tco.tco_netrecptcf))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tco.tco_netrecptcf);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
+				case T_CLTS:
+					switch (ih->name) {
+					default:
+						olen += T_SPACE(optlen);
 						continue;
-				case T_TCO_PROTECTION:
-				case T_TCL_PROTECTION:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(t->options.osi.protection))
-						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.osi.protection);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_PRIORITY:
-				case T_TCL_PRIORITY:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.osi.priority))
-						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.osi.priority);
-					if (ih->name != T_ALLOPT)
-						continue;
-				case T_TCO_CHECKSUM:
-				case T_TCL_CHECKSUM:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.osi.checksum))
-						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.osi.checksum);
-					if (ih->name != T_ALLOPT)
-						continue;
+					case T_ALLOPT:
+					case T_TCL_TRANSDEL:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tcl.tcl_transdel))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_transdel);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_RESERRORRATE:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tcl.tcl_reserrorrate))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_reserrorrate);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PROTECTION:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tcl.tcl_protection))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_protection);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_PRIORITY:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tcl.tcl_priority))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_priority);
+						if (ih->name != T_ALLOPT)
+							continue;
+					case T_TCL_CHECKSUM:
+						if (ih->name != T_ALLOPT
+						    && optlen != sizeof(t->options.tcl.tcl_checksum))
+							goto einval;
+						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_checksum);
+						if (ih->name != T_ALLOPT)
+							continue;
+					}
+					break;
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
@@ -3900,350 +3807,334 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			case TP_CMINOR_CLTS:
 			case TP_CMINOR_COTS_OSI:
 			case TP_CMINOR_CLTS_OSI:
-				switch (ih->name) {
-				default:
-					oh->len = sizeof(*oh);
-					oh->level = ih->level;
-					oh->name = ih->name;
-					oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					continue;
-				case T_ALLOPT:
-				case T_TCO_THROUGHPUT:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.throughput);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_THROUGHPUT;
-					if (t->p.info.SERV_type != T_COTS)
+				switch (t->p.info.SERV_type) {
+				case T_COTS:
+					switch (ih->name) {
+					default:
+						oh->len = sizeof(*oh);
+						oh->level = ih->level;
+						oh->name = ih->name;
 						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
-						oh->status = T_SUCCESS;
-						*(struct thrpt *) T_OPT_DATA(oh) = t_defaults.osi.throughput;
-					}
-					if (ih->name != T_ALLOPT)
 						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_TRANSFFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.transffailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_TRANSFFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+					case T_ALLOPT:
+					case T_TCO_THROUGHPUT:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_throughput);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_THROUGHPUT;
+						oh->status = T_SUCCESS;
+						*(struct thrpt *) T_OPT_DATA(oh) =
+						    t_defaults.tco.tco_throughput;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_TRANSDEL:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_transdel);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_TRANSDEL;
+						oh->status = T_SUCCESS;
+						*(struct transdel *) T_OPT_DATA(oh) = t_defaults.tco.tco_transdel;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RESERRORRATE:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_reserrorrate);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RESERRORRATE;
+						oh->status = T_SUCCESS;
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_reserrorrate;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_TRANSFFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_transffailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_TRANSFFAILPROB;
 						oh->status = T_SUCCESS;
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t_defaults.osi.transffailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ESTFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.estfailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ESTFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						    t_defaults.tco.tco_transffailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ESTFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_estfailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ESTFAILPROB;
 						oh->status = T_SUCCESS;
-						*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.estfailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RELFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.relfailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RELFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_estfailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RELFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_relfailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RELFAILPROB;
 						oh->status = T_SUCCESS;
-						*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.relfailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ESTDELAY:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.estdelay);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ESTDELAY;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_relfailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ESTDELAY:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_estdelay);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ESTDELAY;
 						oh->status = T_SUCCESS;
-						*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.estdelay;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RELDELAY:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.reldelay);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RELDELAY;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_estdelay;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RELDELAY:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_reldelay);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RELDELAY;
 						oh->status = T_SUCCESS;
-						*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.reldelay;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_CONNRESIL:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.connresil);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_CONNRESIL;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_reldelay;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_CONNRESIL:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_connresil);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_CONNRESIL;
 						oh->status = T_SUCCESS;
-						*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.connresil;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_EXPD:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.expd);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_EXPD;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tco.tco_connresil;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PROTECTION:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_protection);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PROTECTION;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.expd;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_LTPDU:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.ltpdu);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_LTPDU;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_protection;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PRIORITY:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_priority);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PRIORITY;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.ltpdu;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ACKTIME:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.acktime);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ACKTIME;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_priority;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_EXPD:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_expd);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_EXPD;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.acktime;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_REASTIME:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.reastime);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_REASTIME;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+							t_defaults.tco.tco_expd;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_LTPDU:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_ltpdu);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_LTPDU;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.reastime;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PREFCLASS:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.prefclass);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PREFCLASS;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+							t_defaults.tco.tco_ltpdu;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ACKTIME:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_acktime);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ACKTIME;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.prefclass;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS1:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.altclass1);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS1;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_acktime;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_REASTIME:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_reastime);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_REASTIME;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.altclass1;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS2:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.altclass2);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS2;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_reastime;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PREFCLASS:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_prefclass);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PREFCLASS;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.altclass2;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS3:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.altclass3);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS3;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_prefclass;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS1:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_altclass1);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS1;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.altclass3;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS4:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.altclass4);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS4;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_altclass1;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS2:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_altclass2);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS2;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.altclass4;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_EXTFORM:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.extform);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_EXTFORM;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_altclass2;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS3:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_altclass3);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS3;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.extform;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_FLOWCTRL:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.flowctrl);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_FLOWCTRL;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_altclass3;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS4:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_altclass4);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS4;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.flowctrl;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_NETEXP:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.netexp);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_NETEXP;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_altclass4;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_EXTFORM:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_extform);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_EXTFORM;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.netexp;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_NETRECPTCF:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.netrecptcf);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_NETRECPTCF;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_extform;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_FLOWCTRL:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_flowctrl);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_FLOWCTRL;
 						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.netrecptcf;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_flowctrl;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_CHECKSUM:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_checksum);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_CHECKSUM;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_checksum;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_NETEXP:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_netexp);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_NETEXP;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+							t_defaults.tco.tco_netexp;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_NETRECPTCF:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tco.tco_netrecptcf);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_NETRECPTCF;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tco.tco_netrecptcf;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
 					}
-					if (ih->name != T_ALLOPT)
+					break;
+				case T_CLTS:
+					switch (ih->name) {
+					default:
+						oh->len = sizeof(*oh);
+						oh->level = ih->level;
+						oh->name = ih->name;
+						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
 						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_TRANSDEL:
-				case T_TCL_TRANSDEL:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.transdel);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_TRANSDEL;
-					oh->status = T_SUCCESS;
-					*(struct transdel *) T_OPT_DATA(oh) = t_defaults.osi.transdel;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RESERRORRATE:
-				case T_TCL_RESERRORRATE:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.reserrorrate);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RESERRORRATE;
-					oh->status = T_SUCCESS;
-					*(struct rate *) T_OPT_DATA(oh) = t_defaults.osi.reserrorrate;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PROTECTION:
-				case T_TCL_PROTECTION:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.protection);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PROTECTION;
-					oh->status = T_SUCCESS;
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.protection;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PRIORITY:
-				case T_TCL_PRIORITY:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.priority);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PRIORITY;
-					oh->status = T_SUCCESS;
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.priority;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_CHECKSUM:
-				case T_TCL_CHECKSUM:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.osi.checksum);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_CHECKSUM;
-					oh->status = T_SUCCESS;
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.osi.checksum;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
+					case T_ALLOPT:
+					case T_TCL_TRANSDEL:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tcl.tcl_transdel);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_TRANSDEL;
+						oh->status = T_SUCCESS;
+						*(struct transdel *) T_OPT_DATA(oh) = t_defaults.tcl.tcl_transdel;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_RESERRORRATE:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tcl.tcl_reserrorrate);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_RESERRORRATE;
+						oh->status = T_SUCCESS;
+						*(struct rate *) T_OPT_DATA(oh) = t_defaults.tcl.tcl_reserrorrate;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_PROTECTION:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tcl.tcl_protection);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_PROTECTION;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tcl.tcl_protection;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_PRIORITY:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tcl.tcl_priority);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_PRIORITY;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tcl.tcl_priority;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_CHECKSUM:
+						oh->len = _T_LENGTH_SIZEOF(t_defaults.tcl.tcl_checksum);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_CHECKSUM;
+						oh->status = T_SUCCESS;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t_defaults.tcl.tcl_checksum;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					}
+					break;
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
@@ -4547,375 +4438,376 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			case TP_CMINOR_CLTS:
 			case TP_CMINOR_COTS_OSI:
 			case TP_CMINOR_CLTS_OSI:
-				switch (ih->name) {
-				default:
-					oh->len = sizeof(*oh);
-					oh->level = ih->level;
-					oh->name = ih->name;
-					oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					continue;
-				case T_ALLOPT:
-				case T_TCO_THROUGHPUT:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.throughput);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_THROUGHPUT;
-					if (t->p.info.SERV_type != T_COTS)
+				switch (t->p.info.SERV_type) {
+				case T_COTS:
+					switch (ih->name) {
+					default:
+						oh->len = sizeof(*oh);
+						oh->level = ih->level;
+						oh->name = ih->name;
 						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						continue;
+					case T_ALLOPT:
+					case T_TCO_THROUGHPUT:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_throughput);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_THROUGHPUT;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct thrpt *) T_OPT_DATA(oh) = t->options.osi.throughput;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_TRANSFFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.transffailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_TRANSFFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct thrpt *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_throughput;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_TRANSDEL:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_transdel);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_TRANSDEL;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(struct transdel *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_transdel;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RESERRORRATE:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reserrorrate);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RESERRORRATE;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.osi.transffailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ESTFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.estfailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ESTFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						    t->options.tco.tco_reserrorrate;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_TRANSFFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_transffailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_TRANSFFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.osi.estfailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RELFAILPROB:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.relfailprob);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RELFAILPROB;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_transffailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ESTFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_estfailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ESTFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.osi.relfailprob;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ESTDELAY:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.estdelay);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ESTDELAY;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_estfailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RELFAILPROB:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_relfailprob);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RELFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.osi.estdelay;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RELDELAY:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.reldelay);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RELDELAY;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_relfailprob;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ESTDELAY:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_estdelay);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ESTDELAY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.osi.reldelay;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_CONNRESIL:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.connresil);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_CONNRESIL;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t->options.tco.tco_estdelay;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_RELDELAY:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reldelay);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_RELDELAY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.osi.connresil;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_EXPD:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.expd);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_EXPD;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) = t->options.tco.tco_reldelay;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_CONNRESIL:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_connresil);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_CONNRESIL;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.expd;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_LTPDU:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.ltpdu);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_LTPDU;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(struct rate *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_connresil;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PROTECTION:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_protection);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PROTECTION;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.ltpdu;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ACKTIME:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.acktime);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ACKTIME;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_protection;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PRIORITY:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_priority);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PRIORITY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.acktime;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_REASTIME:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.reastime);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_REASTIME;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_priority;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_EXPD:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_expd);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_EXPD;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.reastime;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PREFCLASS:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.prefclass);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PREFCLASS;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_expd;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_LTPDU:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_ltpdu);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_LTPDU;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.prefclass;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS1:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.altclass1);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS1;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_ltpdu;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ACKTIME:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_acktime);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ACKTIME;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.altclass1;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS2:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.altclass2);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS2;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_acktime;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_REASTIME:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reastime);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_REASTIME;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.altclass2;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS3:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.altclass3);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS3;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_reastime;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_PREFCLASS:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_prefclass);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_PREFCLASS;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.altclass3;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_ALTCLASS4:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.altclass4);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_ALTCLASS4;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_prefclass;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS1:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass1);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS1;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.altclass4;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_EXTFORM:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.extform);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_EXTFORM;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_altclass1;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS2:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass2);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS2;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.extform;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_FLOWCTRL:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.flowctrl);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_FLOWCTRL;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_altclass2;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS3:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass3);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS3;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.flowctrl;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_NETEXP:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.netexp);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_NETEXP;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_altclass3;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_ALTCLASS4:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass4);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_ALTCLASS4;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.netexp;
-					}
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_NETRECPTCF:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.netrecptcf);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_NETRECPTCF;
-					if (t->p.info.SERV_type != T_COTS)
-						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
-					else {
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_altclass4;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_EXTFORM:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_extform);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_EXTFORM;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.netrecptcf;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_extform;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_FLOWCTRL:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_flowctrl);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_FLOWCTRL;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_flowctrl;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_CHECKSUM:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_checksum);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_CHECKSUM;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_checksum;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_NETEXP:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_netexp);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_NETEXP;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_netexp;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCO_NETRECPTCF:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_netrecptcf);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCO_NETRECPTCF;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tco.tco_netrecptcf;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
 					}
-					if (ih->name != T_ALLOPT)
+					break;
+				case T_CLTS:
+					switch (ih->name) {
+					default:
+						oh->len = sizeof(*oh);
+						oh->level = ih->level;
+						oh->name = ih->name;
+						oh->status = t_overall_result(&overall, T_NOTSUPPORT);
 						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_TRANSDEL:
-				case T_TCL_TRANSDEL:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.transdel);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_TRANSDEL;
-					oh->status = T_SUCCESS;
-					/* refresh current value */
-					*(struct transdel *) T_OPT_DATA(oh) = t->options.osi.transdel;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_RESERRORRATE:
-				case T_TCL_RESERRORRATE:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.reserrorrate);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_RESERRORRATE;
-					oh->status = T_SUCCESS;
-					/* refresh current value */
-					*(struct rate *) T_OPT_DATA(oh) = t->options.osi.reserrorrate;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PROTECTION:
-				case T_TCL_PROTECTION:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.protection);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PROTECTION;
-					oh->status = T_SUCCESS;
-					/* refresh current value */
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.protection;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_PRIORITY:
-				case T_TCL_PRIORITY:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.priority);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_PRIORITY;
-					oh->status = T_SUCCESS;
-					/* refresh current value */
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.priority;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
-				case T_TCO_CHECKSUM:
-				case T_TCL_CHECKSUM:
-					oh->len = _T_LENGTH_SIZEOF(t->options.osi.checksum);
-					oh->level = T_ISO_TP;
-					oh->name = T_TCO_CHECKSUM;
-					oh->status = T_SUCCESS;
-					/* refresh current value */
-					*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.osi.checksum;
-					if (ih->name != T_ALLOPT)
-						continue;
-					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
-						goto efault;
+					case T_ALLOPT:
+					case T_TCL_TRANSDEL:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_transdel);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_TRANSDEL;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(struct transdel *) T_OPT_DATA(oh) =
+						    t->options.tcl.tcl_transdel;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_RESERRORRATE:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_reserrorrate);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_RESERRORRATE;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(struct rate *) T_OPT_DATA(oh) =
+						    t->options.tcl.tcl_reserrorrate;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_PROTECTION:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_protection);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_PROTECTION;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) =
+						    t->options.tcl.tcl_protection;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_PRIORITY:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_priority);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_PRIORITY;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tcl.tcl_priority;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					case T_TCL_CHECKSUM:
+						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_checksum);
+						oh->level = T_ISO_TP;
+						oh->name = T_TCL_CHECKSUM;
+						oh->status = T_SUCCESS;
+						/* refresh current value */
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tcl.tcl_checksum;
+						if (ih->name != T_ALLOPT)
+							continue;
+						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
+							goto efault;
+					}
+					break;
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
