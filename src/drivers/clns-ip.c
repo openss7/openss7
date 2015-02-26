@@ -1481,7 +1481,8 @@ np_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	np->prot.PROTOID_offset = np->prot.QOS_range_offset + mp->prot.QOS_range_length;
 	np->prot.NPI_version = NPI_CURRENT_VERSION;
 }
-static streamscall int
+
+STATIC streamscall int
 np_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 
@@ -1492,7 +1493,7 @@ np_qclose(queue_t *q, int oflags, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  REGISTRATIN AND INITIALIZATION
+ *  REGISTRATION AND INITIALIZATION
  *
  *  =========================================================================
  */
