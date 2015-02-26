@@ -21082,6 +21082,8 @@ mtp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 			if (sp->sq.users != 0) {
 				spin_unlock(&sp->sq.lock);
 				write_unlock_irqrestore(&mtp_mux_lock, flags);
+				schedule();
+				write_lock_irqsave(&mtp_mux_lock, flags);
 				if (!(sp = sp_lookup(cminor))) {
 					err = ENXIO;
 					break;
