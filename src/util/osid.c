@@ -71,11 +71,28 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 static int dryrun = 0;			/* dry run */
 
-static char filename[BUFSIZ + 1] = "/etc/osid.conf";
+static char filename[BUFSIZ + 1] = "/etc/osid.cfg";
+
+/* Basic file format:
+ *
+ * <module/interface_name> device=<device_path> <option>=<value> <option> ...
+ *
+ * OpenSS7 is more automatic than SGI IRIS.  All we really need to configure is the ethernet ports
+ * that will be used by CLNS and/or CONS.  Linux does not refer to ethernet ports by unit number
+ * (although they do have an ifindex).  We prefer to refer to them by name.  The DLPI driver is
+ * configured to provide them by name.  Also, it looks like the SGI IRIS system uses a MAC level
+ * driver and links it under a DLPI multiplexer.
+ */
+static void
+parse_cfg(int argc, char *argv[])
+{
+}
 
 static void
 do_osid(int argc, char *argv[], int start)
 {
+	/* First order of business is to read and parse the configuration file. */
+	parse_cfg(argc, argv);
 }
 
 static void
@@ -174,7 +191,7 @@ Usage:\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
     [FILE]\n\
-        filename of the route file to load [default: /etc/osid.cfg]\n\
+        filename of the route file to load [default: %4$s]\n\
 Options:\n\
   Command:\n\
     -h, --help, -?, --?\n\
@@ -185,15 +202,15 @@ Options:\n\
         print copying permission and exit\n\
   Common:\n\
     -n, --dryrun\n\
-        check but do not write [default: false]\n\
+        check but do not write [default: %5$s]\n\
     -q, --quiet\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -d, --debug [LEVEL]\n\
-        increment or set debug LEVEL [default: 0]\n\
+        increment or set debug LEVEL [default: %2$d]\n\
     -v, --verbose [LEVEL]\n\
-        increment or set output verbosity LEVEL [default: 1]\n\
+        increment or set output verbosity LEVEL [default: %3$d]\n\
         this option may be repeated.\n\
-", argv[0]);
+", argv[0], debug, output, filename, dryrun ? "true" : "false");
 }
 
 #define COMMAND_DFLT  0
