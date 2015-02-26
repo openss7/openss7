@@ -1125,7 +1125,7 @@ typedef struct mtp_notify {
  * convenience of management agents so that it is possible to atomically read
  * all of the attributes associated with an object.
  */
-    typedef struct mtp_attr_df {
+typedef struct mtp_attr_df {
 	struct mtp_conf_df config;
 	struct mtp_opt_conf_df option;
 	struct mtp_info_df inform;
