@@ -696,8 +696,26 @@ T_TCO_EXTFORM:t_uscalar_t:T_YES/T_NO/T_UNSPEC:extended format
 T_TCO_FLOWCTRL:t_uscalar_t:T_YES/T_NO/T_UNSPEC:flow ctrl
 T_TCO_CHECKSUM:t_uscalar_t:T_YES/T_NO/T_UNSPEC:checksum
 T_TCO_NETEXP:t_uscalar_t:T_YES/T_NO/T_UNSPEC:network expedited data
-T_TCO_NETRECPTCF:t_uscalar_t:T_YES/T_NO/T_UNSPEC:user of network
-:::receipt confirmation
+T_TCO_NETRECPTCF:t_uscalar_t:T_YES/T_NO/T_UNSPEC:T{
+.ad l
+.hy 0
+network confirmation
+T}
+T_TCO_SELECTACK:t_uscalar_t:T_YES/T_NO/T_UNSPEC:T{
+.ad l
+.hy 0
+selective ack.
+T}
+T_TCO_REQUESTACK:t_uscalar_t:T_YES/T_NO/T_UNSPEC:T{
+.ad l
+.hy 0
+request ack.
+T}
+T_TCO_NBLKEXPDATA:t_uscalar_t:T_YES/T_NO/T_UNSPEC:T{
+.ad l
+.hy 0
+non-blocking exp. data
+T}
 .TE
 .sp
 .ce 1
