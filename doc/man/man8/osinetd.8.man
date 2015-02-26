@@ -120,7 +120,7 @@ The
 is a user-space C-language program that can be run in the background as a
 daemon process to establish, initialize, configure and collect statistics and
 events from
-.I @PACKAGE_TITLE@ .
+.IR @PACKAGE_TITLE@ .
 But, see
 .RI \(lq NOTICES \(rq.
 .\"
@@ -134,11 +134,11 @@ mutually exclusive options:
 .TP
 \fB-n\fP, \fB--nodaemon\fP
 Specifies that the
-.B ss7statsd
+.B osinetd
 is to run in the foreground with output to standard out and errors to standard
 error (unless overridden by options).  This is the default when \fB--debug\fP
 is specified.  Otherwise,
-.B ss7statsd
+.B osinetd
 normally closes standard input, output and error and places itself in the
 background as a daemon process, reading configuraiton from the configuration
 file, sending output to the output file, and sending errors to the log file.
@@ -170,7 +170,7 @@ an output file and standard error to a log file.
 When run in the daemon mode, specifies the directory,
 .IR DIRECTORY ,
 in which output and error files will be opened.  The default output directory is
-.IR \(lq /var/tmp/ss7statsd \(rq.
+.IR \(lq /var/tmp/osinetd \(rq.
 .TP
 \fB-o\fP, \fB--outfile\fP \fIFILENAME\fP
 When run in daemon mode, specifies the output filename,
@@ -203,7 +203,7 @@ Increases or set the debugging level.  When this option is given without the
 .I LEVEL
 argument, it specifies that the debugging level should be increased by one.  If the
 .I LEVEL
-argument is specified, the debuggin level is set to that integer value.  This option can be
+argument is specified, the debugging level is set to that integer value.  This option can be
 repeated.  For example,
 .B -ddddd
 is equivalent to
@@ -373,13 +373,13 @@ Disabling of this function unit is normally for debugging purposes only.
 .B sys.osinet.transport.clns.status
 Turns the selected transport entity on or off.  If you turn the entity status
 off, the transport entity is isolated, and data no longer passes through this
-transprot layer.  You might want to do this for security or debuggin purposes.
+transprot layer.  You might want to do this for security or debugging purposes.
 .TP
 .B sys.osinet.transport.clns.max_pdu_size
 Specifies the maximum size for a transport PDU.  The actual value is
 negotiated between the local and the remote system, the lower value being
-accepted.   Specify one of the following values: 128, 256, 512, 1024, 2148,
-4096 or 8192.  The default size is 512.
+accepted.   Specify one of the following values: 128, 256, 512, 1024, 2048,
+4096 or 8192.  The default size is 1024.
 .TP
 .B sys.osinet.transport.clns.credit_window
 This value is used in the calculation to define the maximum buffer space
@@ -502,7 +502,7 @@ You might want to do this for security or debugging purposes.
 .B sys.osinet.transport.cons.max_pdu_size
 Specifies the maximum size a transport PDU is allowed to be on this system.
 The actual value is negoitated between the local and the remote system, the
-lower value being accpeted.  Specify one of: 128, 256, 512, 1024, 2148, 4096
+lower value being accpeted.  Specify one of: 128, 256, 512, 1024, 2048, 4096
 or 8192.  The default size is 512.
 .TP
 .B sys.osinet.transport.cons.credit_window
@@ -521,7 +521,7 @@ for disconnection of an inactive network connection.  Specify a value between
 3 and 12 (decaseconds).  The default value is 6 decaseconds (60 seconds).
 .TP
 .B sys.osinet.transport.cons.t1r_timeout
-Specifies the time between trying to resynchronize or reassing the trasnport
+Specifies the time between trying to resynchronize or reassessing the trasnport
 connection after a transmission failure.  It is only used when the local
 system initiated a class 3 protocol connection.  Specify a value between 3 and
 12 (decaseconds).  The default value is 6 decaseconds (60 seconds).
