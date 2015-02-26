@@ -677,7 +677,7 @@ typedef struct mx_stats {
  * notification).  Events can be requested by object class, and a mechanism
  * exists for requesting events by specific object; however, the driver is not
  * required to support per-object notification and will return EOPNOTSUPP.  To
- * request notification for an object class, specific zero (0) for the
+ * request notification for an object class, specify zero (0) for the
  * object identifier.
  *
  * Event requests are per requesting Stream.  Non-management streams should only
