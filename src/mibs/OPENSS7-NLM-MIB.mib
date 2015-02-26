@@ -61,7 +61,7 @@ IMPORTS
     AreaAddresses, CircuitID, CircuitType, DatabaseState, HopMetric, 
     ISType, IntermediateSystemPriority, Password, Passwords, SystemId
         FROM OPENSS7-ISIS-MIB
-    openss7Modules
+    openss7X
         FROM OPENSS7-SMI
     AdministrativeState, OperationalState, SimpleNameType
         FROM OPENSS7-SMI-MIB
@@ -139,7 +139,7 @@ nlmMIB MODULE-IDENTITY
     REVISION    "201502181310Z"
     DESCRIPTION 
         "Initial version of this mib."
-    ::= { openss7Modules 34 }
+    ::= { openss7X 283 }
 
  -- top level organization of the MIB
 

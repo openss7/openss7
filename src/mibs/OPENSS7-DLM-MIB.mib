@@ -58,11 +58,11 @@
 OPENSS7-DLM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    LocalDistinguishedName, LocalDistinguishedNames
+    LocalDistinguishedNames
         FROM OPENSS7-NLM-MIB
-    openss7Modules
+    openss7X
         FROM OPENSS7-SMI
-    AdministrativeState, OperationalState, SimpleNameType
+    OperationalState, SimpleNameType
         FROM OPENSS7-SMI-MIB
     MilliSeconds
         FROM OPENSS7-TC
@@ -119,7 +119,7 @@ dlmMIB MODULE-IDENTITY
     REVISION    "201502210709Z"
     DESCRIPTION 
         "Initial version of this mib."
-    ::= { openss7Modules 24 }
+    ::= { openss7X 282 }
 
  -- top level organization of the MIB
 
@@ -1416,7 +1416,7 @@ dlmLLCCLPMEntry OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
                lLCCCLPM MANAGED OBJECT"
-    INDEX       { dlEntityId, dlmLLCCLPMClProtocolMachineId }
+    INDEX       { dlmEntityId, dlmLLCCLPMClProtocolMachineId }
     ::= { dlmLLCCLPMTable 1 }
 
 DlmLLCCLPMEntry ::= SEQUENCE {
@@ -1513,7 +1513,7 @@ dlmLLCCOPMEntry OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.282 (1999) | ISO/IEC 10742 : 1994, 
                lLCCOPM MANAGED OBJECT"
-    INDEX       { dlmEntityId, dlmLLCCOPMClProtocolMachineId }
+    INDEX       { dlmEntityId, dlmLLCCOPMCoProtocolMachineId }
     ::= { dlmLLCCOPMTable 1 }
 
 DlmLLCCOPMEntry ::= SEQUENCE {

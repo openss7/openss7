@@ -58,7 +58,7 @@
 OPENSS7-TLM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7Modules
+    openss7X
         FROM OPENSS7-SMI
     AdministrativeState, OperationalState, SimpleNameType
         FROM OPENSS7-SMI-MIB
@@ -122,7 +122,7 @@ tlmMIB MODULE-IDENTITY
     REVISION    "201502170534Z"
     DESCRIPTION 
         "Initial version of this mib."
-    ::= { openss7Modules 41 }
+    ::= { openss7X 284 }
 
  -- top level organization of the MIB
 
@@ -1675,14 +1675,14 @@ tlmConnectionIVMOProtocolClasses OBJECT-TYPE
     ::= { tlmConnectionIVMOEntry 2 }
 
 tlmConnectionIVMOMaxTPDUSize OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (0 | 128 | 256 | 512 | 1024 | 2048 | 4096 | 8192)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         "The maximum TPDU size negotiated for the connection.  
          Implementation constraints or policies, or relating to 
          the remote NSAP or transport entity, may cause 
-         a smaller value to be used as an initial vlaue for 
+         a smaller value to be used as an initial value for 
          negotiation.  During connection establishment, this 
          attribute represents the desired value and not 
          necessarily the value that will ultimatedly be used."
