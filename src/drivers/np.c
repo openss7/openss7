@@ -73,9 +73,9 @@ static char const ident[] = "src/drivers/np.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <linux/bitops.h>
 
-#define n_tst_bit(nr,addr)	test_bit(nr,addr)
-#define n_set_bit(nr,addr)	__set_bit(nr,addr)
-#define n_clr_bit(nr,addr)	__clear_bit(nr,addr)
+#define np_tst_bit(nr,addr)	test_bit(nr,addr)
+#define np_set_bit(nr,addr)	__set_bit(nr,addr)
+#define np_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
 #include <linux/interrupt.h>
 
@@ -114,11 +114,11 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 
-#define NP_IP_DRV_ID	CONFIG_STREAMS_NP_IP_MODID
-#define NP_IP_DRV_NAME	CONFIG_STREAMS_NP_IP_NAME
-#define NP_IP_CMAJORS	CONFIG_STREAMS_NP_IP_NMAJOR
-#define NP_IP_CMAJOR_0	CONFIG_STREAMS_NP_IP_MAJOR
-#define NP_IP_UNITS	CONFIG_STREAMS_NP_IP_NMINORS
+#define NP_DRV_ID	CONFIG_STREAMS_NP_MODID
+#define NP_DRV_NAME	CONFIG_STREAMS_NP_NAME
+#define NP_CMAJORS	CONFIG_STREAMS_NP_NMAJORS
+#define NP_CMAJOR_0	CONFIG_STREAMS_NP_MAJOR
+#define NP_UNITS	CONFIG_STREAMS_NP_NMINORS
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
@@ -128,58 +128,90 @@ MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_NP_MAJOR));
 MODULE_ALIAS("/dev/streams/np_ip");
 MODULE_ALIAS("/dev/streams/np_ip/*");
 MODULE_ALIAS("/dev/streams/clone/np_ip");
-MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_IP_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(CONFIG_STREAMS_CLONE_MAJOR) "-" __stringify(NP_CMAJOR_0));
 MODULE_ALIAS("/dev/np_ip");
 //MODULE_ALIAS("devname:np_ip");
-#endif				/* MODULE_ALIAS */
-#endif				/* LINUX */
+#endif				/* defined MODULE_ALIAS */
+#endif				/* defined LINUX */
 
 /*
+ *  ==========================================================================
+ *
  *  STREAMS Definitions
- *  ===================
+ *
+ *  ==========================================================================
  */
 
-#define DRV_ID		NP_IP_DRV_ID
-#define CMAJORS		NP_IP_CMAJORS
-#define CMAJOR_0	NP_IP_CMAJOR_0
-#define UNITS		NP_IP_UNITS
+#define DRV_ID		NP_DRV_ID
+#define DRV_NAME	NP_DRV_NAME
+#define CMAJORS		NP_CMAJORS
+#define CMAJOR_0	NP_CMAJOR_0
+#define UNITS		NP_UNITS
 #ifdef MODULE
-#define DRV_BANNER	NP_IP_BANNER
+#define DRV_BANNER	NP_BANNER
 #else				/* MODULE */
-#define DRV_BANNER	NP_IP_SPLASH
+#define DRV_BANNER	NP_SPLASH
 #endif				/* MODULE */
 
 STATIC struct module_info np_minfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
-	.mi_idname = DRV_NAME,		/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_hiwat = 1 << 10,		/* Lo water mark */
+	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idname = DRV_NAME,	/* Module name */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = (1 << 16),	/* Max packet size accepted */
+	.mi_hiwat = (1 << 18),	/* Hi water mark */
+	.mi_lowat = (1 << 16),	/* Lo water mark */
 };
 
-STATIC struct module_stat np_mstat = {
-};
+STATIC struct module_stat np_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat dl_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat dl_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a N provider following the NPI. */
 
 STATIC streamscall int np_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int np_qclose(queue_t *, int, cred_t *);
 
+streamscall int np_rput(queue_t *, mblk_t *);
+streamscall int np_rsrv(queue_t *);
+
 STATIC struct qinit np_rinit = {
-	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_osrv,		/* Read service procedure */
-	.qi_qopen = &np_qopen,		/* Each open */
-	.qi_qclose = &np_qclose,	/* Last close */
-	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_putp = np_rput,	/* Read put procedure (message from below) */
+	.qi_srvp = np_rsrv,	/* Read service procedure */
+	.qi_qopen = np_qopen,	/* Each open */
+	.qi_qclose = np_qclose,	/* Last close */
+	.qi_minfo = &np_minfo,	/* Module information */
+	.qi_mstat = &np_rstat,	/* Module statistics */
 };
 
+streamscall int dl_rput(queue_t *, mblk_t *);
+streamscall int dl_rsrv(queue_t *);
+
+STATIC struct qinit dl_rinit = {
+	.qi_putp = dl_rput,
+	.qi_srvp = dl_rsrv,
+	.qi_minfo = &dl_minfo,
+	.qi_mstat = &dl_rstat,
+};
+
+streamscall int np_wput(queue_t *, mblk_t *);
+streamscall int np_wsrv(queue_t *);
+
 STATIC struct qinit np_winit = {
-	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_isrv,		/* Read service procedure */
-	.qi_minfo = &np_minfo,		/* Module information */
-	.qi_mstat = &np_mstat,		/* Module statistics */
+	.qi_putp = np_wput,	/* Write put procedure (message from above) */
+	.qi_srvp = np_wsrv,	/* Write service procedure */
+	.qi_minfo = &np_minfo,	/* Module information */
+	.qi_mstat = &np_wstat,	/* Module statistics */
+};
+
+streamscall int dl_wput(queue_t *, mblk_t *);
+streamscall int dl_wsrv(queue_t *);
+
+STATIC struct qinit dl_winit = {
+	.qi_putp = dl_wput,
+	.qi_srvp = dl_wsrv,
+	.qi_minfo = &dl_minfo,
+	.qi_mstat = &dl_wstat,
 };
 
 STATIC struct module_info dl_minfo = {
@@ -191,24 +223,8 @@ STATIC struct module_info dl_minfo = {
 	.mi_lowat = 1 << 10,
 };
 
-STATIC struct module_stat dl_mstat = {
-};
 
-STATIC struct qinit dl_rinit = {
-	.qi_putp = &ss7_iput,
-	.qi_srvp = &ss7_iput,
-	.qi_minfo = &dl_minfo,
-	.qi_mstat = &dl_mstat,
-};
-
-STATIC struct qinit dl_winit = {
-	.qi_putp = &ss7_oput,
-	.qi_srvp = &ss7_oput,
-	.qi_minfo = &dl_minfo,
-	.qi_mstat = &dl_mstat,
-};
-
-STATIC struct streamtab np_info = {
+MODULE_STATIC struct streamtab np_info = {
 	.st_rdinit = &np_rinit,		/* Upper read queue */
 	.st_wrinit = &np_winit,		/* Upper write queue */
 	.st_muxrinit = &dl_rinit,
@@ -395,6 +411,54 @@ np_alloc(void)
 	}
 	return (np);
 }
+
+/*
+ *  Locking
+ */
+
+/* Must always be bottom-half versions to avoid lock badness.  But give these
+ * different names to avoid conflict with generic definitions.  */
+
+//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#if 1
+
+#define spin_lock_str2(__lkp, __flags) \
+	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
+#define spin_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; spin_unlock_bh(__lkp); } while (0)
+#define write_lock_str2(__lkp, __flags) \
+	do { (void)__flags; write_lock_bh(__lkp); } while (0)
+#define write_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; write_unlock_bh(__lkp); } while (0)
+#define read_lock_str2(__lkp, __flags) \
+	do { (void)__flags; read_lock_bh(__lkp); } while (0)
+#define read_unlock_str2(__lkp, __flags) \
+	do { (void)__flags; read_unlock_bh(__lkp); } while (0)
+#define local_save_str2(__flags) \
+	do { (void)__flags; local_bh_disable(); } while (0)
+#define local_restore_str2(__flags) \
+	do { (void)__flags; local_bh_enable(); } while (0)
+
+#else
+
+#define spin_lock_str2(__lkp, __flags) \
+	spin_lock_irqsave(__lkp, __flags)
+#define spin_unlock_str2(__lkp, __flags) \
+	spin_unlock_irqrestore(__lkp, __flags)
+#define write_lock_str2(__lkp, __flags) \
+	write_lock_irqsave(__lkp, __flags)
+#define write_unlock_str2(__lkp, __flags) \
+	write_unlock_irqrestore(__lkp, __flags)
+#define read_lock_str2(__lkp, __flags) \
+	read_lock_irqsave(__lkp, __flags)
+#define read_unlock_str2(__lkp, __flags) \
+	read_unlock_irqrestore(__lkp, __flags)
+#define local_save_str2(__flags) \
+	local_irq_save(__flags)
+#define local_restore_str2(__flags) \
+	local_irq_restore(__flags)
+
+#endif
 
 STATIC INLINE struct dl *
 dl_get(struct dl *dl)
@@ -2318,7 +2382,7 @@ np_lapf_event(queue_t *q, struct np *np, union ne_event *ep)
 /* ========================================================================== */
 
 /*
- * NP_IP
+ * NP
  * --------
  */
 
@@ -4524,6 +4588,11 @@ np_alloc_priv(queue_t *q, struct np **npp, uint type, int sflag, dev_t *devp, cr
 		       "could not allocate driver private structure");
 	return (np);
 }
+
+/**
+ * np_free_priv - deallocate a private structure for the close routine
+ * @q: read queue of closing Stream
+ */
 STATIC void
 np_free_priv(queue_t *q)
 {
@@ -4617,22 +4686,34 @@ np_free_link(queue_t *q)
 }
 
 /*
- *  STREAMS Open and Close
- *  ======================
+ *  Open and Close
+ */
+/**
+ * np_qopen - NPI IP driver STREAMS open routine
+ * @q: read queue of opened Stream
+ * @devp: pointer to device number opened
+ * @oflag: flags to the open call
+ * @sflag: STREAMS flag: DRVOPEN, MODOPEN or CLONEOPEN
+ * @crp: pointer to opener's credentials
  */
 STATIC streamscall int
-np_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
+np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp), bminor = cminor;
 	struct np *np, **npp;
 
-	if (q->q_ptr != NULL)
+	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
+	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE, "cannot push as module");
-		return (ENXIO);
+		return (EIO);
 	}
+	/* Linux Fast-STREAMS always passes internal major device number (module id).  Note also, however,
+	   that strconf-sh attempts to allocate module ids that are identical to the base major device number 
+	   anyway. */
+	/* Linux Fast-STREAMS always passes internal major device numbers (modules ids) */
 	if (cmajor != DRV_ID || cminor >= NP_MINOR_FREE) {
 		strlog(DRV_ID, cminor, LOG_WARNING, SL_WARN | SL_CONSOLE,
 		       "attempt to open device %d:%d directly", cmajor, cminor);
@@ -4648,18 +4729,21 @@ np_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	for (; *npp; npp = &(*npp)->next) {
 		if (cmajor != (*npp)->u.dev.cmajor)
 			break;
-		if (cminor < (*npp)->u.dev.cminor)
-			break;
-		if (cminor == (*npp)->u.dev.cminor) {
-			if (sflag != CLONEOPEN) {
-				write_unlock_bh(&master.lock);
-				strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
-				       "opened device %d:%d in use!", cmajor, cminor);
-				return (EAGAIN);
-			}
-			if (getminor(makedevice(cmajor, ++cminor)) != cminor) {
-				cmajor = 0;
+		if (cmajor == (*npp)->u.dev.cmajor) {
+			if (cminor < (*npp)->u.dev.cminor)
 				break;
+			if (cminor == (*npp)->u.dev.cminor) {
+				if (sflag != CLONEOPEN) {
+					write_unlock_bh(&master.lock);
+					strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
+					       "opened device %d:%d in use!", cmajor, cminor);
+					return (EAGAIN);
+				}
+				if (getminor(makedevice(cmajor, ++cminor)) != cminor) {
+					cmajor = 0;
+					break;
+				}
+				continue;
 			}
 		}
 	}
@@ -4679,14 +4763,26 @@ np_open(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	return (0);
 }
 
+/**
+ * np_qclose - NPI NP driver STREAMS close routine
+ * @q: read queue of closing Stream
+ * @oflag: flags to open call
+ * @crp: pointer to closer's credentials
+ */
 STATIC streamscall int
-np_qclose(queue_t *q, int oflags, cred_t *crp)
+np_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct np *np = NP_PRIV(q);
 
+	(void) oflag;
+	(void) crp;
+	(void) np;
 	strlog(DRV_ID, np->u.dev.cminor, LOG_DEBUG, SL_TRACE, "closing character device");
+	/* make sure procedures are off */
+	flushq(WR(q), FLUSHALL);
+	flushq(RD(q), FLUSHALL);
 	qprocsoff(q);
-	np_free_priv(q);
+	np_free_priv(q);	/* free and unlink the structure */
 	goto quit;
       quit:
 	return (0);
@@ -4698,27 +4794,27 @@ np_qclose(queue_t *q, int oflags, cred_t *crp)
  */
 #ifdef LINUX
 /*
- *  Linux Regsitration
+ *  Linux registration
  *  ------------------
  */
 
 unsigned short modid = DRV_ID;
 
-#ifndef module_parm
+#ifndef module_param
 MODULE_PARM(modid, "h");
-#else				/* module_parm */
+#else
 module_param(modid, ushort, 0444);
-#endif				/* module_parm */
-MODULE_PARM_DESC(modid, "Module ID number for NP driver (0 for allocation).");
+#endif
+MODULE_PARM_DESC(modid, "Module ID for the NP driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
 
 #ifndef module_param
 MODULE_PARM(major, "h");
-#else				/* module_param */
+#else
 module_param(major, uint, 0444);
-#endif				/* module_param */
-MODULE_PARM_DESC(major, "Major device number for NP driver (0 for allocation).");
+#endif
+MODULE_PARM_DESC(major, "Device number for the NP driver. (0 for allocation.)");
 
 /*
  *  Linux Fast-STREAMS Registration
@@ -4735,57 +4831,59 @@ STATIC struct cdevsw np_cdev = {
 
 STATIC struct devnode np_node_eth = {
 	.n_name = "eth",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_lapb = {
 	.n_name = "lapb",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_lapd = {
 	.n_name = "lapd",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_lapf = {
 	.n_name = "lapf",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_ip = {
 	.n_name = "ip",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_x25 = {
 	.n_name = "x25",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_clnl = {
 	.n_name = "clnl",
-	.n_flag = D_CLONE,		/* clone minor */
+	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 STATIC struct devnode np_node_cons = {
 	.n_name = "cons",
 	.n_flag = D_CLONE,		/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC int
+STATIC __unlikely int
 np_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = regsister_strdev(&np_cdev, major)) < 0)
+	if ((err = register_strdev(&np_cdev, major)) < 0)
 		return (err);
-	return (0);
-}
-STATIC void
-np_register_strnod(void)
-{
 	register_strnod(&np_cdev, &np_node_eth, NP_MINOR_ETH);
 	register_strnod(&np_cdev, &np_node_lapb, NP_MINOR_LAPB);
 	register_strnod(&np_cdev, &np_node_lapd, NP_MINOR_LAPD);
@@ -4794,9 +4892,11 @@ np_register_strnod(void)
 	register_strnod(&np_cdev, &np_node_x25, NP_MINOR_X25);
 	register_strnod(&np_cdev, &np_node_clnl, NP_MINOR_CLNL);
 	register_strnod(&np_cdev, &np_node_cons, NP_MINOR_CONS);
+	return (0);
 }
-STATIC void
-np_unregister_strnod(void)
+
+STATIC __unlikely int
+np_unregister_strdev(major_t major)
 {
 	unregister_strnod(&np_cdev, &np_node_cons, NP_MINOR_CONS);
 	unregister_strnod(&np_cdev, &np_node_clnl, NP_MINOR_CLNL);
@@ -4806,16 +4906,13 @@ np_unregister_strnod(void)
 	unregister_strnod(&np_cdev, &np_node_lapd, NP_MINOR_LAPD);
 	unregister_strnod(&np_cdev, &np_node_lapb, NP_MINOR_LAPB);
 	unregister_strnod(&np_cdev, &np_node_eth, NP_MINOR_ETH);
-}
-STATIC int
-np_unregister_strdev(major_t major)
-{
 	if ((err = unregister_strdev(&np_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
 
 STATIC int np_initialized = 0;
+
 STATIC void
 np_init(void)
 {
@@ -4850,7 +4947,6 @@ np_terminate(void)
 
 	if (np_initialized <= 0)
 		return;
-	np_unregister_strnod();
 	if (major) {
 		if ((err = np_unregister_strdev(major)) < 0)
 			strlog(DRV_ID, 0, LOG_CRIT, SL_FATAL | SL_CONSOLE,
@@ -4877,6 +4973,10 @@ np_module_exit(void)
 	return np_terminate();
 }
 
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
 module_init(np_module_init);
 module_exit(np_module_exit);
 
