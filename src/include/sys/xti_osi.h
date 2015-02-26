@@ -173,6 +173,9 @@ struct transdel {
 #define T_TCO_CHECKSUM		0x0600	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 #define T_TCO_NETEXP		0x0700	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 #define T_TCO_NETRECPTCF	0x0800	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_SELECTACK		0x0e00  /**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_REQUESTACK	0x0f00	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_NBLKEXPDATA	0x1000  /**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 
 #define T_TCL_TRANSDEL		0x000d
 #define T_TCL_RESERRORRATE	T_TCO_RESERRORRATE
