@@ -2491,6 +2491,8 @@ dnl
 	if ! echo "$linux_cv_k_cppflags" | grep 'kconfig\.h' >/dev/null 2>&1 ; then
 	    AC_DEFINE_UNQUOTED([NEED_LINUX_AUTOCONF_H], [$linux_cv_k_autoconf],
 		[Defined when the header file ]$linux_cv_k_autoconf[ needs to be explicitly included.])
+dnl	    stupid gcc 3.3.3 compiler from FC2 defines 'linux' as '1' and expands it everywhere
+	    linux_cv_k_cppflags="-Ulinux $linux_cv_k_cppflags"
 	fi
     fi
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
