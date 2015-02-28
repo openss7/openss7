@@ -1498,7 +1498,10 @@ function write_syssymver(file,    sym,line,count_syms,mod)
 	if (sym in crcs && crcs[sym] && crcs[sym]!~/^0x$/)
 	{ line = crcs[sym] } else
 	{ line = "0x00000000" }
-	line = line "\t" sym "\t" mod "\t" exps[sym]
+	if (sym in exps)
+	    line = line "\t" sym "\t" mod "\t" exps[sym]
+	else
+	    line = line "\t" sym "\t" mod
 	count_syms++
 	print line > file
     }
@@ -1526,7 +1529,10 @@ function write_modsymver(file,    sym,line,count_syms,mod)
 	if (sym in crcs && crcs[sym] && crcs[sym]!~/^0x$/)
 	{ line = crcs[sym] } else
 	{ line = "0x00000000" }
-	line = line "\t" sym "\t" mod "\t" exps[sym]
+	if (sym in exps)
+	    line = line "\t" sym "\t" mod "\t" exps[sym]
+	else
+	    line = line "\t" sym "\t" mod
 	count_syms++
 	print line > file
     }
