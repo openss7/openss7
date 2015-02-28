@@ -2892,7 +2892,7 @@ qprocsoff(queue_t *q)
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		unsigned long pl;
-		struct stdata *sd2;
+		struct stdata *sd2 = NULL;
 
 		/* spin here waiting for queue procedures to exit */
 		pwlock(sd, pl);
