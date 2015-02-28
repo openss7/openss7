@@ -1,0 +1,12 @@
+#!/bin/bash
+set -x
+where=`dirname $0`
+srcdir=`(cd $where/..; pwd)`
+$srcdir/configure \
+	--disable-maintainer-mode \
+	--disable-k-abi-support \
+	--disable-k-weak-symbols \
+	--enable-k-weak-modules \
+	--disable-specfs-lock \
+	$* \
+	2>&1 | tee configure.log
