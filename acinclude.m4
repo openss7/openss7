@@ -1196,6 +1196,7 @@ dnl----------------------------------------------------------------------------
 	struct rtable.dst,
 	struct rtable.rt_dst,
 	struct rtable.rt_src,
+	struct rtable.rt_oif,
 	struct inet_protocol.copy,
 	struct inet_protocol.next,
 	struct inet_protocol.no_policy,
