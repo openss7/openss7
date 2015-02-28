@@ -4091,6 +4091,8 @@ xotmodinit(void)
 	}
 	if (modid == 0)
 		modid = err;
+#else
+	(void) modid;
 #endif
 	return (0);
 }
