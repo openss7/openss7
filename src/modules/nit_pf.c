@@ -302,10 +302,12 @@ pf_iocdata(queue_t *q, mblk_t *mp)
 				mi_copy_done(q, mp, EPROTO);
 				break;
 			case MI_COPY_CASE(MI_COPY_IN, 1):
+#if (ENMAXFILTERS < 255)
 				if (unlikely(dp->b_rptr[1] > ENMAXFILTERS)) {
 					mi_copy_done(q, mp, ERANGE);
 					break;
 				}
+#endif
 				pf->pf_FilterLenTmp = dp->b_rptr[1];
 				mi_copyin_n(q, mp, 2, 2 * pf->pf_FilterLenTmp);
 				break;
