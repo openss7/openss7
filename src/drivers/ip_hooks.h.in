@@ -320,12 +320,14 @@ extern struct rtable *__ip_route_output_key(struct net *, struct flowi4 *flp);
 
 /* Symbol __ip_rt_update_pmtu is available. */
 #undef HAVE___IP_RT_UPDATE_PMTU_SYMBOL
+#ifdef HAVE___IP_RT_UPDATE_PMTU_SYMBOL
 /* Symbol __ip_rt_update_pmtu is supported. */
 #undef HAVE___IP_RT_UPDATE_PMTU_SUPPORT
 #if defined HAVE___IP_RT_UPDATE_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
 #else
 extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
+#endif
 #endif
 
 #undef HAVE_KMEMB_STRUCT_RTABLE_U_DST
