@@ -5548,15 +5548,31 @@ sctp_queue_xmit(struct sk_buff *skb)
  */
 #ifdef NETIF_F_NO_CSUM
 #ifdef NETIF_F_SCTP_CSUM
+#ifdef NETIF_F_LOOPBACK
 #define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM|NETIF_F_NO_CSUM|NETIF_F_LOOPBACK)
 #else
+#define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM|NETIF_F_NO_CSUM)
+#endif
+#else
+#ifdef NETIF_F_LOOPBACK
 #define SCTP_NO_CSUM (NETIF_F_NO_CSUM|NETIF_F_LOOPBACK)
+#else
+#define SCTP_NO_CSUM (NETIF_F_NO_CSUM)
+#endif
 #endif
 #else
 #ifdef NETIF_F_SCTP_CSUM
+#ifdef NETIF_F_LOOPBACK
 #define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM|NETIF_F_LOOPBACK)
 #else
+#define SCTP_NO_CSUM (NETIF_F_SCTP_CSUM)
+#endif
+#else
+#ifdef NETIF_F_LOOPBACK
 #define SCTP_NO_CSUM (NETIF_F_LOOPBACK)
+#else
+#define SCTP_NO_CSUM (0)
+#endif
 #endif
 #endif
 
