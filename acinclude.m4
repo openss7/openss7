@@ -3524,19 +3524,15 @@ dnl	_LINUX_KERNEL_SYMBOL_EXPORT([mount_sem],     [os7_cv_fattach=no])
     fi
 dnl----------------------------------------------------------------------------
     AC_ARG_ENABLE([specfs-lock],
-	[AS_HELP_STRING([--disable-specfs-lock],
-	    [specfs filesystems locks @<:@default=yes@:>@])])
+	[AS_HELP_STRING([--enable-specfs-lock],
+	    [specfs filesystems locks @<:@default=no@:>@])])
     AC_CACHE_CHECK([for specfs locking], [os7_cv_specfs_lock], [dnl
-	os7_cv_specfs_lock=${enable_specfs_lock:-yes}
+	os7_cv_specfs_lock=${enable_specfs_lock:-no}
 	if test :${linux_cv_header_linux_notifier_h} != :yes; then
-	    if test :${os7_cv_specfs_lock} = :yes; then
-		os7_cv_specfs_lock=disabled
-	    fi
+	    os7_cv_specfs_lock=no
 	fi
 	if test :${linux_cv_header_linux_crypto_h} != :yes; then
-	    if test :${os7_cv_specfs_lock} = :yes; then
-		os7_cv_specfs_lock=disabled
-	    fi
+	    os7_cv_specfs_lock=no
 	fi
     ])
     if test :${os7_cv_specfs_lock:-yes} = :yes; then
