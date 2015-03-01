@@ -4154,7 +4154,9 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 		tp->daddrs[0].dst = rt_dst(*rtp);
 		tp->daddrs[0].addr = opt->ip.daddr;
 		tp->daddrs[0].saddr = (*rtp)->rt_src;
+#if defined HAVE_KMEMB_STRUCT_RTABLE_RT_OIF
 		tp->daddrs[0].oif = (*rtp)->rt_oif;
+#endif				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_OIF */
 	}
 #else				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
 	{
