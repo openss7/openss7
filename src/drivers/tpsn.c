@@ -5934,6 +5934,64 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  Address Handling
  *
  *  =========================================================================
+ *
+ *  Addressing:
+ *
+ *  ISO:
+ *
+ *  49			AFI (Local Binary)
+ *  --			IDI (NULL)
+ *  XXXX		Routing Domain/Area Code (Subnetwork)
+ *  HH:HH:HH:HH:HH:HH	MAC Address (first octet 0 for 802.3)
+ *  FE			NSel (LSAP)
+ *  binary length = 10 octets with NSel
+ *
+ *  RFC 1069 -IP NSAPs
+ *  ISO-IP:
+ *
+ *  47			AFI (ICD Binary)
+ *  0006		IDI/ICD (Internet ICD)
+ *  02			DFI Version
+ *  0000		Global Area
+ *  XXXX		Routing Domain
+ *  00000000000000	Padding
+ *  AABBCCDD		IPv4 Address
+ *  00			NSel (LSAP)
+ *  binary length = 20 octets with NSel
+ *
+ *  ISO-UDP: ANSI 2/6/1 format
+ *
+ *  47			AFI (ICD Binary)
+ *  0006		IDI/ICD (Internet ICD)
+ *  02			DFI Version
+ *  0000		Global Area
+ *  XXXX		Routing Domain
+ *  000000		Padding
+ *  XXXX		Area Code
+ *  AABBCCDDPPPP	IPv4 Address and port
+ *  00			NSel (LSAP)
+ *  binary length = 20 octets with NSel
+ *
+ *  RFC 1277 - RFC 1006 NSAPs
+ *
+ *  54			AFI (F.69 Decimal)
+ *  00			F.69 prefix
+ *  728722		Hypothetical telex number
+ *  03			Prefix (RFC1006)
+ *  AAABBBCCCDDD	IPv4 Address (decimal)
+ *  PPPPP		Port number (decimal)
+ *  TTTTT		Transport selection mask (1 TCP, 2 UDP, how about 4 SCTP)
+ *  binary length = 17 without NSel
+ *
+ *  RFC 4548 - IP NSAPs
+ *
+ *  47			AFI (IANA ICP Binary)
+ *  0001		IPv4 (IPv6 is 0000)
+ *  AABBCCDD		IPv4 address
+ *  00...		12 octets of zeros
+ *  00			NSel (LSAP)
+ *  binary length = 20 octets with NSel
+ *
  */
 
 /**
@@ -9020,24 +9078,20 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	}
 	if (p->ADDR_length < 1)
 		goto badaddr;
-	switch (__builtin_expect(tp->p.prot.type, TP_CMINOR_COTS)) {
-	case TP_CMINOR_CLTS:
-	case TP_CMINOR_COTS:
+	switch (__builtin_expect(tp->p.prot.protocol, 0)) {
+	case 0:		/* not determined yet */
 		/* For now we need a local NSAP address that identifies a MAC address or an IETF NSAP address 
 		   that identifies an IPv4 address.  We cannot use ISO-UDP from this minor device. */
 		break;
-	case TP_CMINOR_COTS_OSI:
-	case TP_CMINOR_CLTS_OSI:
+	case T_ISO_TP:
 		/* For now we need a local NSAP address that identifies a MAC address */
 		if (((*(mp->b_rptr + p->ADDR_offset)) & 0x7f) != 0x49)
 			goto badaddr;
 		break;
-	case TP_CMINOR_COTS_IP:
-	case TP_CMINOR_CLTS_IP:
+	case T_INET_IP:
 		/* For now we need an IETF NSAP address that identifies an IPv4 address */
 		break;
-	case TP_CMINOR_COTS_UDP:
-	case TP_CMINOR_CLTS_UDP:
+	case T_INET_UDP:
 		/* For now we need an IETF NSAP address that identifies an IPv4 address */
 		break;
 	default:
@@ -10002,10 +10056,10 @@ unsigned short modid = DRV_ID;
 major_t major = CMAJOR_0;
 
 static const struct tp_profile tp_profiles[] = {
-	{{0x00, TP_CMINOR_COTS, T_ISO_TP},
+	{{0x00, TP_CMINOR_COTS, 0},
 	 {T_INFO_ACK, 1024, 1024, 1024, 1024, 20, T_INFINITE, 1024, T_COTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
-	{{0x00, TP_CMINOR_CLTS, T_ISO_TP},
+	{{0x00, TP_CMINOR_CLTS, 0},
 	 {T_INFO_ACK, 1024, 1024, T_INVALID, T_INVALID, 20, T_INFINITE, 1024, T_CLTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
 	{{0x49, TP_CMINOR_COTS_ISO, T_ISO_TP},
@@ -10014,16 +10068,16 @@ static const struct tp_profile tp_profiles[] = {
 	{{0x49, TP_CMINOR_CLTS_ISO, T_ISO_TP},
 	 {T_INFO_ACK, 1024, 1024, T_INVALID, T_INVALID, 20, T_INFINITE, 1024, T_CLTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
-	{{0x06, TP_CMINOR_COTS_IP, T_INET_IP},
+	{{0x47, TP_CMINOR_COTS_IP, T_INET_IP},
 	 {T_INFO_ACK, 65515, 65515, 65515, 65515, 20, T_INFINITE, 1024, T_COTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
-	{{0x06, TP_CMINOR_CLTS_IP, T_INET_IP},
+	{{0x47, TP_CMINOR_CLTS_IP, T_INET_IP},
 	 {T_INFO_ACK, 65515, 65515, T_INVALID, T_INVALID, 20, T_INFINITE, 1024, T_CLTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
-	{{0x06, TP_CMINOR_COTS_UDP, T_INET_UDP},
+	{{0x47, TP_CMINOR_COTS_UDP, T_INET_UDP},
 	 {T_INFO_ACK, 65507, 65507, 65507, 65507, 20, T_INFINITE, 1024, T_COTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}},
-	{{0x06, TP_CMINOR_CLTS_UDP, T_INET_UDP},
+	{{0x47, TP_CMINOR_CLTS_UDP, T_INET_UDP},
 	 {T_INFO_ACK, 65507, 65507, T_INVALID, T_INVALID, 20, T_INFINITE, 1024, T_CLTS, TS_UNBND,
 	  XPG4_1 | T_SNDZERO}}
 };
