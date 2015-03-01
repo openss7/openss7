@@ -3,10 +3,19 @@ set -x
 where=`dirname $0`
 srcdir=`(cd $where/..; pwd)`
 $srcdir/configure \
+	syslibdir=/lib \
+	sysbindir=/bin \
+	syssbindir=/sbin \
+	--libdir=/usr/lib \
+	--bindir=/usr/bin \
+	--sbindir=/usr/sbin \
+	--libexecdir=/usr/libexec \
 	--disable-maintainer-mode \
 	--disable-k-abi-support \
-	--disable-k-weak-symbols \
-	--enable-k-weak-modules \
 	--disable-specfs-lock \
+	--with-k-optimize=speed \
+	--with-optimize=speed \
+	--with-gnu-ld \
+	--disable-docs \
 	$* \
 	2>&1 | tee configure.log
