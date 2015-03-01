@@ -3687,6 +3687,7 @@ EXTRA_DIST			+= cache/arch-os-i686-config.cache \
 				   cache/debian-squeeze-x86_64-config.cache \
 				   cache/debian-wheezy-i386-config.cache \
 				   cache/fedora-15-x86_64-config.cache \
+				   cache/fedora-2-i586-config.cache \
 				   cache/mageia-1-x86_64-config.cache \
 				   cache/mandriva-2010.2-i586-config.cache \
 				   cache/mandriva-2010.2-i686-config.cache \
@@ -3696,6 +3697,7 @@ EXTRA_DIST			+= cache/arch-os-i686-config.cache \
 				   cache/oracle-6-x86_64-config.cache \
 				   cache/puias-6-x86_64-config.cache \
 				   cache/redhat-6.0-x86_64-config.cache \
+				   cache/redhat-6.4-x86_64-config.cache \
 				   cache/redhat-7.2-i686-config.cache \
 				   cache/rhel-6-x86_64-config.cache \
 				   cache/salix-13.37-i686-config.cache \
@@ -3705,7 +3707,16 @@ EXTRA_DIST			+= cache/arch-os-i686-config.cache \
 				   cache/sle-11-x86_64-config.cache \
 				   cache/suse-11-x86_64-config.cache \
 				   cache/ubuntu-lucid-amd64-config.cache \
-				   cache/ubuntu-lucid-x86_64-config.cache
+				   cache/ubuntu-lucid-x86_64-config.cache \
+				   configs/configure.arch \
+				   configs/configure.debian-squeeze \
+				   configs/configure.debian-testing \
+				   configs/configure.debian-wheezy \
+				   configs/configure.fc2 \
+				   configs/configure.generic \
+				   configs/configure.slackware \
+				   configs/configure.ubuntu-lucid \
+				   configs/sh.arch
 
 MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 				   $(top_srcdir)/config.h.in \
