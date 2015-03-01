@@ -1151,6 +1151,7 @@ dnl----------------------------------------------------------------------------
 #include <linux/kthread.h>
 #endif
 #include <linux/time.h>		/* for struct timespec */
+#include <linux/pci.h>
 #include <linux/pm.h>
 #include <linux/net.h>
 #include <linux/in.h>
@@ -1227,6 +1228,7 @@ dnl----------------------------------------------------------------------------
 	struct packet_type.data,
 	struct packet_type.list,
 	struct packet_type.next,
+	struct pci_dev.is_pcie,
 	struct sk_buff.h.sh,
 	struct sk_buff.transport_header,
 	struct skb_frag_struct.page.p,

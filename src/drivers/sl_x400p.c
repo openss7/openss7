@@ -28374,7 +28374,7 @@ sl_ioctl(queue_t *q, mblk_t *mp, struct xp *xp, struct iocblk *ioc)
 		goto einval;
 	}
 	if (err <= 0) {
-		mblk_t *db;
+		mblk_t *db = NULL;
 		struct ch *ch;
 
 		if ((ch = xp->ch) == NULL)
@@ -32237,7 +32237,11 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 #endif
 
 #ifndef HAVE_KFUNC_PCI_IS_PCIE
+#ifdef HAVE_KMEMB_STRUCT_PCI_DEV_IS_PCIE
 #define pci_is_pcie(dev) (dev->is_pcie)
+#else
+#define pci_is_pcie(dev) (0)
+#endif
 #endif
 
 /** xp_probe: - X400P-SS7 Probe
