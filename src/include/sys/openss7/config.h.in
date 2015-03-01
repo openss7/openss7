@@ -290,6 +290,9 @@
 /* Symbol kill_proc_info_as_uid is available. */
 #undef HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
 
+/* Symbol kill_proc_info is available. */
+#undef HAVE_KILL_PROC_INFO_SYMBOL
+
 /* Define to 1 if you have the <generated/utsrelease.h> header file. */
 #undef HAVE_KINC_GENERATED_UTSRELEASE_H
 

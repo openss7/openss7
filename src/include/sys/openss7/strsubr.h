@@ -110,7 +110,7 @@ struct strevent {
 #endif
 			long events;
 			int fd;
-#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+#if defined HAVE_KILL_PROC_INFO_SYMBOL || defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 #if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
 			kuid_t uid;
 #else
