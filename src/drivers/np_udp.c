@@ -1467,7 +1467,9 @@ np_route_output_slow(struct np *np, const uint32_t daddr, struct rtable **rtp)
 		np->daddrs[0].dst = rt_dst(*rtp);
 		np->daddrs[0].addr = daddr;
 		np->daddrs[0].saddr = (*rtp)->rt_src;
+#if defined HAVE_KMEMB_STRUCT_RTABLE_RT_OIF
 		np->daddrs[0].oif = (*rtp)->rt_oif;
+#endif				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_OIF */
 	}
 #else				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
 	{
@@ -1504,7 +1506,11 @@ np_route_output(struct np *np, const uint32_t daddr, struct rtable **rtp)
 }
 
 #ifdef NETIF_F_NO_CSUM
+#ifdef NETIF_F_LOOPBACK
 #define DONT_CHECKSUM (NETIF_F_NO_CSUM|NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
+#else
+#define DONT_CHECKSUM (NETIF_F_NO_CSUM|NETIF_F_HW_CSUM|NETIF_F_IP_CSUM)
+#endif
 #else
 #define DONT_CHECKSUM (NETIF_F_HW_CSUM|NETIF_F_IP_CSUM|NETIF_F_LOOPBACK)
 #endif
