@@ -408,6 +408,8 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 				b=`basename $$f` ; \
 				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)/$$b" ; \
 				$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)/$$b ; \
+				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(kbuilddir)/$(PACKAGE)/$$b" ; \
+				$(INSTALL) -m 644 $$f $(DESTDIR)$(kbuilddir)/$(PACKAGE)/$$b ; \
 			fi ; \
 		done ; \
 	fi
