@@ -1,0 +1,400 @@
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
+# =============================================================================
+#
+# @(#) File: os7osi.spec.in  Version: @VERSION@  Date: @PACKAGE_DATE@
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# =============================================================================
+
+%global base        @PACKAGE@
+%global baseversion @VERSION@
+%global rpmrelease  @PACKAGE_RPMRELEASE@
+%global title       @PACKAGE_TITLE@
+%global stitle      @PACKAGE_SHORTTITLE@
+%global virtual     STREAMS
+
+%{!?_kversion:          %{expand: %%global _kversion %(uname -r)}}
+%global kernel_version  %{_kversion}
+%global kernel_package  %{name}-%{_kversion}
+%global basearch        %{_arch}
+%global kbaseversion    %{baseversion}
+%global kspecversion    %{baseversion}
+%{!?extrarelease:       %{expand: %%global extrarelease %%{nil}}}
+%global specrelease     %{rpmrelease}%{extrarelease}
+%{!?extrarelease2:      %{expand: %%global extrarelease2 %%{nil}}}
+%global baserelease     %{rpmrelease}%{extrarelease2}
+%global kbaserelease    %{baserelease}
+%global kspecrelease    %{baserelease}
+%global kernel_symvers  symvers-%{_kversion}.gz
+%global kernel_symsets  symsets-%{_kversion}.tar.gz
+
+# define new autoconf 2.60, 2.61 stuff
+%{!?_ksubdir:           %{expand: %%global _ksubdir         updates/%%{base}}}
+%{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
+%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
+%{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
+%{!?_dvidir:            %{expand: %%global _dvidir          %%{_docdir}}}
+%{!?_pdfdir:            %{expand: %%global _pdfdir          %%{_docdir}}}
+%{!?_psdir:             %{expand: %%global _psdir           %%{_docdir}}}
+%{!?_localedir:         %{expand: %%global _localedir       %%{_datadir}/locale}}
+%{!?_configdir:         %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
+%{!?_modutildir:        %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
+%{!?_kmoduledir:        %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
+%{!?_kbuilddir:         %{expand: %%global _kbuilddir       %%{_kmoduledir}/build}}
+%{!?_kincludedir:       %{expand: %%global _kincludedir     %%{_kbuilddir}/include}}
+%{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
+%{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
+%{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
+%{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
+%{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%{!?_syslib32dir:       %{expand: %%global _syslib32dir     /lib}}
+%{!?_syslibdir:         %{expand: %%global _syslibdir       %(echo %{_libdir} | sed 's,/usr,,')}}
+%{!?_sysbindir:         %{expand: %%global _sysbindir       %(echo %{_bindir} | sed 's,/usr,,')}}
+%{!?_syssbindir:        %{expand: %%global _syssbindir      %(echo %{_sbindir} | sed 's,/usr,,')}}
+%{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
+%{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
+%{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
+%{!?_jnidir:            %{expand: %%global _jnidir          %%{_libdir}/java}}
+%{!?_javadir:           %{expand: %%global _javadir         %%{_datadir}/java}}
+%{!?_javadocdir:        %{expand: %%global _javadocdir      %%{_datadir}/javadoc}}
+%{!?_pkgjavadocdir:     %{expand: %%global _pkgjavadocdir   %%{_javadocdir}/%%{name}}}
+%{!?_tcllibdir:         %{expand: %%global _tcllibdir       %%{_libdir}}}
+%{!?_tclsrcdir:         %{expand: %%global _tclsrcdir       %%{_datadir}}}
+%{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/%%{base}%%{baseversion}}}
+%{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
+%{!?_yumrepodir:        %{expand: %%global _yumrepodir      %(if test -d %{_sysconfdir}/yum/repos.d; then echo %{_sysconfdir}/yum/repos.d; else echo %{_sysconfdir}/yum.repos.d; fi)}}
+%{!?_yumplugdir:        %{expand: %%global _yumplugdir      %%{_libdir}/yum-plugins}}
+%{!?_yumdir:            %{expand: %%global _yumdir          %%{_sysconfdir}/yum}}
+%{!?_yumconfdir:        %{expand: %%global _yumconfdir      %%{_sysconfdir}/yum/pluginconf.d}}
+%{!?_zypprepodir:       %{expand: %%global _zypprepodir     %%{_sysconfdir}/zypp/repos.d}}
+%{!?_zyppcreddir:       %{expand: %%global _zyppcreddir     %%{_sysconfdir}/zypp/credentials.d}}
+%{!?_zyppservdir:       %{expand: %%global _zyppservdir     %%{_sysconfdir}/zypp/services.d}}
+%{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
+%{!?_urpmirepodir:      %{expand: %%global _urpmirepodir    %%{_sysconfdir}/urpmi/mediacfg.d}}
+%{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
+%{!?_aptconfdir:        %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
+%{!?_aptrepodir:        %{expand: %%global _aptrepodir      %%{_aptconfdir}/sources.list.d}}
+%{!?_aptvenddir:        %{expand: %%global _aptvenddir      %%{_aptconfdir}/vendors.list.d}}
+
+%{!?_ssldir:            %{expand: %%global _ssldir          %%{_sysconfdir}/ssl}}
+%{!?_sslcertdir:        %{expand: %%global _sslcertdir      %%{_ssldir}/certs}}
+%{!?_cacertdir:         %{expand: %%global _cacertdir       %%{_datarootdir}/ca-certificates}}
+%{!?_lcacertdir:        %{expand: %%global _lcacertdir      %%{_prefix}/local/share/ca-certificates}}
+%{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_sysconfdir}/modprobe.d}}
+
+Summary:        OpenSS7 OSI for Linux
+Name:           os7osi
+Version:        %{baseversion}
+Release:        %{rpmrelease}
+License:        AGPLv3
+Group:          System Environment/Kernel
+Icon:           %{base}.gif
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
+ExclusiveOs:    Linux
+Source:         %{base}-%{baseversion}.tar.bz2
+%{!?buildroot:BuildRoot: %{_tmppath}/%{name}-%{baseversion}-%{specrelease}-root}
+Autoreq:        true
+Autoprov:       true
+
+BuildRequires:  gcc >= 3.3.3
+BuildRequires:  @GROFF@
+BuildRequires:  @SOELIM@
+BuildRequires:  @REFER@
+BuildRequires:  @TBL@
+BuildRequires:  @PIC@
+BuildRequires:  @GZIP_CMD@
+BuildRequires:  @BZIP2_CMD@
+
+# ---------------------------------------------------------------------------
+%description
+The %{name} package cincludes kernel modules, STREAMS drivers, modules,
+libraries, utilities, test programs, daemons, and development environment
+for the development and execution of OpenSS7 OSI drivers, components,
+and applications for the STREAMS OSI environment.  This distribution ic
+currently applicable to the FC2 2.6.12.1 kernel and is validated for
+ix86 architecture.
+
+%prep
+# ---------------------------------------------------------------------------
+
+%setup -q -n %{base}-%{baseversion}
+
+%build
+# ---------------------------------------------------------------------------
+
+%global cache_file %{_host}-%{kernel_version}-config.cache
+%global csite_file %{_host}-config.site
+%global mpost_file %{_host}-%{kernel_version}-modpost.cache
+
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
+
+./configure \
+    ${CC+CC="${CC}"} \
+    ${CFLAGS+CFLAGS="${CFLAGS}"} \
+    ${LD+LD="${LD}"} \
+    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
+    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
+    ${CPP+CPP="${CPP}"} \
+    ${CXX+CXX="${CXX:-$CC}"} \
+    ${CXX-${CC+CXX="$CC"}} \
+    ${CXXFLAGS+CXXFLAGS="${CXXFLAGS}"} \
+    ${CXXFLAGS-${CFLAGS+CXXFLAGS="$CFLAGS"}} \
+    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
+    ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
+    CONFIG_SITE="%{_builddir}/%{csite_file}" \
+    MODPOST_CACHE="%{_builddir}/%{mpost_file}" \
+    --cache-file="%{_builddir}/%{cache_file}" \
+    syslibdir=/lib \
+    sysbindir=/bin \
+    syssbindir=/sbin \
+    --prefix=%{_prefix} \
+    --build=%{_build} \
+    --host=%{_host} \
+    --exec-prefix=%{_exec_prefix} \
+    --bindir=%{_bindir} \
+    --sbindir=%{_sbindir} \
+    --sysconfdir=%{_sysconfdir} \
+    --datadir=%{_datadir} \
+    --includedir=%{_includedir} \
+    --libdir=%{_libdir} \
+    --libexecdir=%{_libexecdir} \
+    --localstatedir=%{_localstatedir} \
+    --sharedstatedir=%{_sharedstatedir} \
+    --mandir=%{_mandir} \
+    --infodir=%{_infodir} \
+    --datarootdir=%{_datadir} \
+    --docdir=%{_datadir}/doc/%{name}-%{baseversion} \
+    --htmldir=%{_datadir}/doc/%{name}-%{baseversion} \
+    --dvidir=%{_datadir}/doc/%{name}-%{baseversion} \
+    --pdfdir=%{_datadir}/doc/%{name}-%{baseversion} \
+    --psdir=%{_datadir}/doc/%{name}-%{baseversion} \
+    --localedir=%{_datadir}/locale \
+    --disable-maintainer-mode \
+    --with-k-release=%{kernel_version} \
+    --with-k-modules=/lib/modules/%{kernel_version} \
+    --disable-k-abi-support \
+    --disable-k-weak-symbols \
+    --enable-k-weak-modules \
+    --disable-specfs-lock \
+    --with-k-optimize=speed \
+    --with-optimize=speed \
+    --with-gnu-ld \
+    --disable-docs \
+    || { rm -f %{_builddir}/%{cache_file} ; exit 1 ; }
+
+make
+
+%install
+
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
+
+# if we are going to create debug packages, we need to install unstripped
+# binaries; otherwise use libtoolized install-strip to strip binaries, modules,
+# shared and static libraries.
+make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
+    %{!?_enable_debug_packages: install-strip} \
+    %{?_enable_debug_packages: install}
+
+# get the installed info directory out of the build root
+[ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir" || :
+
+# should not be necessary except for the cache files
+d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
+# create kernel-specific info directory
+mkdir -p $d
+# copy in makefile variables file
+cp -p Module.mkvars $d
+# copy in autoconf site and cache files for reference
+cp -p %{_builddir}/%{csite_file} $d
+cp -p %{_builddir}/%{cache_file} $d
+
+# should not be necessary except for the cache files
+d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
+# create kernel-specific info directory
+mkdir -p $d
+# copy in symbol versions file
+cp -p System.symvers $d
+cp -p Module.symvers $d
+cp -p Modules.map $d
+# create symbol versions file
+cat System.symvers Module.symvers | gzip > $d/%{kernel_symvers}
+# copy in symbol sets file
+cp -p %{kernel_symsets} $d
+# copy in symbol sets file to boot directory as well
+#mkdir -p %{buildroot}/boot
+#cp -p %{kernel_symsets} %{buildroot}/boot
+# copy in modpost cache file for reference
+cp -p %{_builddir}/%{mpost_file} $d
+
+# stupid mandrake spec-helper will compress our macros files otherwise (perl regex)
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manrefs}"
+export EXCLUDE_FROM_COMPRESS
+
+# stupid mandrake spec-helper will compress our macros files otherwise (perl regex)
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manmacros}"
+export EXCLUDE_FROM_COMPRESS
+
+%clean
+# ---------------------------------------------------------------------------
+
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
+
+%files
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%docdir %{_docdir}
+%{_docdir}/%{name}-%{baseversion}/ABOUT_NLS
+%{_docdir}/%{name}-%{baseversion}/AUTHORS
+%{_docdir}/%{name}-%{baseversion}/BUGS
+%{_docdir}/%{name}-%{baseversion}/COPYING
+%{_docdir}/%{name}-%{baseversion}/ChangeLog
+%{_docdir}/%{name}-%{baseversion}/INSTALL
+%{_docdir}/%{name}-%{baseversion}/INSTALL-%{base}
+%{_docdir}/%{name}-%{baseversion}/LICENSES
+%{_docdir}/%{name}-%{baseversion}/LSM
+%{_docdir}/%{name}-%{baseversion}/MANUAL
+%{_docdir}/%{name}-%{baseversion}/NEWS
+%{_docdir}/%{name}-%{baseversion}/NOTES
+%{_docdir}/%{name}-%{baseversion}/NOTES.cos53
+%{_docdir}/%{name}-%{baseversion}/NOTES.kmod
+%{_docdir}/%{name}-%{baseversion}/NOTES.kmp
+%{_docdir}/%{name}-%{baseversion}/NOTES.ksyms
+%{_docdir}/%{name}-%{baseversion}/NOTES.repo
+%{_docdir}/%{name}-%{baseversion}/NOTES.rpm
+%{_docdir}/%{name}-%{baseversion}/NOTES.sles
+%{_docdir}/%{name}-%{baseversion}/PROBLEMS
+%{_docdir}/%{name}-%{baseversion}/README
+%{_docdir}/%{name}-%{baseversion}/README-alpha
+%{_docdir}/%{name}-%{baseversion}/README-cvs
+%{_docdir}/%{name}-%{baseversion}/README-make
+%{_docdir}/%{name}-%{baseversion}/THANKS
+%{_docdir}/%{name}-%{baseversion}/TODO
+%{_docdir}/%{name}-%{baseversion}/%{base}-%{baseversion}.lsm
+%config(noreplace) %{_sysconfdir}/*.conf
+%config(noreplace) %{_configdir}/*
+%{_initrddir}/*
+%{_pkglibexecdir}/atlocal
+%{_pkglibexecdir}/testsuite*
+%{_pkglibexecdir}/send-pr
+%{_pkglibexecdir}/send-pr.config
+%{_sysconfdir}/kernel/preinst.d/%{name}-update
+%{_sysconfdir}/kernel/postinst.d/%{name}-update
+%{_sysconfdir}/kernel/prerm.d/%{name}-update
+%{_sysconfdir}/kernel/postrm.d/%{name}-update
+%{_sysconfdir}/kernel/header_postinst.d/%{name}-update
+%{_sysconfdir}/kernel/src_postinst.d/%{name}-update
+%{_sbindir}/%{name}-modules
+%{_sbindir}/%{name}-update
+%{_sbindir}/%{name}-patch
+%{_sbindir}/%{name}-modprobe
+%{_modprobeddir}/specfs.conf
+%docdir %{_infodir}
+%{_infodir}/*.info*
+%docdir %{_mandir}
+%{_mandir}/%{manrefs}*
+%{_mandir}/%{manmacros}*
+%{_mandir}/man[1458]*/*
+%{_mandir}/man[2379]*/*
+%{_bindir}/*
+%{_sbindir}/*
+%{_sysbindir}/*
+%{_syssbindir}/*
+%{_libdir}/*.so*
+%{_libdir}/*.la
+%{_syslibdir}/*.so*
+%{_syslibdir}/*.la
+%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}
+%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}
+%{_localedir}/*
+%{_pkglibexecdir}/gdmo
+%{_pkglibexecdir}/%{testfiles}
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%{_libdir}/*.a
+%{_syslibdir}/*.a
+
+%package -n %{kernel_package}
+# ---------------------------------------------------------------------------
+
+Summary:            %{title} kernel modules.
+Group:              System Environment/Kernel
+Icon:               %{base}.gif
+Autoreq:            true
+Autoprov:           true
+Version:            %{kbaseversion}
+Release:            %{kbaserelease}
+
+# ---------------------------------------------------------------------------
+%description -n %{kernel_package}
+The %{kernel_package} binary package contains the kernel modules that
+provide the Linux kernel %{stitle} drivers and modules.  This includes
+assorted drivers and modules for STREAMS and additional %{title}
+protocol suite components.  This binary package also includes modprobe
+configuration files for the associated kernel modules.  This package
+is weakly tied to the kernel for which it and dependent components
+were compiled.  This package applies to kernel %{kernel_version}
+and requires dependent components compiled for a similar kernel.  If
+you cannot find a binary package that matches your kernel, rebuild
+for your kernel from the %{name} package source rpm.
+
+%files -n %{kernel_package}
+# ---------------------------------------------------------------------------
+%dir %{_kmoduledir}/%{_ksubdir}
+%{_kmoduledir}/%{_ksubdir}/*.ko*
+%dir %{_kincludedir}/sys/%{base}
+%{_kincludedir}/sys/%{base}/config.h
+:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
+:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers
+:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}
+%dir %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.mkvars
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{csite_file}
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map
+%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{mpost_file}
+
+# vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

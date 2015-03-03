@@ -3506,7 +3506,8 @@ endif
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
+EXTRA_DIST		+= os7osi.spec \
+			   $(PACKAGE_TARNAME).spec \
 			   $(PACKAGE_TARNAME).gif \
 			   $(PACKAGE_TARNAME).xpm \
 			   .rpmrelease \
