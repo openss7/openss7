@@ -12,6 +12,8 @@ $srcdir/configure \
 	--libexecdir=/usr/libexec \
 	--disable-maintainer-mode \
 	--disable-k-abi-support \
+	--disable-k-weak-symbols \
+	--enable-k-weak-modules \
 	--disable-specfs-lock \
 	--with-k-optimize=speed \
 	--with-optimize=speed \
