@@ -909,6 +909,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
     _kbuilddir="$linux_cv_k_build_eval"
     kbuilddir="$linux_cv_k_build"
     AC_SUBST([kbuilddir])dnl
+    kincludedir="$kbuilddir/include"
+    AC_SUBST([kincludedir])
 ])# _LINUX_CHECK_KERNEL_BUILDDIR
 # =========================================================================
 
