@@ -77,7 +77,7 @@ static int length = 1024;
 static short port = 0;
 
 static void
-do_ping(int argc, char *argv[], int start)
+do_ping(int argc, char *argv[])
 {
 }
 
@@ -216,7 +216,6 @@ main(int argc, char *argv[])
 {
 	int command = COMMAND_DFLT;
 	int c, val, len, bad;
-	int start;
 
 	for (;;) {
 #if defined _GNU_SOURCE
@@ -383,7 +382,7 @@ main(int argc, char *argv[])
 	switch (command) {
 	case COMMAND_DFLT:
 	case COMMAND_PING:
-		do_ping(argc, argv, start);
+		do_ping(argc, argv);
 		break;
 	case COMMAND_HELP:
 		help(argc, argv);
