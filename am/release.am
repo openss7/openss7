@@ -62,11 +62,9 @@
 ##
 ## Put the text manual where we can find it in the distribution
 ##
-$(MANUAL_FILE):
-	$(AM_V_GEN)make -C `dirname $(MANUAL_FILE)` `basename $(MANUAL_FILE)`
-
-MANUAL: $(MANUAL_FILE)
-	$(AM_V_GEN)cp -f $< $@
+MANUAL:
+	$(AM_V_GEN)$(MAKE) $(AM_MAKEFLAGS) -C `dirname $(MANUAL_FILE)` -- `basename $(MANUAL_FILE)`
+	$(AM_V_GEN)cp -f $(MANUAL_FILE) $@
 if MAINTAINER_MODE
 	$(AM_V_at)test $@ -ef $(top_srcdir)/`basename $@` || cp -f $@ $(top_srcdir)
 endif
