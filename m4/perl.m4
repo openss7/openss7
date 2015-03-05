@@ -240,7 +240,7 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 		AC_MSG_CHECKING([for perl ldadd... $perl_lib])
 		if (${OBJDUMP:-objdump} -f "$perl_lib" | grep $perl_targ >/dev/null) 2>/dev/null
 		then
-		    perl_cv_ldadd='${rootdir}'"${perl_lib#$rootdir}"
+		    perl_cv_ldadd="${perl_lib#$rootdir}"
 		    AC_MSG_RESULT([yes])
 		    break 2
 		fi
