@@ -80,19 +80,19 @@ AC_DEFUN([_JAVA_OPTIONS], [dnl
 AC_DEFUN([_JAVA_SETUP], [dnl
     AC_ARG_VAR([CLASSPATH],
 	       [Java CLASSPATH variable. @<:@default=auto@:>@])
+    if test :${javaclasspath+set} != :set ; then
+	if test :${CLASSPATH+set} != :set ; then
+	    CLASSPATH='${builddir}:${srcdir}'
+	fi # java.m4 91
+	javaclasspath="$CLASSPATH"
+    else
+	CLASSPATH='${javaclasspath}'
+    fi # java.m4 95
+    AC_SUBST([javaclasspath])dnl
+    _JAVA_SETUP_GCJ
     if test :${enable_java:-yes} = :yes ; then
-	if test :${javaclasspath+set} != :set ; then
-	    if test :${CLASSPATH+set} != :set ; then
-		CLASSPATH='${builddir}:${srcdir}'
-	    fi # java.m4 91
-	    javaclasspath="$CLASSPATH"
-	else
-	    CLASSPATH='${javaclasspath}'
-	fi # java.m4 95
-	_JAVA_SETUP_GCJ
 	_JAVA_SETUP_JAR
     fi # java.m4 98
-    AC_SUBST([javaclasspath])dnl
 ])# _JAVA_SETUP
 # =============================================================================
 

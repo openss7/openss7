@@ -461,7 +461,8 @@ dnl
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
     _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [], [$tmp_PATH], [dnl
-	_BLD_INSTALL_ERROR([JAVAC], [
+	if test ${enable_java:-yes} != no ; then
+	    _BLD_INSTALL_WARN([JAVAC], [
 ***
 *** Configure could not find the Java class compiler program 'javac'
 *** (nor 'gcj').  This program is part of the GNU Compiler Collection,
@@ -477,9 +478,16 @@ dnl
 *** SLES 11:     'zypper install gcc-java'
 *** Mandriva 10: 'urpmi gcc-java'], [
 ***
-*** Alternatively, you can specify an equivalent command with the JAVAC
-*** environment variable when rerunning configure.
-***])])
+*** Repeat after loading the correct package or by specifying the
+*** 'javac' program with the JAVAC environment variable, or by
+*** specifying --disable-java: continuing under the assumption
+*** that the option --disable-java was intended.
+***])
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_java --disable-java\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--disable-java'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--disable-java'"
+	    enable_java=no
+	fi])
 
 dnl
 dnl We need the gcj-dbtool so that we can create classmap databses and add
@@ -805,8 +813,8 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 ***
 *** Repeat after loading the correct package or by specifying the
 *** location of the headers with the --with-libgcj=DIRECTORY option to
-*** configure, or by specifying --without-java: continuing under the
-*** assumption that the option --without-java was intended.
+*** configure, or by specifying --without-libgcj: continuing under the
+*** assumption that the option --without-libgcj was intended.
 *** ])
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_libgcj --without-libgcj\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-libgcj'"
