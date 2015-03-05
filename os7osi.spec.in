@@ -47,22 +47,74 @@
 #
 # =============================================================================
 
-%global base        @PACKAGE@
-%global baseversion @VERSION@
-%global rpmrelease  @PACKAGE_RPMRELEASE@
-%global title       @PACKAGE_TITLE@
-%global stitle      @PACKAGE_SHORTTITLE@
-%global virtual     STREAMS
+%global base            @PACKAGE@
+%global baseversion     @VERSION@
+%global tclversion      @PACKAGE_VERSION@
+%global rpmrelease      @PACKAGE_RPMRELEASE@
+%global title           @PACKAGE_TITLE@
+%global stitle          @PACKAGE_SHORTTITLE@
+%global virtual         STREAMS
+
+%global binfiles    %{nil}
+%global sbinfiles   %{nil}
+%global sysbinfiles %{nil}
+%global syssbinfiles %{nil}
+%global wrapper     wrapper
+%global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
+%global nonrpmmods  LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm
+%global preloads    specfs streams
+%global libraries   streams
+%global perlmods    %{nil}
+%global tcllibs     %{nil}
+%global gcjlibs     %{nil}
+%global gcjmaps     %{nil}
+%global jarfiles    %{nil}
+%global jnilibs     %{nil}
+%global javadoc     %{nil}
+%global locales     %{nil}
+%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes
+%global manuals     openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp
+%global pngfiles    *.png
+%global cssfiles    *.css
+%global initfiles   specfs streams strerr strace %{base}
+%global nonrpminit  strms_up strms_dn
+%global conffiles   *.conf
+%global testfiles   *test*
+%global testscripts testsuite
+%global sendpr      %{nil}
+%global mibfiles    *.mib
+%global snmpmods    strMIB
+#global gdmos       %{nil}
+%global netconfig   %{base}
+%global sock2path   %{base}
+%global snmpconf    strMIB.conf
+%global manrefs     %{base}.refs
+%global manmacros   %{base}.macros
+%global manpages    man*
+%global includes    %{nil}
+%global license     AGPLv3
+
+%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
+
+%global _unpackaged_files_terminate_build   1
+%global _missing_doc_files_terminate_build  1
+%global _enable_debug_packages              0
+%global _use_internal_dependency_generator  0
 
 %{!?_kversion:          %{expand: %%global _kversion %(uname -r)}}
 %global kernel_version  %{_kversion}
-%global kernel_package  %{name}-%{_kversion}
+%global kernel_flavor   %(echo %{_kversion} | sed -r -e 's,[^-]*-,,;s,-.*$,,;s,.*smp$,-smp,;t;s,.*,,')%{nil}
+%global kernel_kind     %(echo %{_kversion} | sed -r -e 's,.[^-]*,,;s,.[^-]*,,')%{nil}
+%global kernel_number   %(echo %{_kversion} | sed -r -e 's,-.*$,,')
+%global kernel_needed   kernel%{kernel_kind}%{kernel_flavor}
+%global kernel_majnum   %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
+%global kernel_package  %{name}-modules-%{_kversion}
 %global basearch        %{_arch}
 %global kbaseversion    %{baseversion}
 %global kspecversion    %{baseversion}
-%{!?extrarelease:       %{expand: %%global extrarelease %%{nil}}}
+%{!?extrarelease        %{expand: %%global extrarelease     %%{nil}}}
 %global specrelease     %{rpmrelease}%{extrarelease}
-%{!?extrarelease2:      %{expand: %%global extrarelease2 %%{nil}}}
+%{!?extrarelease2       %{expand: %%global extrarelease2    %%{nil}}}
 %global baserelease     %{rpmrelease}%{extrarelease2}
 %global kbaserelease    %{baserelease}
 %global kspecrelease    %{baserelease}
@@ -83,7 +135,7 @@
 %{!?_kmoduledir:        %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
 %{!?_kbuilddir:         %{expand: %%global _kbuilddir       %%{_kmoduledir}/build}}
 %{!?_kincludedir:       %{expand: %%global _kincludedir     %%{_kbuilddir}/include}}
-%{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{base}}}
 %{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
 %{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
 %{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
@@ -95,15 +147,16 @@
 %{!?_syssbindir:        %{expand: %%global _syssbindir      %(echo %{_sbindir} | sed 's,/usr,,')}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
-%{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
+%{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{base}}}
 %{!?_jnidir:            %{expand: %%global _jnidir          %%{_libdir}/java}}
 %{!?_javadir:           %{expand: %%global _javadir         %%{_datadir}/java}}
 %{!?_javadocdir:        %{expand: %%global _javadocdir      %%{_datadir}/javadoc}}
-%{!?_pkgjavadocdir:     %{expand: %%global _pkgjavadocdir   %%{_javadocdir}/%%{name}}}
+%{!?_pkgjavadocdir:     %{expand: %%global _pkgjavadocdir   %%{_javadocdir}/%%{base}}}
 %{!?_tcllibdir:         %{expand: %%global _tcllibdir       %%{_libdir}}}
 %{!?_tclsrcdir:         %{expand: %%global _tclsrcdir       %%{_datadir}}}
-%{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/%%{base}%%{baseversion}}}
+%{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/%%{stitle}%%{tclversion}}}
 %{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
+%{!?_perllibdir:        %{expand: %%global _perllibdir      %%{_libdir}/perl5}}
 %{!?_yumrepodir:        %{expand: %%global _yumrepodir      %(if test -d %{_sysconfdir}/yum/repos.d; then echo %{_sysconfdir}/yum/repos.d; else echo %{_sysconfdir}/yum.repos.d; fi)}}
 %{!?_yumplugdir:        %{expand: %%global _yumplugdir      %%{_libdir}/yum-plugins}}
 %{!?_yumdir:            %{expand: %%global _yumdir          %%{_sysconfdir}/yum}}
@@ -123,6 +176,7 @@
 %{!?_cacertdir:         %{expand: %%global _cacertdir       %%{_datarootdir}/ca-certificates}}
 %{!?_lcacertdir:        %{expand: %%global _lcacertdir      %%{_prefix}/local/share/ca-certificates}}
 %{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_sysconfdir}/modprobe.d}}
+%{!?_buildrootdir:      %{expand: %%global _buildrootdir    %%{_tmppath}/%%{name}-%%{baseversion}-%%{specrelease}-root}}
 
 Summary:        OpenSS7 OSI for Linux
 Name:           os7osi
@@ -131,10 +185,11 @@ Release:        %{rpmrelease}
 License:        AGPLv3
 Group:          System Environment/Kernel
 Icon:           %{base}.gif
+Icon:           %{base}.xpm
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 Source:         %{base}-%{baseversion}.tar.bz2
-%{!?buildroot:BuildRoot: %{_tmppath}/%{name}-%{baseversion}-%{specrelease}-root}
+BuildRoot:      %{_buildrootdir}
 Autoreq:        true
 Autoprov:       true
 
@@ -146,6 +201,63 @@ BuildRequires:  @TBL@
 BuildRequires:  @PIC@
 BuildRequires:  @GZIP_CMD@
 BuildRequires:  @BZIP2_CMD@
+
+BuildRequires:  bzip2
+BuildRequires:  chkconfig
+BuildRequires:  coreutils
+BuildRequires:  fedora-release
+BuildRequires:  filesystem
+BuildRequires:  gcc-java
+BuildRequires:  glibc
+BuildRequires:  gnupg
+BuildRequires:  groff
+BuildRequires:  gzip
+BuildRequires:  initscripts
+BuildRequires:  kernel
+#BuildRequires:  kernel-source
+BuildRequires:  libgcj
+BuildRequires:  lsof
+BuildRequires:  modutils
+BuildRequires:  openssl
+BuildRequires:  perl
+BuildRequires:  rpm
+BuildRequires:  zip
+
+BuildRequires:  tcl
+BuildRequires:  tcl-devel
+BuildRequires:  net-snmp
+BuildRequires:  net-snmp-utils
+BuildRequires:  net-snmp-devel
+
+#BuildRequires:  autoconf
+#BuildRequires:  swig
+
+#BuildRequires:  ghostscript
+#BuildRequires:  gnuplot
+#BuildRequires:  ImageMagick
+#BuildRequires:  tetex
+#BuildRequires:  tetex-dvips
+#BuildRequires:  tetex-latex
+
+Requires:       bzip2
+Requires:       chkconfig
+Requires:       coreutils
+Requires:       filesystem
+Requires:       glibc
+Requires:       groff
+Requires:       gzip
+Requires:       initscripts
+Requires:       kernel
+Requires:       lsof
+Requires:       modutils
+Requires:       openssl
+Requires:       perl
+Requires:       rpm
+Requires:       zip
+
+Requires:       tcl
+Requires:       net-snmp
+Requires:       net-snmp-utils
 
 # ---------------------------------------------------------------------------
 %description
@@ -213,6 +325,7 @@ ix86 architecture.
     --psdir=%{_datadir}/doc/%{name}-%{baseversion} \
     --localedir=%{_datadir}/locale \
     --disable-maintainer-mode \
+    %{?extrarelease: --with-rpm-extra=%{extrarelease}} \
     --with-k-release=%{kernel_version} \
     --with-k-modules=/lib/modules/%{kernel_version} \
     --disable-k-abi-support \
@@ -223,6 +336,7 @@ ix86 architecture.
     --with-optimize=speed \
     --with-gnu-ld \
     --disable-docs \
+    --disable-java \
     || { rm -f %{_builddir}/%{cache_file} ; exit 1 ; }
 
 make
@@ -242,7 +356,7 @@ make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir" || :
 
 # should not be necessary except for the cache files
-d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
+d=%{buildroot}%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}
 # create kernel-specific info directory
 mkdir -p $d
 # copy in makefile variables file
@@ -252,7 +366,7 @@ cp -p %{_builddir}/%{csite_file} $d
 cp -p %{_builddir}/%{cache_file} $d
 
 # should not be necessary except for the cache files
-d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
+d=%{buildroot}%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}
 # create kernel-specific info directory
 mkdir -p $d
 # copy in symbol versions file
@@ -282,11 +396,37 @@ export EXCLUDE_FROM_COMPRESS
 
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
 
+%post -p /bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
+    if   [ -x "`which libtool 2>/dev/null`" ]; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
+	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
+    fi
+fi
+
+%postun -p /bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
+    if   [ -x "`which libtool 2>/dev/null`" ]; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
+	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
+	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
+    fi
+fi
+
 %files
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %docdir %{_docdir}
-%{_docdir}/%{name}-%{baseversion}/ABOUT_NLS
+%{_docdir}/%{name}-%{baseversion}/ABOUT-NLS
 %{_docdir}/%{name}-%{baseversion}/AUTHORS
 %{_docdir}/%{name}-%{baseversion}/BUGS
 %{_docdir}/%{name}-%{baseversion}/COPYING
@@ -316,20 +456,12 @@ export EXCLUDE_FROM_COMPRESS
 %config(noreplace) %{_sysconfdir}/*.conf
 %config(noreplace) %{_configdir}/*
 %{_initrddir}/*
-%{_pkglibexecdir}/atlocal
-%{_pkglibexecdir}/testsuite*
-%{_pkglibexecdir}/send-pr
-%{_pkglibexecdir}/send-pr.config
-%{_sysconfdir}/kernel/preinst.d/%{name}-update
-%{_sysconfdir}/kernel/postinst.d/%{name}-update
-%{_sysconfdir}/kernel/prerm.d/%{name}-update
-%{_sysconfdir}/kernel/postrm.d/%{name}-update
-%{_sysconfdir}/kernel/header_postinst.d/%{name}-update
-%{_sysconfdir}/kernel/src_postinst.d/%{name}-update
-%{_sbindir}/%{name}-modules
-%{_sbindir}/%{name}-update
-%{_sbindir}/%{name}-patch
-%{_sbindir}/%{name}-modprobe
+%{_sysconfdir}/kernel/preinst.d/%{base}-update
+%{_sysconfdir}/kernel/postinst.d/%{base}-update
+%{_sysconfdir}/kernel/prerm.d/%{base}-update
+%{_sysconfdir}/kernel/postrm.d/%{base}-update
+%{_sysconfdir}/kernel/header_postinst.d/%{base}-update
+%{_sysconfdir}/kernel/src_postinst.d/%{base}-update
 %{_modprobeddir}/specfs.conf
 %docdir %{_infodir}
 %{_infodir}/*.info*
@@ -349,23 +481,32 @@ export EXCLUDE_FROM_COMPRESS
 %config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}
 %config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}
 %{_localedir}/*
-%{_pkglibexecdir}/gdmo
-%{_pkglibexecdir}/%{testfiles}
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
+%{_pkglibexecdir}/*
+%dir %{_includedir}/%{base}
+%{_includedir}/%{base}/*
 %{_libdir}/*.a
 %{_syslibdir}/*.a
+%{_snmpconfdir}/snmp.d/*%{base}
+%dir %{_pkgtcllibdir}
+%{_pkgtcllibdir}/*
+%{_perllibdir}/auto/*
+%{_snmpdlmoddir}/*
+%{_snmpmibdir}/*
 
 %package -n %{kernel_package}
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} kernel modules.
 Group:              System Environment/Kernel
-Icon:               %{base}.gif
 Autoreq:            true
 Autoprov:           true
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+
+Provides:           %{name}-modules
+Requires:           %{name} = %{baseversion}-%{rpmrelease}
+Requires:           kernel = %{kernel_number}
+Requires:           %{kernel_needed} = %{kernel_number}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
@@ -380,21 +521,56 @@ and requires dependent components compiled for a similar kernel.  If
 you cannot find a binary package that matches your kernel, rebuild
 for your kernel from the %{name} package source rpm.
 
+%post -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
+    sysmap=/boot/System.map-%{_kversion}
+    if [ -x "`which depmod 2>/dev/null`" ] ; then
+        if [ "%{_kversion}" = "`uname -r`" ] ; then
+            depmod -a || :
+        elif [ -r $sysmap ] ; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae -F $sysmap %{_kversion} || :
+        fi
+    fi
+fi
+
+%postun -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
+    sysmap=/boot/System.map-%{_kversion}
+    if [ -x "`which depmod 2>/dev/null`" ]; then
+        if [ "%{_kversion}" = "`uname -r`" ] ; then
+            depmod -a || :
+        elif [ -r $sysmap ] ; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae -F $sysmap %{_kversion} || :
+        fi
+    fi
+fi
+
 %files -n %{kernel_package}
 # ---------------------------------------------------------------------------
 %dir %{_kmoduledir}/%{_ksubdir}
 %{_kmoduledir}/%{_ksubdir}/*.ko*
+%dir %{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/Module.mkvars
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/%{csite_file}
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}
+%{_usrsrc}/%{base}-%{baseversion}-%{specrelease}/%{_kversion}/%{mpost_file}
 %dir %{_kincludedir}/sys/%{base}
 %{_kincludedir}/sys/%{base}/config.h
-:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers
-:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}
-%dir %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.mkvars
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{csite_file}
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map
-%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{mpost_file}
+%{_kincludedir}/sys/%{base}/version.h
+%dir %{_kbuilddir}/%{base}
+%{_kbuilddir}/%{base}/Module.mkvars
+%{_kbuilddir}/%{base}/Module.symvers
+%{_kbuilddir}/%{base}/Modules.map
+%{_kbuilddir}/%{base}/System.symvers
+%{_kbuilddir}/%{base}/%{kernel_symsets}
 
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
