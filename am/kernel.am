@@ -369,6 +369,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
 	$(mkinstalldirs) $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)
+	$(mkinstalldirs) $(DESTDIR)$(kbuilddir)/$(PACKAGE)
 	some=no ; \
 	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; \
 	if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
