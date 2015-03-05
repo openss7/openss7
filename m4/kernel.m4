@@ -354,7 +354,7 @@ dnl pull out versions from release number
     AC_CACHE_CHECK([for kernel major release number], [linux_cv_k_major], [dnl
 	linux_cv_k_major="`echo $linux_cv_k_release | sed -e 's|[[^0-9]].*||'`" ])
     case ${linux_cv_k_major:-0} in
-    (2|3) ;;
+    (2|3|4) ;;
     (*)
 	AC_MSG_ERROR([
 *** 
@@ -370,7 +370,7 @@ dnl pull out versions from release number
     AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [dnl
 	linux_cv_k_minor="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.||;s|[[^0-9]].*||'`" ])
     case ${linux_cv_k_major:-0}.${linux_cv_k_minor:-0} in
-    (2.4|2.6|3.*) ;;
+    (2.4|2.6|3.*|4.*) ;;
     (*)
 	AC_MSG_ERROR([
 *** 
@@ -378,7 +378,7 @@ dnl pull out versions from release number
 *** too new, or the UTS_RELEASE name "$linux_cv_k_release" is mangled.
 *** Try specifiying a 2.4, 2.6 or 3.x kernel with the --with-k-release
 *** option to configure.  If you are trying to compile for a 2.2, 2.3, 2.5
-*** or 4.x kernel, give up.  Only 2.4, 2.6 and 3.x kernels are supported
+*** or 5.x kernel, give up.  Only 2.4, 2.6 and 3.x kernels are supported
 *** at the current time.
 *** ])
     esac
@@ -426,8 +426,13 @@ dnl pull out versions from release number
 	AC_DEFINE_UNQUOTED([LINUX_3_X], [1], [Define for the linux 3.x kernel series.])
 	kseries="${kmajor}.${kminor}${kflavor:+-$kflavor}"
     fi
+    if test "$linux_cv_k_major" -eq 4
+    then
+	AC_DEFINE_UNQUOTED([LINUX_4_X], [1], [Define for the linux 4.x kernel series.])
+	kseries="${kmajor}.${kminor}${kflavor:+-$kflavor}"
+    fi
     AC_SUBST([kseries])
-    if test "$linux_cv_k_major" -eq 3 -o \( "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \) \)
+    if test "$linux_cv_k_major" -eq 4 -o "$linux_cv_k_major" -eq 3 -o \( "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \) \)
     then
 	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [1], [Define for linux 2.5.48+ .ko kernel modules.])
 	kext=".ko"
@@ -440,9 +445,10 @@ dnl pull out versions from release number
 	KERNEL_NOVERSION="-D__NO_VERSION__"
 	KERNEL_EXPSYMTAB="-DEXPORT_SYMTAB"
     fi
-    AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_minor -eq 4])
-    AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_minor -eq 6])
+    AM_CONDITIONAL([WITH_LINUX_2_4], [test $linux_cv_k_major -eq 2 -a $linux_cv_k_minor -eq 4])
+    AM_CONDITIONAL([WITH_LINUX_2_6], [test $linux_cv_k_major -eq 2 -a $linux_cv_k_minor -eq 6])
     AM_CONDITIONAL([WITH_LINUX_3_X], [test $linux_cv_k_major -eq 3])
+    AM_CONDITIONAL([WITH_LINUX_4_X], [test $linux_cv_k_major -eq 4])
     AM_CONDITIONAL([WITH_KO_MODULES], [test :${linux_cv_k_ko_modules:-no} = :yes])
     AC_SUBST([kext])dnl
     AC_SUBST([KERNEL_NOVERSION])dnl
@@ -610,7 +616,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SUBDIR], [dnl
 	AC_ARG_WITH([k-subdir],
 	    [AS_HELP_STRING([--with-k-subdir=SUBDIR],
 		[kernel module install subdirectory @<:@default=auto@:>@])])
-	if test :"${with_k_modules:-no}" != :no
+	if test :"${with_k_subdir:-no}" != :no
 	then
 	    linux_cv_k_subdir="$with_k_subdir"
 	else
