@@ -236,24 +236,28 @@ Addressing
 - E.164
 
 - RFC 1069 - IP NSAPs
+  ISO-IP:
   47		    AFI (ICD Binary)
   0006		    IDI/ICD (Internet ICD)
   02		    DFI Version
-  00		    Global Area
-  00000000000000    Padding
+  0000		    Global Area
+  XXXX		    Routing Domain
+  00000000000000    Padding (7 octets of zeroes)
   AABBCCDD	    IPv4 address
   00		    Nsel
+  binary length = 20 octets with NSel
 
-  Or 2/6/1 format:
+  ISO-UDP: ANSI 2/6/1 format (RFC 982)
   47                AFI (ICD Binary)
   0006              IDI/ICD (Internet ICD)
   02                DFI Version
-  00                Global Area
+  0000              Global Area
   XXXX		    Routing Domain
   000000	    Padding
-  XX		    Area Code
+  XXXX		    Area Code
   AABBCCDDPPPP      IPv4 address and port
   00                Nsel
+  binary length = 20 octets with NSel
 
 - RFC 1277 - RFC 1006 NSAPs
 
@@ -264,13 +268,16 @@ Addressing
   AAABBBCCCDDD	    IPv4 Address (decimal)
   PPPPP		    Port number (decimal)
   TTTTT		    Transport selection mask (1 TCP, 2 UDP, how about 4 SCTP)
+  binary length = 17 without NSel
 
 - RFC 4548 - IP NSAPs
 
   47		    AFI (IANA ICP Binary)
   0001		    IPv4 (IPv6 is 0000)
-  AABBCCDD          IPv4 address
-  00...             13 octets of zeros
+  AABBCCDD	    IPv4 address
+  00...		    12 octets of zeros
+  00		    NSel (LSAP)
+  binary length = 20 octets with NSel
 
 
 - RFC 1768 - Multicast NSAPs for CLNS and (ES-IS/IS-IS) extensions
@@ -281,7 +288,8 @@ Addressing
   --                IDI (NULL)
   XXXX              Routing Domain/Area Code (Subnetwork)
   HH:HH:HH:HH:HH:HH MAC Address
-  00                NSel
+  00                NSel (00 for NET, FE for ES)
+  binary length = 10 octets with NSel
 
 Note that ES can automatically configure their addresses by observing
 the ISO 9542 IS-Hello packets and using the NET at the NSAP all the way

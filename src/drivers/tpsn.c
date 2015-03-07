@@ -5954,12 +5954,12 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  02			DFI Version
  *  0000		Global Area
  *  XXXX		Routing Domain
- *  00000000000000	Padding
+ *  00000000000000	Padding (7 octets of zeros)
  *  AABBCCDD		IPv4 Address
  *  00			NSel (LSAP)
  *  binary length = 20 octets with NSel
  *
- *  ISO-UDP: ANSI 2/6/1 format
+ *  ISO-UDP: ANSI 2/6/1 format (RFC 982)
  *
  *  47			AFI (ICD Binary)
  *  0006		IDI/ICD (Internet ICD)
