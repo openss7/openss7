@@ -103,10 +103,9 @@
 
 %{!?_kversion:          %{expand: %%global _kversion %(uname -r)}}
 %global kernel_version  %{_kversion}
-%global kernel_flavor   %(echo %{_kversion} | sed -r -e 's,[^-]*-,,;s,-.*$,,;s,.*smp$,-smp,;t;s,.*,,')%{nil}
-%global kernel_kind     %(echo %{_kversion} | sed -r -e 's,.[^-]*,,;s,.[^-]*,,')%{nil}
-%global kernel_number   %(echo %{_kversion} | sed -r -e 's,-.*$,,')
-%global kernel_needed   kernel%{kernel_kind}%{kernel_flavor}
+%global kernel_number   %(echo %{_kversion}|awk 'BEGIN{FS="-"}{print$1}')
+%global kernel_flavor   %(echo %{_kversion}|awk 'BEGIN{FS="-"}{print$2}'|sed -r -e 's,.*smp$,-smp,;t;s,.*,,')%{nil}
+%global kernel_kind     %(echo %{_kversion}|awk 'BEGIN{FS="-"}{if($3){print"-"$3}else{print$3}}')%{nil}
 %global kernel_majnum   %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
 %global kernel_package  %{name}-modules-%{_kversion}
 %global basearch        %{_arch}
@@ -116,8 +115,8 @@
 %global specrelease     %{rpmrelease}%{extrarelease}
 %{!?extrarelease2       %{expand: %%global extrarelease2    %%{nil}}}
 %global baserelease     %{rpmrelease}%{extrarelease2}
+%global kspecrelease    %{specrelease}
 %global kbaserelease    %{baserelease}
-%global kspecrelease    %{baserelease}
 %global kernel_symvers  symvers-%{_kversion}.gz
 %global kernel_symsets  symsets-%{_kversion}.tar.gz
 
@@ -178,10 +177,10 @@
 %{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_sysconfdir}/modprobe.d}}
 %{!?_buildrootdir:      %{expand: %%global _buildrootdir    %%{_tmppath}/%%{name}-%%{baseversion}-%%{specrelease}-root}}
 
-Summary:        OpenSS7 OSI for Linux
+Summary:        %{stitle} OSI for Linux
 Name:           os7osi
 Version:        %{baseversion}
-Release:        %{rpmrelease}
+Release:        %{baserelease}
 License:        AGPLv3
 Group:          System Environment/Kernel
 Icon:           %{base}.gif
@@ -190,19 +189,43 @@ ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm
 ExclusiveOs:    Linux
 Source:         %{base}-%{baseversion}.tar.bz2
 BuildRoot:      %{_buildrootdir}
-Autoreq:        true
+Autoreq:        false
 Autoprov:       true
 
 BuildRequires:  gcc >= 3.3.3
-BuildRequires:  @GROFF@
-BuildRequires:  @SOELIM@
-BuildRequires:  @REFER@
-BuildRequires:  @TBL@
-BuildRequires:  @PIC@
-BuildRequires:  @GZIP_CMD@
+BuildRequires:  @BIBTEX@
 BuildRequires:  @BZIP2_CMD@
+BuildRequires:  @CONVERT@
+BuildRequires:  @DVI2PS@
+BuildRequires:  @DVIPDF@
+BuildRequires:  @FIG2DEV@
+BuildRequires:  @GCJH@
+BuildRequires:  @GENKSYMS@
+BuildRequires:  @GNUPLOT@
+BuildRequires:  @GPG@
+BuildRequires:  @GROFF@
+BuildRequires:  @GZIP_CMD@
+BuildRequires:  @JAVAC@
+BuildRequires:  @JAVAH@
+BuildRequires:  @LATEX@
+BuildRequires:  @LATEX2HTML@
+BuildRequires:  @MD5SUM@
+BuildRequires:  @OBJDUMP@
+BuildRequires:  @OPENSSL@
+BuildRequires:  @PDFLATEX@
+BuildRequires:  @PDFTEX@
+BuildRequires:  @PIC@
+BuildRequires:  @PS2EPSI@
+BuildRequires:  @PS2PDF@
+BuildRequires:  @PSLATEX@
+BuildRequires:  @REFER@
+BuildRequires:  @SHA1SUM@
+BuildRequires:  @SOELIM@
+BuildRequires:  @TBL@
+BuildRequires:  @TEX@
+BuildRequires:  @ZIP@
 
-BuildRequires:  bzip2
+BuildRequires:  binutils
 BuildRequires:  chkconfig
 BuildRequires:  coreutils
 BuildRequires:  fedora-release
@@ -218,52 +241,52 @@ BuildRequires:  kernel
 BuildRequires:  libgcj
 BuildRequires:  lsof
 BuildRequires:  modutils
+BuildRequires:  net-snmp
+BuildRequires:  net-snmp-devel
+BuildRequires:  net-snmp-utils
 BuildRequires:  openssl
 BuildRequires:  perl
 BuildRequires:  rpm
-BuildRequires:  zip
-
 BuildRequires:  tcl
 BuildRequires:  tcl-devel
-BuildRequires:  net-snmp
-BuildRequires:  net-snmp-utils
-BuildRequires:  net-snmp-devel
+BuildRequires:  zip
 
-#BuildRequires:  autoconf
-#BuildRequires:  swig
-
-#BuildRequires:  ghostscript
-#BuildRequires:  gnuplot
-#BuildRequires:  ImageMagick
-#BuildRequires:  tetex
-#BuildRequires:  tetex-dvips
-#BuildRequires:  tetex-latex
-
+Requires:       bash
+Requires:       beecrypt
 Requires:       bzip2
+Requires:       bzip2-libs
 Requires:       chkconfig
 Requires:       coreutils
+Requires:       elfutils-libelf
 Requires:       filesystem
+Requires:       gawk
 Requires:       glibc
 Requires:       groff
 Requires:       gzip
 Requires:       initscripts
 Requires:       kernel
+Requires:       libgcc
+Requires:       libpcap
+Requires:       libselinux
+Requires:       libstdc++
 Requires:       lsof
 Requires:       modutils
+Requires:       net-snmp
+Requires:       net-snmp-perl
 Requires:       openssl
 Requires:       perl
+Requires:       popt
 Requires:       rpm
-Requires:       zip
-
 Requires:       tcl
-Requires:       net-snmp
-Requires:       net-snmp-utils
+Requires:       tcp_wrappers
+Requires:       zip
+Requires:       zlib
 
 # ---------------------------------------------------------------------------
 %description
 The %{name} package cincludes kernel modules, STREAMS drivers, modules,
 libraries, utilities, test programs, daemons, and development environment
-for the development and execution of OpenSS7 OSI drivers, components,
+for the development and execution of %{stitle} OSI drivers, components,
 and applications for the STREAMS OSI environment.  This distribution ic
 currently applicable to the FC2 2.6.12.1 kernel and is validated for
 ix86 architecture.
@@ -391,34 +414,86 @@ export EXCLUDE_FROM_COMPRESS
 EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manmacros}"
 export EXCLUDE_FROM_COMPRESS
 
+# file conflicts with samba
+rm -f %{buildroot}%{_mandir}/man8/net.8*
+
 %clean
 # ---------------------------------------------------------------------------
 
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
 
+%pre -p /bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
+    manuals='%{manuals}'; for n in $manuals ; do
+        for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
+            [ -f %{_infodir}.info${e} ] || continue
+            install-info --delete --info-dir=%{_infodir} %{_infodir}/${n}.info${e} 2>&1 || :
+            break
+        done
+    done
+fi
+
 %post -p /bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
-    if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
-	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
-    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
-	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
+    manuals='%{manuals}'; for n in $manuals ; do
+        for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
+            [ -f %{_infodir}.info${e} ] || continue
+            install-info --info-dir=%{_infodir} %{_infodir}/${n}.info${e} 2>&1 || :
+            break
+        done
+    done
+    [[ -d %{_libdir}        ]] && ldconfig -n %{_libdir}
+    [[ -d %{_syslibdir}     ]] && ldconfig -n %{_syslibdir}
+    [[ -d %{_lib32dir}      ]] && ldconfig -n %{_lib32dir}
+    [[ -d %{_syslib32dir}   ]] && ldconfig -n %{_syslib32dir}
+    update-netconfig
+    update-sock2path
+    update-snmpconf --install
+    if [[ -x /usr/bin/tclsh ]]; then
+        for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+            echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
+        done
     fi
 fi
+
+%preun -p /bin/bash
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
+    rm -f -- %{_sysconfdir}/nslconfig.d/%{netconfig}
+    rmdir -p -- %{_sysconfdir}/nslconfig.d >/dev/null 2>&1 || :
+    update-netconfig
+    rm -f -- %{_sysconfdir}/sock2path.d/%{sock2path}
+    rmdir -p -- %{_sysconfdir}/sock2path.d >/dev/null 2>&1 || :
+    update-sock2path
+    rm -f -- %{_snmpconfdir}/snmp.d/*%{base}
+    rmdir -p -- %{_snmpconfdir}/snmp.d >/dev/null 2>&1 || :
+    update-snmpconf --remove
+    manuals='%{manuals}'; for n in $manuals ; do
+        for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
+            [ -f %{_infodir}.info${e} ] || continue
+            install-info --delete --info-dir=%{_infodir} %{_infodir}/${n}.info${e} 2>&1 || :
+            break
+        done
+    done
+fi
+
 
 %postun -p /bin/bash
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
-    if   [ -x "`which libtool 2>/dev/null`" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d %{_libdir}    ] && { libtool --mode=finish $v %{_libdir}    || :; }
-	[ -d %{_syslibdir} ] && { libtool --mode=finish $v %{_syslibdir} || :; }
-    elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d %{_libdir}    ] && { ldconfig -n %{_libdir}    || :; }
-	[ -d %{_syslibdir} ] && { ldconfig -n %{_syslibdir} || :; }
+    [[ -d %{_libdir}        ]] && ldconfig -n %{_libdir}
+    [[ -d %{_syslibdir}     ]] && ldconfig -n %{_syslibdir}
+    [[ -d %{_lib32dir}      ]] && ldconfig -n %{_lib32dir}
+    [[ -d %{_syslib32dir}   ]] && ldconfig -n %{_syslib32dir}
+    if [[ -x /usr/bin/tcsh ]] ; then
+        for f in `find %{_pkgtcllibdir} -name 'pkgIndex.tcl'` ; do
+            rm -f -- "$f" || :
+            if [ -d "`dirname $f`" ]; then
+                rpmdir -p == "`dirname $f`" 2>/dev/null || :
+            fi
+        done
     fi
 fi
 
@@ -506,7 +581,7 @@ Release:            %{kbaserelease}
 Provides:           %{name}-modules
 Requires:           %{name} = %{baseversion}-%{rpmrelease}
 Requires:           kernel = %{kernel_number}
-Requires:           %{kernel_needed} = %{kernel_number}
+Requires:           kernel%{kernel_kind}%{kernel_flavor} = %{kernel_version}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
