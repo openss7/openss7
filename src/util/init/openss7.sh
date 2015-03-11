@@ -661,11 +661,11 @@ stop_preload () {
 start_params () {
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
 	action "Reconfiguring kernel parameters: " \
-	    sysctl -q -e -p /etc/sysctl.conf 2>/dev/null || :
+	    sysctl -e -p /etc/sysctl.conf >/dev/null 2>&1 || :
     fi
     if [ -f /etc/${name}.conf ] ; then
 	action "Configuring $ucname parameters: " \
-	    sysctl -q -e -p /etc/${name}.conf 2>/dev/null || :
+	    sysctl -e -p /etc/${name}.conf >/dev/null 2>&1 || :
     fi
     return $RETVAL
 }
