@@ -235,6 +235,17 @@ Addressing
 - X.121
 - E.164
 
+- ETSI TS 300 612-2
+  ISO-IP: (OSINET format NSAP)
+  47		    AFI (ICD Binary)
+  0004		    IDI/ICD (OSINET)
+  XXXX		    OG (Organization Number)
+  XXXX		    SN (Subnetwork) 0xFFFF unspecified subnetwork
+  HHHHHHHHHHHH	    ID (Station Identifier)
+  FE		    Sel (Network Selector)
+  binary length = 14 octets with NSel
+
+
 - RFC 1069 - IP NSAPs
   ISO-IP:
   47		    AFI (ICD Binary)
@@ -244,10 +255,10 @@ Addressing
   XXXX		    Routing Domain
   00000000000000    Padding (7 octets of zeroes)
   AABBCCDD	    IPv4 address
-  00		    Nsel
+  50		    Nsel (80 = 0x50 for ISO-IP)
   binary length = 20 octets with NSel
 
-  ISO-UDP: ANSI 2/6/1 format (RFC 982)
+  ISO-IP: ANSI 2/6/1 format (RFC 982)
   47                AFI (ICD Binary)
   0006              IDI/ICD (Internet ICD)
   02                DFI Version
@@ -256,8 +267,53 @@ Addressing
   000000	    Padding
   XXXX		    Area Code
   AABBCCDDPPPP      IPv4 address and port
-  00                Nsel
+  50                Nsel (80 = 0x50 for ISO-IP)
   binary length = 20 octets with NSel
+
+  Note: The selector field performs the same function as the user
+  protocol field in the IP header.  This is necessary because the
+  ISO protocol considers identification of the user protocol to be
+  an addressing issue, and therefore does not allow for the user
+  protocol to be specified in the protocol header independently from
+  address.
+
+- RFC 1070 - UDP NSAPs
+  ISO-UDP:
+  47		    AFI (ICD Binary)
+  0006		    IDI/ICD (Internet ICD)
+  03		    DFI Version
+  0000		    Global Area
+  XXXX		    Routing Domain Number
+  000000	    Padding
+  0000		    Area Code (LOC-AREA)
+  0000		    unused
+  AABBCCDD	    IPv4 address
+  11		    Nsel (17 = 0x11 for ISO-UDP)
+
+- RFC 1237/RFC 1629 GOSIP 2/ANSI NSAPS
+
+  GOSIP 2:
+  47		    AFI (ICD Binary)
+  0005		    IDI/ICD (GSA)
+  80		    DFI Version
+  XXXXXX	    AA Administrative Authority
+  0000		    Rsvd Reserved
+  XXXX		    Routing Domain
+  0000		    Area Identifier
+  HHHHHHHHHHHH	    ID System Identifier
+  00		    NSel (See X.264) [00-NET, 01-X.224, 02-X.234, 03-X.274/X.224, 04-X.274/X.234]
+
+  ANSI: (Also ECMA 117)
+  39		    AFI (ISO DCC Binary)
+  0840		    US (ANSI)
+  80		    DFI Version
+  XXXXXX	    AA Administrative Authority
+  0000		    Rsvd Reserved
+  XXXX		    Routing Domain
+  0000		    Area Identifier
+  HHHHHHHHHHHH	    ID System Identifier
+  00		    NSel (See X.264) [00-NET, 01-X.224, 02-X.234, 03-X.274/X.224, 04-X.274/X.234]
+
 
 - RFC 1277 - RFC 1006 NSAPs
 
@@ -272,7 +328,7 @@ Addressing
 
 - RFC 4548 - IP NSAPs
 
-  47		    AFI (IANA ICP Binary)
+  35		    AFI (IANA ICP Binary)
   0001		    IPv4 (IPv6 is 0000)
   AABBCCDD	    IPv4 address
   00...		    12 octets of zeros
