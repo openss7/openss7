@@ -5946,6 +5946,16 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  FE			NSel (LSAP)
  *  binary length = 10 octets with NSel
  *
+ *  ETSI TS 300 612-2
+ *  ISO-IP: (OSINET format NSAP)
+ *  47			AFI (ICD Binary)
+ *  0004		IDI/ICD (OSINET ICD)
+ *  XXXX		OG (Organization Number)
+ *  FFFF		SN (Subnetwork) 0xFFFF unspecified subnetwork
+ *  HHHHHHHHHHHH	ID (Station Identifier)
+ *  FE			Sel (Network Selector)  LSAP?
+ *  binary length = 14 octets with NSel
+ *
  *  RFC 1069 -IP NSAPs
  *  ISO-IP:
  *
@@ -5958,6 +5968,13 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  AABBCCDD		IPv4 Address
  *  00			NSel (LSAP)
  *  binary length = 20 octets with NSel
+ *
+ *  Note: The selector field performs the same function as the user
+ *  protocol field in the IP header.  This is necessary because the
+ *  ISO protocol considers identification of the user protocol to be
+ *  an addressing issue, and therefore does not allow for the user
+ *  protocol to be specified in the protocol header independently from
+ *  address.
  *
  *  ISO-UDP: ANSI 2/6/1 format (RFC 982)
  *
@@ -5972,6 +5989,30 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  00			NSel (LSAP)
  *  binary length = 20 octets with NSel
  *
+ *  RFC 1237/RFC 1629 GOSIP 2/ANSI NSAPS
+ *
+ *  GOSIP 2:
+ *  47			AFI (ICD Binary)
+ *  0005		IDI/ICD (GSA)
+ *  80			DFI Version
+ *  XXXXXX		AA Administrative Authority
+ *  0000		Rsvd Reserved
+ *  XXXX		Routing Domain
+ *  0000		Area Identifier
+ *  HHHHHHHHHHHH	ID System Identifier
+ *  00			NSel (See X.264) [00-NET, 01-X.224, 02-X.234, 03-X.274/X.224, 04-X.274/X.234]
+ *
+ *  ANSI:
+ *  39			AFI (ISO DCC Binary)
+ *  0840		US (ANSI)
+ *  80			DFI Version
+ *  XXXXXX		AA Administrative Authority
+ *  0000		Reserved
+ *  XXXX		Routing Domain
+ *  0000		Area Identifier
+ *  HHHHHHHHHHHH	ID System Identifier
+ *  00			NSel (See X.264) [00-NET, 01-X.224, 02-X.234, 03-X.274/X.224, 04-X.274/X.234]
+ *
  *  RFC 1277 - RFC 1006 NSAPs
  *
  *  54			AFI (F.69 Decimal)
@@ -5981,40 +6022,243 @@ t_build_options(struct tp *t, unsigned char *ip, size_t ilen, unsigned char *op,
  *  AAABBBCCCDDD	IPv4 Address (decimal)
  *  PPPPP		Port number (decimal)
  *  TTTTT		Transport selection mask (1 TCP, 2 UDP, how about 4 SCTP)
- *  binary length = 17 without NSel
+ *  00			NSel
+ *  binary length = 18 with NSel
  *
  *  RFC 4548 - IP NSAPs
  *
- *  47			AFI (IANA ICP Binary)
+ *  35			AFI (IANA ICP Binary)
  *  0001		IPv4 (IPv6 is 0000)
  *  AABBCCDD		IPv4 address
  *  00...		12 octets of zeros
  *  00			NSel (LSAP)
  *  binary length = 20 octets with NSel
  *
+ *  RFC 1768 - Multicast NSAPs for CLNS and (ES-IS/IS-IS) extensions
+ *
+ *  Typical trick: use
+ *
+ *  49                AFI (Local Binary)
+ *  --                IDI (NULL)
+ *  XXXX              Routing Domain/Area Code (Subnetwork)
+ *  HH:HH:HH:HH:HH:HH MAC Address
+ *  00                NSel (00 for NET, FE for ES)
+ *  binary length = 10 octets with NSel
  */
 
 /**
- * tp_addr_size: - calculate addresss size
- * @add: socket address
+ * tp_addr_type: - extract SNPA address
+ * @add: on call, pointer to NSAP, on return pointer to SNPA in NSAP
+ * @len: on call, length of NSAP, on return length of SNPA in NSAP
+ * @grp: on return, set when address is a group address
+ * @sub: on return, the subnetwork of the SNPA (0xffff unspecified)
+ * @sel: on return, the NSel byte implied or present in the NSAP
  *
- * Calculates and returns the size of the socket address based on the address family contained in
- * the address.
+ * Extracts and determines the type of an SNPA address found in an NSAP address.  Returns a positive
+ * SNAP address type on success and provides a pointer to the SNPA address and its length in the
+ * @add and @len locations.  On failure, returns a negative error code and does not alter the
+ * locations @add nor @len.
+ */
+static int
+tp_addr_type(caddr_t *add, size_t *len, int *grp, short *sub, unsigned char *sel)
+{
+	caddr_t nsap_add, snpa_add = NULL;
+	size_t nsap_len, snpa_len = len;
+
+	if (add == NULL || len == NULL)
+		return (-EFAULT);
+	nsap_add = *add;
+	nsap_len = *len;
+	if (nsap_add == NULL || nsap_len <= 0)
+		return (-EFAULT);
+	if (nsap_len > 20)
+		return (-EMSGSIZE);
+	if (nsap_len < 1)
+		return (-EINVAL);
+	switch (nsap_add[0]) {
+/* RFC 4548 NSAPs */
+	case 0x35:		/* ind IANA ICP binary */
+	case 0xb9:		/* grp IANA ICP binary */
+		if (nsap_len < 20)
+			return (-EINVAL);
+		if (nsap_add[1] != 0x00)
+			return (-EINVAL);
+		switch (nsap_add[2]) {
+		case 0x00:	/* IPv6 Address */
+			*add = nsap_add + 3;
+			*len = 16;
+			if (grp != NULL)
+				*grp = (nsap_add[0] == 0xb9);
+			if (sub != NULL)
+				*sub = 0xffff;
+			if (sel != NULL)
+				/* should be ipproto */
+				*sel = nsap_add[19];
+			return (16);
+		case 0x01:	/* IPv4 Address */
+			*add = nsap_add + 3;
+			*len = 4;
+			if (grp != NULL)
+				*grp = (nsap_add[0] == 0xb9);
+			if (sub != NULL)
+				*sub = 0xffff;
+			if (sel != NULL)
+				/* should be ipproto */
+				*sel = nsap_add[19];
+			return (4);
+		}
+		return (-EINVAL);
+/* ANSI 2/6/1 (also ECMA 117) */
+	case 0x39:		/* ind ISO DCC binary */
+	case 0xbd:		/* grp ISO DCC binary */
+		if (nsap_len < 20)
+			return (-EINVAL);
+		if (nsap_add[1] != 0x08 || nsap_add[2] != 0x40)
+			return (-EINVAL);
+		if (nsap_add[3] != 0x80)
+			return (-EINVAL);
+		if (nsap_add[7] != 0x00 || nsap_add[8] != 0x00)
+			return (-EINVAL);
+		*add = nsap_add + 13;
+		*len = 6;
+		if (grp != NULL)
+			*grp = (nsap_add[0] == 0xbd);
+		if (sub != NULL)
+			*sub = (nsap_add[11] << 8) | (nsap_add[12]);
+		if (sel != NULL)
+			/* 00-NET, 01-X.224, 02-X.234, 03-X.274/224, 04-X.274/234 */
+			*sel = nsap_add[19];
+		return (6);
+/* Various ICD binary formats */
+	case 0x47:		/* ind ICD binary */
+	case 0xc5:		/* grp ICD binary */
+		if (nsap_len < 20)
+			return (-EINVAL);
+		if (nsap_add[1] != 0x00)
+			return (-EINVAL);
+		switch (nsap_add[2]) {
+		case 0x04:	/* OSINET (ETSI TS 300 612-2 and ISO-IP) */
+			*add = nsap_add + 7;
+			*len = 6;
+			if (grp != NULL)
+				*grp = (nsap_add[0] == 0xc5);
+			if (sub != NULL)
+				*sub = (nsap_add[5] << 8) | (nsap_add[6]);
+			if (sel != NULL)
+				/* should be LSAP */
+				*sel = nsap_add[19];
+			return (6);
+		case 0x05:	/* GSA-GOSIP 2 */
+			*add = nsap_add + 13;
+			*len = 6;
+			if (grp != NULL)
+				*grp = (nsap_add[0] == 0xc5);
+			if (sub != NULL)
+				*sub = (nsap_add[12] << 8) | (nsap_add[13]);
+			return (6);
+		case 0x06:	/* DND-Internet */
+			switch (nsap_add[3]) {
+			case 0x02:	/* DFI Version 2 */
+				if (nsap_add[13] == 0x00) {
+					*add = nsap_add + 15;
+					*len = 4;
+					if (grp != NULL)
+						*grp = (nsap_add[0] == 0xc5);
+					if (sub != NULL)
+						/* port number in subnet */
+						*sub = 0x00;
+					return (4);
+				} else {
+					*add = nsap_add + 13;
+					*len = 4;
+					if (grp != NULL)
+						*grp = (nsap_add[0] == 0xc5);
+					if (sub != NULL)
+						/* port number in subnet */
+						*sub = (nsap_add[17] << 8) | (nsap_add[18]);
+					return (4);
+				}
+			case 0x03:	/* DFI Version 3 */
+			}
+		}
+		return (-EINVAL);
+	}
+}
+
+/**
+ * tp_addr_size: - calculate addresss size
+ * @add: address buffer
+ * @len: buffer length
+ *
+ * Calculates and returns the size of the transport address based on the address format indicator
+ * (AFI) contained in the address.
  */
 static inline fastcall __hot int
-tp_addr_size(struct sockaddr *add)
+tp_addr_size(caddr_t add, size_t len)
 {
-	if (add) {
-		switch (add->sa_family) {
-		case AF_INET:
-			return sizeof(struct sockaddr_in);
-		case AF_UNIX:
-			return sizeof(struct sockaddr_un);
-		case AF_UNSPEC:
-			return sizeof(add->sa_family);
-		default:
-			return sizeof(struct sockaddr);
+	if (len < 1)
+		return (0);
+	switch (add[0]) {
+	case 0x35:		/* ind IANA ICP binary */
+	case 0xb9:		/* grp IANA ICP binary */
+		if (len < 20)
+			return (0);
+		if (add[1] != 0x00 || (add[2] != 0x00 && add[2] != 0x01))
+			return (0);
+		return (20);
+
+	case 0x39:		/* ind ISO DCC binary */
+	case 0xbd:		/* grp ISO DCC binary */
+		if (len < 20)
+			return (0);
+		if (add[3] != 0x80)
+			return (0);
+		return (20);
+
+	case 0x47:		/* ind ICD binary */
+	case 0xc5:		/* grp ICD binary */
+		if (len < 20)
+			return (0);
+		if (add[1] != 0x00)
+			return (0);
+		switch (add[2]) {
+		case 0x04: /* OSINET */
+			return (14);
+		case 0x05: /* GSA-GOSIP */
+		case 0x06: /* DND */
+			switch (add[3]) {
+			case 0x02: /* DFI version 2 */
+			case 0x03: /* DFI version 3 */
+				return (20);
+			}
 		}
+		return (0);
+	case 0x49:		/* ind Local binary */
+	case 0xc7:		/* grp Local binary */
+		if (len < 10)
+			return (0);
+		return (10);
+
+	case 0x50:		/* ind Local text: ISO/IEC 646 */
+	case 0x51:		/* ind Local text: national character */
+		if (len < 5)
+			return (0);
+		return ((int) len);
+
+	case 0x40:		/* ind F.69 decimal */
+	case 0x54:		/* ind F.69 decimal */
+	case 0xbe:		/* grp F.69 decimal */
+	case 0xcc:		/* grp F.69 decimal */
+		if (len < 18)
+			return (0);
+		if (add[1] != 0x00)
+			return (0);
+		if (add[2] != 0x72 || add[3] != 0x87 || add[4] != 0x22 || add[5] != 0x03)
+			return (0);
+		if ((add[14] & 0x0f) != 0x00 || add[15] != 0x00
+		    || (add[16] != 0x01 && add[16] != 0x02 && add[16] != 0x04))
+			return (0);
+		return (18);
 	}
 	return (0);
 }
@@ -6923,6 +7167,27 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, st
  * @q; active queue
  * @msg: pre-prepared message header
  * @dp: the data
+ *
+ * The UD TPDU arrived in the user data field of an N-UNITDATA indication.
+ *
+ * If a checksum parameter is present in the UD TPDU then a checksum verification will be made of
+ * the UD TPDU using the algorithm defined in ITU-T Rec. X.234 (1994 E) 6.4.  If the result of the
+ * verification is false then the TPDU is discarded.  If the result of the verificaiton is true, or
+ * if the checksum mechanisms is not used, then the transport entity will construct a T-UNITDATA
+ * indication and provide it to the appropriate transport service user.
+ *
+ * The source network address from the N-UNITDATA indication and the source TSAP-ID from the UD TPDU
+ * will be used to determine the source address parameter for the T-UNITDATA indication.
+ *
+ * The destination network address from the N-UNITDATA indication and the destination TSAP-ID from
+ * the UD TPDU will be used to determine the desitnation address parameter for the T-UNITDATA
+ * indication.
+ *
+ * The user data field of the UD TPDU will be mapped to the user data paraemter of the T-UNITDATA
+ * indicaiton.
+ *
+ * The QOS parameter is derived from the a priori knowledge of the QOS available from the
+ * association and whether the checksum mechanism was used.
  */
 static inline fastcall __hot_in int
 t_unitdata_ind(struct tp *tp, queue_t *q, struct msghdr *msg, mblk_t *dp)
@@ -9163,6 +9428,34 @@ t_unbind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 /*
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
+ *  The source and destination address parameters of the T-UNITDATA request service primitive are
+ *  used to determine the source network address, source TSAP-ID, destination network address, and
+ *  destination TSAP-ID.
+ *
+ *  The quality of tservice parameter in the T-UNITDATA request is used to determine if a checksum
+ *  should be included in the unit data UD TPDU.
+ *
+ *  NOTE -- If the length of the TSDU given in the T-UNITDATA request, plus the PCI of the UD TPDU
+ *  exceeds the maximum NSDU size supported by the network service, then the TSDU is discarded and a
+ *  local report may be made to the TS-user indicating the inability of the Transport Layer to
+ *  provide the service requested.
+ *
+ *  A UD TPDU is constructed with a checksum parameter (if necessary), a source TSAP-ID, a
+ *  desitnation TSAP-ID, and the user data field from the T-UNITDATA request.
+ *
+ *  An N-UNITDATA request service primitive is issued with the source and destination network
+ *  addresses determined above, the quality of service requested and a user field contianing the UD
+ *  TPDU.
+ *
+ *  Each TPDU is transmitted by the use of the connectionless-mode network service over a
+ *  pre-existing association between a pair of NSAPs.  The association is considered by transport
+ *  entities as permanently established and available.
+ *
+ *  There is no indication given to transport entities about the ability of the network entity to
+ *  fulfull the service requirements given in the N-UNITDATA primitive.  However, it can be a local
+ *  matter to make transport entities aware of the availability and caharacteristics (QOS) of
+ *  connectionless-mode network services, as the corresponding NSAP associations exist logically  by
+ *  the nature of the connectionless-mode network service and may be recognized by network entities.
  */
 static inline fastcall __hot_out int
 t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
