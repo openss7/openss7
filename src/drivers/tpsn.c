@@ -10655,7 +10655,7 @@ tp_w_proto_slow(queue_t *q, mblk_t *mp, t_scalar_t prim)
 }
 
 /**
- * __ss_w_proto: - process M_PROTO or M_PCPROTO message locked
+ * __tp_w_proto: - process M_PROTO or M_PCPROTO message locked
  * @tp: private structure (locked)
  * @q: active queue (write queue)
  * @mp: the M_PROTO or M_PCPROTO message
@@ -10724,8 +10724,39 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
+
 /**
- * __ss_w_data: - process M_DATA message
+ * __tp_r_data: - process M_DATA message
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the M_DATA message
+ *
+ * This function either returns zero (0) when the message is consumed, or a negative error number
+ * when the message is to be (re)queued.  This non-locking version is used by the service procedure.
+ */
+static inline fastcall __hot_read int
+__tp_r_data(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	return t_read(tp, q, mp);
+}
+
+/**
+ * tp_r_data: - process M_DATA  messages
+ * @q: active queue (read queue)
+ * @mp: the M_DATA message
+ *
+ * This function either returns zero (0) when the message is consumed, or a negative error number
+ * when the message is to be (re)queued.  This locking version is used by the put procedure.
+ */
+static inline fastcall __hot_read int
+tp_r_data(queue_t *q, mblk_t *mp)
+{
+	/* Always queue from put procedure for performance */
+	return (-EAGAIN);
+}
+
+/**
+ * __tp_w_data: - process M_DATA message
  * @tp: private structure (locked)
  * @q: active queue (write queue)
  * @mp: the M_DATA message
@@ -10761,6 +10792,33 @@ tp_w_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
+
+/**
+ * tp_r_flush: M_FLUSH handling
+ * @q: active queue (read queue)
+ * @mp: the M_FLUSH message
+ *
+ * As we are a driver it is not normal to receive a flush message on the read queue (unless we have
+ * explicitly place it there); however, at some point this driver might be pushed as a module over
+ * an IP or LLC driver stream in which case we will need to perform proper canonical flushing.  The
+ * private structure is unlocked at this point.  This funciton always consumes the message and
+ * returns 0.
+ */
+noinline fastcall __unlikely int
+tp_r_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(q, FLUSHALL);
+		putnext(q, mp);
+	} else if (mp->b_rptr[0] & FLUSHW) {
+		putnext(q, mp);
+	} else
+		freemsg(mp);
+	return (0);
+}
 
 /**
  * tp_w_flush: - canonical driver write flush procedure
@@ -10918,45 +10976,129 @@ tp_w_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
  */
 
 /**
+ * tp_r_prim_put: - read primitive handling
+ * @q: active queue (read queue)
+ * @mp: the primitive
+ *
+ * This is the put procedure version of message handling.  All procedures that require private
+ * structure locks take them.  Note that we do not expect M_DATA or M_CTL here unless TPSN is pushed
+ * as a module: tp_v4_rcv() and tp_v4_err() place messages directly on the queue for processing by
+ * the service procedure.
+ */
+STATIC inline streamscall __hot_in int
+tp_r_prim_put(queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(DB_TYPE(mp), M_FLUSH)) {
+	case M_FLUSH:
+		return tp_r_flush(q, mp);
+	case M_DATA:
+		return tp_r_data(q, mp);
+	case M_CTL:
+		return tp_r_ctl(q, mp);
+	default:
+		return tp_r_other(q, mp);
+	}
+}
+
+/**
  * tp_rput: - read put procedure
  * @q: active queue (read queue)
+ * @mp: message to put
  *
- * The read put procedure is no longer used by the strinet driver.  Events result in generation of
- * messages upstream or state changes within the private structure.
+ * This is a canonical put procedure for the read queue.  Messages placed on the read queue either
+ * come from this module internally (e.g. timers), the IP or LLC sublayer or when TPSN is pushed as
+ * a module from the driver.  Never call put() from soft interrupt.  In tp_v4_rcv() and tp_v4_err()
+ * messages are placed directly on the queue with putq().
  */
-static streamscall __unlikely int
+STATIC streamscall __hot_int int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	LOGERR(PRIV(q), "SWERR: Read put routine called!");
-	freemsg(mp);
+	if (unlikely(DB_TYPE(mp) < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || unlikely(tp_r_prim_put(q, mp))) {
+		tp_rstat.ms_acnt++;
+		if (unlikely(!putq(q, mp))) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
+	}
 	return (0);
+}
+
+/**
+ * tp_r_prim_srv: - read primitive handling
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the primitive
+ */
+STATIC inline streamscall __hot_in int
+tp_r_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(DB_TYPE(mp), M_DATA)) {
+	case M_DATA:
+		return __tp_recv_msg(tp, q, mp);
+	case M_CTL:
+		return __tp_recv_err(tp, q, mp);
+	case M_FLUSH:
+		return tp_r_flush(q, mp);
+	default:
+		return tp_r_other(q, mp);
+	}
 }
 
 /**
  * tp_rsrv: - read service procedure
  * @q: active queue (read queue)
  *
- * The read service procedure is responsible for servicing the read side of the underlying socket
- * when data is available.  It is scheduled from socket callbacks on the read side: sk_data_ready
- * and sk_error_report and sk_state_change.
+ * This is a canonical service procedure for the read queue.  Messages on the read queue either come
+ * from this module internally, the IP or LLC sublayer or when TPSN is pushed as a module from the
+ * driver.  The service procedure takes private structure locks once for the entire loop for speed.
  */
-static streamscall __hot_in int
+streamscall __hot_out int
 tp_rsrv(queue_t *q)
 {
 	struct tp *tp;
 
-	if (likely(! !(tp = tp_trylock(q)))) {
-		__tp_r_events(tp, q);
+	if (likely((tp = tp_trylock(q)) != NULL)) {
+		mblk_t *mp;
+
+		__tp_deferred_timers(tp);
+
+		if (likely((mp = getq(q)) != NULL)) {
+			__tp_cleanup_read(tp);
+			do {
+				if (unlikely(tp_r_prim_srv(tp, q, mp))) {
+					if (unlikely(!putbq(q, mp))) {
+						mp->b_band = 0;	/* must succeed */
+						putbq(q, mp);
+					}
+					LOGRX(tp, "read queue stalled");
+					__tp_transmit_wakeup(tp);
+					break;
+				}
+			} while (likely((mp = getq(q)) != NULL));
+		}
+		__tp_cleanup_read(tp);
+		__tp_transmit_wakeup(tp);
 		tp_unlock(tp);
 	}
 	return (0);
 }
 
-#if 0
-#define PRELOAD (FASTBUF<<2)
-#else
-#define PRELOAD (0)
-#endif
+STATIC inline fastcall __hot_write int
+tp_w_prim_put(queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(DB_TYPE(mp), M_PROTO)) {
+	case M_PROTO:
+	case M_PCPROTO:
+		return tp_w_proto(q, mp);
+	case M_DATA:
+		return tp_w_data(q, mp);
+	case M_FLUSH:
+		return tp_w_flush(q, mp);
+	default:
+		return tp_w_other(q, mp);
+	}
+}
 
 /**
  * tp_wput: - write put procedure
@@ -10966,20 +11108,34 @@ tp_rsrv(queue_t *q)
  * This is a canoncial put procedure for write.  Locking is performed by the individual message
  * handling procedures.
  */
-static streamscall __hot_in int
+static streamscall __hot_write int
 tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(DB_TYPE(mp) < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || unlikely(tp_w_prim_put(q, mp))) {
 		tp_wstat.ms_acnt++;
-		/* apply backpressure */
-		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;
 			putq(q, mp);	/* must succeed */
 		}
 	}
 	return (0);
+}
+
+STATIC inline fastcall __hot_out int
+tp_w_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(DB_TYPE(mp), M_PROTO)) {
+	case M_PROTO:
+	case M_PCPROTO:
+		return __tp_w_proto(tp, q, mp);
+	case M_DATA:
+		return __tp_w_data(tp, q, mp);
+	case M_FLUSH:
+		return tp_w_flush(q, mp);
+	default:
+		return tp_w_other(q, mp);
+	}
 }
 
 /**
@@ -10990,19 +11146,16 @@ tp_wput(queue_t *q, mblk_t *mp)
  * locks do not need to be released and acquired with each loop.  Note that the wakeup function must
  * also be executed with the private structure locked.
  */
-static streamscall __hot_in int
+static streamscall __hot_out int
 tp_wsrv(queue_t *q)
 {
 	struct tp *tp;
-	mblk_t *mp;
 
-	if (likely(! !(tp = tp_trylock(q)))) {
-		while (likely(! !(mp = getq(q)))) {
-			/* remove backpressure */
-			mp->b_wptr -= PRELOAD;
+	if (likely((tp = tp_trylock(q)) != NULL)) {
+		mblk_t *mp;
+
+		while (likely((mp = getq(q)) != NULL)) {
 			if (unlikely(tp_w_prim_srv(tp, q, mp))) {
-				/* reapply backpressure */
-				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;	/* must succeed */
 					putbq(q, mp);
@@ -11011,9 +11164,7 @@ tp_wsrv(queue_t *q)
 				break;
 			}
 		}
-#if 0
-		tp_w_wakeup(tp, q);
-#endif
+		__tp_transmit_wakeup(tp);
 		tp_unlock(tp);
 	}
 	return (0);
