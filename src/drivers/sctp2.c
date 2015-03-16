@@ -5255,42 +5255,38 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			route_changed = 1;
 			/* try wildcard saddr and dif routing */
 #if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
-			err = ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0);
+			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS
 			err =
-			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
-					     sp->sport, sp->dport, NULL);
+			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP, sp->sport,
+					     sp->dport, NULL);
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			err =
-			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
-					     sp->sport, sp->dport, NULL, 0);
+			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP, sp->sport,
+					     sp->dport, NULL, 0);
 #else
-			err = ip_route_output(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0);
+			err = ip_route_output(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0);
 #endif
 #elif defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS
-#if 0
+#if defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC
 			err =
-			    ip_route_connect(&rt, sd->daddr, sd->saddr, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP,
-					     sp->sport, sp->dport, NULL, 0);
-#else
+			    ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0, IPPROTO_SCTP, sp->sport,
+					     sp->dport, NULL, 0);
+#else				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
 			{
 				struct flowi4 fl4;
 				struct rtable *rt2;
 
 				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
-						   IPPROTO_SCTP, 0, sd->daddr, sd->saddr, sp->dport,
-						   sp->sport);
-				if (!sd->daddr || !sd->saddr) {
-					rt2 = __ip_route_output_key(&init_net, &fl4);
-					if (IS_ERR(rt2)) {
-						err = PTR_ERR(rt2);
-						goto done;
-					}
-					ip_rt_put(rt2);
-					flowi4_update_output(&fl4, 0, RT_CONN_FLAGS(sp), fl4.daddr,
-							     fl4.saddr);
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport);
+				rt2 = __ip_route_output_key(&init_net, &fl4);
+				if (IS_ERR(rt2)) {
+					err = PTR_ERR(rt2);
+					goto done;
 				}
+				ip_rt_put(rt2);
+				flowi4_update_output(&fl4, 0, RT_CONN_FLAGS(sp), fl4.daddr, fl4.saddr);
 				rt2 = __ip_route_output_key(&init_net, &fl4);
 				if (IS_ERR(rt2)) {
 					err = PTR_ERR(rt2);
@@ -5302,7 +5298,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 				sd->dif = fl4.flowi4_oif;
 			}
 		      done:
-#endif
+#endif				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
