@@ -1760,6 +1760,52 @@ dnl----------------------------------------------------------------------------
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for rcu_note_context_switch with no args],
+		       [linux_cv_rcu_note_context_switch_no_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif]],
+		    [[rcu_note_context_switch();]]) ],
+		[linux_cv_rcu_note_context_switch_no_args='yes'],
+		[linux_cv_rcu_note_context_switch_no_args='no'])
+	    ])
+	if test :$linux_cv_rcu_note_context_switch_no_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_RCU_NOTE_CONTEXT_SWITCH_NO_ARGS], [1], [Define if
+		function rcu_note_context_switch takes no arguments (void).])
+	fi
 	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args],
 		       [linux_cv_kmem_cache_create_5_args], [dnl
 	    AC_COMPILE_IFELSE([

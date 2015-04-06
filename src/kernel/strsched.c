@@ -5865,7 +5865,11 @@ kstreamd_fn(unsigned int cpu)
 	if (local_strevent_pending()) {
 		preempt_enable();
 		__runqueues();
+#ifdef HAVE_KFUNC_RCU_NOTE_CONTEXT_SWITCH_NO_ARGS
+		rcu_note_context_switch();
+#else
 		rcu_note_context_switch(cpu);
+#endif
 		cond_resched();
 		return;
 	}
