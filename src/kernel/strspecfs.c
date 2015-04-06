@@ -433,11 +433,11 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		fops_put(file->f_op);
 		file->f_op = (struct file_operations *) f_op;
 	}
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 #ifdef HAVE_KFUNC_I_READCOUNT_INC
 	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
 		i_readcount_dec(file->f_dentry->d_inode);
 #endif
-#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	if (file->f_dentry != NULL)
 		dput(file->f_dentry);
 	file->f_dentry = dentry;
@@ -445,6 +445,10 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
 #else
+#ifdef HAVE_KFUNC_I_READCOUNT_INC
+	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+		i_readcount_dec(file->f_path.dentry->d_inode);
+#endif
 	path_put(&file->f_path);
 	file->f_path.dentry = dentry;
 	file->f_path.mnt = mnt;
@@ -499,7 +503,11 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 	if (!(err = spec_reparent(file, cdev, dev))) {
 		file->f_flags =
 		    (sflag == CLONEOPEN) ? (file->f_flags | O_CLONE) : (file->f_flags & ~O_CLONE);
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 		err = file->f_op->open(file->f_dentry->d_inode, file);
+#else
+		err = file->f_op->open(file->f_path.dentry->d_inode, file);
+#endif
 		file->f_flags &= ~O_CLONE;
 		if (!err) {
 #ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
