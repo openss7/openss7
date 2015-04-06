@@ -315,7 +315,11 @@ STATIC streams_inline streams_fastcall struct stdata *
 stri_acquire_ok(struct file *file)
 {
 	struct stdata *sd;
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	struct inode *inode = file->f_dentry->d_inode;
+#else
+	struct inode *inode = file->f_path.dentry->d_inode;
+#endif
 
 	/* always hold the inode spinlock while lookup up the STREAM head */
 	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
@@ -4496,7 +4500,11 @@ stropen(struct inode *inode, struct file *file)
 			_ctrace(cdrv_put(sd->sd_cdevsw));
 			sd->sd_cdevsw = cdev;
 			/* FIXME: pull stuff out of qattach here. */
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 			inode = file->f_dentry->d_inode;
+#else
+			inode = file->f_path.dentry->d_inode;
+#endif
 		}
 		_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 		stri_lock(inode);
@@ -8638,7 +8646,12 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 {
 	int fd, err;
 
-	if ((err = fd = get_unused_fd()) >= 0) {
+#ifdef HAVE_KFUNC_GET_UNUSED_FD_FLAGS
+	err = fd = get_unused_fd_flags(0);
+#else
+	err = fd = get_unused_fd();
+#endif
+	if (fd >= 0) {
 		mblk_t *mp = NULL;
 
 		if (!(err = straccess_rlock(sd, (FREAD | FEXCL | FNDELAY)))) {

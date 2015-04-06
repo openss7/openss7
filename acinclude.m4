@@ -853,6 +853,7 @@ dnl----------------------------------------------------------------------------
 	free_dma \
 	generic_delete_inode \
 	get_pid \
+	get_unused_fd_flags \
 	iget_locked \
 	in_atomic \
 	inet_csk \
