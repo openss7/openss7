@@ -973,6 +973,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_CPUMASK_H
 #include <linux/cpumask.h>
 #endif
@@ -1066,6 +1070,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_CPUMASK_H
 #include <linux/cpumask.h>
 #endif
@@ -1133,6 +1141,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -1781,6 +1793,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -1827,6 +1843,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -1877,6 +1897,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -1938,6 +1962,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -1978,6 +2006,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -2018,6 +2050,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -2058,6 +2094,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -2098,6 +2138,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -2138,6 +2182,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -2196,6 +2244,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -2246,6 +2298,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -3489,6 +3545,10 @@ dnl----------------------------------------------------------------------------
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
