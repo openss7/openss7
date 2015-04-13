@@ -173,9 +173,9 @@ struct transdel {
 #define T_TCO_CHECKSUM		0x0600	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 #define T_TCO_NETEXP		0x0700	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 #define T_TCO_NETRECPTCF	0x0800	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
-#define T_TCO_SELECTACK		0x0e00  /**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_SELECTACK		0x0e00	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 #define T_TCO_REQUESTACK	0x0f00	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
-#define T_TCO_NBLKEXPDATA	0x1000  /**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
+#define T_TCO_NBLKEXPDATA	0x1000	/**< t_uscalar_t, T_YES/T_NO/T_UNSPEC. */
 
 #define T_TCL_TRANSDEL		0x000d
 #define T_TCL_RESERRORRATE	T_TCO_RESERRORRATE
@@ -183,6 +183,116 @@ struct transdel {
 #define T_TCL_PRIORITY		T_TCO_PRIORITY
 #define T_TCL_CHECKSUM		T_TCO_CHECKSUM
 /** @} */
+
+/**
+  * @name Address/Selector Sizes
+  *
+  * @{ */
+#define NODSIZ		 6	/**< fixed length of 802.[345] address */
+#define MACSIZ		20	/**< max length of MAC address */
+#define NSAPSZ		20	/**< max length of NSAP address */
+#define SUBNSZ		20	/**< max length of subnetwork address */
+#define TSAPSZ		32	/**< max length of TSAP selector */
+#define SSAPSZ		16	/**< max length of SSAP selector */
+#define PSAPSZ		16	/**< max length of PSAP selector */
+/** @} */
+
+/**
+  * Node structure
+  */
+typedef struct {
+	unsigned char addr[NODSIZ];	/* node address */
+} node_address;
+
+/**
+  * MAC structure
+  */
+typedef struct {
+	unsigned len;			/* MAC address length */
+	unsigned char addr[MACSIZ];	/* MAC address */
+} mac_address;
+
+/**
+  * Subnet structure
+  */
+typedef struct {
+	unsigned len;			/* subnet address length */
+	unsigned char addr[SUBNSZ];	/* subnet address */
+} subnet_address;
+
+/**
+  * LSAP selector
+  */
+typedef unsigned char lsap_selector;	/* DLSAP selector */
+
+/**
+  * NSAP address structure
+  */
+typedef struct {
+	unsigned len;			/* NSAP address length */
+	unsigned char addr[NSAPSZ];	/* NSAP address (binary) */
+} nsap_address;
+
+/**
+  * NSAP selector
+  */
+typedef unsigned char nsap_selector;	/* NSAP selector */
+
+/**
+  * NSAP service user identifier
+  */
+typedef unsigned char nsu_id;		/* NSAP service user TLID */
+
+/**
+  * TSAP selector structure
+  */
+typedef struct {
+	unsigned len;			/* TSAP selector length */
+	unsigned char addr[TSAPSZ];	/* TSAP selector */
+} tsap_selector;
+
+/**
+  * TSAP address structure
+  */
+typedef struct {
+	tsap_selector tsap;		/* TSAP selector */
+	nsap_address nsap;		/* NSAP address */
+} tsap_address;
+
+/**
+  * SSAP selector structure
+  */
+typedef struct {
+	unsigned len;			/* SSAP selector length */
+	unsigned char addr[SSAPSZ];	/* SSAP selector */
+} ssap_selector;
+
+/**
+  * SSAP address structure
+  */
+typedef struct {
+	ssap_selector ssap;		/* SSAP id */
+	tsap_selector tsap;		/* TSAP id */
+	nsap_address nsap;		/* NSAP address */
+} ssap_address;
+
+/**
+  * PSAP selector structure
+  */
+typedef struct {
+	unsigned len;			/* PSAP selector length */
+	unsigned char addr[PSAPSZ];	/* PSAP selector */
+} psap_selector;
+
+/**
+  * PSAP address structure
+  */
+typedef struct {
+	psap_selector psap;		/* PSAP id */
+	ssap_selector ssap;		/* SSAP id */
+	tsap_selector tsap;		/* TSAP id */
+	nsap_address nsap;		/* NSAP address */
+} psap_address;
 
 #endif				/* _SYS_XTI_OSI_H */
 
