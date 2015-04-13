@@ -106,6 +106,7 @@
 %global kernel_number   %(echo %{_kversion}|awk 'BEGIN{FS="-"}{print$1}')
 %global kernel_flavor   %(echo %{_kversion}|awk 'BEGIN{FS="-"}{print$2}'|sed -r -e 's,.*smp$,-smp,;t;s,.*,,')%{nil}
 %global kernel_kind     %(echo %{_kversion}|awk 'BEGIN{FS="-"}{if($3){print"-"$3}else{print$3}}')%{nil}
+%global kernel_release  %(echo %{_kversion}|awk 'BEGIN{FS="-"}{print$1"-"$2}'|sed -r -e 's,smp$,,')
 %global kernel_majnum   %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
 %global kernel_package  %{name}-modules-%{_kversion}
 %global basearch        %{_arch}
@@ -225,9 +226,11 @@ BuildRequires:  @TBL@
 BuildRequires:  @TEX@
 BuildRequires:  @ZIP@
 
+BuildRequires:  beecrypt-devel
 BuildRequires:  binutils
 BuildRequires:  chkconfig
 BuildRequires:  coreutils
+BuildRequires:  elfutils-libelf-devel
 BuildRequires:  fedora-release
 BuildRequires:  filesystem
 BuildRequires:  gcc-java
@@ -249,6 +252,7 @@ BuildRequires:  perl
 BuildRequires:  rpm
 BuildRequires:  tcl
 BuildRequires:  tcl-devel
+BuildRequires:  transfig
 BuildRequires:  zip
 
 Requires:       bash
@@ -355,6 +359,7 @@ ix86 architecture.
     --disable-k-weak-symbols \
     --enable-k-weak-modules \
     --disable-specfs-lock \
+    --with-rpm-release=%{rpmrelease} \
     --with-k-optimize=speed \
     --with-optimize=speed \
     --with-gnu-ld \
@@ -581,7 +586,7 @@ Release:            %{kbaserelease}
 Provides:           %{name}-modules
 Requires:           %{name} = %{baseversion}-%{rpmrelease}
 Requires:           kernel = %{kernel_number}
-Requires:           kernel%{kernel_kind}%{kernel_flavor} = %{kernel_version}
+Requires:           kernel%{kernel_kind}%{kernel_flavor} = %{kernel_release}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
