@@ -13027,6 +13027,9 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 		mm_segment_t fs = get_fs();
 
 		set_fs(KERNEL_DS);
+#ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
+		iov_iter_init(&msg->msg_iter, WRITE, msg->msg_iter.iov, msg->msg_iter.nr_segs, len);
+#endif
 		err = sock_sendmsg(ss->sock, msg, len);
 		set_fs(fs);
 	}
@@ -13060,6 +13063,9 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 		mm_segment_t fs = get_fs();
 
 		set_fs(KERNEL_DS);
+#ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
+		iov_iter_init(&msg->msg_iter, READ, msg->msg_iter.iov, msg->msg_iter.nr_segs, size);
+#endif
 		err = sock_recvmsg(ss->sock, msg, size, MSG_DONTWAIT | MSG_NOSIGNAL);
 		set_fs(fs);
 	}
@@ -14255,8 +14261,13 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 		struct iovec iov[n];
 
 		msg->msg_flags |= (MSG_DONTWAIT | MSG_NOSIGNAL);
+#ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
+		msg->msg_iter.iov = iov;
+		msg->msg_iter.nr_segs = n;
+#else
 		msg->msg_iov = iov;
 		msg->msg_iovlen = n;
+#endif
 		/* convert message blocks to an iovec */
 		for (i = 0, dp = mp; dp; dp = dp->b_cont) {
 			if (dp->b_datap->db_type == M_DATA && dp->b_wptr > dp->b_rptr) {
@@ -14412,8 +14423,13 @@ ss_setup_message(mblk_t *mp, int size, int type)
 	mp->b_rptr = mp->b_wptr;
 	iov->iov_base = mp->b_rptr;
 	iov->iov_len = size;
+#ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
+	msg->msg_iter.iov = iov;
+	msg->msg_iter.nr_segs = 1;
+#else
 	msg->msg_iov = iov;
 	msg->msg_iovlen = 1;
+#endif
 	msg->msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL;
 
 	return (msg);

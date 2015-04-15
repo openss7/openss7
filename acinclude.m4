@@ -1231,6 +1231,7 @@ dnl----------------------------------------------------------------------------
 	struct kobject.kref,
 	struct kstatfs.f_type,
 	struct module.next,
+	struct msghdr.msg_iter,
 	struct net.dev_base_head,
 	struct net_device.hard_header,
 	struct net_device.rebuild_header,
