@@ -210,9 +210,15 @@ static int
 nsdevopen(struct inode *inode, struct file *file)
 {
 	struct cdevsw *cdev;
+	struct dentry *dentry;
 	int err;
 
-	if ((cdev = cdev_match((char *) file->f_dentry->d_name.name))) {
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
+	dentry = file->f_dentry;
+#else
+	dentry = file->f_path.dentry;
+#endif
+	if ((cdev = cdev_match((char *) dentry->d_name.name))) {
 		major_t major = cdev->d_modid;
 		minor_t minor = getminor(inode->i_ino);
 		dev_t dev = makedevice(major, minor);
@@ -276,6 +282,7 @@ nsdev_open(struct inode *inode, struct file *file)
 {
 	int err;
 	struct cdevsw *cdev;
+	struct dentry *dentry;
 	major_t major;
 	minor_t minor;
 	modID_t modid, instance;
@@ -291,8 +298,13 @@ nsdev_open(struct inode *inode, struct file *file)
 	minor = cdev_minor(&nsdev_cdev, major, minor);
 	major = nsdev_cdev.d_major;
 	modid = nsdev_cdev.d_modid;
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
+	dentry = file->f_dentry;
+#else
+	dentry = file->f_path.dentry;
+#endif
 	err = -ENXIO;
-	if (!(cdev = cdev_match((char *) file->f_dentry->d_name.name)))
+	if (!(cdev = cdev_match((char *) dentry->d_name.name)))
 		goto exit;
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
