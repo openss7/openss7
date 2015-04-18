@@ -2927,7 +2927,6 @@ openss7_man_MANS = \
 	man8/mtp.8 \
 	man8/mtpconfig.8 \
 	man8/mxmib.8 \
-	man8/net.8 \
 	man8/netitle.8 \
 	man8/nsap.8 \
 	man8/nuimap.8 \
@@ -7338,7 +7337,6 @@ openss7_dist_noinst_MANS = \
 	man8/mtp.8.man \
 	man8/mtpconfig.8.man \
 	man8/mxmib.8.man \
-	man8/net.8.man \
 	man8/netitle.8.man \
 	man8/nsap.8.man \
 	man8/nuimap.8.man \
