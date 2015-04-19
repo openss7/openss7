@@ -811,6 +811,7 @@ libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/x25-lapb.c \
 				  src/drivers/x25-plp.c \
 				  src/drivers/clns.c \
+				  src/drivers/tpsn.c \
 				  src/drivers/atm.c \
 				  src/drivers/mtp.c \
 				  src/drivers/mtp_min.c \
