@@ -120,6 +120,7 @@ driver	tali	    tali	*
 driver	tcap	    tcap	*		    
 driver	tcp	    tcp		*		    
 driver	tp	    tp		*		    
+driver	tpsn	    tpsn	*		    
 driver	tua	    tua		*		    
 driver	tua-as	    tua_as	*		    
 driver	ua-as	    ua_as	*		    
@@ -218,6 +219,7 @@ objname	driver	tali	    tali
 objname	driver	tcap	    tcap
 objname	driver	tcp	    tcp
 objname	driver	tp	    tp
+objname driver	tpsn	    tpsn
 objname	driver	tua	    tua
 objname	driver	tua-as	    tua_as
 objname	driver	ua-as	    ua_as
@@ -330,6 +332,7 @@ loadable	tali
 loadable	tcap
 loadable	tcp
 loadable	tp
+loadable	tpsn
 loadable	tua
 loadable	tua_as
 loadable	ua_as
@@ -548,6 +551,14 @@ node	/dev/tp1	    c	    0666    tp		2
 node	/dev/tp2	    c	    0666    tp		3
 node	/dev/tp3	    c	    0666    tp		4
 node	/dev/tp4	    c	    0666    tp		5
+node	/dev/cots	    c	    0666    tpsn	0
+node	/dev/clts	    c	    0666    tpsn	1
+node	/dev/cotz	    c	    0666    tpsn	2
+node	/dev/cltz	    c	    0666    tpsn	3
+node	/dev/cots-ip	    c	    0666    tpsn	4
+node	/dev/clts-ip	    c	    0666    tpsn	5
+node	/dev/cots-udp	    c	    0666    tpsn	6
+node	/dev/clts-udp	    c	    0666    tpsn	7
 node	/dev/tua	    c	    0666    tua		0
 node	/dev/tua-as	    c	    0666    tua-as	0
 node	/dev/ua-as	    c	    0666    ua-as	0
