@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) File: src/drivers/tp.c
+ @(#) File: src/drivers/tpsnold.c
 
  -----------------------------------------------------------------------------
 
@@ -69,6 +69,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define _MPS_SOURCE	1
 
 #include <sys/os7/compat.h>
+#include <sys/strsun.h>
 
 #include <linux/bitops.h>
 
@@ -77,6 +78,13 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define t_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
 #include <linux/interrupt.h>
+#ifdef HAVE_KINC_ASM_SOFTIRQ_H
+#include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
+#endif
+#include <linux/random.h>	/* for secure_tcp_sequence_number */
+#ifdef HAVE_KINC_LINUX_RCUPDATE_H
+#include <linux/rcupdate.h>
+#endif
 
 #ifdef HAVE_KINC_LINUX_BRLOCK_H
 #include <linux/brlock.h>
@@ -100,6 +108,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #include <net/udp.h>
 #include <net/llc.h>
+#include <net/llc_pdu.h>
 
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
@@ -110,6 +119,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#include <linux/inetdevice.h>
 
 #include "net_hooks.h"
 
@@ -129,6 +139,8 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #endif
 
 #include <sys/xti.h>
+#include <sys/xti_ip.h>
+#include <sys/xti_udp.h>
 #include <sys/xti_osi.h>
 
 #define T_ALLLEVELS -1
@@ -346,20 +358,6 @@ MODULE_STATIC struct streamtab tp_info = {
 #define T_USER	    1
 #endif
 
-/*
-   Socket state masks 
- */
-
-/*
-   TCP state masks 
- */
-#define TCPM_CLOSING	(TCPF_CLOSE\
-			|TCPF_TIME_WAIT\
-			|TCPF_CLOSE_WAIT)
-#define TCPM_CONNIND	(TCPF_SYN_RECV\
-			|TCPF_ESTABLISHED\
-			|TCPF_LISTEN)
-
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *
@@ -555,8 +553,6 @@ skb_set_mac_header(struct sk_buff *skb, const int offset)
 #define _TP_STATE_AKWAIT	 6
 #define _TP_STATE_CLOSING	 7
 
-
-
 /*
  *  =========================================================================
  *
@@ -564,6 +560,21 @@ skb_set_mac_header(struct sk_buff *skb, const int offset)
  *
  *  =========================================================================
  */
+
+/*
+ *  Option Handling
+ */
+#define T_SPACE(len) \
+	(sizeof(struct t_opthdr) + T_ALIGN(len))
+
+#define T_LENGTH(len) \
+	(sizeof(struct t_opthdr) + len)
+
+#define _T_SPACE_SIZEOF(s) \
+	T_SPACE(sizeof(s))
+
+#define _T_LENGTH_SIZEOF(s) \
+	T_LENGTH(sizeof(s))
 
 struct tp_options {
 	unsigned long flags[3];		/* at least 96 flags */
@@ -804,7 +815,7 @@ struct tp_timer {
 #define TP_CMINOR_COTS_IP	4
 #define TP_CMINOR_CLTS_IP	5
 #define TP_CMINOR_COTS_UDP	6
-#define TP_CMINOR_COTS_UDP	7
+#define TP_CMINOR_CLTS_UDP	7
 
 struct tp_profile {
 	struct {
@@ -1100,48 +1111,48 @@ enum {
 					|_T_FLAG_TCL_PRIORITY \
 					|_T_FLAG_TCL_CHECKSUM)
 
-STATIC const t_uscalar_t tp_space[_T_BIT_LAST] = {
+static const t_uscalar_t tp_space[_T_BIT_LAST] = {
 	/* *INDENT-OFF* */
-	.[_T_BIT_XTI_DEBUG		] = T_SPACE(4 * sizeof(t_uscalar_t)),
-	.[_T_BIT_XTI_LINGER		] = _T_SPACE_SIZEOF(struct t_linger),
-	.[_T_BIT_XTI_RCVBUF		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_XTI_RCVLOWAT		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_XTI_SNDBUF		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_XTI_SNDLOWAT		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_XTI_DEBUG		] = T_SPACE(4 * sizeof(t_uscalar_t)),
+	[_T_BIT_XTI_LINGER		] = _T_SPACE_SIZEOF(struct t_linger),
+	[_T_BIT_XTI_RCVBUF		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_XTI_RCVLOWAT		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_XTI_SNDBUF		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_XTI_SNDLOWAT		] = _T_SPACE_SIZEOF(t_uscalar_t),
 
-	.[_T_BIT_TCO_THROUGHPUT		] = _T_SPACE_SIZEOF(struct thrpt),
-	.[_T_BIT_TCO_TRANSDEL		] = _T_SPACE_SIZEOF(struct transdel),
-	.[_T_BIT_TCO_RESERRORRATE	] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_TRANSFFAILPROB	] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_ESTFAILPROB	] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_RELFAILPROB	] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_ESTDELAY		] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_RELDELAY		] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_CONNRESIL		] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCO_PROTECTION		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_PRIORITY		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_EXPD		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_THROUGHPUT		] = _T_SPACE_SIZEOF(struct thrpt),
+	[_T_BIT_TCO_TRANSDEL		] = _T_SPACE_SIZEOF(struct transdel),
+	[_T_BIT_TCO_RESERRORRATE	] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_TRANSFFAILPROB	] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_ESTFAILPROB		] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_RELFAILPROB		] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_ESTDELAY		] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_RELDELAY		] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_CONNRESIL		] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCO_PROTECTION		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_PRIORITY		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_EXPD		] = _T_SPACE_SIZEOF(t_uscalar_t),
 
-	.[_T_BIT_TCO_LTPDU		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_ACKTIME		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_REASTIME		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_PREFCLASS		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_ALTCLASS1		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_ALTCLASS2		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_ALTCLASS3		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_ALTCLASS4		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_EXTFORM		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_FLOWCTRL		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_CHECKSUM		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_NETEXP		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_NETRECPTCF		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCO_SELECTACK		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_LTPDU		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_ACKTIME		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_REASTIME		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_PREFCLASS		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_ALTCLASS1		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_ALTCLASS2		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_ALTCLASS3		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_ALTCLASS4		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_EXTFORM		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_FLOWCTRL		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_CHECKSUM		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_NETEXP		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_NETRECPTCF		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCO_SELECTACK		] = _T_SPACE_SIZEOF(t_uscalar_t),
 
-	.[_T_BIT_TCL_TRANSDEL		] = _T_SPACE_SIZEOF(struct transdel),
-	.[_T_BIT_TCL_RESERRORRATE	] = _T_SPACE_SIZEOF(struct rate),
-	.[_T_BIT_TCL_PROTECTION		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCL_PRIORITY		] = _T_SPACE_SIZEOF(t_uscalar_t),
-	.[_T_BIT_TCL_CHECKSUM		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCL_TRANSDEL		] = _T_SPACE_SIZEOF(struct transdel),
+	[_T_BIT_TCL_RESERRORRATE	] = _T_SPACE_SIZEOF(struct rate),
+	[_T_BIT_TCL_PROTECTION		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCL_PRIORITY		] = _T_SPACE_SIZEOF(t_uscalar_t),
+	[_T_BIT_TCL_CHECKSUM		] = _T_SPACE_SIZEOF(t_uscalar_t),
 	/* *INDENT-ON* */
 };
 
@@ -1155,15 +1166,6 @@ static rwlock_t tp_lock = RW_LOCK_UNLOCKED;	/* protects tp_opens lists */
 #error cannot initialize read-write locks
 #endif
 static caddr_t tp_opens = NULL;
-
-#if 0
-
-/*
-   for later when we support default destinations and default listeners 
- */
-static struct tp *tp_dflt_dest = NULL;
-static struct tp *tp_dflt_lstn = NULL;
-#endif
 
 /*
  *  Bind buckets, caches and hashes.
@@ -1517,6 +1519,180 @@ tp_v4_err_next(struct mynet_protocol *next, struct sk_buff *skb, __u32 info)
 	return;
 }
 
+/**
+ * tp_init_nproto - initialize network protocol override
+ * @proto: the protocol to register or override
+ *
+ * This is the network protocol override function.
+ *
+ * This is complicated because we hack the inet protocol tables.  If no other protocol was
+ * previously registered, this reduces to inet_add_protocol().  If there is a protocol previously
+ * registered, we take a reference on the kernel module owning the entry, if possible, and replace
+ * the entry with our own, saving a pointer to the previous entry for passing sk_bufs along that we
+ * are not interested in.  Taking a module reference is particularly for things like SCTP, where
+ * unloading the module after protocol override would break things horribly.  Taking the reference
+ * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
+ */
+STATIC INLINE fastcall __unlikely struct tp_prot_bucket *
+tp_init_nproto(unsigned char proto, unsigned int type)
+{
+#if 0
+	struct tp_prot_bucket *pb;
+	struct ipnet_protocol *pp;
+	struct mynet_protocol **ppp;
+	int hash = proto & (MAX_INET_PROTOS - 1);
+
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
+		pb->refs++;
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			++pb->corefs;
+			break;
+		case T_CLTS:
+			++pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
+	} else if ((pb = kmem_cache_alloc(tp_udp_prot_cachep, GFP_ATOMIC))) {
+		bzero(pb, sizeof(*pb));
+		pb->refs = 1;
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			pb->corefs = 1;
+			break;
+		case T_CLTS:
+			pb->clrefs = 1;
+			break;
+		default:
+			swerr();
+			break;
+		}
+		pp = &pb->prot;
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+		pp->proto.protocol = proto;
+		pp->proto.name = "streams-udp";
+#endif
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
+		pp->proto.proto = proto;
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+		pp->proto.no_policy = 1;
+#endif
+		pp->proto.handler = &tp_v4_rcv;
+		pp->proto.err_handler = &tp_v4_err;
+		ppp = &inet_protosp[hash];
+
+		{
+			net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+			while (*ppp && (*ppp)->protocol != proto)
+				ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+			if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+				/* can only override last entry */
+				if ((*ppp)->copy != 0) {
+					__ptrace(("Cannot override copy entry\n"));
+					net_protocol_unlock();
+					write_unlock_bh(&tp_prot_lock);
+					kmem_cache_free(tp_udp_prot_cachep, pb);
+					return (NULL);
+				}
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+				if ((pp->kmod = streams_module_address((ulong) *ppp))
+				    && pp->kmod != THIS_MODULE) {
+					if (!try_module_get(pp->kmod)) {
+						__ptrace(("Cannot acquire module\n"));
+						net_protocol_unlock();
+						write_unlock_bh(&tp_prot_lock);
+						kmem_cache_free(tp_udp_prot_cachep, pb);
+						return (NULL);
+					}
+				}
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+				pp->proto.next = (*ppp)->next;
+#endif
+			}
+			pp->next = xchg(ppp, &pp->proto);
+			net_protocol_unlock();
+		}
+		/* link into hash slot */
+		tp_prots[proto] = pb;
+	}
+	write_unlock_bh(&tp_prot_lock);
+	return (pb);
+#endif
+	return (NULL);
+}
+
+/**
+ * tp_term_nproto - terminate network protocol override
+ * @proto: network protocol to terminate
+ *
+ * This is the network protocol restoration function.
+ *
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
+ */
+STATIC INLINE fastcall __unlikely void
+tp_term_nproto(unsigned char proto, unsigned int type)
+{
+#if 0
+	struct tp_prot_bucket *pb;
+
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			assure(pb->corefs > 0);
+			--pb->corefs;
+			break;
+		case T_CLTS:
+			assure(pb->clrefs > 0);
+			--pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
+		if (--pb->refs == 0) {
+			struct ipnet_protocol *pp = &pb->prot;
+			struct mynet_protocol **ppp;
+			int hash = proto & (MAX_INET_PROTOS - 1);
+
+			ppp = &inet_protosp[hash];
+			{
+				net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+				while (*ppp && *ppp != &pp->proto)
+					ppp = &(*ppp)->next;
+				if (pp->next)
+					pp->next->next = pp->proto.next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+				__assert(*ppp == &pp->proto);
+				*ppp = pp->next;
+				net_protocol_unlock();
+			}
+			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
+				module_put(pp->kmod);
+			/* unlink from hash slot */
+			tp_prots[proto] = NULL;
+
+			kmem_cache_free(tp_udp_prot_cachep, pb);
+		}
+	}
+	write_unlock_bh(&tp_prot_lock);
+#endif
+}
 #endif				/* LINUX */
 
 /**
@@ -1557,159 +1733,6 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
 	tp_term_nproto(proto, type);
 }
 
-#if 0
-/*
- *  =========================================================================
- *
- *  Socket Callbacks
- *
- *  =========================================================================
- */
-/*
- * Forward declarations of our callback functions.
- */
-static void ss_state_change(struct sock *sk);
-static void ss_write_space(struct sock *sk);
-static void ss_error_report(struct sock *sk);
-
-#ifdef HAVE_KFUNC_SK_DATA_READY_1_ARG
-static void ss_data_ready(struct sock *sk);
-#else
-static void ss_data_ready(struct sock *sk, int len);
-#endif
-
-/**
- * ss_socket_put: - restore socket from strinet use.
- * @sockp: pointer to socket pointer of socket to release
- */
-static void
-ss_socket_put(struct socket **sockp)
-{
-	unsigned long flags;
-	struct socket *sock;
-	struct sock *sk;
-
-	if (likely((sock = xchg(sockp, NULL)) != NULL)) {
-		if (likely((sk = sock->sk) != NULL)) {
-			/* We don't really need to lock out interrupts here, just bottom halves 'cause a read 
-			   lock is taken in the callback function itself. */
-			lock_sock(sk);
-			write_lock_irqsave(&sk->sk_callback_lock, flags);
-			{
-				ss_t *ss;
-
-				if ((ss = SOCK_PRIV(sk))) {
-					SOCK_PRIV(sk) = NULL;
-					sk->sk_state_change = ss->cb_save.sk_state_change;
-					sk->sk_data_ready = ss->cb_save.sk_data_ready;
-					sk->sk_write_space = ss->cb_save.sk_write_space;
-					sk->sk_error_report = ss->cb_save.sk_error_report;
-					// mi_close_put((caddr_t) ss);
-				} else
-					assure(ss);
-				/* The following will cause the socket to be aborted, particularly for Linux
-				   TCP or other orderly release sockets. XXX: Perhaps should check the state
-				   of the socket and call sock_disconnect() first as well. SCTP will probably 
-				   behave better that way. */
-				sock_set_keepopen(sk);
-				sk->sk_lingertime = 0;
-			}
-			write_unlock_irqrestore(&sk->sk_callback_lock, flags);
-			release_sock(sk);
-		} else
-			assure(sk);
-		sock_release(sock);
-	}
-}
-
-static void
-ss_socket_get(struct socket *sock, ss_t *ss)
-{
-	unsigned long flags;
-	struct sock *sk;
-
-	ensure(sock, return);
-	if ((sk = sock->sk)) {
-		/* We don't really need to lock out interrupts here, just bottom halves 'cause a read lock is 
-		   taken in the callback function itself. */
-		lock_sock(sk);
-		write_lock_irqsave(&sk->sk_callback_lock, flags);
-		{
-			SOCK_PRIV(sk) = ss;
-			// mi_open_grab((caddr_t) ss);
-			ss->cb_save.sk_state_change = sk->sk_state_change;
-			ss->cb_save.sk_data_ready = sk->sk_data_ready;
-			ss->cb_save.sk_write_space = sk->sk_write_space;
-			ss->cb_save.sk_error_report = sk->sk_error_report;
-			sk->sk_state_change = ss_state_change;
-			sk->sk_data_ready = ss_data_ready;
-			sk->sk_write_space = ss_write_space;
-			sk->sk_error_report = ss_error_report;
-#ifdef LINUX_2_4
-			inet_sk(sk)->recverr = 1;
-#else
-			sk->ip_recverr = 1;
-#endif
-			ss->tcp_state = sk->sk_state;	/* initialized tcp state */
-		}
-		write_unlock_irqrestore(&sk->sk_callback_lock, flags);
-		release_sock(sk);
-	} else
-		assure(sk);
-}
-
-/**
- * ss_socket_grab: - hold a socket for use by strinet
- * @sock: the accepted socket
- * @ss: the accepting Stream
- */
-static void
-ss_socket_grab(struct socket *sock, ss_t *ss)
-{
-	unsigned long flags;
-	struct sock *sk;
-
-	ensure(sock, return);
-	if ((sk = sock->sk)) {
-		/* We don't really need to lock out interrupts here, just bottom halves 'cause a read lock is 
-		   taken in the callback function itself. */
-		lock_sock(sk);
-		write_lock_irqsave(&sk->sk_callback_lock, flags);
-		{
-			SOCK_PRIV(sk) = ss;
-			// mi_open_grab((caddr_t) ss);
-			/* We only want to overwrite the ones that were not inherited from the parent
-			   listening socket. */
-			if (sk->sk_state_change != ss_state_change) {
-				ss->cb_save.sk_state_change = sk->sk_state_change;
-				sk->sk_state_change = ss_state_change;
-			}
-			if (sk->sk_data_ready != ss_data_ready) {
-				ss->cb_save.sk_data_ready = sk->sk_data_ready;
-				sk->sk_data_ready = ss_data_ready;
-			}
-			if (sk->sk_write_space != ss_write_space) {
-				ss->cb_save.sk_write_space = sk->sk_write_space;
-				sk->sk_write_space = ss_write_space;
-			}
-			if (sk->sk_error_report != ss_error_report) {
-				ss->cb_save.sk_error_report = sk->sk_error_report;
-				sk->sk_error_report = ss_error_report;
-			}
-#ifdef LINUX_2_4
-			inet_sk(sk)->recverr = 1;
-#else
-			sk->ip_recverr = 1;
-#endif
-			ss->tcp_state = sk->sk_state;	/* initialized tcp state */
-		}
-		write_unlock_irqrestore(&sk->sk_callback_lock, flags);
-		release_sock(sk);
-	} else
-		assure(sk);
-}
-#endif
-
 /*
  *  =========================================================================
  *
@@ -1717,18 +1740,6 @@ ss_socket_grab(struct socket *sock, ss_t *ss)
  *
  *  =========================================================================
  */
-#define T_SPACE(len) \
-	(sizeof(struct t_opthdr) + T_ALIGN(len))
-
-#define T_LENGTH(len) \
-	(sizeof(struct t_opthdr) + len)
-
-#define _T_SPACE_SIZEOF(s) \
-	T_SPACE(sizeof(s))
-
-#define _T_LENGTH_SIZEOF(s) \
-	T_LENGTH(sizeof(s))
-
 static struct tp_options tp_defaults = {
 	{0,}
 	,
@@ -3912,8 +3923,8 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			switch (t->p.prot.type) {
 			case T_CMINOR_COTS:
 			case T_CMINOR_CLTS:
-			case T_CMINOR_COTS_OSI:
-			case T_CMINOR_CLTS_OSI:
+			case T_CMINOR_COTS_ISO:
+			case T_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -4266,8 +4277,8 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			switch (t->p.prot.type) {
 			case T_CMINOR_COTS:
 			case T_CMINOR_CLTS:
-			case T_CMINOR_COTS_OSI:
-			case T_CMINOR_CLTS_OSI:
+			case T_CMINOR_COTS_ISO:
+			case T_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -5191,8 +5202,8 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			switch (t->prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
-			case TP_CMINOR_COTS_OSI:
-			case TP_CMINOR_CLTS_OSI:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 				break;
@@ -5201,8 +5212,8 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			switch (t->prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
-			case TP_CMINOR_COTS_OSI:
-			case TP_CMINOR_CLTS_OSI:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -5867,8 +5878,8 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			switch (t->p.prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
-			case TP_CMINOR_COTS_OSI:
-			case TP_CMINOR_CLTS_OSI:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 				break;
@@ -5877,8 +5888,8 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 			switch (t->p.prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
-			case TP_CMINOR_COTS_OSI:
-			case TP_CMINOR_CLTS_OSI:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -13101,6 +13112,99 @@ struct tp4hdr {
 	unsigned char tpdu[0];
 };
 
+STATIC int tp_tp4_v4_rcv(struct sk_buff *skb);
+STATIC void tp_tp4_v4_err(struct sk_buff *skb, uint32_t info);
+STATIC int tp_iso_v4_rcv(struct sk_buff *skb);
+STATIC void tp_iso_v4_err(struct sk_buff *skb, uint32_t info);
+STATIC __hot_in int tp_udp_v4_rcv(struct sk_buff *skb);
+STATIC __unlikely void tp_udp_v4_err(struct sk_buff *skb, u32 info);
+
+#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
+STATIC struct inet_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.protocol = 29,		/* ISO-TP4 protocol ID */
+	.name = "ISO-TP4",
+};
+
+STATIC struct inet_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.protocol = 80,		/* ISO-IP protocol ID */
+	.name = "ISO-IP",
+};
+
+STATIC struct inet_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.protocol = IPPROTO_UDP,	/* ISO-UDP protocol ID */
+	.name = "ISO-UDP",
+};
+#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
+
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+STATIC struct inet_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.no_policy = 1,
+};
+
+STATIC struct inet_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.no_policy = 1,
+};
+
+STATIC struct inet_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.no_policy = 1,
+};
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
+
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+STATIC struct net_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.no_policy = 1,
+};
+
+STATIC struct net_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.no_policy = 1,
+};
+
+STATIC struct net_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.no_policy = 1,
+};
+#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
+
+STATIC struct ipnet_protocols tp_protos = {
+	.tp4 = {
+		.proto = &tp_tp4_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+	.iso = {
+		.proto = &tp_iso_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+	.udp = {
+		.proto = &tp_udp_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+};
+
+static inline void
+tp_put(struct tp *tp)
+{
+}
+
 STATIC streamscall __hot_get void
 tp_free(caddr_t data)
 {
@@ -13275,7 +13379,7 @@ tp_tp4_v4_err(struct sk_buff *skb, uint32_t info)
 	/* release reference from lookup */
 	if (tp)
 		tp_put(tp);
-	tp_v4_err_next(&tp_protos.tp4, skb, info);	/* anyway */
+	tp_v4_err_next(tp_protos.tp4.next, skb, info);	/* anyway */
 	return;
       no_buffers:
 	ptrace(("ERROR: could not allocate buffer\n"));
@@ -13285,7 +13389,7 @@ tp_tp4_v4_err(struct sk_buff *skb, uint32_t info)
 	goto discard_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
-	tp_v4_err_next(&tp_protos.tp4, skb, info);
+	tp_v4_err_next(tp_protos.tp4.next, skb, info);
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
@@ -13437,7 +13541,7 @@ tp_iso_v4_err(struct sk_buff *skb, uint32_t info)
 	/* release reference from lookup */
 	if (tp)
 		tp_put(tp);
-	tp_v4_err_next(&tp_protos.iso, skb, info);	/* anyway */
+	tp_v4_err_next(tp_protos.iso.next, skb, info);	/* anyway */
 	return;
       no_buffers:
 	ptrace(("ERROR: could not allocate buffer\n"));
@@ -13447,7 +13551,7 @@ tp_iso_v4_err(struct sk_buff *skb, uint32_t info)
 	goto discard_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
-	tp_v4_err_next(&tp_protos.iso, skb, info);
+	tp_v4_err_next(tp_protos.iso.next, skb, info);
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
@@ -13578,7 +13682,7 @@ tp_udp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: No stream\n"));
 	/* Note, in case there is nobody to pass it to, we have to complete the checksum check before
 	   dropping it to handle stats correctly. */
-	if (skb->ip_summed ! !=CHECKSUM_UNNECESSARY
+	if (skb->ip_summed != CHECKSUM_UNNECESSARY
 	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
 		goto bad_checksum;
 //      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
@@ -13586,7 +13690,7 @@ tp_udp_v4_rcv(struct sk_buff *skb)
       bad_pkt_type:
 #endif
       too_small:
-	if (tp_v4_rcv_next(&tp_protos.udp, skb)) {
+	if (tp_v4_rcv_next(tp_protos.udp.next, skb)) {
 		/* TODO: want to generate an ICMP error here */
 	}
 	return (0);
@@ -13653,7 +13757,7 @@ tp_udp_v4_err(struct sk_buff *skb, u32 info)
 	/* release reference from lookup */
 	if (tp)
 		tp_put(tp);
-	tp_v4_err_next(&tp_protos.udp, skb, info);	/* anyway */
+	tp_v4_err_next(tp_protos.udp.next, skb, info);	/* anyway */
 	return;
       no_buffers:
 	ptrace(("ERROR: could not allocate buffer\n"));
@@ -13663,7 +13767,7 @@ tp_udp_v4_err(struct sk_buff *skb, u32 info)
 	goto discard_put;
       no_stream:
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
-	tp_v4_err_next(&tp_protos.udp, skb, info);
+	tp_v4_err_next(tp_protos.udp.next, skb, info);
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
@@ -13702,7 +13806,7 @@ tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt)
 	unsigned char *nlpid;
 	struct tp4hdr *th;
 	struct llc_pdu_un *uh;
-	struct llc_addr = daddr, saddr;
+	struct llc_addr daddr, saddr;
 
 #ifdef HAVE_KFUNC_NF_RESET
 	nf_reset(skb);
@@ -13778,6 +13882,19 @@ tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt)
  *
  *  =========================================================================
  */
+#ifndef LOOPBACK
+#define LOOPBACK(x) ipv4_is_loopback(x)
+#endif
+#ifndef MULTICAST
+#define MULTICAST(x) ipv4_is_multicast(x)
+#endif
+#ifndef ZERONET
+#define ZERONET(x) ipv4_is_zeronet(x)
+#endif
+#ifndef LOCAL_MCAST
+#define LOCAL_MCAST(x) ipv4_is_local_multicast(x)
+#endif
+
 STATIC int
 tp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 {
@@ -13924,87 +14041,6 @@ tp_term_notify(void)
 	return (0);
 }
 
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
-STATIC struct inet_protocol tp_tp4_protocol = {
-	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
-	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
-	.protocol = 29,		/* ISO-TP4 protocol ID */
-	.name = "ISO-TP4",
-};
-
-STATIC struct inet_protocol tp_iso_protocol = {
-	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
-	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
-	.protocol = 80,		/* ISO-IP protocol ID */
-	.name = "ISO-IP",
-};
-
-STATIC struct inet_protocol tp_udp_protocol = {
-	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
-	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
-	.protocol = IPPROTO_UDP,	/* ISO-UDP protocol ID */
-	.name = "ISO-UDP",
-};
-#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
-
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
-STATIC struct inet_protocol tp_tp4_protocol = {
-	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
-	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
-	.no_policy = 1,
-};
-
-STATIC struct inet_protocol tp_iso_protocol = {
-	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
-	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
-	.no_policy = 1,
-};
-
-STATIC struct inet_protocol tp_udp_protocol = {
-	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
-	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
-	.no_policy = 1,
-};
-#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
-
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
-STATIC struct net_protocol tp_tp4_protocol = {
-	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
-	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
-	.no_policy = 1,
-};
-
-STATIC struct net_protocol tp_iso_protocol = {
-	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
-	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
-	.no_policy = 1,
-};
-
-STATIC struct net_protocol tp_udp_protocol = {
-	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
-	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
-	.no_policy = 1,
-};
-#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
-
-STATIC struct ipnet_protocols tp_protos = {
-	.tp4 = {
-		.proto = &tp_tp4_protocol,
-		.next = NULL,
-		.kmod = NULL,
-		},
-	.iso = {
-		.proto = &tp_iso_protocol,
-		.next = NULL,
-		.kmod = NULL,
-		},
-	.udp = {
-		.proto = &tp_udp_protocol,
-		.next = NULL,
-		.kmod = NULL,
-		},
-};
-
 STATIC int
 tp_term_proto(void)
 {
@@ -14052,7 +14088,7 @@ tp_term_llc(void)
 		tp_llc_sap = NULL;
 		return (0);
 	}
-	return (-EINVAL)
+	return (-EINVAL);
 }
 
 /*
@@ -14203,12 +14239,12 @@ tp_unregister_strdev(major_t major)
 	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_IP)) < 0)
 		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
 		       "Could not unregister TP_CMINOR_COTS_IP, err = %d", err);
-	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS_OSI)) < 0)
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS_ISO)) < 0)
 		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
-		       "Could not unregister TP_CMINOR_CLTS_OSI, err = %d", err);
-	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_OSI)) < 0)
+		       "Could not unregister TP_CMINOR_CLTS_ISO, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_ISO)) < 0)
 		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
-		       "Could not unregister TP_CMINOR_COTS_OSI, err = %d", err);
+		       "Could not unregister TP_CMINOR_COTS_ISO, err = %d", err);
 	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS)) < 0)
 		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
 		       "Could not unregister TP_CMINOR_CLTS, err = %d", err);
@@ -14238,6 +14274,10 @@ tp_init(void)
 		cmn_err(CE_WARN, "%s could not initialize hashes, err = %d", DRV_NAME, err);
 		goto no_hashes;
 	}
+	if ((err = tp_init_llc())) {
+		cmn_err(CE_WARN, "%s could not initialize llc, err = %d", DRV_NAME, err);
+		goto no_llc;
+	}
 	if ((err = tp_init_notify())) {
 		cmn_err(CE_WARN, "%s could not initialize notify, err = %d", DRV_NAME, err);
 		goto no_notify;
@@ -14258,6 +14298,8 @@ tp_init(void)
       no_notify:
 	tp_term_hashes();
       no_hashes:
+	tp_term_llc();
+      no_llc:
 	tp_unregister_strdev(major);
       error:
 	return (err);
@@ -14275,6 +14317,8 @@ tp_exit(void)
 		cmn_err(CE_WARN, "%s could not terminate protocols, err = %d", DRV_NAME, err);
 	if ((err = tp_term_notify()))
 		cmn_err(CE_WARN, "%s could not terminate notify, err = %d", DRV_NAME, err);
+	if ((err = tp_term_llc()))
+		cmn_err(CE_WARN, "%s could not terminate llc, err = %d", DRV_NAME, err);
 	if ((err = tp_term_hashes()))
 		cmn_err(CE_WARN, "%s could not terminate hashes, err = %d", DRV_NAME, err);
 	if ((err = tp_term_caches()))

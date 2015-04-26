@@ -78,6 +78,13 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define t_clr_bit(nr,addr)	__clear_bit(nr,addr)
 
 #include <linux/interrupt.h>
+#ifdef HAVE_KINC_ASM_SOFTIRQ_H
+#include <asm/softirq.h>	/* for start_bh_atomic, end_bh_atomic */
+#endif
+#include <linux/random.h>	/* for secure_tcp_sequence_number */
+#ifdef HAVE_KINC_LINUX_RCUPDATE_H
+#include <linux/rcupdate.h>
+#endif
 
 #ifdef HAVE_KINC_LINUX_BRLOCK_H
 #include <linux/brlock.h>
@@ -101,6 +108,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #include <net/udp.h>
 #include <net/llc.h>
+#include <net/llc_pdu.h>
 
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
@@ -111,6 +119,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #include <linux/skbuff.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#include <linux/inetdevice.h>
 
 #include "net_hooks.h"
 
@@ -211,15 +220,27 @@ MODULE_ALIAS("/dev/cots");
 #define STRLOGIO	6	/* log INET additional data */
 #define STRLOGDA	7	/* log INET data */
 
-#define LOGERR(ss, fmt, ...) INETLOG(ss, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define LOGNO(ss, fmt, ...) INETLOG(ss, STRLOGNO, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGST(ss, fmt, ...) INETLOG(ss, STRLOGST, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGTO(ss, fmt, ...) INETLOG(ss, STRLOGTO, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGRX(ss, fmt, ...) INETLOG(ss, STRLOGRX, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGTX(ss, fmt, ...) INETLOG(ss, STRLOGTX, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGTE(ss, fmt, ...) INETLOG(ss, STRLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGIO(ss, fmt, ...) INETLOG(ss, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
-#define LOGDA(ss, fmt, ...) INETLOG(ss, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
+#if 1
+#define LOGERR(tp, fmt, ...) INETLOG(tp, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGNO(tp, fmt, ...) INETLOG(tp, STRLOGNO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGST(tp, fmt, ...) INETLOG(tp, STRLOGST, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTO(tp, fmt, ...) INETLOG(tp, STRLOGTO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGRX(tp, fmt, ...) INETLOG(tp, STRLOGRX, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTX(tp, fmt, ...) INETLOG(tp, STRLOGTX, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTE(tp, fmt, ...) INETLOG(tp, STRLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGIO(tp, fmt, ...) INETLOG(tp, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGDA(tp, fmt, ...) INETLOG(tp, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
+#else
+#define LOGERR(tp, fmt, ...) INETLOG(tp, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGNO(tp, fmt, ...) INETLOG(tp, STRLOGNO, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGST(tp, fmt, ...) INETLOG(tp, STRLOGST, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTO(tp, fmt, ...) INETLOG(tp, STRLOGTO, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGRX(tp, fmt, ...) INETLOG(tp, STRLOGRX, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTX(tp, fmt, ...) INETLOG(tp, STRLOGTX, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTE(tp, fmt, ...) INETLOG(tp, STRLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGIO(tp, fmt, ...) INETLOG(tp, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGDA(tp, fmt, ...) INETLOG(tp, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
+#endif
 
 /*
  *  =========================================================================
@@ -818,6 +839,7 @@ struct snpaaddr {
 	unsigned char addr[16];		/* SNPA (MAC or IP) address */
 	unsigned char subnet[2];	/* SNPA subnet or IP port */
 	unsigned char lsap;
+	struct net_device *dev;
 };
 
 struct nsapaddr {
@@ -1146,7 +1168,741 @@ static rwlock_t tp_lock = RW_LOCK_UNLOCKED;	/* protects tp_opens lists */
 #endif
 static caddr_t tp_opens = NULL;
 
+/*
+ *  Bind buckets, caches and hashes.
+ */
+struct tp_ipv4_bind_bucket {
+	struct tp_bind_bucket *next;	/* linkage of bind buckets for hash slot */
+	struct tp_bind_bucket **prev;	/* linkage of bind buckets for hash slot */
+	unsigned char proto;		/* IP protocol identifier or LSAP */
+	unsigned short port;		/* port number (host order) */
+	struct tp *owners;		/* list of owners of this protocol/port combination */
+	struct tp *dflt;		/* default listeners/destinations for this protocol */
+};
 
+struct tp_conn_bucket {
+	struct tp_conn_bucket *next;	/* linkage of conn buckets for hash slot */
+	struct tp_conn_bucket **prev;	/* linkage of conn buckets for hash slot */
+	unsigned char proto;		/* IP protocol identifier or LSAP */
+	unsigned short sport;		/* source port number (network order) */
+	unsigned short dport;		/* destination port number (network order) */
+	struct tp *owners;		/* list of owners of this protocol/sport/dport combination */
+};
+
+struct tp_bhash_bucket {
+	rwlock_t lock;
+	struct tp *list;
+};
+
+struct tp_chash_bucket {
+	rwlock_t lock;
+	struct tp *list;
+};
+
+STATIC struct tp_bhash_bucket *tp_bhash;
+STATIC size_t tp_bhash_size = 0;
+STATIC size_t tp_bhash_order = 0;
+
+STATIC struct tp_chash_bucket *tp_chash;
+STATIC size_t tp_chash_size = 0;
+STATIC size_t tp_chash_order = 0;
+
+STATIC INLINE fastcall __hot_in int
+tp_bhashfn(unsigned char proto, unsigned short bport)
+{
+	return ((tp_bhash_size - 1) & (proto + bport));
+}
+
+STATIC INLINE fastcall __unlikely int
+tp_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
+{
+	return ((tp_chash_size - 1) & (proto + sport + dport));
+}
+
+#if	defined DEFINE_RWLOCK
+STATIC DEFINE_RWLOCK(tp_hash_lock);
+STATIC DEFINE_RWLOCK(tp_prot_lock);
+#elif	defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t tp_hash_lock = __RW_LOCK_UNLOCKED(tp_hash_lock);
+STATIC rwlock_t tp_prot_lock = __RW_LOCK_UNLOCKED(tp_prot_lock);
+#elif	defined RW_LOCK_UNLOCKED
+STATIC rwlock_t tp_hash_lock = RW_LOCK_UNLOCKED;
+STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
+#else
+#error cannot initialize read-write locks
+#endif
+
+#ifdef LINUX
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+struct inet_protocol {
+	struct net_protocol proto;
+	struct net_protocol *next;
+	struct module *kmod;
+};
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTCCOL */
+#endif				/* LINUX */
+
+struct tp_prot_bucket {
+	unsigned char proto;		/* protocol number */
+	int refs;			/* reference count */
+	int corefs;			/* N_CONS references */
+	int clrefs;			/* N_CLNS references */
+	struct inet_protocol prot;	/* Linux registration structure */
+};
+STATIC struct tp_prot_bucket *tp_prots[256];
+
+STATIC kmem_cachep_t tp_bind_cachep;
+STATIC kmem_cachep_t tp_prot_cachep;
+
+/*
+ *  =========================================================================
+ *
+ *  Private Structure cache
+ *
+ *  =========================================================================
+ */
+static kmem_cachep_t tp_priv_cachep = NULL;
+
+/**
+ * tp_init_caches: - initialize caches
+ *
+ * Returns zero (0) on success or a negative error code on failure.
+ */
+static int
+tp_init_caches(void)
+{
+	if (!tp_priv_cachep
+	    && !(tp_priv_cachep =
+		 kmem_create_cache("tp_priv_cachep", mi_open_size(sizeof(struct tp)), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL)
+	    )) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate tp_priv_cachep", __FUNCTION__);
+		return (-ENOMEM);
+	} else
+		cmn_err(CE_DEBUG, "%s: initialized driver private structure cache", DRV_NAME);
+	return (0);
+}
+
+/**
+ * tp_term_caches: - terminate caches
+ *
+ * Returns zero (0) on success or a negative error code on failure.
+ */
+static int
+tp_term_caches(void)
+{
+	if (tp_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
+		if (kmem_cache_destroy(tp_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy tp_priv_cachep", __FUNCTION__);
+			return (-EBUSY);
+		} else
+			cmn_err(CE_DEBUG, "%s: destroyed tp_priv_cachep", DRV_NAME);
+#else
+		kmem_cache_destroy(tp_priv_cachep);
+#endif
+	}
+	return (0);
+}
+
+/**
+ * tp_trylock: - try to lock a Stream queue pair
+ * @q: the queue pair to lock
+ *
+ * Because we lock connecting, listening and accepting Streams, and listening streams can be waiting
+ * on accepting streams, we must ensure that the other stream cannot close and detach from its queue
+ * pair at the same time that we are locking or unlocking.  Therefore, hold the master list
+ * reader-writer lock while locking or unlocking.
+ */
+static inline fastcall struct tp *
+tp_trylock(queue_t *q)
+{
+	struct tp *tp;
+
+	read_lock(&tp_lock);
+	tp = (struct tp *) mi_trylock(q);
+	read_unlock(&tp_lock);
+	return (tp);
+}
+
+/**
+ * tp_unlock: - unlock a Stream queue pair
+ * @q: the queue pair to unlock
+ *
+ * Because we lock connecting, listening and accepting Streams, and listening streams can be waiting
+ * on accepting streams, we must ensure that the other stream cannot close and detach from its queue
+ * pair at the same time that we are locking or unlocking.  Therefore, hold the master list
+ * reader-writer lock while locking or unlocking.
+ */
+static inline fastcall void
+tp_unlock(struct tp *tp)
+{
+	read_lock(&tp_lock);
+	mi_unlock((caddr_t) tp);
+	read_unlock(&tp_lock);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  IP Local Management
+ *
+ *  =========================================================================
+ */
+/*
+ *  IP subsystem management
+ */
+#ifdef LINUX
+/**
+ * tp_v4_steal - steal a socket buffer
+ * @skb: socket buffer to steal
+ *
+ * In the 2.4 packet handler, if the packet is for us, steal the packet by overwritting the protocol
+ * and returning.  THis is only done for normal packets and not error packets (thst do not need to
+ * be stolen).  In the 2.4 handler loop, iph->protocol is examined on each iteration, permitting us
+ * to steal the packet by overwritting the protocol number.
+ *
+ * In the 2.6 packet handler, if the packet is not for us, steal the packet by simply not passing it
+ * to the next handler.
+ */
+STATIC INLINE fastcall __hot_in void
+tp_v4_steal(struct sk_buff *skb)
+{
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
+#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
+	skb->nh.iph->protocol = 255;
+	skb->protocol = 255;
+#endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
+}
+
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#define mynet_protocol net_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#define mynet_protocol inet_protocol
+#endif				/* defined HAVE_KTYPE_STRUCT_INET_PROTOCOL */
+
+struct ipnet_protocol {
+	struct mynet_protocol *proto;
+	struct mynet_protocol *next;
+	struct module *kmod;
+};
+
+struct ipnet_protocols {
+	struct ipnet_protocol tp4;
+	struct ipnet_protocol iso;
+	struct ipnet_protocol udp;
+};
+
+STATIC struct ipnet_protocols tp_protos;
+
+/**
+ * tp_take_protocol: - initialize network protocol override
+ * @pp: our static protocol structure
+ * @proto: the protocol to register or override
+ *
+ * This is the network protocol override function.
+ *
+ * This is complicated because we hack the inet protocol tables.  If no other protocol was
+ * previously registered, this reduces to inet_add_protocol().  If there is a protocol previously
+ * registered, we take a reference on the kernel module owning the entry, if possible, and replace
+ * the entry with our own, saving a pointer to the previous entry for passing sk_buffs along that we
+ * are not interested in.  Taking a module reference is particularly for things like SCTP, where
+ * unloading the module after protocol override would otherwise break things horribly.  Takeing the
+ * reference keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
+ */
+STATIC __unlikely int
+tp_take_protocol(struct ipnet_protocol *pp, unsigned char proto)
+{
+	struct mynet_protocol **ppp;
+	int hash = proto & (MAX_INET_PROTOS - 1);
+
+	ppp = &inet_protosp[hash];
+	{
+		net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+		while (*ppp && (*ppp)->protocol != proto)
+			ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+		if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+			/* can only override last entry */
+			if ((*ppp)->copy != 0) {
+				__ptrace(("Cannot override copy entry\n"));
+				net_protocol_unlock();
+				return (-EBUSY);
+			}
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+			if ((pp->kmod = streams_module_address((ulong) *ppp))
+			    && pp->kmod != THIS_MODULE) {
+				if (!try_module_get(pp->kmod)) {
+					__ptrace(("Cannot acquire module\n"));
+					net_protocol_unlock();
+					return (-EDEADLK);
+				}
+			}
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+			pp->proto->next = (*ppp)->next;
+#endif
+		}
+		pp->next = xchg(ppp, pp->proto);
+		net_protocol_unlock();
+	}
+	return (0);
+}
+
+/**
+ * tp_give_protocol: - terminate network protocol override
+ * @pp: our static protocol structure
+ * @proto: network protocol to terminate
+ *
+ * This is the network protocol restoration function.
+ *
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
+ */
+STATIC __unlikely void
+tp_give_protocol(struct ipnet_protocol *pp, unsigned char proto)
+{
+	struct mynet_protocol **ppp;
+	int hash = proto & (MAX_INET_PROTOS - 1);
+
+	ppp = &inet_protosp[hash];
+	{
+		net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+		while (*ppp && *ppp != pp->proto)
+			ppp = &(*ppp)->next;
+		if (pp->next)
+			pp->next->next = pp->proto->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+		__assert(*ppp == pp->proto);
+		*ppp = pp->next;
+		net_protocol_unlock();
+	}
+	if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
+		module_put(pp->kmod);
+	return;
+}
+
+/**
+ * tp_v4_rcv_next: - pass a socket buffer to the next handler
+ * @next: next protocol structure
+ * @skb: the socket buffer
+ */
+STATIC INLINE fastcall __hot_in int
+tp_v4_rcv_next(struct mynet_protocol *next, struct sk_buff *skb)
+{
+	if (next != NULL) {
+		next->handler(skb);
+		return (1);
+	}
+	kfree_skb(skb);
+	return (0);
+}
+
+/**
+ * tp_v4_err_next: - pass a socket buffer to the next error handler
+ * @next: next protocol structure
+ * @skb: the socket buffer
+ * @info: ICMP information
+ */
+STATIC INLINE fastcall __hot_in void
+tp_v4_err_next(struct mynet_protocol *next, struct sk_buff *skb, __u32 info)
+{
+	if (next != NULL)
+		next->err_handler(skb, info);
+	return;
+}
+
+/**
+ * tp_init_nproto - initialize network protocol override
+ * @proto: the protocol to register or override
+ *
+ * This is the network protocol override function.
+ *
+ * This is complicated because we hack the inet protocol tables.  If no other protocol was
+ * previously registered, this reduces to inet_add_protocol().  If there is a protocol previously
+ * registered, we take a reference on the kernel module owning the entry, if possible, and replace
+ * the entry with our own, saving a pointer to the previous entry for passing sk_bufs along that we
+ * are not interested in.  Taking a module reference is particularly for things like SCTP, where
+ * unloading the module after protocol override would break things horribly.  Taking the reference
+ * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
+ */
+STATIC INLINE fastcall __unlikely struct tp_prot_bucket *
+tp_init_nproto(unsigned char proto, unsigned int type)
+{
+#if 0
+	struct tp_prot_bucket *pb;
+	struct ipnet_protocol *pp;
+	struct mynet_protocol **ppp;
+	int hash = proto & (MAX_INET_PROTOS - 1);
+
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
+		pb->refs++;
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			++pb->corefs;
+			break;
+		case T_CLTS:
+			++pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
+	} else if ((pb = kmem_cache_alloc(tp_udp_prot_cachep, GFP_ATOMIC))) {
+		bzero(pb, sizeof(*pb));
+		pb->refs = 1;
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			pb->corefs = 1;
+			break;
+		case T_CLTS:
+			pb->clrefs = 1;
+			break;
+		default:
+			swerr();
+			break;
+		}
+		pp = &pb->prot;
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+		pp->proto.protocol = proto;
+		pp->proto.name = "streams-udp";
+#endif
+#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO
+		pp->proto.proto = proto;
+#endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL_PROTO */
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+		pp->proto.no_policy = 1;
+#endif
+		pp->proto.handler = &tp_v4_rcv;
+		pp->proto.err_handler = &tp_v4_err;
+		ppp = &inet_protosp[hash];
+
+		{
+			net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+			while (*ppp && (*ppp)->protocol != proto)
+				ppp = &(*ppp)->next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+			if (*ppp != NULL) {
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
+				/* can only override last entry */
+				if ((*ppp)->copy != 0) {
+					__ptrace(("Cannot override copy entry\n"));
+					net_protocol_unlock();
+					write_unlock_bh(&tp_prot_lock);
+					kmem_cache_free(tp_udp_prot_cachep, pb);
+					return (NULL);
+				}
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+				if ((pp->kmod = streams_module_address((ulong) *ppp))
+				    && pp->kmod != THIS_MODULE) {
+					if (!try_module_get(pp->kmod)) {
+						__ptrace(("Cannot acquire module\n"));
+						net_protocol_unlock();
+						write_unlock_bh(&tp_prot_lock);
+						kmem_cache_free(tp_udp_prot_cachep, pb);
+						return (NULL);
+					}
+				}
+#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
+				pp->proto.next = (*ppp)->next;
+#endif
+			}
+			pp->next = xchg(ppp, &pp->proto);
+			net_protocol_unlock();
+		}
+		/* link into hash slot */
+		tp_prots[proto] = pb;
+	}
+	write_unlock_bh(&tp_prot_lock);
+	return (pb);
+#endif
+	return (NULL);
+}
+
+/**
+ * tp_term_nproto - terminate network protocol override
+ * @proto: network protocol to terminate
+ *
+ * This is the network protocol restoration function.
+ *
+ * This is complicated and brittle.  The module stuff here is just for ourselves (other kernel
+ * modules pulling the same trick) as Linux IP protocols are normally kernel resident.  If a
+ * protocol was previously registered, restore the protocol's entry and drop the reference to its
+ * owning kernel module.  If there was no protocol previously registered, this reduces to
+ * inet_del_protocol().
+ */
+STATIC INLINE fastcall __unlikely void
+tp_term_nproto(unsigned char proto, unsigned int type)
+{
+#if 0
+	struct tp_prot_bucket *pb;
+
+	write_lock_bh(&tp_prot_lock);
+	if ((pb = tp_prots[proto]) != NULL) {
+		switch (type) {
+		case T_COTS:
+		case T_COTS_ORD:
+			assure(pb->corefs > 0);
+			--pb->corefs;
+			break;
+		case T_CLTS:
+			assure(pb->clrefs > 0);
+			--pb->clrefs;
+			break;
+		default:
+			swerr();
+			break;
+		}
+		if (--pb->refs == 0) {
+			struct ipnet_protocol *pp = &pb->prot;
+			struct mynet_protocol **ppp;
+			int hash = proto & (MAX_INET_PROTOS - 1);
+
+			ppp = &inet_protosp[hash];
+			{
+				net_protocol_lock();
+#ifdef HAVE_OLD_STYLE_INET_PROTOCOL
+				while (*ppp && *ppp != &pp->proto)
+					ppp = &(*ppp)->next;
+				if (pp->next)
+					pp->next->next = pp->proto.next;
+#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+				__assert(*ppp == &pp->proto);
+				*ppp = pp->next;
+				net_protocol_unlock();
+			}
+			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
+				module_put(pp->kmod);
+			/* unlink from hash slot */
+			tp_prots[proto] = NULL;
+
+			kmem_cache_free(tp_udp_prot_cachep, pb);
+		}
+	}
+	write_unlock_bh(&tp_prot_lock);
+#endif
+}
+#endif				/* LINUX */
+
+/**
+ *  tp_bind_prot -  bind a protocol
+ *  @proto:	    protocol number to bind
+ *
+ *  NOTICES: Notes about registration.  Older 2.4 kernels will allow you to register whatever inet
+ *  protocols you want on top of any existing protocol.  This is good.  2.6 kernels, on the other
+ *  hand, do not allow registration of inet protocols over existing inet protocols.  We rip symbols
+ *  on 2.6 and put special code in the handler to give us effectively the old 2.4 approach.
+ *  This is also detectable by the fact that inet_add_protocol() returns void on 2.4 and int on 2.6.
+ *
+ *  Issues with the 2.4 approach to registration is that the ip_input function passes a cloned skb
+ *  to each protocol registered.  We don't want to do that.  If the message is for us, we want to
+ *  process it without passing it to others.
+ *
+ *  Issues with the 2.6 approach to registration is that the ip_input function passes the skb to
+ *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
+ *  to the next protocol module.
+ */
+STATIC INLINE fastcall int
+tp_bind_prot(unsigned char proto, unsigned int type)
+{
+	struct tp_prot_bucket *pb;
+
+	if ((pb = tp_init_nproto(proto, type)))
+		return (0);
+	return (-ENOMEM);
+}
+
+/**
+ *  tp_unbind_prot - unbind a protocol
+ *  @proto:	    protocol number to unbind
+ */
+STATIC INLINE fastcall void
+tp_unbind_prot(unsigned char proto, unsigned int type)
+{
+	tp_term_nproto(proto, type);
+}
+
+
+/*
+ *  =========================================================================
+ *
+ *  STATE Changes
+ *
+ *  =========================================================================
+ */
+
+#if !defined _OPTIMIZE_SPEED
+/**
+ * tpi_statename: - name TPI state
+ * @state: state to name
+ * Returns the name of the state or "(unknown)".
+ */
+static const char *
+tpi_statename(t_scalar_t state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WREQ_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	case TS_NOSTATES:
+		return ("TS_NOSTATES");
+	default:
+		return ("(unknown)");
+	}
+}
+
+/**
+ * tpi_primname: - name TPI primitive
+ * @prim: the primitive to name
+ * Returns the name of the primitive or "(unknown)".
+ */
+static const char *
+tpi_primname(t_scalar_t prim)
+{
+	switch (prim) {
+	case T_CONN_REQ:
+		return ("T_CONN_REQ");
+	case T_CONN_RES:
+		return ("T_CONN_RES");
+	case T_DISCON_REQ:
+		return ("T_DISCON_REQ");
+	case T_DATA_REQ:
+		return ("T_DATA_REQ");
+	case T_EXDATA_REQ:
+		return ("T_EXDATA_REQ");
+	case T_INFO_REQ:
+		return ("T_INFO_REQ");
+	case T_BIND_REQ:
+		return ("T_BIND_REQ");
+	case T_UNBIND_REQ:
+		return ("T_UNBIND_REQ");
+	case T_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ");
+	case T_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ");
+	case T_ORDREL_REQ:
+		return ("T_ORDREL_REQ");
+	case T_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ");
+	case T_ADDR_REQ:
+		return ("T_ADDR_REQ");
+	case T_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case T_CONN_IND:
+		return ("T_CONN_IND");
+	case T_CONN_CON:
+		return ("T_CONN_CON");
+	case T_DISCON_IND:
+		return ("T_DISCON_IND");
+	case T_DATA_IND:
+		return ("T_DATA_IND");
+	case T_EXDATA_IND:
+		return ("T_EXDATA_IND");
+	case T_INFO_ACK:
+		return ("T_INFO_ACK");
+	case T_BIND_ACK:
+		return ("T_BIND_ACK");
+	case T_ERROR_ACK:
+		return ("T_ERROR_ACK");
+	case T_OK_ACK:
+		return ("T_OK_ACK");
+	case T_UNITDATA_IND:
+		return ("T_UNITDATA_IND");
+	case T_UDERROR_IND:
+		return ("T_UDERROR_IND");
+	case T_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK");
+	case T_ORDREL_IND:
+		return ("T_ORDREL_IND");
+	case T_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case T_ADDR_ACK:
+		return ("T_ADDR_ACK");
+	case T_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+	default:
+		return ("????");
+	}
+}
+#endif				/* !defined _OPTIMIZE_SPEED */
+
+/**
+ * tp_set_state: - set TPI state of private structure
+ * @tp: private structure (locked) for which to set state
+ * @state: the state to set
+ */
+STATIC INLINE fastcall __hot void
+tp_set_state(struct tp *tp, t_scalar_t state)
+{
+	LOGST(tp, "%s <- %s", tpi_statename(state), tpi_statename(tp->p.info.CURRENT_state));
+	tp->p.info.CURRENT_state = state;
+}
+
+/**
+ * tp_get_state: - get TPI state of private strcutrue
+ * @tp: private structure (locked) for which to get state
+ * @state: the state to get
+ */
+STATIC INLINE fastcall __hot t_scalar_t
+tp_get_state(struct tp *tp)
+{
+	return (tp->p.info.CURRENT_state);
+}
+
+STATIC INLINE fastcall t_scalar_t
+tp_chk_state(struct tp *tp, t_scalar_t mask)
+{
+	return (((1 << tp_get_state(tp)) & (mask)) != 0);
+}
+
+STATIC INLINE fastcall t_scalar_t
+tp_not_state(struct tp *tp, t_scalar_t mask)
+{
+	return (((1 << tp_get_state(tp)) & (mask)) == 0);
+}
 
 /*
  *  =========================================================================
@@ -1506,6 +2262,18 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	(void) tp_info;
 	(void) tp_lock;
 	(void) tp_opens;
+	(void) tp_bhash;
+	(void) tp_bhash_size;
+	(void) tp_bhash_order;
+	(void) tp_chash;
+	(void) tp_chash_size;
+	(void) tp_chash_order;
+	(void) tp_hash_lock;
+	(void) tp_prot_lock;
+	(void) tp_prots;
+	(void) tp_bind_cachep;
+	(void) tp_prot_cachep;
+	(void) tpi_primname;
 	return (ENXIO);
 }
 
@@ -1520,3 +2288,1252 @@ tp_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	return (0);
 }
+
+/*
+ *  =========================================================================
+ *
+ *  Bottom-end receive functions
+ *
+ *  =========================================================================
+ */
+
+struct tp4hdr {
+	unsigned char len;
+	unsigned char type;
+	unsigned short dref;
+	unsigned short sref;
+	unsigned char tpdu[0];
+};
+
+STATIC int tp_tp4_v4_rcv(struct sk_buff *skb);
+STATIC void tp_tp4_v4_err(struct sk_buff *skb, uint32_t info);
+STATIC int tp_iso_v4_rcv(struct sk_buff *skb);
+STATIC void tp_iso_v4_err(struct sk_buff *skb, uint32_t info);
+STATIC __hot_in int tp_udp_v4_rcv(struct sk_buff *skb);
+STATIC __unlikely void tp_udp_v4_err(struct sk_buff *skb, u32 info);
+
+#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
+STATIC struct inet_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.protocol = 29,		/* ISO-TP4 protocol ID */
+	.name = "ISO-TP4",
+};
+
+STATIC struct inet_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.protocol = 80,		/* ISO-IP protocol ID */
+	.name = "ISO-IP",
+};
+
+STATIC struct inet_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.protocol = IPPROTO_UDP,	/* ISO-UDP protocol ID */
+	.name = "ISO-UDP",
+};
+#endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
+
+#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+STATIC struct inet_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.no_policy = 1,
+};
+
+STATIC struct inet_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.no_policy = 1,
+};
+
+STATIC struct inet_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.no_policy = 1,
+};
+#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
+
+#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+STATIC struct net_protocol tp_tp4_protocol = {
+	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
+	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
+	.no_policy = 1,
+};
+
+STATIC struct net_protocol tp_iso_protocol = {
+	.handler = tp_iso_v4_rcv,	/* ISO-IP data handler */
+	.err_handler = tp_iso_v4_err,	/* ISO-IP error control */
+	.no_policy = 1,
+};
+
+STATIC struct net_protocol tp_udp_protocol = {
+	.handler = tp_udp_v4_rcv,	/* ISO-UDP data handler */
+	.err_handler = tp_udp_v4_err,	/* ISO-UDP error control */
+	.no_policy = 1,
+};
+#endif				/* HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY */
+
+STATIC struct ipnet_protocols tp_protos = {
+	.tp4 = {
+		.proto = &tp_tp4_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+	.iso = {
+		.proto = &tp_iso_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+	.udp = {
+		.proto = &tp_udp_protocol,
+		.next = NULL,
+		.kmod = NULL,
+		},
+};
+
+static inline void
+tp_put(struct tp *tp)
+{
+}
+
+STATIC streamscall __hot_get void
+tp_free(caddr_t data)
+{
+	struct sk_buff *skb = (typeof(skb)) data;
+
+	dassert(skb != NULL);
+	kfree_skb(skb);
+	return;
+}
+
+/**
+ * tp_tp4_v4_rcv: - receive an ISO-TP4 message
+ * @skb: the message
+ *
+ * This is the received frame handler for ISO-TP4.  All packets received by IPv4 with the protocol
+ * 29 (ISO-TP4) will arrive here first.
+ */
+STATIC int
+tp_tp4_v4_rcv(struct sk_buff *skb)
+{
+	mblk_t *mp;
+	struct tp *tp;
+	struct tp4hdr *th;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
+	if (skb->pkt_type != PACKET_HOST)
+		goto bad_pkt_type;
+	/* For now...  We should actually place non-linear fragments into seperate mblks and pass them up as
+	   a chain, or deal with non-linear sk_buffs directly.  As it winds up, the netfilter hooks linearize 
+	   anyway. */
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+	if (skb_is_nonlinear(skb) && skb_linearize(skb) != 0)
+		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+	/* pull up the ip header */
+	th = (typeof(th)) skb_transport_header(skb);
+	if (th->len < 6)
+		goto too_small;
+	if (!(mp = skballoc(skb, BPRI_MED)))
+		goto no_buffers;
+	// mp->b_rptr = skb->data;
+	// mp->b_wptr = mp->b_rptr + skb->len;
+	DB_BASE(mp) = skb_network_header(skb);	/* important */
+	DB_LIM(mp) = mp->b_wptr;
+	mp->b_datap->db_size = DB_LIM(mp) - DB_BASE(mp);
+	/* we do the lookup before the checksum */
+	{
+		struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
+
+		printd(("%s: mp %p lookup of stream\n", __FUNCTION__, mp));
+		// if (!(tp = tp_lookup(th, iph->daddr, iph->saddr)))
+			goto no_stream;
+	}
+	/* perform the stream-specific checksum */
+	// FIXME;
+	skb->dev = NULL;
+	if (!tp->rq || !canput(tp->rq))
+		goto flow_controlled;
+	putq(tp->rq, mp);	/* must succeed, band 0 */
+	/* all done */
+	printd(("%s: mp %p put to stream %p\n", __FUNCTION__, mp, tp));
+	tp_put(tp);
+	return (0);
+#if 0
+      bad_checksum:
+	ptrace(("ERROR: Bad checksum\n"));
+	goto free_it;
+#endif
+      no_stream:
+	ptrace(("ERROR: No stream\n"));
+	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
+	// tp_rcv_ootb(mp);
+	goto free_it;
+      free_it:
+	ptrace(("ERROR: Discarding message\n"));
+	/* free skb in sockets, free mp in streams */
+	freemsg(mp);
+	return (0);
+      too_small:
+	ptrace(("ERROR: Packet too small\n"));
+	goto discard_it;
+      linear_fail:
+	ptrace(("ERROR: Could not linearize skb\n"));
+	goto discard_it;
+      bad_pkt_type:
+	ptrace(("ERROR: Packet not PACKET_HOST\n"));
+	goto discard_it;
+      discard_it:
+	/* Discard frame silently. */
+	ptrace(("ERROR: Discarding frame silently\n"));
+	kfree_skb(skb);
+	return (0);
+      flow_controlled:
+	tp_put(tp);
+	ptrace(("ERROR: Flow Controlled\n"));
+	goto free_it;
+      no_buffers:
+	ptrace(("ERROR: Could not allocate mblk\n"));
+	goto discard_it;
+}
+
+/**
+ * tp_tp4_v4_err: - receive ICMP error message
+ * @skb: the message
+ * @info: the ICMP error information
+ *
+ * This is the error handler for ISO-TP4.  We have received an ICMP error for the protocol number.
+ * THis routine is called by the ICMP module when it gets some sort of error condition.  If err < 0
+ * then the stream should be errored (M_ERROR) and the error returned to the peer.  If err > 0 it is
+ * just the icmp type << 8 | icmp code.  After adjustment header points to the first 8 bytes of the
+ * TP4 header.  We need to find the appropriate remote reference.
+ *
+ * Because we don't want any races where, we place a M_CTL message (in band 1) on the read queue of
+ * the stream to which the message applies.  This distinguishes it from M_DATA messages.  It is
+ * processed within the stream with queues locked  by tp_recv_err when the M_CTL message is dequeued
+ * and processed.  We have to copy the information because the skb will go away after this call
+ * returns.  Because we check for flow control, this approach is also more resilient against ICMP
+ * flooding attacks.
+ *
+ * TP4 headers on sent messages are as follows:
+ *
+ *	Octet 1	- length of header excluding this octet
+ *	Octet 2 - message type (and credit)
+ *	Octet 3 - hi order DREF (zero on CR)
+ *	Octet 4 - lo order DREF (zero on CR)
+ *	Octet 5 - hi order SREF
+ *	Octet 6 - lo order SREF
+ */
+STATIC void
+tp_tp4_v4_err(struct sk_buff *skb, uint32_t info)
+{
+	struct tp *tp;
+	struct iphdr *iph = (struct iphdr *) skb->data;
+
+	if (skb->len < (iph->ihl << 2) + 1 + sizeof(struct tp4hdr))
+		goto drop;
+	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+	/* Note: use returned IP header and possibly payload for lookup */
+	// if ((tp = tp_tp4_lookup_icmp(iph, skb->len)) == NULL)
+		goto no_stream;
+	if (tp_get_state(tp) == TS_UNBND)
+		goto closed;
+	{
+		mblk_t *mp;
+		queue_t *q;
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
+
+		/* Create and queue a specialized M_CTL message to the Stream's read queue for further
+		   processing.  The Stream will convert this message into a T_UDERROR_IND or T_DISCON_IND
+		   message and pass it along. */
+		if ((mp = allocb(plen, BPRI_MED)) == NULL)
+			goto no_buffers;
+		/* check flow control only after we have a buffer */
+		if ((q = tp->rq) == NULL || !bcanput(q, 1))
+			goto flow_controlled;
+		mp->b_datap->db_type = M_CTL;
+		mp->b_band = 1;
+		bcopy(skb_network_header(skb), mp->b_wptr, plen);
+		mp->b_wptr += plen;
+		put(q, mp);
+		goto discard_put;
+	      flow_controlled:
+		tp_rstat.ms_ccnt++;
+		ptrace(("ERROR: stream is flow controlled\n"));
+		freeb(mp);
+		goto discard_put;
+	}
+      discard_put:
+	/* release reference from lookup */
+	if (tp)
+		tp_put(tp);
+	tp_v4_err_next(tp_protos.tp4.next, skb, info);	/* anyway */
+	return;
+      no_buffers:
+	ptrace(("ERROR: could not allocate buffer\n"));
+	goto discard_put;
+      closed:
+	ptrace(("ERROR: ICMP for closed stream\n"));
+	goto discard_put;
+      no_stream:
+	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	tp_v4_err_next(tp_protos.tp4.next, skb, info);
+	goto drop;
+      drop:
+#ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
+	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
+#else
+	ICMP_INC_STATS_BH(IcmpInErrors);
+#endif
+	return;
+}
+
+STATIC int
+tp_iso_v4_rcv(struct sk_buff *skb)
+{
+	mblk_t *mp;
+	struct tp *tp;
+	struct tp4hdr *th;
+	unsigned char *nlpid;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
+	if (skb->pkt_type != PACKET_HOST)
+		goto bad_pkt_type;
+	/* For now...  We should actually place non-linear fragments into seperate mblks and pass them up as
+	   a chain, or deal with non-linear sk_buffs directly.  As it winds up, the netfilter hooks linearize 
+	   anyway. */
+#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+	if (skb_is_nonlinear(skb) && skb_linearize(skb) != 0)
+		goto linear_fail;
+#else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
+		goto linear_fail;
+#endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
+	/* pull up the ip header */
+	nlpid = (typeof(nlpid)) skb_transport_header(skb);
+	if (nlpid[0] != 0)
+		goto wrong_protocol;
+	th = (typeof(th)) (nlpid + 1);
+	if (th->len < 6)
+		goto too_small;
+	if (!(mp = skballoc(skb, BPRI_MED)))
+		goto no_buffers;
+	// mp->b_rptr = skb->data;
+	// mp->b_wptr = mp->b_rptr + skb->len;
+	DB_BASE(mp) = skb_network_header(skb);	/* important */
+	DB_LIM(mp) = mp->b_wptr;
+	mp->b_datap->db_size = DB_LIM(mp) - DB_BASE(mp);
+	/* we do the lookup before the checksum */
+	{
+		struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
+
+		printd(("%s: mp %p lookup of stream\n", __FUNCTION__, mp));
+		// if (!(tp = tp_lookup(th, iph->daddr, iph->saddr)))
+			goto no_stream;
+	}
+	/* perform the stream-specific checksum */
+	// FIXME;
+	skb->dev = NULL;
+	if (!tp->rq || !canput(tp->rq))
+		goto flow_controlled;
+	putq(tp->rq, mp);	/* must succeed, band 0 */
+	/* all done */
+	printd(("%s: mp %p put to stream %p\n", __FUNCTION__, mp, tp));
+	tp_put(tp);
+	return (0);
+#if 0
+      bad_checksum:
+	ptrace(("ERROR: Bad checksum\n"));
+	goto free_it;
+#endif
+      no_stream:
+	ptrace(("ERROR: No stream\n"));
+	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
+	// tp_rcv_ootb(mp);
+	goto free_it;
+      free_it:
+	ptrace(("ERROR: Discarding message\n"));
+	/* free skb in sockets, free mp in streams */
+	freemsg(mp);
+	return (0);
+      too_small:
+	ptrace(("ERROR: Packet too small\n"));
+	goto discard_it;
+      wrong_protocol:
+	ptrace(("ERROR: Packet not for INLP\n"));
+	goto discard_it;
+      linear_fail:
+	ptrace(("ERROR: Could not linearize skb\n"));
+	goto discard_it;
+      bad_pkt_type:
+	ptrace(("ERROR: Packet not PACKET_HOST\n"));
+	goto discard_it;
+      discard_it:
+	/* Discard frame silently. */
+	ptrace(("ERROR: Discarding frame silently\n"));
+	kfree_skb(skb);
+	return (0);
+      flow_controlled:
+	tp_put(tp);
+	ptrace(("ERROR: Flow Controlled\n"));
+	goto free_it;
+      no_buffers:
+	ptrace(("ERROR: Could not allocate mblk\n"));
+	goto discard_it;
+}
+
+STATIC void
+tp_iso_v4_err(struct sk_buff *skb, uint32_t info)
+{
+	struct tp *tp;
+	struct iphdr *iph = (struct iphdr *) skb->data;
+
+	if (skb->len < (iph->ihl << 2) + 1 + sizeof(struct tp4hdr))
+		goto drop;
+	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+	/* Note: use returned IP header and possibly payload for lookup */
+	// if ((tp = tp_iso_lookup_icmp(iph, skb->len)) == NULL)
+		goto no_stream;
+	if (tp_get_state(tp) == TS_UNBND)
+		goto closed;
+	{
+		mblk_t *mp;
+		queue_t *q;
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
+
+		/* Create and queue a specialized M_CTL message to the Stream's read queue for further
+		   processing.  The Stream will convert this message into a T_UDERROR_IND or T_DISCON_IND
+		   message and pass it along. */
+		if ((mp = allocb(plen, BPRI_MED)) == NULL)
+			goto no_buffers;
+		/* check flow control only after we have a buffer */
+		if ((q = tp->rq) == NULL || !bcanput(q, 1))
+			goto flow_controlled;
+		mp->b_datap->db_type = M_CTL;
+		mp->b_band = 1;
+		bcopy(skb_network_header(skb), mp->b_wptr, plen);
+		mp->b_wptr += plen;
+		put(q, mp);
+		goto discard_put;
+	      flow_controlled:
+		tp_rstat.ms_ccnt++;
+		ptrace(("ERROR: stream is flow controlled\n"));
+		freeb(mp);
+		goto discard_put;
+	}
+      discard_put:
+	/* release reference from lookup */
+	if (tp)
+		tp_put(tp);
+	tp_v4_err_next(tp_protos.iso.next, skb, info);	/* anyway */
+	return;
+      no_buffers:
+	ptrace(("ERROR: could not allocate buffer\n"));
+	goto discard_put;
+      closed:
+	ptrace(("ERROR: ICMP for closed stream\n"));
+	goto discard_put;
+      no_stream:
+	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	tp_v4_err_next(tp_protos.iso.next, skb, info);
+	goto drop;
+      drop:
+#ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
+	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
+#else
+	ICMP_INC_STATS_BH(IcmpInErrors);
+#endif
+	return;
+}
+
+#ifndef CHECKSUM_HW
+#define CHECKSUM_HW CHECKSUM_COMPLETE
+#endif
+
+/**
+ * tp_udp_v4_rcv: - process a received UDP packet
+ * @skb: socket buffer containing IP packet
+ *
+ * This function is a callback function called by the Linux IP code when a packet is delivered to
+ * the UDP IP protocol number.  If the destination address is a broadcast or multicast address, pass
+ * it for distribution to multiple Streams.  If the destination address is a unicast address, look
+ * up the receiving IP Stream based on the protocol number and IP addresses.  If no receiving IP
+ * Stream exists for a unicast packet, or if the packet is a broadcast or multicast packet, pass the
+ * packet along to the next handler, if any.  If there is no next handler, and the packet was not
+ * sent to any Stream, generate an appropriate ICMP error.  If the receiving Stream is flow
+ * controlled, simply discard its copy of the IP packet.  Otherwise, generate an (internal) M_DATA
+ * message and pass it to the Stream.
+ */
+STATIC __hot_in int
+tp_udp_v4_rcv(struct sk_buff *skb)
+{
+	struct tp *tp = NULL;
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
+	struct udphdr *uh = (struct udphdr *) (skb_network_header(skb) + (iph->ihl << 2));
+	unsigned char *nlpid;
+	struct tp4hdr *th;
+	struct rtable *rt;
+	ushort ulen;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
+//      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
+	if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr) + 1 + sizeof(struct tp4hdr))))
+		goto too_small;
+#if 1
+	/* I don't think that ip_rcv will ever give us a packet that is not PACKET_HOST. */
+	if (unlikely(skb->pkt_type != PACKET_HOST))
+		goto bad_pkt_type;
+#endif
+	rt = skb_rtable(skb);
+	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
+		/* need to do something about broadcast and multicast */ ;
+	_printd(("%s: %s: packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+//      UDP_INC_STATS_BH(UdpInDatagrams);
+	uh = (typeof(uh)) skb_transport_header(skb);
+	ulen = ntohs(uh->len);
+	/* sanity check UDP length */
+	if (unlikely(ulen > skb->len || ulen < sizeof(struct udphdr) + 1 + sizeof(struct tp4hdr)))
+		goto too_small;
+	if (unlikely(pskb_trim(skb, ulen)))
+		goto too_small;
+	/* we do the lookup before the checksum */
+	nlpid = (typeof(nlpid)) (uh + 1);
+	if (unlikely(*nlpid != 0))
+		goto wrong_protocol;
+	th = (typeof(th)) (nlpid + 1);
+	if (unlikely(th->len < sizeof(struct tp4hdr)))
+		goto too_small;
+	// if (unlikely((tp = tp_udp_lookup(iph, uh, th)) == NULL))
+		goto no_stream;
+	/* checksum initialization */
+	if (likely(uh->check == 0))
+		skb->ip_summed = CHECKSUM_UNNECESSARY;
+	else {
+		if (skb->ip_summed == CHECKSUM_HW)
+			skb->ip_summed = CHECKSUM_UNNECESSARY;
+		else if (skb->ip_summed != CHECKSUM_UNNECESSARY)
+			skb->csum = csum_tcpudp_nofold(iph->saddr, iph->daddr, ulen, IPPROTO_UDP, 0);
+	}
+	if (unlikely(skb_is_nonlinear(skb))) {
+		_ptrace(("Non-linear sk_buff encountered!\n"));
+		goto linear_fail;
+	}
+	{
+		mblk_t *mp;
+		frtn_t fr = { &tp_free, (caddr_t) skb };
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
+
+		/* now allocate an mblk */
+		if (unlikely((mp = esballoc(skb_network_header(skb), plen, BPRI_MED, &fr)) == NULL))
+			goto no_buffers;
+		/* tell others it is a socket buffer */
+		mp->b_datap->db_flag |= DB_SKBUFF;
+		_ptrace(("Allocated external buffer message block %p\n", mp));
+		/* check flow control only after we have a buffer */
+		if (unlikely(tp->rq == NULL || !canput(tp->rq)))
+			goto flow_controlled;
+		// mp->b_datap->db_type = M_DATA;
+		mp->b_wptr += plen;
+		put(tp->rq, mp);
+//              UDP_INC_STATS_BH(UdpInDatagrams);
+		/* release reference from lookup */
+		tp_put(tp);
+		return (0);
+	      flow_controlled:
+		tp_rstat.ms_ccnt++;
+		freeb(mp);	/* will take sk_buff with it */
+		tp_put(tp);
+		return (0);
+	}
+      bad_checksum:
+//      UDP_INC_STATS_BH(UdpInErrors);
+//      IP_INC_STATS_BH(IpInDiscards);
+	/* decrement IpInDelivers ??? */
+	// goto linear_fail;
+      wrong_protocol:
+      no_buffers:
+      linear_fail:
+	if (tp)
+		tp_put(tp);
+	kfree_skb(skb);
+	return (0);
+      no_stream:
+	ptrace(("ERROR: No stream\n"));
+	/* Note, in case there is nobody to pass it to, we have to complete the checksum check before
+	   dropping it to handle stats correctly. */
+	if (skb->ip_summed != CHECKSUM_UNNECESSARY
+	    && (unsigned short) csum_fold(skb_checksum(skb, 0, skb->len, skb->csum)))
+		goto bad_checksum;
+//      UDP_INC_STATS_BH(UdpNoPorts);   /* should wait... */
+#if 1
+      bad_pkt_type:
+#endif
+      too_small:
+	if (tp_v4_rcv_next(tp_protos.udp.next, skb)) {
+		/* TODO: want to generate an ICMP error here */
+	}
+	return (0);
+}
+
+/**
+ * tp_udp_v4_err: - process a received ICMP packet
+ * @skb: socket buffer containing ICMP packet
+ * @info: additional information (unused)
+ *
+ * This function is a network protocol callback that is invoked when transport specific ICMP errors
+ * are received.  The function looks up the Stream and, if found, wraps the packet in an M_CTL
+ * message and passes it to the read queue of the Stream.
+ *
+ * ICMP packet consists of ICMP IP header, ICMP header, IP header of returned packet, and IP payload
+ * of returned packet (up to some number of bytes of total payload).  The passed in sk_buff has
+ * skb->data pointing to the ICMP payload which is the beginning of the returned IP header.
+ * However, we include the entire packet in the message.
+ *
+ * LOCKING: tp_lock protects the master list and protects from open, close, link and unlink.
+ * tp->qlock protects the state of private structure.  tp->refs protects the private structure from
+ * being deallocated before locking.
+ */
+STATIC __unlikely void
+tp_udp_v4_err(struct sk_buff *skb, u32 info)
+{
+	struct tp *tp;
+	struct iphdr *iph = (struct iphdr *) skb->data;
+
+	if (skb->len < (iph->ihl << 2) + sizeof(struct udphdr) + 1 + sizeof(struct tp4hdr))
+		goto drop;
+	printd(("%s: %s: error packet received %p\n", DRV_NAME, __FUNCTION__, skb));
+	/* Note: use returned IP header and possibly payload for lookup */
+	// if ((tp = tp_udp_lookup_icmp(iph, skb->len)) == NULL)
+		goto no_stream;
+	if (tp_get_state(tp) == TS_UNBND)
+		goto closed;
+	{
+		mblk_t *mp;
+		queue_t *q;
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
+
+		/* Create and queue a specialized M_CTL message to the Stream's read queue for further
+		   processing.  The Stream will convert this message into a T_UDERROR_IND or T_DISCON_IND
+		   message and pass it along. */
+		if ((mp = allocb(plen, BPRI_MED)) == NULL)
+			goto no_buffers;
+		/* check flow control only after we have a buffer */
+		if ((q = tp->rq) == NULL || !bcanput(q, 1))
+			goto flow_controlled;
+		mp->b_datap->db_type = M_CTL;
+		mp->b_band = 1;
+		bcopy(skb_network_header(skb), mp->b_wptr, plen);
+		mp->b_wptr += plen;
+		put(q, mp);
+		goto discard_put;
+	      flow_controlled:
+		tp_rstat.ms_ccnt++;
+		ptrace(("ERROR: stream is flow controlled\n"));
+		freeb(mp);
+		goto discard_put;
+	}
+      discard_put:
+	/* release reference from lookup */
+	if (tp)
+		tp_put(tp);
+	tp_v4_err_next(tp_protos.udp.next, skb, info);	/* anyway */
+	return;
+      no_buffers:
+	ptrace(("ERROR: could not allocate buffer\n"));
+	goto discard_put;
+      closed:
+	ptrace(("ERROR: ICMP for closed stream\n"));
+	goto discard_put;
+      no_stream:
+	ptrace(("ERROR: could not find stream for ICMP message\n"));
+	tp_v4_err_next(tp_protos.udp.next, skb, info);
+	goto drop;
+      drop:
+#ifdef HAVE_KINC_LINUX_SNMP_H
+#ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
+	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
+	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
+#else
+	ICMP_INC_STATS_BH(IcmpInErrors);
+#endif
+	return;
+}
+
+/**
+ * tp_llc_rcv: - receive an unnumbered LLC class I frame
+ * @skb: the frame
+ * @dev: the device on which the frame was received
+ * @pt: the packet type of the received frame
+ *
+ * Note that it is not necessary to use the device or packet type.  The packet type will always be
+ * 802.2, either for Ethernet (802.3) or Token Ring (802.5).
+ *
+ * The network_header points to the DSAP/SSAP/UI-CTRL portion of the frame (the 802.2 part and is
+ * actually the data link portion).  The transport_header points to the payload of the UI frame (I
+ * field) and is in fact the network portion.
+ */
+STATIC __hot_in int
+#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
+tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
+#else
+tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt)
+#endif
+{
+	struct tp *tp = NULL;
+	unsigned char *nlpid;
+	struct tp4hdr *th;
+	struct llc_pdu_un *uh;
+	struct llc_addr daddr, saddr;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
+	if (unlikely(!pskb_may_pull(skb, 1 + sizeof(struct tp4hdr))))
+		goto too_small;
+	if (unlikely(skb->pkt_type != PACKET_HOST))
+		goto bad_pkt_type;
+	uh = (typeof(uh)) skb_network_header(skb);
+	nlpid = (typeof(nlpid)) skb_transport_header(skb);
+	if (unlikely(*nlpid != 0))
+		goto wrong_protocol;
+	th = (typeof(th)) (nlpid + 1);
+	if (unlikely(th->len < sizeof(struct tp4hdr)))
+		goto too_small;
+	if (unlikely(skb->len < 2 + th->len))
+		goto too_small;
+	llc_pdu_decode_da(skb, daddr.mac);
+	llc_pdu_decode_dsap(skb, &daddr.lsap);
+	llc_pdu_decode_sa(skb, saddr.mac);
+	llc_pdu_decode_ssap(skb, &saddr.lsap);
+	// if (unlikely((tp = tp_llc_lookup(uh, &daddr, &saddr)) == NULL))
+		goto no_stream;
+	if (unlikely(skb_is_nonlinear(skb))) {
+		_ptrace(("Non-linear sk_buff encountered!\n"));
+		goto linear_fail;
+	}
+	{
+		mblk_t *mp;
+		frtn_t fr = { &tp_free, (caddr_t) skb };
+		size_t plen = skb->len + (skb->data - skb_network_header(skb));
+
+		/* now allocate an mblk */
+		if (unlikely((mp = esballoc(skb_network_header(skb), plen, BPRI_MED, &fr)) == NULL))
+			goto no_buffers;
+		/* tell others it is a socket buffer */
+		mp->b_datap->db_flag |= DB_SKBUFF;
+		_ptrace(("Allocated external buffer message block %p\n", mp));
+		/* check flow control only after we have a buffer */
+		if (unlikely(tp->rq == NULL || !canput(tp->rq)))
+			goto flow_controlled;
+		// mp->b_datap->db_type = M_DATA;
+		mp->b_wptr += plen;
+		put(tp->rq, mp);
+		/* release reference from lookup */
+		tp_put(tp);
+		return (0);
+	      flow_controlled:
+		tp_rstat.ms_ccnt++;
+		freeb(mp);	/* will take sk_buff with it */
+		tp_put(tp);
+		return (0);
+	}
+      wrong_protocol:
+      no_buffers:
+      linear_fail:
+	if (tp)
+		tp_put(tp);
+	kfree_skb(skb);
+	return (0);
+      no_stream:
+	ptrace(("ERROR: No stream\n"));
+      bad_pkt_type:
+      too_small:
+	kfree_skb(skb);
+	return (0);
+
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Netdevice Notifier
+ *
+ *  =========================================================================
+ */
+#ifndef LOOPBACK
+#define LOOPBACK(x) ipv4_is_loopback(x)
+#endif
+#ifndef MULTICAST
+#define MULTICAST(x) ipv4_is_multicast(x)
+#endif
+#ifndef ZERONET
+#define ZERONET(x) ipv4_is_zeronet(x)
+#endif
+#ifndef LOCAL_MCAST
+#define LOCAL_MCAST(x) ipv4_is_local_multicast(x)
+#endif
+
+STATIC int
+tp_notifier(struct notifier_block *self, unsigned long msg, void *data)
+{
+	struct net_device *dev = (struct net_device *) data;
+	struct in_device *in_dev;
+
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+	rcu_read_lock();
+#endif
+#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+	if (!(in_dev = __in_dev_get_rcu(dev)))
+		goto done;
+#else
+	if (!(in_dev = __in_dev_get(dev)))
+		goto done;
+#endif
+	switch (msg) {
+	case NETDEV_UP:
+	case NETDEV_REBOOT:
+	{
+		caddr_t item;
+
+		read_lock(&tp_lock);
+		for (item = tp_opens; item; item = mi_next_ptr(item)) {
+			struct tp *tp = (typeof(tp)) item;
+
+			if (tp_chk_state(tp, TSF_UNBND | TSF_WACK_BREQ))
+				continue;
+
+			switch (tp->loc.type) {
+			case TP_SNPA_TYPE_IP4:
+			case TP_SNPA_TYPE_IP4_PORT:
+			{
+				struct in_ifaddr *ifa;
+
+				for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
+					if (LOOPBACK(ifa->ifa_local))
+						continue;
+					/* check if we bound to ifa_local */
+					if (memcmp(tp->loc.addr, (unsigned char *) &ifa->ifa_local, 4) == 0) {
+						tp->loc.dev = dev;
+						break;
+					}
+				}
+				break;
+			}
+			case TP_SNPA_TYPE_MAC:
+			case TP_SNPA_TYPE_IP6:
+			case TP_SNPA_TYPE_IP6_PORT:
+			case TP_SNPA_TYPE_IFNAME:
+				break;
+			default:
+				continue;
+			}
+
+		}
+		read_unlock(&tp_lock);
+		break;
+	}
+	case NETDEV_DOWN:
+	case NETDEV_GOING_DOWN:
+	{
+		caddr_t item;
+
+		read_lock(&tp_lock);
+		for (item = tp_opens; item; item = mi_next_ptr(item)) {
+			struct tp *tp = (typeof(tp)) item;
+
+			if (tp_chk_state(tp, TSF_UNBND | TSF_WACK_BREQ))
+				continue;
+
+			switch (tp->loc.type) {
+			case TP_SNPA_TYPE_IP4:
+			case TP_SNPA_TYPE_IP4_PORT:
+			{
+				struct in_ifaddr *ifa;
+
+				for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
+					if (LOOPBACK(ifa->ifa_local))
+						continue;
+					/* check if we bound to ifa_local */
+					if (memcmp(tp->loc.addr, (unsigned char *) &ifa->ifa_local, 4) == 0) {
+						tp->loc.dev = NULL;
+						break;
+					}
+				}
+				break;
+			}
+			case TP_SNPA_TYPE_MAC:
+			case TP_SNPA_TYPE_IP6:
+			case TP_SNPA_TYPE_IP6_PORT:
+			case TP_SNPA_TYPE_IFNAME:
+				break;
+			default:
+				continue;
+			}
+
+		}
+		read_unlock(&tp_lock);
+		break;
+	}
+	case NETDEV_CHANGEADDR:
+		/* we should probably do something for this, but I don't know wheterh it is possible to
+		   change addresses on an up interface anyway */
+	default:
+	case NETDEV_CHANGE:
+	case NETDEV_REGISTER:
+	case NETDEV_UNREGISTER:
+	case NETDEV_CHANGEMTU:
+	case NETDEV_CHANGENAME:
+		break;
+	}
+      done:
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+	rcu_read_unlock();
+#endif
+	return NOTIFY_DONE;
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Registration and initialization
+ *
+ *  =========================================================================
+ */
+#ifdef LINUX
+
+STATIC struct notifier_block tp_netdev_notifier = {
+	.notifier_call = &tp_notifier,
+};
+
+STATIC int
+tp_init_notify(void)
+{
+	register_netdevice_notifier(&tp_netdev_notifier);
+	return (0);
+}
+
+STATIC int
+tp_term_notify(void)
+{
+	unregister_netdevice_notifier(&tp_netdev_notifier);
+	return (0);
+}
+
+STATIC int
+tp_term_proto(void)
+{
+	tp_give_protocol(&tp_protos.udp, IPPROTO_UDP);
+	tp_give_protocol(&tp_protos.iso, 80);
+	tp_give_protocol(&tp_protos.tp4, 29);
+	return (0);
+}
+
+STATIC int
+tp_init_proto(void)
+{
+	int err;
+
+	if ((err = tp_take_protocol(&tp_protos.tp4, 29)))
+		goto no_tp4;
+	if ((err = tp_take_protocol(&tp_protos.iso, 80)))
+		goto no_iso;
+	if ((err = tp_take_protocol(&tp_protos.udp, IPPROTO_UDP)))
+		goto no_udp;
+	return (0);
+      no_udp:
+	tp_give_protocol(&tp_protos.iso, 80);
+      no_iso:
+	tp_give_protocol(&tp_protos.tp4, 29);
+      no_tp4:
+	return (err);
+}
+
+STATIC struct llc_sap *tp_llc_sap = NULL;
+
+STATIC __unlikely int
+tp_init_llc(void)
+{
+	if ((tp_llc_sap = llc_sap_open(0xfe, tp_llc_rcv)) == NULL)
+		return (-EBUSY);
+	return (0);
+}
+
+STATIC __unlikely int
+tp_term_llc(void)
+{
+	if (tp_llc_sap != NULL) {
+		llc_sap_close(tp_llc_sap);
+		tp_llc_sap = NULL;
+		return (0);
+	}
+	return (-EINVAL);
+}
+
+/*
+ *  Linux Registration
+ *  -------------------------------------------------------------------------
+ */
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for the TPSN driver. (0 for allocation.)");
+
+#ifndef module_param
+MODULE_PARM(major, "h");
+#else
+module_param(major, int, 0444);
+#endif
+MODULE_PARM_DESC(major, "Device number for the TPSN driver. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+static struct cdevsw tp_cdev = {
+	.d_name = DRV_NAME,
+	.d_str = &tp_info,
+	.d_flag = D_MP | D_CLONE,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+	.d_kmod = THIS_MODULE,
+};
+
+static struct devnode tp_node_cots = {
+	.n_name = "cots",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_clts = {
+	.n_name = "clts",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_cots_iso = {
+	.n_name = "cots-iso",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_clts_iso = {
+	.n_name = "clts-iso",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_cots_ip = {
+	.n_name = "cots-ip",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_clts_ip = {
+	.n_name = "clts-ip",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_cots_udp = {
+	.n_name = "cots-udp",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+static struct devnode tp_node_clts_udp = {
+	.n_name = "clts-udp",
+	.n_flag = D_CLONE,	/* clone minor */
+	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
+};
+
+/**
+ * tp_register_strdev: - register STREAMS pseudo-device driver
+ * @major: major device number to register (0 for allocation)
+ *
+ * This function registers the INET pseudo-device driver and a host of minor device nodes associated
+ * with the driver.  Should this function fail it returns a negative error number; otherwise, it
+ * returns zero.  Only failure to register the major device number is considered an error as minor
+ * device nodes in the specfs are optional.
+ */
+static __unlikely int
+tp_register_strdev(major_t major)
+{
+	int err;
+
+	if ((err = register_strdev(&tp_cdev, major)) < 0)
+		return (err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_cots, TP_CMINOR_COTS)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_COTS, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_clts, TP_CMINOR_CLTS)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_CLTS, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_cots_iso, TP_CMINOR_COTS_ISO)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_COTS_ISO, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_clts_iso, TP_CMINOR_CLTS_ISO)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_CLTS_ISO, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_cots_ip, TP_CMINOR_COTS_IP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_COTS_IP, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_clts_ip, TP_CMINOR_CLTS_IP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_CLTS_IP, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_cots_udp, TP_CMINOR_COTS_UDP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_COTS_UDP, err = %d", err);
+	if ((err = register_strnod(&tp_cdev, &tp_node_clts_udp, TP_CMINOR_CLTS_UDP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not register TP_CMINOR_CLTS_UDP, err = %d", err);
+	return (0);
+}
+
+/**
+ * tp_unregister_strdev: - unregister STREAMS pseudo-device driver
+ * @major: major device number to unregister
+ *
+ * The function unregisters the host of minor device nodes and the major deivce node associated with
+ * the driver in the reverse order in which they were allocated.  Only deregistration of the major
+ * device node is considered fatal as minor device nodes were optional during initialization.
+ */
+static int
+tp_unregister_strdev(major_t major)
+{
+	int err;
+
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS_UDP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_CLTS_UDP, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_UDP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_COTS_UDP, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS_IP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_CLTS_IP, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_IP)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_COTS_IP, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS_ISO)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_CLTS_ISO, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS_ISO)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_COTS_ISO, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_CLTS)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_CLTS, err = %d", err);
+	if ((err = unregister_strnod(&tp_cdev, TP_CMINOR_COTS)) < 0)
+		strlog(major, 0, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "Could not unregister TP_CMINOR_COTS, err = %d", err);
+	if ((err = unregister_strdev(&tp_cdev, major)) < 0)
+		return (err);
+	return (0);
+}
+
+/**
+ * tp_init: - initialize the INET kernel module under Linux
+ */
+static __init int
+tp_init(void)
+{
+	int err;
+
+	if ((err = tp_register_strdev(major)) < 0) {
+		cmn_err(CE_WARN, "%s could not register STREAMS device, err = %d", DRV_NAME, err);
+		goto error;
+	}
+	if (major == 0)
+		major = err;
+#if 0
+	if ((err = tp_init_hashes())) {
+		cmn_err(CE_WARN, "%s could not initialize hashes, err = %d", DRV_NAME, err);
+		goto no_hashes;
+	}
+#endif
+	if ((err = tp_init_llc())) {
+		cmn_err(CE_WARN, "%s could not initialize llc, err = %d", DRV_NAME, err);
+		goto no_llc;
+	}
+	if ((err = tp_init_notify())) {
+		cmn_err(CE_WARN, "%s could not initialize notify, err = %d", DRV_NAME, err);
+		goto no_notify;
+	}
+	if ((err = tp_init_proto())) {
+		cmn_err(CE_WARN, "%s could not initialize protocols, err = %d", DRV_NAME, err);
+		goto no_proto;
+	}
+	if ((err = tp_init_caches())) {
+		cmn_err(CE_WARN, "%s could not initialize caches, err = %d", DRV_NAME, err);
+		goto no_caches;
+	}
+	return (0);
+      no_caches:
+	tp_term_proto();
+      no_proto:
+	tp_term_notify();
+      no_notify:
+#if 0
+	tp_term_hashes();
+      no_hashes:
+#endif
+	tp_term_llc();
+      no_llc:
+	tp_unregister_strdev(major);
+      error:
+	return (err);
+}
+
+/**
+ * tp_exit: - remove the INET kernel module under Linux
+ */
+static __exit void
+tp_exit(void)
+{
+	int err;
+
+	if ((err = tp_term_proto()))
+		cmn_err(CE_WARN, "%s could not terminate protocols, err = %d", DRV_NAME, err);
+	if ((err = tp_term_notify()))
+		cmn_err(CE_WARN, "%s could not terminate notify, err = %d", DRV_NAME, err);
+	if ((err = tp_term_llc()))
+		cmn_err(CE_WARN, "%s could not terminate llc, err = %d", DRV_NAME, err);
+#if 0
+	if ((err = tp_term_hashes()))
+		cmn_err(CE_WARN, "%s could not terminate hashes, err = %d", DRV_NAME, err);
+#endif
+	if ((err = tp_term_caches()))
+		cmn_err(CE_WARN, "%s could not terminate caches, err = %d", DRV_NAME, err);
+	if ((err = tp_unregister_strdev(major)) < 0)
+		cmn_err(CE_WARN, "%s could not unregister STREAMS device, err = %d", DRV_NAME, err);
+	return;
+}
+
+module_init(tp_init);
+module_exit(tp_exit);
+
+#endif				/* LINUX */
