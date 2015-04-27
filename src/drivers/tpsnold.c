@@ -67,9 +67,12 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
+//#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
-#include <sys/strsun.h>
+// #include <sys/mps/ddi.h>
+// #include <sys/strsun.h>
 
 #include <linux/bitops.h>
 
@@ -808,6 +811,7 @@ struct tp_timer {
  *  ----------------------------
  */
 
+#define FIRST_CMINOR		0
 #define TP_CMINOR_COTS		0
 #define TP_CMINOR_CLTS		1
 #define TP_CMINOR_COTS_ISO	2
@@ -816,6 +820,8 @@ struct tp_timer {
 #define TP_CMINOR_CLTS_IP	5
 #define TP_CMINOR_COTS_UDP	6
 #define TP_CMINOR_CLTS_UDP	7
+#define LAST_CMINOR		7
+#define FREE_CMINOR		8
 
 struct tp_profile {
 	struct {
@@ -839,6 +845,7 @@ struct snpaaddr {
 	unsigned char addr[16];		/* SNPA (MAC or IP) address */
 	unsigned char subnet[2];	/* SNPA subnet or IP port */
 	unsigned char lsap;
+	struct net_device *dev;
 };
 
 struct nsapaddr {
@@ -905,6 +912,21 @@ struct tp {
 	struct tp *lnext;		/* list hash linkage */
 	struct tp **lprev;		/* list hash linkage */
 	struct tp_lhash_bucket *listb;	/* list hash bucket */
+	struct {
+		mblk_t *t1;
+		mblk_t *t2;
+		mblk_t *t3;
+		mblk_t *t4;
+	} timers;
+	struct {
+		uint32_t t1;
+		uint32_t t2;
+		uint32_t t3;
+		uint32_t t4;
+	} config;
+	int pstate;
+	int count;
+	int maximum;
 };
 
 struct tp_conind {
@@ -915,7 +937,7 @@ struct tp_conind {
 	t_uscalar_t ci_seq;		/* sequence number */
 };
 
-#define PRIV(__q) ((struct tp *)((__q)->q_ptr)
+#define PRIV(__q) ((struct tp *)((__q)->q_ptr))
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
@@ -1339,6 +1361,11 @@ tp_unlock(struct tp *tp)
 	read_lock(&tp_lock);
 	mi_unlock((caddr_t) tp);
 	read_unlock(&tp_lock);
+}
+
+static void
+tp_priv_init(struct tp *tp)
+{
 }
 
 /*

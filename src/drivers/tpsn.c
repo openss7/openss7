@@ -67,9 +67,12 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
+//#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
-#include <sys/strsun.h>
+// #include <sys/mps/ddi.h>
+// #include <sys/strsun.h>
 
 #include <linux/bitops.h>
 
@@ -808,6 +811,7 @@ struct tp_timer {
  *  ----------------------------
  */
 
+#define FIRST_CMINOR		0
 #define TP_CMINOR_COTS		0
 #define TP_CMINOR_CLTS		1
 #define TP_CMINOR_COTS_ISO	2
@@ -816,6 +820,8 @@ struct tp_timer {
 #define TP_CMINOR_CLTS_IP	5
 #define TP_CMINOR_COTS_UDP	6
 #define TP_CMINOR_CLTS_UDP	7
+#define LAST_CMINOR		7
+#define FREE_CMINOR		8
 
 struct tp_profile {
 	struct {
@@ -906,6 +912,21 @@ struct tp {
 	struct tp *lnext;		/* list hash linkage */
 	struct tp **lprev;		/* list hash linkage */
 	struct tp_lhash_bucket *listb;	/* list hash bucket */
+	struct {
+		mblk_t *t1;
+		mblk_t *t2;
+		mblk_t *t3;
+		mblk_t *t4;
+	} timers;
+	struct {
+		uint32_t t1;
+		uint32_t t2;
+		uint32_t t3;
+		uint32_t t4;
+	} config;
+	int pstate;
+	int count;
+	int maximum;
 };
 
 struct tp_conind {
@@ -916,7 +937,7 @@ struct tp_conind {
 	t_uscalar_t ci_seq;		/* sequence number */
 };
 
-#define PRIV(__q) ((struct tp *)((__q)->q_ptr)
+#define PRIV(__q) ((struct tp *)((__q)->q_ptr))
 
 #define xti_default_debug		{ 0, }
 #define xti_default_linger		(struct t_linger){T_YES, 120}
@@ -1340,6 +1361,11 @@ tp_unlock(struct tp *tp)
 	read_lock(&tp_lock);
 	mi_unlock((caddr_t) tp);
 	read_unlock(&tp_lock);
+}
+
+static void
+tp_priv_init(struct tp *tp)
+{
 }
 
 /*
@@ -1915,6 +1941,7 @@ tp_not_state(struct tp *tp, t_scalar_t mask)
  *  -------------------------------------------------------------------------
  */
 
+
 /*
  *  =========================================================================
  *
@@ -1982,7 +2009,7 @@ tp_w_prim_put(queue_t *q, mblk_t *mp)
 		break;
 		// return tp_w_ioctl(q, mp);
 	}
-	// LOGERR(PRIV(q), "SWERR: %s %s: %d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(PRIV(q), "SWERR: %s %s: %d", __FUNCTION__, __FILE__, __LINE__);
 	freemsg(mp);
 	return (0);
 }
@@ -2230,9 +2257,8 @@ static fastcall __unlikely int
 tp_alloc_qbands(queue_t *q, int cminor)
 {
 	int err;
-	psw_t pl;
 
-	pl = freezestr(q);
+	freezestr(q);
 	{
 		/* Pre-allocate queue band structures on the read side. */
 		if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
@@ -2243,7 +2269,7 @@ tp_alloc_qbands(queue_t *q, int cminor)
 			       "ERROR: could not allocate queue band 2 structure, err = %d", err);
 		}
 	}
-	unfreezestr(q, pl);
+	unfreezestr(q);
 	return (err);
 }
 
@@ -2258,6 +2284,12 @@ tp_alloc_qbands(queue_t *q, int cminor)
 static streamscall int
 tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
+	minor_t cminor = getminor(*devp);
+	psw_t flags;
+	caddr_t ptr;
+	struct tp *tp;
+	int err;
+
 	(void) tp_alloc_qbands;
 	(void) tp_info;
 	(void) tp_lock;
@@ -2274,7 +2306,55 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	(void) tp_bind_cachep;
 	(void) tp_prot_cachep;
 	(void) tpi_primname;
-	return (ENXIO);
+
+	if (q->q_ptr)
+		return (0);	/* already open */
+	if (cminor < FIRST_CMINOR || cminor > LAST_CMINOR)
+		return (ENXIO);
+	if (!mi_set_sth_lowat(q, 0))
+		return (ENOBUFS);
+	if (!mi_set_sth_hiwat(q, SHEADHIWAT >> 1))
+		return (ENOBUFS);
+	if ((err = tp_alloc_qbands(q, cminor)))
+		return (err);
+	if (!(tp = (struct tp *) (ptr = mi_open_alloc_cache(tp_priv_cachep, GFP_KERNEL))))
+		return (ENOMEM);
+	{
+		struct tp_timer *t;
+
+		bzero(tp, sizeof(*tp));
+		tp->tp_parent = tp;
+		tp->rq = RD(q);
+		tp->wq = WR(q);
+		tp->p = tp_profiles[cminor - FIRST_CMINOR];
+		tp->cred = *crp;
+		bufq_init(&tp->conq);
+		if (!(tp->timers.t1 = mi_timer_alloc(sizeof(*t))))
+			return (ENOBUFS);
+	}
+	sflag = CLONEOPEN;
+	cminor = FREE_CMINOR;	/* start at the first free minor device number */
+	/* The static device range for mi_open_link() is 5 or 10, and tpsn uses 10, so we adjust the minor
+	   device number before calling mi_open_link(). */
+	*devp = makedevice(getmajor(*devp), cminor);
+	write_lock_irqsave(&tp_lock, flags);
+	if (mi_acquire_sleep(ptr, &ptr, &tp_lock, &flags) == NULL) {
+		err = EINTR;
+		goto unlock_free;
+	}
+	if ((err = mi_open_link(&tp_opens, ptr, devp, oflags, sflag, crp))) {
+		mi_release(ptr);
+		goto unlock_free;
+	}
+	mi_attach(q, ptr);
+	mi_release(ptr);
+	write_unlock_irqrestore(&tp_lock, flags);
+	tp_priv_init(tp);
+	return (0);
+      unlock_free:
+	mi_close_free_cache(tp_priv_cachep, ptr);
+	write_unlock_irqrestore(&tp_lock, flags);
+	return (err);
 }
 
 /**
@@ -2286,8 +2366,124 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 static streamscall int
 tp_qclose(queue_t *q, int oflags, cred_t *crp)
 {
-	return (0);
+	struct tp *tp = PRIV(q);
+	caddr_t ptr = (caddr_t) tp;
+	psw_t flags;
+	int err;
+
+	write_lock_irqsave(&tp_lock, flags);
+	mi_acquire_sleep_nosignal(ptr, &ptr, &tp_lock, &flags);
+	qprocsoff(q);
+	while (bufq_head(&tp->conq))
+		freemsg(__bufq_dequeue(&tp->conq));
+	tp->tp_parent = NULL;
+	tp->rq = NULL;
+	tp->wq = NULL;
+	err = mi_close_comm(&tp_opens, q);
+	write_unlock_irqrestore(&tp_lock, flags);
+	return (err);
 }
+
+/*
+ *  =========================================================================
+ *
+ *  Timers
+ *
+ *  =========================================================================
+ */
+enum {
+	tall,				/* all timers */
+	t1,				/* retransmission timer */
+	t2,				/* inactivity timer */
+	t3,				/* window timer */
+	t4				/* reference timer */
+};
+
+static void
+tp_timer_stop(struct tp *tp, const uint timer)
+{
+	int single = 1;
+
+	switch (timer) {
+	case tall:
+		single = 0;
+		/* fall through */
+	case t1:
+		mi_timer_stop(tp->timers.t1);
+		if (single)
+			break;
+		/* fall through */
+	case t2:
+		mi_timer_stop(tp->timers.t2);
+		if (single)
+			break;
+		/* fall through */
+	case t3:
+		mi_timer_stop(tp->timers.t3);
+		if (single)
+			break;
+		/* fall through */
+	case t4:
+		mi_timer_stop(tp->timers.t4);
+		if (single)
+			break;
+		/* fall through */
+		break;
+	default:
+		LOGERR(tp, "bad timer value");
+		break;
+	}
+}
+
+static void
+tp_timer_start(struct tp *tp, queue_t *q, const uint timer)
+{
+	switch (timer) {
+	case t1:
+		((struct tp_timer *)tp->timers.t1->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t1, tp->config.t1);
+		break;
+	case t2:
+		((struct tp_timer *)tp->timers.t2->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t2, tp->config.t2);
+		break;
+	case t3:
+		((struct tp_timer *)tp->timers.t3->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t3, tp->config.t3);
+		break;
+	case t4:
+		((struct tp_timer *)tp->timers.t4->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t4, tp->config.t4);
+		break;
+	default:
+		LOGERR(tp, "bad timer value");
+		break;
+	}
+}
+
+#if 0
+static int
+do_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct tp_timer *t = (typeof(t)) mp->b_rptr;
+	switch (t->timer) {
+	case t1:
+		LOGTO(tp, "t1 expiry at %lu", jiffies);
+		return tp_t1_timeout(tp, q, mp);
+	case t2:
+		LOGTO(tp, "t2 expiry at %lu", jiffies);
+		return tp_t2_timeout(tp, q, mp);
+	case t3:
+		LOGTO(tp, "t3 expiry at %lu", jiffies);
+		return tp_t3_timeout(tp, q, mp);
+	case t4:
+		LOGTO(tp, "t4 expiry at %lu", jiffies);
+		return tp_t4_timeout(tp, q, mp);
+	default:
+		return (0);
+	}
+}
+#endif
 
 /*
  *  =========================================================================
@@ -3462,6 +3658,9 @@ static __init int
 tp_init(void)
 {
 	int err;
+
+	(void) tp_timer_stop;
+	(void) tp_timer_start;
 
 	if ((err = tp_register_strdev(major)) < 0) {
 		cmn_err(CE_WARN, "%s could not register STREAMS device, err = %d", DRV_NAME, err);
