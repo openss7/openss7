@@ -11236,46 +11236,46 @@ __tp_w_proto_slow(struct tp *tp, queue_t *q, mblk_t *mp, t_scalar_t prim)
 		rtn = t_conn_req(tp, q, mp);
 		break;
 	case T_CONN_RES:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_conn_res(tp, q, mp);
 		break;
 	case T_DISCON_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_discon_req(tp, q, mp);
 		break;
 	case T_DATA_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_data_req(tp, q, mp);
 		break;
 	case T_EXDATA_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_exdata_req(tp, q, mp);
 		break;
 	case T_INFO_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_info_req(tp, q, mp);
 		break;
 	case T_BIND_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_bind_req(tp, q, mp);
 		break;
 	case T_UNBIND_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_unbind_req(tp, q, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_optmgmt_req(tp, q, mp);
 		break;
 	case T_UNITDATA_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_unitdata_req(tp, q, mp);
 		break;
 	case T_ORDREL_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_ordrel_req(tp, q, mp);
 		break;
 	case T_OPTDATA_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_optdata_req(tp, q, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_addr_req(tp, q, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		rtn = t_conn_req(tp, q, mp);
+		rtn = t_capability_req(tp, q, mp);
 		break;
 #endif
 	case T_CONN_IND:
@@ -11396,6 +11396,8 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
+int t_read(struct tp *tp, queue_t *q, mblk_t *mp);
+
 /**
  * __tp_r_data: - process M_DATA message
  * @tp: private structure (locked)
@@ -11409,9 +11411,7 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 static inline fastcall __hot_read int
 __tp_r_data(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	return (-ENOBUFS);
-	// FIXME FIXME FIXME
-	// return t_read(tp, q, mp);
+	return t_read(tp, q, mp);
 }
 
 /**
@@ -11426,9 +11426,7 @@ __tp_r_data(struct tp *tp, queue_t *q, mblk_t *mp)
 static inline fastcall __hot_write int
 __tp_w_data(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	return (-ENOBUFS);
-	// FIXME FIXME FIXME
-	// return t_write(tp, q, mp);
+	return t_write(tp, q, mp);
 }
 
 /**
@@ -11749,9 +11747,7 @@ tp_r_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	switch (__builtin_expect(DB_TYPE(mp), M_DATA)) {
 	case M_DATA:
-		break;
-		// FIXME FIXME FIXME
-		// return __tp_recv_msg(tp, q, mp);
+		return __tp_r_data(tp, q, mp);
 	case M_SIG:
 	case M_PCSIG:
 		return __tp_r_sig(tp, q, mp);
@@ -14067,16 +14063,6 @@ tp_init(void)
 	(void) t_conn_con;
 	(void) t_ordrel_ind;
 	(void) tp_pack_ea;
-	(void) t_conn_res;
-	(void) t_discon_req;
-	(void) t_info_req;
-	(void) t_bind_req;
-	(void) t_unbind_req;
-	(void) t_optmgmt_req;
-	(void) t_ordrel_req;
-	(void) t_addr_req;
-	(void) t_capability_req;
-	(void) t_capability_req;
 
 	if ((err = tp_register_strdev(major)) < 0) {
 		cmn_err(CE_WARN, "%s could not register STREAMS device, err = %d", DRV_NAME, err);
