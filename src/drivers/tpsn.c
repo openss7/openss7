@@ -9807,6 +9807,841 @@ t_capability_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t caps, int t
 /*
  *  =========================================================================
  *
+ *  Received message handling:
+ *
+ *  =========================================================================
+ */
+
+/**
+ * tp_tst_checksum - test the checksum
+ * @mp: message containin TPDU
+ * @offset: offset of variable part within message.
+ *
+ * Test the checksum * by calculating the checksum for the TPDU.  This calculation
+ * follows the procedures in X.224 Annex D.  It is necessary that the TPDU contains
+ * a checksum, but not necessary to know where it is located.
+ */
+STATIC INLINE __hot int
+tp_tst_checksum(mblk_t *mp)
+{
+	mblk_t *bp;
+	int c0 = 0, c1 = 0, L = 0;
+
+	for (bp = mp; bp; bp = bp->b_cont) {
+		register unsigned char *p = bp->b_rptr;
+		register unsigned char *e = bp->b_wptr;
+
+		if (p < e) {
+			L += e - p;
+			while (p < e) {
+				c0 += *p++;
+				c1 += c0;
+			}
+		}
+	}
+	return ((c1 == 0) && (c0 == 0));
+}
+
+
+static int
+tp_cr_check(struct tp *tp, mblk_t *mp)
+{
+	size_t msize, csize;
+	mblk_t *cp;
+	pl_t pl;
+
+	msize = DB_BASE(mp) - mp->b_rptr + 4;
+	pl = bufq_lock(&tp->conq);
+	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
+		csize = DB_BASE(cp) - cp->b_rptr + 4;
+
+		if (csize == msize && memcmp(DB_BASE(mp), DB_BASE(cp), msize) == 0) {
+			bufq_unlock(&tp->conq, pl);
+			return (0);
+		}
+	}
+	bufq_unlock(&tp->conq, pl);
+	return (1);
+}
+
+/**
+ * tp_recv_cr - a CR is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the CR message
+ *
+ * In state _TP_STATE_CLOSED:
+ * If not _TP_PREDICATE_P8 (acceptable CR-TPDU), _TP_ACTION_21 (send a DC-TPDU with
+ *	src-ref equal to zero), stay in _TP_STATE_CLOSED.
+ * If _TP_PREDICATE_P8 (acceptable CR-TPDU), _TP_ACTION_1 (count = count + 1),
+ *	_TP_ACTION_9 (set initial credit for sending according to the received
+ *	CR/CC-TPDU), _TP_ACTION_3 (set retransmission timer), generate T-CONNECTION
+ *	indication, move to _TP_STATE_WFTRESP, _TP_NOTE_5 (not a duplicate CR-TPDU;
+ *	if duplicated, ignore it).
+ *
+ * In state _TP_STATE_OPEN:
+ * _TP_ACTION_8 (stop inactivity timer if running), _TP_ACTION_7 (set inactivity
+ *	timer), stay in _TP_STATE_OPEN.
+ *
+ * In state _TP_STATE_WFTRESP: stay in _TP_STATE_WFTRESP.
+ *
+ * In state _TP_STATE_AKWAIT: send CC-TPDU, stay in _TP_STATE_AKWAIT.
+ *
+ * In state _TP_STATE_CLOSING:
+ * stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU may be either repeated
+ *	immediately or when T1 will run out).
+ */
+static int
+tp_recv_cr(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	register unsigned char *m;
+	int hlen, mlen;
+	uint16_t dref, sref;
+	int li, acceptable = 1, copt, credit, extf;
+
+	/* Note that checksum is always present in CR */
+	if (unlikely(!tp_tst_checksum(mp)))
+		goto badpdu;
+
+	/* check for duplicate connection request */
+	if (unlikely(!tp_cr_check(tp, mp)))
+		goto duplicate;
+
+	m = mp->b_rptr;
+	mlen = msgsize(mp);
+	if (unlikely(mlen < 2))
+		goto badpdu;
+	hlen = li = m[0];
+	if (unlikely(mlen < li))
+		goto badpdu;
+	if (unlikely(li < 2))
+		goto badpdu;
+	if ((m[1] & 0xf0) != _TP_MT_CR)
+		goto badpdu;
+	credit = m[1] & 0x0f;
+	if (unlikely(li < 7))
+		goto badpdu;
+	/* DST-REF must always be zero in CR-TPDU */
+	if (unlikely((dref = (m[2] << 8) | m[3]) != 0))
+		goto badpdu;
+	dref = tp->rref;
+	if (unlikely((sref = (m[4] << 8) | m[5]) == 0))
+		goto badpdu;
+	if (unlikely((copt = m[6] & 0x0f) != T_CLASS4))
+		goto badpdu;
+	if (unlikely(m[6] & _T_F_CO_RESERVED4))
+		goto badpdu;
+	if (unlikely(m[6] & _T_F_CO_RESERVED3))
+		goto badpdu;
+	if (unlikely(m[6] & _T_F_CO_FLOWCTRL))
+		goto badpdu;	/* class 2 only */
+	extf = (m[6] & _T_F_CO_EXTFORM) ? 1 : 0;
+	m += 7;
+	hlen -= 7;
+	while (hlen > 0) {
+		li = m[1];
+		switch (m[0]) {
+			int val;
+
+		case _TP_PT_CGTRANSSEL:
+			if (li >= 2) {
+				tp->dst.tsel[0] = m[2];
+				tp->dst.tsel[1] = m[3];
+			}
+			break;
+		case _TP_PT_CDTRANSSEL:
+			if (li >= 2) {
+				tp->src.tsel[0] = m[2];
+				tp->src.tsel[1] = m[3];
+			}
+			break;
+		case _TP_PT_TPDU_SIZE:
+			if (li != 1)
+				goto badpdu;
+			val = m[2];
+			if (val < 7 || val > 13)
+				goto badpdu;
+			val = (1 << val);
+			break;
+		case _TP_PT_PREF_TPDU_SIZE:
+			break;
+		case _TP_PT_VERSION:
+			if (li != 1 || m[2] != 0x1)
+				goto badpdu;
+			break;
+		case _TP_PT_PROTECTION:
+			break;
+		case _TP_PT_CHECKSUM:
+			break;
+		default:
+			break;
+		}
+		m += 2 + li;
+		hlen -= 2 + li;
+	}
+
+	switch (tp->pstate) {
+	case _TP_STATE_CLOSED:
+		if (!acceptable) {
+		} else {
+		}
+		break;
+	case _TP_STATE_OPEN:
+		tp_timer_stop(tp, t2);
+		tp_timer_start(tp, q, t2);
+		break;
+	case _TP_STATE_WFTRESP:
+		/* We are waiting for a response from the user, this is likely a repeat. */
+		break;
+	case _TP_STATE_AKWAIT:
+		/* We have already received a CR-TPDU to which we have sent a CC-TPDU.  Send the
+		   CC-TPDU again and stay in this state. */
+		tp_resend(tp, q);
+		break;
+	case _TP_STATE_CLOSING:
+#if 0
+		tp_resend(tp, q);
+#endif
+		break;
+	}
+	freemsg(mp);
+	return (0);
+
+      badpdu:
+	LOGRX(tp, "discarding bad CR-TPDU");
+	freemsg(mp);
+	return (0);
+#if 0
+      enobufs:
+	err = -ENOBUFS;
+	goto error;
+
+      error:
+	return (err);
+#endif
+      duplicate:
+	LOGRX(tp, "discarding multiple CR-TPDU");
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * tp_recv_cc - a CC is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the CC message
+ *
+ * In state _TP_STATE_REFWAIT: Send DR-TPDU, stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_WFCC: If _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_9 (set
+ * initial credit for sending according to the received CR/CC-TPDU), _TP_ACTION_2 (count = 0),
+ * _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_5 (set window timer),
+ * _TP_ACTION_7 (set inactivity timer), _TP_ACTION_17 (send a TPDU according to data transfer
+ * procedure), generate T-CONNECTION confirmation, _TP_NOTE_9 (at least an AK-TPDU shall be sent if
+ * the transport entity is the initiator in order to ensure that the responder will complete its
+ * three-way handshake).  If not _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_4 (stop
+ * retransmission timer if running), _TP_ACTION_3 (set retransmission timer), _TP_ACTION_2 (count =
+ * 0), _TP_ACTION_1 (count = count + 1), _TP_ACTION_23 (send a DR-TPDU with src-ref = local-ref and
+ * dst-ref = SRC-REF in CC-TPDU), generate T-DISCONNECT indiciation, move to _TP_STATE_CLOSING.
+ *
+ * In state _TP_STATE_WBCL: If _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_2 (count =
+ * 0), _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3 (set retransmission timer),
+ * _TP_ACTION_1 (count = count + 1), _TP_ACTION_15 (send the DR-TPDU, this DR-TPDU is sent with
+ * src-ref = local-ref and dst-ref = remote-ref (may be zero)), move to _TP_STATE_CLOSING.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_17 (set a TPDU according to data transfer procedures),
+ * _TP_ACTION_8 (stop inactivity timer if running), _TP_ACTION_7 (start inactivity timer),
+ * _TP_NOTE_9 (at least an AK-TPDU shall be sent if the transport entity is the initiator in order
+ * to ensure that the responder will complete its three-way handshake), stay in _TP_STATE_OPEN.
+ *
+ * In state _TP_STATE_CLOSING: If _TP_PREDICATE_P9 (acceptable class 4 TC-TPDU), _TP_NOTE_11 (if the
+ * CLOSING state has been entered, coming from WFCC state, the remote-ref is zero.  The SRC-REF
+ * field of the CC-TPDU is ignored (i.e. if the DR-TPDU is retransmitted, it will be with the
+ * dst-ref field set to zero)), stay in state _TP_STATE_CLOSING.
+ */
+static int
+tp_recv_cc(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_er - a ER is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the ER message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_WFCC: _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
+ * move to _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_WBCL: _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_6 (stop window timer if running), _TP_ACITON_8 (stop
+ * inactivit timer if running), _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3
+ * (set retransmission timer), _TP_ACTION_2 (count = 0), _TP_ACTION_1 (count = count + 1),
+ * _TP_ACTION_15 (send the DR-TPDU, this DR-TPDU is sent with src-ref = local-ref and dst-ref =
+ * remote-ref (may be zero)), generate T-DISCONNECT indication, move to _TP_STATE_CLOSING.
+ *
+ * In state _TP_STATE_AKWAIT: _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3 (set
+ * retransmission timer), _TP_ACTION_2 (count = 0), _TP_ACTION_1 (count = count + 1), _TP_ACTION_15
+ * (send the DR-TPDU, this DR-TPDU is sent with src-ref = local-ref and dst-ref = remote-ref (may be
+ * zero)), generate T-DISCONNECT indication, move to _TP_STATE_CLOSING.
+ *
+ * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
+ */
+static int
+tp_recv_er(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_dr - a DR is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @dp: the DR message
+ *
+ * In state _TP_STATE_REFWAIT: _TP_ACTION_22 (send a DC-TPDU with src-ref equal to
+ * zero), stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: _TP_ACTION_22 (send a DC-TPDU with src-ref equal to
+ * zero), stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_WFCC: _TP_NOTE_8 (association to this transport connection is
+ * done regardless of the SRC-REF field; if SRC-REF is not zero, a DC-TPDU is sent
+ * back), _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
+ * move to _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_WBCL: _TP_NOTE_8 (association to this transport connection is
+ * done regardless of the SRC-REF field; if SRC-REF is not zero, a DC-TPDU is sent
+ * back), _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_OPEN: Send DC-TPDU,
+ * _TP_NOTE_10 (if association has been made, and DST-REF is zero, then the DC-TPDU
+ * contains a src-ref field set to zero),
+ * _TP_ACTION_0 (set reference timer),
+ * generate T-DISCONNECT indication,
+ * move to _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_WFTRESP: Send DC-TPDU, _TP_NOTE_10 (if association has been
+ * made, and DST-REF is zero, then the DC-TPDU contains a src-ref field set to
+ * zero), generate T-DISCONNECT indication, move to _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_AKWAIT: Send DC-TPDU, _TP_NOTE_10 (if association has been
+ * made, and DST-REF is zero, then the DC-TPDU contains a src-ref field set to
+ * zero), _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
+ * move to _TP_STATE_REFWAIT
+ *
+ * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to
+ * _TP_STATE_REFWAIT.
+ */
+static int
+tp_recv_dr(struct tp *tp, queue_t *q, mblk_t *dp)
+{
+	uint16_t dref, sref;
+	mblk_t *mp;
+	int err;
+
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(dp)) {
+			freemsg(dp);
+			return (0);
+		}
+	}
+#endif
+
+	dref = (dp->b_rptr[2] << 8) | dp->b_rptr[3];
+	sref = (dp->b_rptr[4] << 8) | dp->b_rptr[5];
+
+	switch (tp->pstate) {
+	case _TP_STATE_WFCC:
+	case _TP_STATE_WBCL:
+		if (sref == 0)
+			break;
+		goto senddc;
+	case _TP_STATE_REFWAIT:
+	case _TP_STATE_CLOSED:
+		dref = 0;
+		goto senddc;
+	case _TP_STATE_OPEN:
+	case _TP_STATE_AKWAIT:
+	case _TP_STATE_WFTRESP:
+	      senddc:
+		if ((mp = tp_pack_dc(tp, q, sref, dref)) == NULL)
+			goto enobufs;
+		tp_queue_xmit(tp, q, mp);
+		freemsg(mp);
+		break;
+	}
+	switch (tp->pstate) {
+	case _TP_STATE_WBCL:
+	case _TP_STATE_AKWAIT:
+	case _TP_STATE_WFTRESP:
+		if ((err = t_discon_ind(tp, q, _TP_REASON_UNSPECIFIED, NULL)))
+			goto error;
+		break;
+	}
+	switch (tp->pstate) {
+	case _TP_STATE_WFCC:
+	case _TP_STATE_WBCL:
+	case _TP_STATE_OPEN:
+	case _TP_STATE_AKWAIT:
+	case _TP_STATE_CLOSING:
+		tp_timer_start(tp, q, t4);
+		tp->pstate = _TP_STATE_REFWAIT;
+		break;
+	case _TP_STATE_WFTRESP:
+		tp->pstate = _TP_STATE_CLOSED;
+		break;
+	}
+	return (0);
+      error:
+	return (err);
+      enobufs:
+	err = -ENOBUFS;
+	goto error;
+}
+
+/**
+ * tp_recv_dc - a DC is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the DC message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to
+ * _TP_STATE_REFWAIT.
+ */
+static int
+tp_recv_dc(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	switch (tp->pstate) {
+	case _TP_STATE_REFWAIT:
+	case _TP_STATE_CLOSED:
+		break;
+	case _TP_STATE_CLOSING:
+		tp_timer_start(tp, q, t4);
+		tp->pstate = _TP_STATE_REFWAIT;
+		break;
+	default:
+		break;
+	}
+	return (0);
+}
+
+/**
+ * tp_recv_ea - a EA is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the EA message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
+ * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
+ * data transfer procedures).
+ *
+ * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
+ * may be either repeated immediately or when T1 will run out).
+ */
+static int
+tp_recv_ea(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_dt - a DT is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the DT message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
+ * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
+ * data transfer procedures).
+ *
+ * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
+ * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
+ * requests are ready for processing according to data transfer procedures),
+ * _TP_NOTE_16 (see data transfer procedures).
+ *
+ * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
+ * may be either repeated immediately or when T1 will run out).
+ */
+static int
+tp_recv_dt(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	register unsigned char *m;
+	int hlen, mlen, dlen;
+	int roa, eot;
+	uint16_t dref;
+	uint32_t seq;
+
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	if (unlikely(tp_get_state(tp) != TS_DATA_XFER))
+		goto outstate;
+
+	mlen = msgsize(mp);
+	m = mp->b_rptr;
+	if (unlikely(mlen < 1))
+		goto badpdu;
+	hlen = *m++;
+	dlen = mlen - hlen;
+	hlen--;
+	if (unlikely(dlen < 0))
+		goto badpdu;
+	if (unlikely(mlen < 2))
+		goto badpdu;
+	if ((*m & 0xfe) != _TP_MT_DT)
+		goto badpdu;
+	roa = *m++ & 0x01;
+	hlen--;
+	dref = (m[0] << 8) | m[1];
+	m += 2;
+	hlen -= 2;
+	if (!(tp->opts & _T_F_CO_EXTFORM)) {
+		/* short form */
+		eot = ((m[0] & 0x80) != 0);
+		seq = ((m[0] << 0) & 0x7f);
+		m++;
+		hlen--;
+	} else {
+		/* extended form */
+		eot = ((m[0] & 0x80) != 0);
+		seq = ((m[0] << 24) & 0x7f) | (m[1] << 16) | (m[2] << 8) | m[3];
+		m += 4;
+		hlen -= 4;
+	}
+
+
+	switch (tp->pstate) {
+	case _TP_STATE_REFWAIT:
+	case _TP_STATE_CLOSED:
+	default:
+		freemsg(mp);
+		return (0);
+	case _TP_STATE_OPEN:
+	case _TP_STATE_AKWAIT:
+		tp_timer_stop(tp, t2);
+		tp_timer_start(tp, q, t2);
+		tp->pstate = _TP_STATE_OPEN;
+		qenable(tp->rq);
+		/* FIXME: perform data transfer procedure */
+		break;
+	case _TP_STATE_CLOSING:
+		freemsg(mp);
+		return tp_send_dr(tp, q, NULL);	/* optional */
+	}
+	return (0);
+
+      badpdu:
+	LOGERR(tp, "bad DT-TPDU");
+      outstate:
+	/* ignore out of state messages */
+	freemsg(mp);
+	return (0);
+}
+
+static int
+tp_recv_rj(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_ak - a AK is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the AK message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
+ * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
+ * data transfer procedures).
+ *
+ * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
+ * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
+ * requests are ready for processing according to data transfer procedures),
+ * _TP_NOTE_16 (see data transfer procedures).
+ *
+ * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
+ * may be either repeated immediately or when T1 will run out).
+ */
+static int
+tp_recv_ak(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_ed - a ED is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the ED message
+ *
+ * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
+ *
+ * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
+ *
+ * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
+ * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
+ * data transfer procedures).
+ *
+ * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
+ * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
+ * requests are ready for processing according to data transfer procedures),
+ * _TP_NOTE_16 (see data transfer procedures).
+ *
+ * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
+ * may be either repeated immediately or when T1 will run out).
+ */
+static int
+tp_recv_ed(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	return (0);
+}
+
+/**
+ * tp_recv_ud - a UD is received
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the UD message (must be pulled up)
+ *
+ * Generate T-UNITDATA indication.
+ */
+static int
+tp_recv_ud(struct tp *tp, queue_t *q, mblk_t *mp, struct tsapaddr *saddr)
+{
+	register unsigned char *m;
+	int hlen, plen, mlen, dlen;
+	struct netbuf src, opt;
+
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tcl.tcl_checksum == T_YES) {
+		if (!tp_tst_checksum(mp)) {
+			freemsg(mp);
+			return (0);
+		}
+	}
+#endif
+	src.buf = (typeof(src.buf)) saddr;
+	src.len = saddr->nsap.len + 2;
+
+	opt.buf = NULL;
+	opt.len = 0;		/* FIXME: put checksum in here eventually */
+
+	if (unlikely(tp_get_state(tp) != TS_IDLE))
+		goto outstate;
+
+	mlen = msgsize(mp);
+	m = mp->b_rptr;
+	if (unlikely(mlen < 1))
+		goto badpdu;
+	hlen = *m++;
+	dlen = mlen - hlen;
+	hlen--;
+	if (unlikely(dlen < 0))
+		goto badpdu;
+	if (unlikely(mlen < 2))
+		goto badpdu;
+	if (*m++ != _TP_MT_UD)
+		goto badpdu;
+	hlen--;
+	while (hlen > 0) {
+		switch (*m++) {
+		case _TP_PT_CDTRANSSEL:
+			hlen--;
+			plen = *m++;
+			hlen--;
+			if (unlikely(plen > hlen))
+				goto badpdu;
+			m += plen;
+			hlen -= plen;
+			break;
+		case _TP_PT_CGTRANSSEL:
+			hlen--;
+			plen = *m++;
+			hlen--;
+			saddr->tsel[0] = m[0];
+			saddr->tsel[1] = m[1];
+			if (unlikely(plen > hlen))
+				goto badpdu;
+			m += plen;
+			hlen -= plen;
+			break;
+		case _TP_PT_CHECKSUM:
+			hlen--;
+			plen = *m++;
+			hlen--;
+			if (unlikely(plen > hlen))
+				goto badpdu;
+			m += plen;
+			hlen -= plen;
+			break;
+		default:
+			goto badpdu;
+		}
+	}
+	return t_unitdata_ind(tp, q, &src, &opt, mp);
+      badpdu:
+	LOGERR(tp, "bad UD-TPDU");
+      outstate:
+	/* ignore out of state messages */
+	freemsg(mp);
+	return (0);
+#if 0
+      enobufs:
+	return (-ENOBUFS);
+      ebusy:
+	return (-EBUSY);
+#endif
+}
+
+/**
+ * t_read - read data message from below
+ * @tp: private structure (locked)
+ * @q: active queue (read queue)
+ * @mp: the data message
+ *
+ * Messages from below consist of the entire frame that was received from the
+ * underlying network provider.  For subnetwork (llc) frames this is the entire
+ * ethernet frame.  For ISO-IP and ISO-UDP this is the entire frame without the
+ * layer 2 header (IP and possibly UDP).  Frames have already been assigned to the
+ * appropriate stream by lower level discriminator and lookup functions.
+ *
+ * Note that DB_BASE(mp) points to the network header.  For llc, this is the L2
+ * header including ethernet addresses.  For ISO-IP and ISO-UDP, this is the IP
+ * header.  mp->b_rptr points to the transport header (TPDU).  Frames must be
+ * descriminated again by TPDU message type and fed to the appropriate message
+ * receive functions.
+ */
+int
+t_read(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	switch (mp->b_rptr[1] & 0xf0) {
+	case _TP_MT_ED:
+		return tp_recv_ed(tp, q, mp);
+	case _TP_MT_EA:
+		return tp_recv_ea(tp, q, mp);
+	case _TP_MT_UD:
+		return tp_recv_ud(tp, q, mp, &tp->dst);
+	case _TP_MT_RJ:
+		return tp_recv_rj(tp, q, mp);
+	case _TP_MT_AK:
+		return tp_recv_ak(tp, q, mp);
+	case _TP_MT_ER:
+		return tp_recv_er(tp, q, mp);
+	case _TP_MT_DR:
+		return tp_recv_dr(tp, q, mp);
+	case _TP_MT_DC:
+		return tp_recv_dc(tp, q, mp);
+	case _TP_MT_CC:
+		return tp_recv_cc(tp, q, mp);
+	case _TP_MT_CR:
+		return tp_recv_cr(tp, q, mp);
+	case _TP_MT_DT:
+		return tp_recv_dt(tp, q, mp);
+	default:
+		freemsg(mp);
+		return (0);
+	}
+}
+
+/*
+ *  =========================================================================
+ *
  *  IP T-User --> T-Provider Primitives (Request and Response)
  *
  *  =========================================================================
@@ -11396,8 +12231,6 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
-int t_read(struct tp *tp, queue_t *q, mblk_t *mp);
-
 /**
  * __tp_r_data: - process M_DATA message
  * @tp: private structure (locked)
@@ -11752,7 +12585,7 @@ tp_r_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
 	case M_PCSIG:
 		return __tp_r_sig(tp, q, mp);
 	case M_CTL:
-		break;
+		return (-EFAULT);
 		// FIXME FIXME FIXME
 		// return __tp_recv_err(tp, q, mp);
 	case M_FLUSH:
@@ -11760,8 +12593,6 @@ tp_r_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		return tp_r_other(q, mp);
 	}
-	// FIXME FIXME FIXME
-	return (-EFAULT);
 }
 
 /**
@@ -12013,841 +12844,6 @@ tp_qclose(queue_t *q, int oflags, cred_t *crp)
 	err = mi_close_comm(&tp_opens, q);
 	write_unlock_irqrestore(&tp_lock, flags);
 	return (err);
-}
-
-/*
- *  =========================================================================
- *
- *  Received message handling:
- *
- *  =========================================================================
- */
-
-/**
- * tp_tst_checksum - test the checksum
- * @mp: message containin TPDU
- * @offset: offset of variable part within message.
- *
- * Test the checksum * by calculating the checksum for the TPDU.  This calculation
- * follows the procedures in X.224 Annex D.  It is necessary that the TPDU contains
- * a checksum, but not necessary to know where it is located.
- */
-STATIC INLINE __hot int
-tp_tst_checksum(mblk_t *mp)
-{
-	mblk_t *bp;
-	int c0 = 0, c1 = 0, L = 0;
-
-	for (bp = mp; bp; bp = bp->b_cont) {
-		register unsigned char *p = bp->b_rptr;
-		register unsigned char *e = bp->b_wptr;
-
-		if (p < e) {
-			L += e - p;
-			while (p < e) {
-				c0 += *p++;
-				c1 += c0;
-			}
-		}
-	}
-	return ((c1 == 0) && (c0 == 0));
-}
-
-
-static int
-tp_cr_check(struct tp *tp, mblk_t *mp)
-{
-	size_t msize, csize;
-	mblk_t *cp;
-	pl_t pl;
-
-	msize = DB_BASE(mp) - mp->b_rptr + 4;
-	pl = bufq_lock(&tp->conq);
-	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
-		csize = DB_BASE(cp) - cp->b_rptr + 4;
-
-		if (csize == msize && memcmp(DB_BASE(mp), DB_BASE(cp), msize) == 0) {
-			bufq_unlock(&tp->conq, pl);
-			return (0);
-		}
-	}
-	bufq_unlock(&tp->conq, pl);
-	return (1);
-}
-
-/**
- * tp_recv_cr - a CR is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the CR message
- *
- * In state _TP_STATE_CLOSED:
- * If not _TP_PREDICATE_P8 (acceptable CR-TPDU), _TP_ACTION_21 (send a DC-TPDU with
- *	src-ref equal to zero), stay in _TP_STATE_CLOSED.
- * If _TP_PREDICATE_P8 (acceptable CR-TPDU), _TP_ACTION_1 (count = count + 1),
- *	_TP_ACTION_9 (set initial credit for sending according to the received
- *	CR/CC-TPDU), _TP_ACTION_3 (set retransmission timer), generate T-CONNECTION
- *	indication, move to _TP_STATE_WFTRESP, _TP_NOTE_5 (not a duplicate CR-TPDU;
- *	if duplicated, ignore it).
- *
- * In state _TP_STATE_OPEN:
- * _TP_ACTION_8 (stop inactivity timer if running), _TP_ACTION_7 (set inactivity
- *	timer), stay in _TP_STATE_OPEN.
- *
- * In state _TP_STATE_WFTRESP: stay in _TP_STATE_WFTRESP.
- *
- * In state _TP_STATE_AKWAIT: send CC-TPDU, stay in _TP_STATE_AKWAIT.
- *
- * In state _TP_STATE_CLOSING:
- * stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU may be either repeated
- *	immediately or when T1 will run out).
- */
-static int
-tp_recv_cr(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	register unsigned char *m;
-	int hlen, mlen;
-	uint16_t dref, sref;
-	int li, acceptable = 1, copt, credit, extf;
-
-	/* Note that checksum is always present in CR */
-	if (unlikely(!tp_tst_checksum(mp)))
-		goto badpdu;
-
-	/* check for duplicate connection request */
-	if (unlikely(!tp_cr_check(tp, mp)))
-		goto duplicate;
-
-	m = mp->b_rptr;
-	mlen = msgsize(mp);
-	if (unlikely(mlen < 2))
-		goto badpdu;
-	hlen = li = m[0];
-	if (unlikely(mlen < li))
-		goto badpdu;
-	if (unlikely(li < 2))
-		goto badpdu;
-	if ((m[1] & 0xf0) != _TP_MT_CR)
-		goto badpdu;
-	credit = m[1] & 0x0f;
-	if (unlikely(li < 7))
-		goto badpdu;
-	/* DST-REF must always be zero in CR-TPDU */
-	if (unlikely((dref = (m[2] << 8) | m[3]) != 0))
-		goto badpdu;
-	dref = tp->rref;
-	if (unlikely((sref = (m[4] << 8) | m[5]) == 0))
-		goto badpdu;
-	if (unlikely((copt = m[6] & 0x0f) != T_CLASS4))
-		goto badpdu;
-	if (unlikely(m[6] & _T_F_CO_RESERVED4))
-		goto badpdu;
-	if (unlikely(m[6] & _T_F_CO_RESERVED3))
-		goto badpdu;
-	if (unlikely(m[6] & _T_F_CO_FLOWCTRL))
-		goto badpdu;	/* class 2 only */
-	extf = (m[6] & _T_F_CO_EXTFORM) ? 1 : 0;
-	m += 7;
-	hlen -= 7;
-	while (hlen > 0) {
-		li = m[1];
-		switch (m[0]) {
-			int val;
-
-		case _TP_PT_CGTRANSSEL:
-			if (li >= 2) {
-				tp->dst.tsel[0] = m[2];
-				tp->dst.tsel[1] = m[3];
-			}
-			break;
-		case _TP_PT_CDTRANSSEL:
-			if (li >= 2) {
-				tp->src.tsel[0] = m[2];
-				tp->src.tsel[1] = m[3];
-			}
-			break;
-		case _TP_PT_TPDU_SIZE:
-			if (li != 1)
-				goto badpdu;
-			val = m[2];
-			if (val < 7 || val > 13)
-				goto badpdu;
-			val = (1 << val);
-			break;
-		case _TP_PT_PREF_TPDU_SIZE:
-			break;
-		case _TP_PT_VERSION:
-			if (li != 1 || m[2] != 0x1)
-				goto badpdu;
-			break;
-		case _TP_PT_PROTECTION:
-			break;
-		case _TP_PT_CHECKSUM:
-			break;
-		default:
-			break;
-		}
-		m += 2 + li;
-		hlen -= 2 + li;
-	}
-
-	switch (tp->pstate) {
-	case _TP_STATE_CLOSED:
-		if (!acceptable) {
-		} else {
-		}
-		break;
-	case _TP_STATE_OPEN:
-		tp_timer_stop(tp, t2);
-		tp_timer_start(tp, q, t2);
-		break;
-	case _TP_STATE_WFTRESP:
-		/* We are waiting for a response from the user, this is likely a repeat. */
-		break;
-	case _TP_STATE_AKWAIT:
-		/* We have already received a CR-TPDU to which we have sent a CC-TPDU.  Send the
-		   CC-TPDU again and stay in this state. */
-		tp_resend(tp, q);
-		break;
-	case _TP_STATE_CLOSING:
-#if 0
-		tp_resend(tp, q);
-#endif
-		break;
-	}
-	freemsg(mp);
-	return (0);
-
-      badpdu:
-	LOGRX(tp, "discarding bad CR-TPDU");
-	freemsg(mp);
-	return (0);
-#if 0
-      enobufs:
-	err = -ENOBUFS;
-	goto error;
-
-      error:
-	return (err);
-#endif
-      duplicate:
-	LOGRX(tp, "discarding multiple CR-TPDU");
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * tp_recv_cc - a CC is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the CC message
- *
- * In state _TP_STATE_REFWAIT: Send DR-TPDU, stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_WFCC: If _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_9 (set
- * initial credit for sending according to the received CR/CC-TPDU), _TP_ACTION_2 (count = 0),
- * _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_5 (set window timer),
- * _TP_ACTION_7 (set inactivity timer), _TP_ACTION_17 (send a TPDU according to data transfer
- * procedure), generate T-CONNECTION confirmation, _TP_NOTE_9 (at least an AK-TPDU shall be sent if
- * the transport entity is the initiator in order to ensure that the responder will complete its
- * three-way handshake).  If not _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_4 (stop
- * retransmission timer if running), _TP_ACTION_3 (set retransmission timer), _TP_ACTION_2 (count =
- * 0), _TP_ACTION_1 (count = count + 1), _TP_ACTION_23 (send a DR-TPDU with src-ref = local-ref and
- * dst-ref = SRC-REF in CC-TPDU), generate T-DISCONNECT indiciation, move to _TP_STATE_CLOSING.
- *
- * In state _TP_STATE_WBCL: If _TP_PREDICATE_P9 (acceptable class 4 CC-TPDU), _TP_ACTION_2 (count =
- * 0), _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3 (set retransmission timer),
- * _TP_ACTION_1 (count = count + 1), _TP_ACTION_15 (send the DR-TPDU, this DR-TPDU is sent with
- * src-ref = local-ref and dst-ref = remote-ref (may be zero)), move to _TP_STATE_CLOSING.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_17 (set a TPDU according to data transfer procedures),
- * _TP_ACTION_8 (stop inactivity timer if running), _TP_ACTION_7 (start inactivity timer),
- * _TP_NOTE_9 (at least an AK-TPDU shall be sent if the transport entity is the initiator in order
- * to ensure that the responder will complete its three-way handshake), stay in _TP_STATE_OPEN.
- *
- * In state _TP_STATE_CLOSING: If _TP_PREDICATE_P9 (acceptable class 4 TC-TPDU), _TP_NOTE_11 (if the
- * CLOSING state has been entered, coming from WFCC state, the remote-ref is zero.  The SRC-REF
- * field of the CC-TPDU is ignored (i.e. if the DR-TPDU is retransmitted, it will be with the
- * dst-ref field set to zero)), stay in state _TP_STATE_CLOSING.
- */
-static int
-tp_recv_cc(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_er - a ER is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the ER message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_WFCC: _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
- * move to _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_WBCL: _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_6 (stop window timer if running), _TP_ACITON_8 (stop
- * inactivit timer if running), _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3
- * (set retransmission timer), _TP_ACTION_2 (count = 0), _TP_ACTION_1 (count = count + 1),
- * _TP_ACTION_15 (send the DR-TPDU, this DR-TPDU is sent with src-ref = local-ref and dst-ref =
- * remote-ref (may be zero)), generate T-DISCONNECT indication, move to _TP_STATE_CLOSING.
- *
- * In state _TP_STATE_AKWAIT: _TP_ACTION_4 (stop retransmission timer if running), _TP_ACTION_3 (set
- * retransmission timer), _TP_ACTION_2 (count = 0), _TP_ACTION_1 (count = count + 1), _TP_ACTION_15
- * (send the DR-TPDU, this DR-TPDU is sent with src-ref = local-ref and dst-ref = remote-ref (may be
- * zero)), generate T-DISCONNECT indication, move to _TP_STATE_CLOSING.
- *
- * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
- */
-static int
-tp_recv_er(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_dr - a DR is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @dp: the DR message
- *
- * In state _TP_STATE_REFWAIT: _TP_ACTION_22 (send a DC-TPDU with src-ref equal to
- * zero), stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: _TP_ACTION_22 (send a DC-TPDU with src-ref equal to
- * zero), stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_WFCC: _TP_NOTE_8 (association to this transport connection is
- * done regardless of the SRC-REF field; if SRC-REF is not zero, a DC-TPDU is sent
- * back), _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
- * move to _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_WBCL: _TP_NOTE_8 (association to this transport connection is
- * done regardless of the SRC-REF field; if SRC-REF is not zero, a DC-TPDU is sent
- * back), _TP_ACTION_0 (set reference timer), move to _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_OPEN: Send DC-TPDU,
- * _TP_NOTE_10 (if association has been made, and DST-REF is zero, then the DC-TPDU
- * contains a src-ref field set to zero),
- * _TP_ACTION_0 (set reference timer),
- * generate T-DISCONNECT indication,
- * move to _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_WFTRESP: Send DC-TPDU, _TP_NOTE_10 (if association has been
- * made, and DST-REF is zero, then the DC-TPDU contains a src-ref field set to
- * zero), generate T-DISCONNECT indication, move to _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_AKWAIT: Send DC-TPDU, _TP_NOTE_10 (if association has been
- * made, and DST-REF is zero, then the DC-TPDU contains a src-ref field set to
- * zero), _TP_ACTION_0 (set reference timer), generate T-DISCONNECT indication,
- * move to _TP_STATE_REFWAIT
- *
- * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to
- * _TP_STATE_REFWAIT.
- */
-static int
-tp_recv_dr(struct tp *tp, queue_t *q, mblk_t *dp)
-{
-	uint16_t dref, sref;
-	mblk_t *mp;
-	int err;
-
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(dp)) {
-			freemsg(dp);
-			return (0);
-		}
-	}
-#endif
-
-	dref = (dp->b_rptr[2] << 8) | dp->b_rptr[3];
-	sref = (dp->b_rptr[4] << 8) | dp->b_rptr[5];
-
-	switch (tp->pstate) {
-	case _TP_STATE_WFCC:
-	case _TP_STATE_WBCL:
-		if (sref == 0)
-			break;
-		goto senddc;
-	case _TP_STATE_REFWAIT:
-	case _TP_STATE_CLOSED:
-		dref = 0;
-		goto senddc;
-	case _TP_STATE_OPEN:
-	case _TP_STATE_AKWAIT:
-	case _TP_STATE_WFTRESP:
-	      senddc:
-		if ((mp = tp_pack_dc(tp, q, sref, dref)) == NULL)
-			goto enobufs;
-		tp_queue_xmit(tp, q, mp);
-		freemsg(mp);
-		break;
-	}
-	switch (tp->pstate) {
-	case _TP_STATE_WBCL:
-	case _TP_STATE_AKWAIT:
-	case _TP_STATE_WFTRESP:
-		if ((err = t_discon_ind(tp, q, _TP_REASON_UNSPECIFIED, NULL)))
-			goto error;
-		break;
-	}
-	switch (tp->pstate) {
-	case _TP_STATE_WFCC:
-	case _TP_STATE_WBCL:
-	case _TP_STATE_OPEN:
-	case _TP_STATE_AKWAIT:
-	case _TP_STATE_CLOSING:
-		tp_timer_start(tp, q, t4);
-		tp->pstate = _TP_STATE_REFWAIT;
-		break;
-	case _TP_STATE_WFTRESP:
-		tp->pstate = _TP_STATE_CLOSED;
-		break;
-	}
-	return (0);
-      error:
-	return (err);
-      enobufs:
-	err = -ENOBUFS;
-	goto error;
-}
-
-/**
- * tp_recv_dc - a DC is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the DC message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_CLOSING: _TP_ACTION_0 (set reference timer), move to
- * _TP_STATE_REFWAIT.
- */
-static int
-tp_recv_dc(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	switch (tp->pstate) {
-	case _TP_STATE_REFWAIT:
-	case _TP_STATE_CLOSED:
-		break;
-	case _TP_STATE_CLOSING:
-		tp_timer_start(tp, q, t4);
-		tp->pstate = _TP_STATE_REFWAIT;
-		break;
-	default:
-		break;
-	}
-	return (0);
-}
-
-/**
- * tp_recv_ea - a EA is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the EA message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
- * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
- * data transfer procedures).
- *
- * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
- * may be either repeated immediately or when T1 will run out).
- */
-static int
-tp_recv_ea(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_dt - a DT is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the DT message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
- * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
- * data transfer procedures).
- *
- * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
- * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
- * requests are ready for processing according to data transfer procedures),
- * _TP_NOTE_16 (see data transfer procedures).
- *
- * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
- * may be either repeated immediately or when T1 will run out).
- */
-static int
-tp_recv_dt(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	register unsigned char *m;
-	int hlen, mlen, dlen;
-	int roa, eot;
-	uint16_t dref;
-	uint32_t seq;
-
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	if (unlikely(tp_get_state(tp) != TS_DATA_XFER))
-		goto outstate;
-
-	mlen = msgsize(mp);
-	m = mp->b_rptr;
-	if (unlikely(mlen < 1))
-		goto badpdu;
-	hlen = *m++;
-	dlen = mlen - hlen;
-	hlen--;
-	if (unlikely(dlen < 0))
-		goto badpdu;
-	if (unlikely(mlen < 2))
-		goto badpdu;
-	if ((*m & 0xfe) != _TP_MT_DT)
-		goto badpdu;
-	roa = *m++ & 0x01;
-	hlen--;
-	dref = (m[0] << 8) | m[1];
-	m += 2;
-	hlen -= 2;
-	if (!(tp->opts & _T_F_CO_EXTFORM)) {
-		/* short form */
-		eot = ((m[0] & 0x80) != 0);
-		seq = ((m[0] << 0) & 0x7f);
-		m++;
-		hlen--;
-	} else {
-		/* extended form */
-		eot = ((m[0] & 0x80) != 0);
-		seq = ((m[0] << 24) & 0x7f) | (m[1] << 16) | (m[2] << 8) | m[3];
-		m += 4;
-		hlen -= 4;
-	}
-
-
-	switch (tp->pstate) {
-	case _TP_STATE_REFWAIT:
-	case _TP_STATE_CLOSED:
-	default:
-		freemsg(mp);
-		return (0);
-	case _TP_STATE_OPEN:
-	case _TP_STATE_AKWAIT:
-		tp_timer_stop(tp, t2);
-		tp_timer_start(tp, q, t2);
-		tp->pstate = _TP_STATE_OPEN;
-		qenable(tp->rq);
-		/* FIXME: perform data transfer procedure */
-		break;
-	case _TP_STATE_CLOSING:
-		freemsg(mp);
-		return tp_send_dr(tp, q, NULL);	/* optional */
-	}
-	return (0);
-
-      badpdu:
-	LOGERR(tp, "bad DT-TPDU");
-      outstate:
-	/* ignore out of state messages */
-	freemsg(mp);
-	return (0);
-}
-
-static int
-tp_recv_rj(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_ak - a AK is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the AK message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
- * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
- * data transfer procedures).
- *
- * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
- * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
- * requests are ready for processing according to data transfer procedures),
- * _TP_NOTE_16 (see data transfer procedures).
- *
- * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
- * may be either repeated immediately or when T1 will run out).
- */
-static int
-tp_recv_ak(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_ed - a ED is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the ED message
- *
- * In state _TP_STATE_REFWAIT: stay in _TP_STATE_REFWAIT.
- *
- * In state _TP_STATE_CLOSED: stay in _TP_STATE_CLOSED.
- *
- * In state _TP_STATE_OPEN: _TP_ACTION_8 (stop inactivity timer if running),
- * _TP_ACTION_7 (set inactivity timer), stay in _TP_STATE_OPEN, _TP_NOTE_16 (see
- * data transfer procedures).
- *
- * In state _TP_STATE_AKWAIT: _TP_ACTION_7 (set inactivity timer), move to
- * _TP_STATE_OPEN, _TP_NOTE_15 (previously stored T-DATA or T-EXPEDITED-DATA
- * requests are ready for processing according to data transfer procedures),
- * _TP_NOTE_16 (see data transfer procedures).
- *
- * In state _TP_STATE_CLOSING: stay in _TP_STATE_CLOSING, _TP_NOTE_13 (the DR-TPDU
- * may be either repeated immediately or when T1 will run out).
- */
-static int
-tp_recv_ed(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tco.tco_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	return (0);
-}
-
-/**
- * tp_recv_ud - a UD is received
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the UD message (must be pulled up)
- *
- * Generate T-UNITDATA indication.
- */
-static int
-tp_recv_ud(struct tp *tp, queue_t *q, mblk_t *mp, struct tsapaddr *saddr)
-{
-	register unsigned char *m;
-	int hlen, plen, mlen, dlen;
-	struct netbuf src, opt;
-
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.res.tcl.tcl_checksum == T_YES) {
-		if (!tp_tst_checksum(mp)) {
-			freemsg(mp);
-			return (0);
-		}
-	}
-#endif
-	src.buf = (typeof(src.buf)) saddr;
-	src.len = saddr->nsap.len + 2;
-
-	opt.buf = NULL;
-	opt.len = 0;		/* FIXME: put checksum in here eventually */
-
-	if (unlikely(tp_get_state(tp) != TS_IDLE))
-		goto outstate;
-
-	mlen = msgsize(mp);
-	m = mp->b_rptr;
-	if (unlikely(mlen < 1))
-		goto badpdu;
-	hlen = *m++;
-	dlen = mlen - hlen;
-	hlen--;
-	if (unlikely(dlen < 0))
-		goto badpdu;
-	if (unlikely(mlen < 2))
-		goto badpdu;
-	if (*m++ != _TP_MT_UD)
-		goto badpdu;
-	hlen--;
-	while (hlen > 0) {
-		switch (*m++) {
-		case _TP_PT_CDTRANSSEL:
-			hlen--;
-			plen = *m++;
-			hlen--;
-			if (unlikely(plen > hlen))
-				goto badpdu;
-			m += plen;
-			hlen -= plen;
-			break;
-		case _TP_PT_CGTRANSSEL:
-			hlen--;
-			plen = *m++;
-			hlen--;
-			saddr->tsel[0] = m[0];
-			saddr->tsel[1] = m[1];
-			if (unlikely(plen > hlen))
-				goto badpdu;
-			m += plen;
-			hlen -= plen;
-			break;
-		case _TP_PT_CHECKSUM:
-			hlen--;
-			plen = *m++;
-			hlen--;
-			if (unlikely(plen > hlen))
-				goto badpdu;
-			m += plen;
-			hlen -= plen;
-			break;
-		default:
-			goto badpdu;
-		}
-	}
-	return t_unitdata_ind(tp, q, &src, &opt, mp);
-      badpdu:
-	LOGERR(tp, "bad UD-TPDU");
-      outstate:
-	/* ignore out of state messages */
-	freemsg(mp);
-	return (0);
-#if 0
-      enobufs:
-	return (-ENOBUFS);
-      ebusy:
-	return (-EBUSY);
-#endif
-}
-
-/**
- * t_read - read data message from below
- * @tp: private structure (locked)
- * @q: active queue (read queue)
- * @mp: the data message
- *
- * Messages from below consist of the entire frame that was received from the
- * underlying network provider.  For subnetwork (llc) frames this is the entire
- * ethernet frame.  For ISO-IP and ISO-UDP this is the entire frame without the
- * layer 2 header (IP and possibly UDP).  Frames have already been assigned to the
- * appropriate stream by lower level discriminator and lookup functions.
- *
- * Note that DB_BASE(mp) points to the network header.  For llc, this is the L2
- * header including ethernet addresses.  For ISO-IP and ISO-UDP, this is the IP
- * header.  mp->b_rptr points to the transport header (TPDU).  Frames must be
- * descriminated again by TPDU message type and fed to the appropriate message
- * receive functions.
- */
-int
-t_read(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	switch (mp->b_rptr[1] & 0xf0) {
-	case _TP_MT_ED:
-		return tp_recv_ed(tp, q, mp);
-	case _TP_MT_EA:
-		return tp_recv_ea(tp, q, mp);
-	case _TP_MT_UD:
-		return tp_recv_ud(tp, q, mp, &tp->dst);
-	case _TP_MT_RJ:
-		return tp_recv_rj(tp, q, mp);
-	case _TP_MT_AK:
-		return tp_recv_ak(tp, q, mp);
-	case _TP_MT_ER:
-		return tp_recv_er(tp, q, mp);
-	case _TP_MT_DR:
-		return tp_recv_dr(tp, q, mp);
-	case _TP_MT_DC:
-		return tp_recv_dc(tp, q, mp);
-	case _TP_MT_CC:
-		return tp_recv_cc(tp, q, mp);
-	case _TP_MT_CR:
-		return tp_recv_cr(tp, q, mp);
-	case _TP_MT_DT:
-		return tp_recv_dt(tp, q, mp);
-	default:
-		freemsg(mp);
-		return (0);
-	}
 }
 
 /*
