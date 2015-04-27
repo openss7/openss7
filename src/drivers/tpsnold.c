@@ -898,7 +898,10 @@ struct tp {
 	struct snpaaddr rem;		/* remote SNPA address */
 	unsigned short lref;		/* local reference */
 	unsigned short rref;		/* remote reference */
-	struct tp_options options;	/* protocol options */
+	struct {
+		struct tp_options req;	/* protocol options */
+		struct tp_options res;	/* protocol options */
+	} options;
 	unsigned char _pad[40];		/* pad for options */
 	bufq_t conq;			/* connection queue */
 	uint conind;			/* number of connection indications */
@@ -924,9 +927,22 @@ struct tp {
 		uint32_t t3;
 		uint32_t t4;
 	} config;
+	int lasterror;
 	int pstate;
+	int flags;
 	int count;
 	int maximum;
+	int credit;
+	int opts;
+	int addopts;
+	int inactivity;
+	int sackblks;
+	int rnr;
+	int rssn;
+	uint16_t sref;
+	uint16_t dref;
+	mblk_t *sent;
+	int local_choke;
 };
 
 struct tp_conind {
@@ -1229,15 +1245,15 @@ STATIC size_t tp_chash_size = 0;
 STATIC size_t tp_chash_order = 0;
 
 STATIC INLINE fastcall __hot_in int
-tp_bhashfn(unsigned char proto, unsigned short bport)
+tp_bhashfn(unsigned short bsel)
 {
-	return ((tp_bhash_size - 1) & (proto + bport));
+	return ((tp_bhash_size - 1) & (bsel));
 }
 
 STATIC INLINE fastcall __unlikely int
-tp_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
+tp_chashfn(unsigned short sref, unsigned short dref)
 {
-	return ((tp_chash_size - 1) & (proto + sport + dport));
+	return ((tp_chash_size - 1) & (sref + dref));
 }
 
 #if	defined DEFINE_RWLOCK
@@ -1860,7 +1876,7 @@ tp_size_conn_opts(struct tp *tp)
 	int byte;
 
 	for (byte = 0; byte < 3; byte++)
-		flags[byte] = tp->tp_options.req.flags[byte] | tp->tp_options.res.flags[byte];
+		flags[byte] = tp->options.req.flags[byte] | tp->options.res.flags[byte];
 	return tp_size_opts(flags);
 }
 
@@ -1915,80 +1931,81 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 	if (t_tst_bit(_T_BIT_XTI_DEBUG, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.debug);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_debug);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_DEBUG;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
 		/* FIXME: range check parameter */
-		bcopy(rem->xti.debug, T_OPT_DATA(oh), sizeof(rem->xti.debug));
+		bcopy(rem->xti.xti_debug, T_OPT_DATA(oh), sizeof(rem->xti.xti_debug));
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_LINGER, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.linger);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_linger);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_LINGER;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
 		/* FIXME: range check parameter */
-		*((struct t_linger *) T_OPT_DATA(oh)) = rem->xti.linger;
+		*((struct t_linger *) T_OPT_DATA(oh)) = rem->xti.xti_linger;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_RCVBUF, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.rcvbuf);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_rcvbuf);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_RCVBUF;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
 		/* FIXME: range check parameter */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.rcvbuf;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.xti_rcvbuf;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.rcvlowat);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_rcvlowat);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_RCVLOWAT;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
 		/* FIXME: range check parameter */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.rcvlowat;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.xti_rcvlowat;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_SNDBUF, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.sndbuf);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_sndbuf);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_SNDBUF;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
 		/* FIXME: range check parameter */
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.sndbuf;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.xti_sndbuf;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, flags)) {
 		if (oh == NULL)
 			goto efault;
-		oh->len = _T_LENGTH_SIZEOF(rem->xti.sndlowat);
+		oh->len = _T_LENGTH_SIZEOF(rem->xti.xti_sndlowat);
 		oh->level = XTI_GENERIC;
 		oh->name = XTI_SNDLOWAT;
 		oh->status = T_SUCCESS;
 		/* No end-to-end significance */
-		if (rem->xti.sndlowat != 1) {
-			if (rem->xti.sndlowat != T_UNSPEC && rem->xti.sndlowat < 1)
+		if (rem->xti.xti_sndlowat != 1) {
+			if (rem->xti.xti_sndlowat != T_UNSPEC && rem->xti.xti_sndlowat < 1)
 				oh->status = T_PARTSUCCESS;
-			rem->xti.sndlowat = 1;
+			rem->xti.xti_sndlowat = 1;
 		}
-		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.sndlowat;
+		*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->xti.xti_sndlowat;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	switch (tp->p.info.SERV_type) {
+#define toggled 0
 	case T_COTS:
 		if (t_tst_bit(_T_BIT_TCO_THROUGHPUT, flags)) {
 			if (oh == NULL)
@@ -1999,7 +2016,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->status = T_SUCCESS;
 			/* End-to-end significance. */
 			/* Check requested but not responded, responded without request */
-			if (t_bit_tst(_T_BIT_TCO_THROUGHPUT, toggled))
+			if (t_tst_bit(_T_BIT_TCO_THROUGHPUT, toggled))
 				oh->status = T_FAILURE;
 			/* Check if we got downgraded. */
 			/* FIXME: check validity of requested option */
@@ -2013,7 +2030,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_TRANSDEL;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_TRANSDEL, toggled))
+			if (t_tst_bit(_T_BIT_TCO_TRANSDEL, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_transdel)) T_OPT_DATA(oh)) = rem->tco.tco_transdel;
@@ -2026,7 +2043,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_RESERRORRATE;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_RESERRORRATE, toggled))
+			if (t_tst_bit(_T_BIT_TCO_RESERRORRATE, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_reserrorrate)) T_OPT_DATA(oh)) = rem->tco.tco_reserrorrate;
@@ -2039,10 +2056,10 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_TRANSFFAILPROB;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_TRANSFFAILPROB, toggled))
+			if (t_tst_bit(_T_BIT_TCO_TRANSFFAILPROB, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
-			*((typeof(&rem->tco.tco_trasffailprob)) T_OPT_DATA(oh)) = rem->tco.tco_trasffailprob;
+			*((typeof(&rem->tco.tco_transffailprob)) T_OPT_DATA(oh)) = rem->tco.tco_transffailprob;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_TCO_ESTFAILPROB, flags)) {
@@ -2052,7 +2069,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_ESTFAILPROB;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_ESTFAILPROB, toggled))
+			if (t_tst_bit(_T_BIT_TCO_ESTFAILPROB, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_estfailprob)) T_OPT_DATA(oh)) = rem->tco.tco_estfailprob;
@@ -2065,7 +2082,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_RELFAILPROB;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_RELFAILPROB, toggled))
+			if (t_tst_bit(_T_BIT_TCO_RELFAILPROB, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_relfailprob)) T_OPT_DATA(oh)) = rem->tco.tco_relfailprob;
@@ -2078,7 +2095,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_ESTDELAY;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_ESTDELAY, toggled))
+			if (t_tst_bit(_T_BIT_TCO_ESTDELAY, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_estdelay)) T_OPT_DATA(oh)) = rem->tco.tco_estdelay;
@@ -2091,7 +2108,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_RELDELAY;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_RELDELAY, toggled))
+			if (t_tst_bit(_T_BIT_TCO_RELDELAY, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_reldelay)) T_OPT_DATA(oh)) = rem->tco.tco_reldelay;
@@ -2104,7 +2121,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_CONNRESIL;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_CONNRESIL, toggled))
+			if (t_tst_bit(_T_BIT_TCO_CONNRESIL, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_connresil)) T_OPT_DATA(oh)) = rem->tco.tco_connresil;
@@ -2117,7 +2134,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_PROTECTION;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_PROTECTION, toggled))
+			if (t_tst_bit(_T_BIT_TCO_PROTECTION, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_protection)) T_OPT_DATA(oh)) = rem->tco.tco_protection;
@@ -2130,7 +2147,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_PRIORITY;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_PRIORITY, toggled))
+			if (t_tst_bit(_T_BIT_TCO_PRIORITY, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_priority)) T_OPT_DATA(oh)) = rem->tco.tco_priority;
@@ -2143,7 +2160,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_EXPD;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_EXPD, toggled))
+			if (t_tst_bit(_T_BIT_TCO_EXPD, toggled))
 				oh->status = T_FAILURE;
 			if (rem->tco.tco_expd != T_UNSPEC) {
 			}
@@ -2158,7 +2175,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_LTPDU;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_LTPDU, toggled))
+			if (t_tst_bit(_T_BIT_TCO_LTPDU, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_ltpdu)) T_OPT_DATA(oh)) = rem->tco.tco_ltpdu;
@@ -2171,7 +2188,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_ACKTIME;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_ACKTIME, toggled))
+			if (t_tst_bit(_T_BIT_TCO_ACKTIME, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_acktime)) T_OPT_DATA(oh)) = rem->tco.tco_acktime;
@@ -2184,7 +2201,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_REASTIME;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_REASTIME, toggled))
+			if (t_tst_bit(_T_BIT_TCO_REASTIME, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_reastime)) T_OPT_DATA(oh)) = rem->tco.tco_reastime;
@@ -2197,7 +2214,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_EXTFORM;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_EXTFORM, toggled))
+			if (t_tst_bit(_T_BIT_TCO_EXTFORM, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_extform)) T_OPT_DATA(oh)) = rem->tco.tco_extform;
@@ -2210,7 +2227,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_FLOWCTRL;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_FLOWCTRL, toggled))
+			if (t_tst_bit(_T_BIT_TCO_FLOWCTRL, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_flowctrl)) T_OPT_DATA(oh)) = rem->tco.tco_flowctrl;
@@ -2223,7 +2240,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_CHECKSUM;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_CHECKSUM, toggled))
+			if (t_tst_bit(_T_BIT_TCO_CHECKSUM, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_checksum)) T_OPT_DATA(oh)) = rem->tco.tco_checksum;
@@ -2236,7 +2253,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_NETEXP;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_NETEXP, toggled))
+			if (t_tst_bit(_T_BIT_TCO_NETEXP, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_netexp)) T_OPT_DATA(oh)) = rem->tco.tco_netexp;
@@ -2249,7 +2266,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_NETRECPTCF;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_NETRECPTCF, toggled))
+			if (t_tst_bit(_T_BIT_TCO_NETRECPTCF, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_netrecptcf)) T_OPT_DATA(oh)) = rem->tco.tco_netrecptcf;
@@ -2262,7 +2279,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_SELECTACK;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_SELECTACK, toggled))
+			if (t_tst_bit(_T_BIT_TCO_SELECTACK, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_selectack)) T_OPT_DATA(oh)) = rem->tco.tco_selectack;
@@ -2275,7 +2292,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_REQUESTACK;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_REQUESTACK, toggled))
+			if (t_tst_bit(_T_BIT_TCO_REQUESTACK, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_requestack)) T_OPT_DATA(oh)) = rem->tco.tco_requestack;
@@ -2288,7 +2305,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_NBLKEXPDATA;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_NBLKEXPDATA, toggled))
+			if (t_tst_bit(_T_BIT_TCO_NBLKEXPDATA, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_nblkexpdata)) T_OPT_DATA(oh)) = rem->tco.tco_nblkexpdata;
@@ -2301,7 +2318,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCO_PREFCLASS;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCO_PREFCLASS, toggled))
+			if (t_tst_bit(_T_BIT_TCO_PREFCLASS, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tco.tco_prefclass)) T_OPT_DATA(oh)) = rem->tco.tco_prefclass;
@@ -2360,7 +2377,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCL_TRANSDEL;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCL_TRANSDEL, toggled))
+			if (t_tst_bit(_T_BIT_TCL_TRANSDEL, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tcl.tcl_transdel)) T_OPT_DATA(oh)) = rem->tcl.tcl_transdel;
@@ -2373,7 +2390,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCL_RESERRORRATE;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCL_RESERRORRATE, toggled))
+			if (t_tst_bit(_T_BIT_TCL_RESERRORRATE, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tcl.tcl_reserrorrate)) T_OPT_DATA(oh)) = rem->tcl.tcl_reserrorrate;
@@ -2386,7 +2403,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCL_PROTECTION;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCL_PROTECTION, toggled))
+			if (t_tst_bit(_T_BIT_TCL_PROTECTION, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tcl.tcl_protection)) T_OPT_DATA(oh)) = rem->tcl.tcl_protection;
@@ -2399,7 +2416,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCL_PRIORITY;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCL_PRIORITY, toggled))
+			if (t_tst_bit(_T_BIT_TCL_PRIORITY, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tcl.tcl_priority)) T_OPT_DATA(oh)) = rem->tcl.tcl_priority;
@@ -2412,7 +2429,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->level = T_ISO_TP;
 			oh->name = T_TCL_CHECKSUM;
 			oh->status = T_SUCCESS;
-			if (t_bit_tst(_T_BIT_TCL_CHECKSUM, toggled))
+			if (t_tst_bit(_T_BIT_TCL_CHECKSUM, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
 			*((typeof(&rem->tcl.tcl_checksum)) T_OPT_DATA(oh)) = rem->tcl.tcl_checksum;
@@ -2434,10 +2451,10 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->name = T_UDP_CHECKSUM;
 			oh->status = T_SUCCESS;
 			/* End-to-end significance */
-			if (t_bit_tst(_T_BIT_UDP_CHECKSUM, toggled))
+			if (t_tst_bit(_T_BIT_UDP_CHECKSUM, toggled))
 				oh->status = T_FAILURE;
 			/* FIXME: check validity of requested option */
-			*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->udp.checksum;
+			*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->udp.udp_checksum;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		/* fall thru */
@@ -2446,7 +2463,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 		if (t_tst_bit(_T_BIT_IP_OPTIONS, flags)) {
 			if (oh == NULL)
 				goto efault;
-			oh->len = _T_LENGTH_SIZEOF(rem->ip.options);
+			oh->len = _T_LENGTH_SIZEOF(rem->ip.ip_options);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_OPTIONS;
 			oh->status = T_SUCCESS;
@@ -2456,24 +2473,24 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 		if (t_tst_bit(_T_BIT_IP_TOS, flags)) {
 			if (oh == NULL)
 				goto efault;
-			oh->len = _T_LENGTH_SIZEOF(rem->ip.tos);
+			oh->len = _T_LENGTH_SIZEOF(rem->ip.ip_tos);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_TOS;
 			oh->status = T_SUCCESS;
 			/* End-to-end significance */
-			*((unsigned char *) T_OPT_DATA(oh)) = rem->ip.tos;
+			*((unsigned char *) T_OPT_DATA(oh)) = rem->ip.ip_tos;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_TTL, flags)) {
 			if (oh == NULL)
 				goto efault;
-			oh->len = _T_LENGTH_SIZEOF(rem->ip.ttl);
+			oh->len = _T_LENGTH_SIZEOF(rem->ip.ip_ttl);
 			oh->level = T_INET_IP;
 			oh->name = T_IP_TTL;
 			oh->status = T_SUCCESS;
 			/* No end-to-end significance */
 			/* FIXME: check validity of requested option */
-			*((unsigned char *) T_OPT_DATA(oh)) = rem->ip.ttl;
+			*((unsigned char *) T_OPT_DATA(oh)) = rem->ip.ip_ttl;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_REUSEADDR, flags)) {
@@ -2486,7 +2503,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->status = T_SUCCESS;
 			/* No end-to-end significance */
 			/* FIXME: check validity of requested option */
-			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.reuseaddr;
+			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.ip_reuseaddr;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_DONTROUTE, flags)) {
@@ -2499,7 +2516,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->status = T_SUCCESS;
 			/* No end-to-end significance */
 			/* FIXME: check validity of requested option */
-			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.dontroute;
+			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.ip_dontroute;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_BROADCAST, flags)) {
@@ -2512,7 +2529,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->status = T_SUCCESS;
 			/* No end-to-end significance */
 			/* FIXME: check validity of requested option */
-			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.broadcast;
+			*((unsigned int *) T_OPT_DATA(oh)) = rem->ip.ip_broadcast;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		if (t_tst_bit(_T_BIT_IP_ADDR, flags)) {
@@ -2525,7 +2542,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			oh->status = T_SUCCESS;
 			/* No end-to-end significance */
 			/* FIXME: check validity of requested option */
-			*((uint32_t *) T_OPT_DATA(oh)) = rem->ip.addr;
+			*((uint32_t *) T_OPT_DATA(oh)) = rem->ip.ip_addr;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
 		break;
@@ -2559,63 +2576,49 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 static int
 t_set_options(struct tp *tp)
 {
-	struct sock *sk;
-
-	if (!tp || !tp->sock || !(sk = tp->sock->sk))
-		goto eproto;
-	if (t_tst_bit(_T_BIT_XTI_DEBUG, tp->options.flags)) {
+	if (t_tst_bit(_T_BIT_XTI_DEBUG, tp->options.res.flags)) {
 		/* absolute */
 	}
-	if (t_tst_bit(_T_BIT_XTI_LINGER, tp->options.flags)) {
-		struct t_linger *valp = &tp->options.xti.linger;
+	if (t_tst_bit(_T_BIT_XTI_LINGER, tp->options.res.flags)) {
+		struct t_linger *valp = &tp->options.res.xti.xti_linger;
 
 		if (valp->l_onoff == T_NO)
 			valp->l_linger = T_UNSPEC;
 		else {
 			if (valp->l_linger == T_UNSPEC)
-				valp->l_linger = t_defaults.xti.linger.l_linger;
+				valp->l_linger = t_defaults.xti.xti_linger.l_linger;
 			if (valp->l_linger == T_INFINITE)
 				valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
 			if (valp->l_linger >= MAX_SCHEDULE_TIMEOUT / HZ)
 				valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
 		}
-		if (valp->l_onoff == T_YES) {
-			sock_set_linger(sk);
-			sk->sk_lingertime = valp->l_linger * HZ;
-		} else {
-			sock_clr_linger(sk);
-			sk->sk_lingertime = 0;
-		}
 	}
-	if (t_tst_bit(_T_BIT_XTI_RCVBUF, tp->options.flags)) {
-		t_uscalar_t *valp = &tp->options.xti.rcvbuf;
+	if (t_tst_bit(_T_BIT_XTI_RCVBUF, tp->options.res.flags)) {
+		t_uscalar_t *valp = &tp->options.res.xti.xti_rcvbuf;
 
 		if (*valp > sysctl_rmem_max)
 			*valp = sysctl_rmem_max;
 		if (*valp < SOCK_MIN_RCVBUF / 2)
 			*valp = SOCK_MIN_RCVBUF / 2;
-		sk->sk_rcvbuf = *valp * 2;
 	}
-	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, tp->options.flags)) {
-		t_uscalar_t *valp = &tp->options.xti.rcvlowat;
+	if (t_tst_bit(_T_BIT_XTI_RCVLOWAT, tp->options.res.flags)) {
+		t_uscalar_t *valp = &tp->options.res.xti.xti_rcvlowat;
 
 		if (*valp < 1)
 			*valp = 1;
 		if (*valp > INT_MAX)
 			*valp = INT_MAX;
-		sk->sk_rcvlowat = *valp;
 	}
-	if (t_tst_bit(_T_BIT_XTI_SNDBUF, tp->options.flags)) {
-		t_uscalar_t *valp = &tp->options.xti.sndbuf;
+	if (t_tst_bit(_T_BIT_XTI_SNDBUF, tp->options.res.flags)) {
+		t_uscalar_t *valp = &tp->options.res.xti.xti_sndbuf;
 
 		if (*valp > sysctl_wmem_max)
 			*valp = sysctl_wmem_max;
 		if (*valp < SOCK_MIN_SNDBUF / 2)
 			*valp = SOCK_MIN_SNDBUF / 2;
-		sk->sk_sndbuf = *valp * 2;
 	}
-	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, tp->options.flags)) {
-		t_uscalar_t *valp = &tp->options.xti.sndlowat;
+	if (t_tst_bit(_T_BIT_XTI_SNDLOWAT, tp->options.res.flags)) {
+		t_uscalar_t *valp = &tp->options.res.xti.xti_sndlowat;
 
 		if (*valp < 1)
 			*valp = 1;
@@ -2623,442 +2626,61 @@ t_set_options(struct tp *tp)
 			*valp = 1;
 	}
 	if (tp->p.prot.family == PF_INET) {
-		struct inet_opt *np = inet_sk(sk);
-
-		if (t_tst_bit(_T_BIT_IP_OPTIONS, tp->options.flags)) {
-			unsigned char *valp = tp->options.ip.options;
+		if (t_tst_bit(_T_BIT_IP_OPTIONS, tp->options.res.flags)) {
+			unsigned char *valp = tp->options.res.ip.ip_options;
 
 			(void) valp;	/* FIXME */
 		}
-		if (t_tst_bit(_T_BIT_IP_TOS, tp->options.flags)) {
-			unsigned char *valp = &tp->options.ip.tos;
+		if (t_tst_bit(_T_BIT_IP_TOS, tp->options.res.flags)) {
+			unsigned char *valp = &tp->options.res.ip.ip_tos;
 
-			np->tos = *valp;
-		}
-		if (t_tst_bit(_T_BIT_IP_TTL, tp->options.flags)) {
-			unsigned char *valp = &tp->options.ip.ttl;
+			(void) valp;	/* FIXME */
 
-			if (*valp < 1)
-				*valp = 1;
-#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
-			np->ttl = *valp;
-#else
-#ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
-			np->uc_ttl = *valp;
-#endif
-#endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
-		}
-		if (t_tst_bit(_T_BIT_IP_REUSEADDR, tp->options.flags)) {
-			unsigned int *valp = &tp->options.ip.reuseaddr;
-
-			sk->sk_reuse = (*valp == T_YES) ? 1 : 0;
-		}
-		if (t_tst_bit(_T_BIT_IP_DONTROUTE, tp->options.flags)) {
-			unsigned int *valp = &tp->options.ip.dontroute;
-
-			if (*valp == T_YES)
-				sock_set_localroute(sk);
-			else
-				sock_clr_localroute(sk);
-		}
-		if (t_tst_bit(_T_BIT_IP_BROADCAST, tp->options.flags)) {
-			unsigned int *valp = &tp->options.ip.broadcast;
-
-			if (*valp == T_YES)
-				sock_set_broadcast(sk);
-			else
-				sock_clr_broadcast(sk);
-		}
-		if (t_tst_bit(_T_BIT_IP_ADDR, tp->options.flags)) {
-			uint32_t *valp = &tp->options.ip.addr;
-
-			sock_saddr(sk) = *valp;
-		}
-		switch (tp->p.prot.protocol) {
-		case T_INET_UDP:
-			if (t_tst_bit(_T_BIT_UDP_CHECKSUM, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.udp.checksum;
-
-#if defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_TX && defined HAVE_KMEMB_STRUCT_SOCK_SK_NO_CHECK_RX
-				sk->sk_no_check_tx = (*valp == T_YES) ? 0 : 1;
-#else
-				sk->sk_no_check = (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
-#endif
 			}
-			break;
-		case T_INET_TCP:
-		{
-			struct tcp_opt *tp = tcp_sk(sk);
-
-			if (t_tst_bit(_T_BIT_TCP_NODELAY, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.nodelay;
-
-				tp->nonagle = (*valp == T_YES) ? 1 : 0;
-			}
-			if (t_tst_bit(_T_BIT_TCP_MAXSEG, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.maxseg;
-
-				if (*valp < 8)
-					*valp = 8;
-				if (*valp > MAX_TCP_WINDOW)
-					*valp = MAX_TCP_WINDOW;
-				tcp_user_mss(tp) = *valp;
-			}
-			if (t_tst_bit(_T_BIT_TCP_KEEPALIVE, tp->options.flags)) {
-				struct t_kpalive *valp = &tp->options.tcp.keepalive;
-
-				if (valp->kp_onoff == T_NO)
-					valp->kp_timeout = T_UNSPEC;
-				else {
-					if (valp->kp_timeout == T_UNSPEC)
-						valp->kp_timeout = t_defaults.tcp.keepalive.kp_timeout;
-					if (valp->kp_timeout < 1)
-						valp->kp_timeout = 1;
-					if (valp->kp_timeout > MAX_SCHEDULE_TIMEOUT / 60 / HZ)
-						valp->kp_timeout = MAX_SCHEDULE_TIMEOUT / 60 / HZ;
-				}
-				if (valp->kp_onoff == T_YES)
-					tp->keepalive_time = valp->kp_timeout * 60 * HZ;
-#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
-				tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
-#endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
-				if (valp->kp_onoff == T_YES)
-					sock_set_keepopen(sk);
-				else
-					sock_clr_keepopen(sk);
-			}
-			if (t_tst_bit(_T_BIT_TCP_CORK, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.cork;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_KEEPIDLE, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.keepidle;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_KEEPINTVL, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.keepitvl;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_KEEPCNT, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.keepcnt;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_SYNCNT, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.syncnt;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_LINGER2, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.linger2;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_DEFER_ACCEPT, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.defer_accept;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_WINDOW_CLAMP, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.window_clamp;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_TCP_INFO, tp->options.flags)) {
-				/* read only */
-			}
-			if (t_tst_bit(_T_BIT_TCP_QUICKACK, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.tcp.quickack;
-
-				(void) valp;	/* TODO: complete this action */
-			}
-			break;
-		}
-#if defined HAVE_OPENSS7_SCTP
-		case T_INET_SCTP:
-		{
-			struct sctp_opt *sp = sctp_sk(sk);
-
-			if (t_tst_bit(_T_BIT_SCTP_NODELAY, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.nodelay;
-
-				(void) *valp;	/* TODO: complete this action */
-			}
-			if (t_tst_bit(_T_BIT_SCTP_MAXSEG, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.maxseg;
+		if (t_tst_bit(_T_BIT_IP_TTL, tp->options.res.flags)) {
+			unsigned char *valp = &tp->options.res.ip.ip_ttl;
 
 				if (*valp < 1)
 					*valp = 1;
-				if (*valp > MAX_TCP_WINDOW)
-					*valp = MAX_TCP_WINDOW;
-				sp->user_amps = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_CORK, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.cork;
 
-				if (sp->nonagle != 1)
-					sp->nonagle = (*valp == T_YES) ? 2 : 0;
+			(void) valp;	/* FIXME */
 			}
-			if (t_tst_bit(_T_BIT_SCTP_PPI, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.ppi;
+		if (t_tst_bit(_T_BIT_IP_REUSEADDR, tp->options.res.flags)) {
+			unsigned int *valp = &tp->options.res.ip.ip_reuseaddr;
 
-				sp->ppi = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_SID, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.sid;
+			(void) valp;	/* FIXME */
 
-				sp->sid = *valp;
 			}
-			if (t_tst_bit(_T_BIT_SCTP_RECVOPT, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.recvopt;
+		if (t_tst_bit(_T_BIT_IP_DONTROUTE, tp->options.res.flags)) {
+			unsigned int *valp = &tp->options.res.ip.ip_dontroute;
 
-				if (*valp == T_YES)
-					sp->cmsg_flags |=
-					    (SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
-					     SCTP_CMSGF_RECVTSN);
-				else
-					sp->cmsg_flags &=
-					    ~(SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
-					      SCTP_CMSGF_RECVTSN);
-			}
-			if (t_tst_bit(_T_BIT_SCTP_COOKIE_LIFE, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.cookie_life;
+			(void) valp;	/* FIXME */
 
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->ck_life = *valp / 1000 * HZ;
 			}
-			if (t_tst_bit(_T_BIT_SCTP_SACK_DELAY, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.sack_delay;
+		if (t_tst_bit(_T_BIT_IP_BROADCAST, tp->options.res.flags)) {
+			unsigned int *valp = &tp->options.res.ip.ip_broadcast;
 
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->max_sack = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_PATH_MAX_RETRANS, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.path_max_retrans;
+			(void) valp;	/* FIXME */
 
-				sp->rtx_path = *valp;
 			}
-			if (t_tst_bit(_T_BIT_SCTP_ASSOC_MAX_RETRANS, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.assoc_max_retrans;
+		if (t_tst_bit(_T_BIT_IP_ADDR, tp->options.res.flags)) {
+			uint32_t *valp = &tp->options.res.ip.ip_addr;
 
-				sp->max_retrans = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_MAX_INIT_RETRIES, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.max_init_retries;
+			(void) valp;	/* FIXME */
 
-				sp->max_inits = *valp;
 			}
-			if (t_tst_bit(_T_BIT_SCTP_HEARTBEAT_ITVL, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.heartbeat_itvl;
+		switch (tp->p.prot.protocol) {
+		case T_INET_UDP:
+			if (t_tst_bit(_T_BIT_UDP_CHECKSUM, tp->options.res.flags)) {
+				t_uscalar_t *valp = &tp->options.res.udp.udp_checksum;
 
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->hb_itvl = *valp / 1000 * HZ;
-#if defined CONFIG_SCTP_THROTTLE_HEARTBEATS
-				sp->hb_tint = (*valp >> 1) + 1;
-#endif
-			}
-			if (t_tst_bit(_T_BIT_SCTP_RTO_INITIAL, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.rto_initial;
+				(void) valp;	/* FIXME */
 
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp > sp->rto_max / HZ * 1000)
-					*valp = sp->rto_max / HZ * 1000;
-				if (*valp < sp->rto_min / HZ * 1000)
-					*valp = sp->rto_min / HZ * 1000;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->rto_ini = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_RTO_MIN, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.rto_min;
-
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp > sp->rto_max / HZ * 1000)
-					*valp = sp->rto_max / HZ * 1000;
-				if (*valp > sp->rto_ini / HZ * 1000)
-					*valp = sp->rto_ini / HZ * 1000;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->rto_min = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_RTO_MAX, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.rto_max;
-
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp < sp->rto_min / HZ * 1000)
-					*valp = sp->rto_min / HZ * 1000;
-				if (*valp < sp->rto_ini / HZ * 1000)
-					*valp = sp->rto_ini / HZ * 1000;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->rto_max = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_OSTREAMS, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.ostreams;
-
-				sp->req_ostr = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_ISTREAMS, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.istreams;
-
-				sp->max_istr = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_COOKIE_INC, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.cookie_inc;
-
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->ck_inc = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_THROTTLE_ITVL, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.throttle_itvl;
-
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->throttle = *valp / 1000 * HZ;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_MAC_TYPE, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.mac_type;
-
-				sp->hmac = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_CKSUM_TYPE, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.cksum_type;
-
-				sp->cksum = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_HB, tp->options.flags)) {
-				struct t_sctp_hb *valp = &tp->options.sctp.hb;
-
-				if (valp->hb_itvl == T_UNSPEC)
-					valp->hb_itvl = t_defaults.sctp.hb.hb_itvl;
-				if (valp->hb_itvl == T_INFINITE)
-					valp->hb_itvl = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->hb_itvl / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					valp->hb_itvl = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->hb_itvl < 1000 / HZ)
-					valp->hb_itvl = 1000 / HZ;
-				/* FIXME: set values for destination address */
-			}
-			if (t_tst_bit(_T_BIT_SCTP_RTO, tp->options.flags)) {
-				struct t_sctp_rto *valp = &tp->options.sctp.rto;
-
-				if (valp->rto_initial == T_INFINITE)
-					valp->rto_initial = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->rto_initial / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					valp->rto_initial = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->rto_min == T_INFINITE)
-					valp->rto_min = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->rto_min / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					valp->rto_min = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->rto_max == T_INFINITE)
-					valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (valp->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				/* FIXME: set values for destination address */
-			}
-			if (t_tst_bit(_T_BIT_SCTP_STATUS, tp->options.flags)) {
-				/* this is a read-only option */
-			}
-			if (t_tst_bit(_T_BIT_SCTP_DEBUG, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.debug;
-
-				sp->options = *valp;
-			}
-#if defined CONFIG_SCTP_ECN
-			if (t_tst_bit(_T_BIT_SCTP_ECN, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.ecn;
-
-				if (*valp == T_YES)
-					sp->l_caps |= SCTP_CAPS_ECN;
-				else
-					sp->l_caps &= ~SCTP_CAPS_ECN;
-			}
-#endif				/* defined CONFIG_SCTP_ECN */
-#if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
-			if (t_tst_bit(_T_BIT_SCTP_ALI, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.ali;
-
-				if (*valp)
-					sp->l_caps |= SCTP_CAPS_ALI;
-				else
-					sp->l_caps &= ~SCTP_CAPS_ALI;
-			}
-#endif				/* defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO */
-#if defined CONFIG_SCTP_ADD_IP
-			if (t_tst_bit(_T_BIT_SCTP_ADD, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.add;
-
-				if (*valp == T_YES)
-					sp->l_caps |= SCTP_CAPS_ADD_IP;
-				else
-					sp->l_caps &= ~SCTP_CAPS_ADD_IP;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_SET, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.set;
-
-				if (*valp == T_YES)
-					sp->l_caps |= SCTP_CAPS_SET_IP;
-				else
-					sp->l_caps &= ~SCTP_CAPS_SET_IP;
-			}
-#endif				/* defined CONFIG_SCTP_ADD_IP */
-#if defined CONFIG_SCTP_PARTIAL_RELIABILITY
-			if (t_tst_bit(_T_BIT_SCTP_PR, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.pr;
-
-				sp->prel = *valp;
-			}
-#endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
-#if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
-			if (t_tst_bit(_T_BIT_SCTP_LIFETIME, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.lifetime;
-
-				if (*valp == T_INFINITE)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-					*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				sp->life = *valp / 1000 * HZ;
-			}
-#endif				/* defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY */
-			if (t_tst_bit(_T_BIT_SCTP_DISPOSITION, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.disposition;
-
-				sp->disp = *valp;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_MAX_BURST, tp->options.flags)) {
-				t_uscalar_t *valp = &tp->options.sctp.max_burst;
-
-				sp->max_burst = *valp;
 			}
 			break;
 		}
-#endif				/* defined HAVE_OPENSS7_SCTP */
-		}
 	}
 	return (0);
-      eproto:
-	LOGERR(tp, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
-	return (-EPROTO);
 }
 
 /**
@@ -3107,11 +2729,11 @@ t_set_options(struct tp *tp)
 static int
 t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int request)
 {
-	struct t_opthdr *oh;
+	struct t_opthdr *ih;
 
 	/* clear flags, these flags will be used when sending a connection confirmation to determine which
 	   options to include in the confirmation. */
-	bzero(tp->options.flags, sizeof(tp->options.flags));
+	bzero(tp->options.req.flags, sizeof(tp->options.req.flags));
 	if (ip == NULL || ilen == 0)
 		return (0);
 	/* For each option recognized, we test the requested value for legallity, and then set the requested
@@ -3135,22 +2757,22 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 				if (((ih->len - sizeof(*ih)) % sizeof(t_uscalar_t)) != 0)
 					goto einval;
 				if (ih->len >= sizeof(*ih) + 4 * sizeof(t_uscalar_t))
-					tp->options.xti.debug[3] = valp[3];
+					tp->options.req.xti.xti_debug[3] = valp[3];
 				else
-					tp->options.xti.debug[3] = 0;
+					tp->options.req.xti.xti_debug[3] = 0;
 				if (ih->len >= sizeof(*ih) + 3 * sizeof(t_uscalar_t))
-					tp->options.xti.debug[2] = valp[2];
+					tp->options.req.xti.xti_debug[2] = valp[2];
 				else
-					tp->options.xti.debug[2] = 0;
+					tp->options.req.xti.xti_debug[2] = 0;
 				if (ih->len >= sizeof(*ih) + 2 * sizeof(t_uscalar_t))
-					tp->options.xti.debug[1] = valp[1];
+					tp->options.req.xti.xti_debug[1] = valp[1];
 				else
-					tp->options.xti.debug[1] = 0;
+					tp->options.req.xti.xti_debug[1] = 0;
 				if (ih->len >= sizeof(*ih) + 1 * sizeof(t_uscalar_t))
-					tp->options.xti.debug[0] = valp[0];
+					tp->options.req.xti.xti_debug[0] = valp[0];
 				else
-					tp->options.xti.debug[1] = 0;
-				t_set_bit(_T_BIT_XTI_DEBUG, tp->options.flags);
+					tp->options.req.xti.xti_debug[1] = 0;
+				t_set_bit(_T_BIT_XTI_DEBUG, tp->options.req.flags);
 				continue;
 			}
 			case XTI_LINGER:
@@ -3164,15 +2786,15 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 				if (valp->l_linger != T_INFINITE && valp->l_linger != T_UNSPEC
 				    && valp->l_linger < 0)
 					goto einval;
-				tp->options.xti.linger = *valp;
-				t_set_bit(_T_BIT_XTI_LINGER, tp->options.flags);
+				tp->options.req.xti.xti_linger = *valp;
+				t_set_bit(_T_BIT_XTI_LINGER, tp->options.req.flags);
 				if (!request)
 					continue;
 				if (valp->l_onoff == T_NO)
 					valp->l_linger = T_UNSPEC;
 				else {
 					if (valp->l_linger == T_UNSPEC)
-						valp->l_linger = t_defaults.xti.linger.l_linger;
+						valp->l_linger = t_defaults.xti.xti_linger.l_linger;
 					if (valp->l_linger == T_INFINITE)
 						valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
 					if (valp->l_linger >= MAX_SCHEDULE_TIMEOUT / HZ)
@@ -3186,8 +2808,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.xti.rcvbuf = *valp;
-				t_set_bit(_T_BIT_XTI_RCVBUF, tp->options.flags);
+				tp->options.req.xti.xti_rcvbuf = *valp;
+				t_set_bit(_T_BIT_XTI_RCVBUF, tp->options.req.flags);
 				if (!request)
 					continue;
 				if (*valp > sysctl_rmem_max)
@@ -3202,8 +2824,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.xti.rcvlowat = *valp;
-				t_set_bit(_T_BIT_XTI_RCVLOWAT, tp->options.flags);
+				tp->options.req.xti.xti_rcvlowat = *valp;
+				t_set_bit(_T_BIT_XTI_RCVLOWAT, tp->options.req.flags);
 				if (!request)
 					continue;
 				if (*valp < 1)
@@ -3218,8 +2840,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.xti.sndbuf = *valp;
-				t_set_bit(_T_BIT_XTI_SNDBUF, tp->options.flags);
+				tp->options.req.xti.xti_sndbuf = *valp;
+				t_set_bit(_T_BIT_XTI_SNDBUF, tp->options.req.flags);
 				if (!request)
 					continue;
 				if (*valp > sysctl_wmem_max)
@@ -3234,8 +2856,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.xti.sndlowat = *valp;
-				t_set_bit(_T_BIT_XTI_SNDLOWAT, tp->options.flags);
+				tp->options.req.xti.xti_sndlowat = *valp;
+				t_set_bit(_T_BIT_XTI_SNDLOWAT, tp->options.req.flags);
 				if (!request)
 					continue;
 				if (*valp < 1)
@@ -3257,8 +2879,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_throughput = *valp;
-					t_set_bit(_T_BIT_TCO_THROUGHPUT, tp->options.flags);
+					tp->options.req.tco.tco_throughput = *valp;
+					t_set_bit(_T_BIT_TCO_THROUGHPUT, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3270,8 +2892,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_transdel = *valp;
-					t_set_bit(_T_BIT_TCO_TRANSDEL, tp->options.flags);
+					tp->options.req.tco.tco_transdel = *valp;
+					t_set_bit(_T_BIT_TCO_TRANSDEL, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3283,8 +2905,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_reserrorrate = *valp;
-					t_set_bit(_T_BIT_TCO_RESERRORRATE, tp->options.flags);
+					tp->options.req.tco.tco_reserrorrate = *valp;
+					t_set_bit(_T_BIT_TCO_RESERRORRATE, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3296,8 +2918,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_transffailprob = *valp;
-					t_set_bit(_T_BIT_TCO_TRANSFFAILPROB, tp->options.flags);
+					tp->options.req.tco.tco_transffailprob = *valp;
+					t_set_bit(_T_BIT_TCO_TRANSFFAILPROB, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3309,8 +2931,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_estfailprob = *valp;
-					t_set_bit(_T_BIT_TCO_ESTFAILPROB, tp->options.flags);
+					tp->options.req.tco.tco_estfailprob = *valp;
+					t_set_bit(_T_BIT_TCO_ESTFAILPROB, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3322,8 +2944,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_relfailprob = *valp;
-					t_set_bit(_T_BIT_TCO_RELFAILPROB, tp->options.flags);
+					tp->options.req.tco.tco_relfailprob = *valp;
+					t_set_bit(_T_BIT_TCO_RELFAILPROB, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3335,8 +2957,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_estdelay = *valp;
-					t_set_bit(_T_BIT_TCO_ESTDELAY, tp->options.flags);
+					tp->options.req.tco.tco_estdelay = *valp;
+					t_set_bit(_T_BIT_TCO_ESTDELAY, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3348,8 +2970,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_reldelay = *valp;
-					t_set_bit(_T_BIT_TCO_RELDELAY, tp->options.flags);
+					tp->options.req.tco.tco_reldelay = *valp;
+					t_set_bit(_T_BIT_TCO_RELDELAY, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3361,8 +2983,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_connresil = *valp;
-					t_set_bit(_T_BIT_TCO_CONNRESIL, tp->options.flags);
+					tp->options.req.tco.tco_connresil = *valp;
+					t_set_bit(_T_BIT_TCO_CONNRESIL, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3378,8 +3000,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_NOPROTECT)
 						goto eacces;
-					tp->options.tco.tco_protection = *valp;
-					t_set_bit(_T_BIT_TCO_PROTECTION, tp->options.flags);
+					tp->options.req.tco.tco_protection = *valp;
+					t_set_bit(_T_BIT_TCO_PROTECTION, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3393,8 +3015,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_PRITOP && *valp != T_PRIHIGH && *valp != T_PRIMID
 					    && *valp != T_PRILOW && *valp != T_PRIDFLT)
 						goto einval;
-					tp->options.tco.tco_priority = *valp;
-					t_set_bit(_T_BIT_TCO_PRIORITY, tp->options.flags);
+					tp->options.req.tco.tco_priority = *valp;
+					t_set_bit(_T_BIT_TCO_PRIORITY, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3407,8 +3029,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_YES && *valp != T_NO)
 						goto einval;
-					tp->options.tco.tco_expd = *valp;
-					t_set_bit(_T_BIT_TCO_EXPD, tp->options.flags);
+					tp->options.req.tco.tco_expd = *valp;
+					t_set_bit(_T_BIT_TCO_EXPD, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3420,8 +3042,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_ltpdu = *valp;
-					t_set_bit(_T_BIT_TCO_LTPDU, tp->options.flags);
+					tp->options.req.tco.tco_ltpdu = *valp;
+					t_set_bit(_T_BIT_TCO_LTPDU, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3433,8 +3055,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_acktime = *valp;
-					t_set_bit(_T_BIT_TCO_ACKTIME, tp->options.flags);
+					tp->options.req.tco.tco_acktime = *valp;
+					t_set_bit(_T_BIT_TCO_ACKTIME, tp->options.req.flags);
 					if (!request)
 						continue;
 					if (*valp < 10)
@@ -3450,8 +3072,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tco.tco_reastime = *valp;
-					t_set_bit(_T_BIT_TCO_REASTIME, tp->options.flags);
+					tp->options.req.tco.tco_reastime = *valp;
+					t_set_bit(_T_BIT_TCO_REASTIME, tp->options.req.flags);
 					if (!request)
 						continue;
 					if (*valp < 10)
@@ -3471,8 +3093,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_CLASS4)
 						goto einval;
-					tp->options.tco.tco_prefclass = *valp;
-					t_set_bit(_T_BIT_TCO_PREFCLASS, tp->options.flags);
+					tp->options.req.tco.tco_prefclass = *valp;
+					t_set_bit(_T_BIT_TCO_PREFCLASS, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3488,8 +3110,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_UNSPEC)
 						goto einval;
-					tp->options.tco.tco_altclass1 = *valp;
-					t_set_bit(_T_BIT_TCO_ALTCLASS1, tp->options.flags);
+					tp->options.req.tco.tco_altclass1 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS1, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3505,8 +3127,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_UNSPEC)
 						goto einval;
-					tp->options.tco.tco_altclass2 = *valp;
-					t_set_bit(_T_BIT_TCO_ALTCLASS2, tp->options.flags);
+					tp->options.req.tco.tco_altclass2 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS2, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3522,8 +3144,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_UNSPEC)
 						goto einval;
-					tp->options.tco.tco_altclass3 = *valp;
-					t_set_bit(_T_BIT_TCO_ALTCLASS3, tp->options.flags);
+					tp->options.req.tco.tco_altclass3 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS3, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3539,8 +3161,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_UNSPEC)
 						goto einval;
-					tp->options.tco.tco_altclass4 = *valp;
-					t_set_bit(_T_BIT_TCO_ALTCLASS4, tp->options.flags);
+					tp->options.req.tco.tco_altclass4 = *valp;
+					t_set_bit(_T_BIT_TCO_ALTCLASS4, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3554,8 +3176,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_extform = *valp;
-					t_set_bit(_T_BIT_TCO_EXTFORM, tp->options.flags);
+						tp->options.req.tco.tco_extform = *valp;
+					t_set_bit(_T_BIT_TCO_EXTFORM, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3569,8 +3191,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_flowctrl = *valp;
-					t_set_bit(_T_BIT_TCO_FLOWCTRL, tp->options.flags);
+						tp->options.req.tco.tco_flowctrl = *valp;
+					t_set_bit(_T_BIT_TCO_FLOWCTRL, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3584,8 +3206,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_checksum = *valp;
-					t_set_bit(_T_BIT_TCO_CHECKSUM, tp->options.flags);
+						tp->options.req.tco.tco_checksum = *valp;
+					t_set_bit(_T_BIT_TCO_CHECKSUM, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3599,8 +3221,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_netexp = *valp;
-					t_set_bit(_T_BIT_TCO_NETEXP, tp->options.flags);
+						tp->options.req.tco.tco_netexp = *valp;
+					t_set_bit(_T_BIT_TCO_NETEXP, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3614,8 +3236,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_netrecptcf = *valp;
-					t_set_bit(_T_BIT_TCO_NETRECPTCF, tp->options.flags);
+						tp->options.req.tco.tco_netrecptcf = *valp;
+					t_set_bit(_T_BIT_TCO_NETRECPTCF, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3629,8 +3251,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_selectack = *valp;
-					t_set_bit(_T_BIT_TCO_SELECTACK, tp->options.flags);
+						tp->options.req.tco.tco_selectack = *valp;
+					t_set_bit(_T_BIT_TCO_SELECTACK, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3644,8 +3266,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_requestack = *valp;
-					t_set_bit(_T_BIT_TCO_REQUESTACK, tp->options.flags);
+						tp->options.req.tco.tco_requestack = *valp;
+					t_set_bit(_T_BIT_TCO_REQUESTACK, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3659,8 +3281,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tco.tco_nblkexpdata = *valp;
-					t_set_bit(_T_BIT_TCO_NBLKEXPDATA, tp->options.flags);
+						tp->options.req.tco.tco_nblkexpdata = *valp;
+					t_set_bit(_T_BIT_TCO_NBLKEXPDATA, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3676,8 +3298,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tcl.tcl_transdel = *valp;
-					t_set_bit(_T_BIT_TCL_TRANSDEL, tp->options.flags);
+					tp->options.req.tcl.tcl_transdel = *valp;
+					t_set_bit(_T_BIT_TCL_TRANSDEL, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3689,8 +3311,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					/* FIXME: check values */
-					tp->options.tcl.tcl_reserrorrate = *valp;
-					t_set_bit(_T_BIT_TCL_RESERRORRATE, tp->options.flags);
+					tp->options.req.tcl.tcl_reserrorrate = *valp;
+					t_set_bit(_T_BIT_TCL_RESERRORRATE, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3706,8 +3328,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 						goto einval;
 					if (*valp != T_NOPROTECT)
 						goto eacces;
-					tp->options.tcl.tcl_protection = *valp;
-					t_set_bit(_T_BIT_TCL_PROTECTION, tp->options.flags);
+					tp->options.req.tcl.tcl_protection = *valp;
+					t_set_bit(_T_BIT_TCL_PROTECTION, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3721,8 +3343,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_PRITOP && *valp != T_PRIHIGH && *valp != T_PRIMID
 					    && *valp != T_PRILOW && *valp != T_PRIDFLT)
 						goto einval;
-					tp->options.tcl.tcl_priority = *valp;
-					t_set_bit(_T_BIT_TCL_PRIORITY, tp->options.flags);
+					tp->options.req.tcl.tcl_priority = *valp;
+					t_set_bit(_T_BIT_TCL_PRIORITY, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3736,8 +3358,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					if (*valp != T_YES && *valp != T_NO && *valp != T_UNSPEC)
 						goto einval;
 					if (*valp != T_UNSPEC)
-						tp->options.tcl.tcl_checksum = *valp;
-					t_set_bit(_T_BIT_TCL_CHECKSUM, tp->options.flags);
+						tp->options.req.tcl.tcl_checksum = *valp;
+					t_set_bit(_T_BIT_TCL_CHECKSUM, tp->options.req.flags);
 					if (!request)
 						continue;
 					continue;
@@ -3764,7 +3386,7 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 				unsigned char *valp = (typeof(valp)) T_OPT_DATA(ih);
 
 				(void) valp;	/* FIXME */
-				t_set_bit(_T_BIT_IP_OPTIONS, tp->options.flags);
+				t_set_bit(_T_BIT_IP_OPTIONS, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_TOS:
@@ -3773,8 +3395,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.ip.tos = *valp;
-				t_set_bit(_T_BIT_IP_TOS, tp->options.flags);
+				tp->options.req.ip.ip_tos = *valp;
+				t_set_bit(_T_BIT_IP_TOS, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_TTL:
@@ -3783,8 +3405,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.ip.ttl = *valp;
-				t_set_bit(_T_BIT_IP_TTL, tp->options.flags);
+				tp->options.req.ip.ip_ttl = *valp;
+				t_set_bit(_T_BIT_IP_TTL, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_REUSEADDR:
@@ -3795,8 +3417,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					goto einval;
 				if (*valp != T_NO && *valp != T_YES)
 					goto einval;
-				tp->options.ip.reuseaddr = *valp;
-				t_set_bit(_T_BIT_IP_REUSEADDR, tp->options.flags);
+				tp->options.req.ip.ip_reuseaddr = *valp;
+				t_set_bit(_T_BIT_IP_REUSEADDR, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_DONTROUTE:
@@ -3807,8 +3429,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					goto einval;
 				if (*valp != T_NO && *valp != T_YES)
 					goto einval;
-				tp->options.ip.dontroute = *valp;
-				t_set_bit(_T_BIT_IP_DONTROUTE, tp->options.flags);
+				tp->options.req.ip.ip_dontroute = *valp;
+				t_set_bit(_T_BIT_IP_DONTROUTE, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_BROADCAST:
@@ -3819,8 +3441,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					goto einval;
 				if (*valp != T_NO && *valp != T_YES)
 					goto einval;
-				tp->options.ip.broadcast = *valp;
-				t_set_bit(_T_BIT_IP_BROADCAST, tp->options.flags);
+				tp->options.req.ip.ip_broadcast = *valp;
+				t_set_bit(_T_BIT_IP_BROADCAST, tp->options.req.flags);
 				continue;
 			}
 			case T_IP_ADDR:
@@ -3829,8 +3451,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 
 				if (ih->len - sizeof(*ih) != sizeof(*valp))
 					goto einval;
-				tp->options.ip.addr = *valp;
-				t_set_bit(_T_BIT_IP_ADDR, tp->options.flags);
+				tp->options.req.ip.ip_addr = *valp;
+				t_set_bit(_T_BIT_IP_ADDR, tp->options.req.flags);
 				continue;
 			}
 			}
@@ -3854,8 +3476,8 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 					goto einval;
 				if (*valp != T_NO && *valp != T_YES)
 					goto einval;
-				tp->options.udp.checksum = *valp;
-				t_set_bit(_T_BIT_UDP_CHECKSUM, tp->options.flags);
+				tp->options.req.udp.udp_checksum = *valp;
+				t_set_bit(_T_BIT_UDP_CHECKSUM, tp->options.req.flags);
 				continue;
 			}
 			}
@@ -3867,9 +3489,11 @@ t_parse_conn_opts(struct tp *tp, const unsigned char *ip, size_t ilen, int reque
 	return (-EINVAL);
       eacces:
 	return (-EACCES);
+#if 0
       eproto:
 	LOGERR(tp, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
+#endif
 }
 
 /**
@@ -3920,27 +3544,27 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				continue;
 			case T_ALLOPT:
 			case XTI_DEBUG:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.debug);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_debug);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.linger);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_linger);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvbuf);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvlowat);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndbuf);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndlowat);
+				olen += _T_SPACE_SIZEOF(t_defaults.xti.xti_sndlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -3948,10 +3572,10 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				continue;
 		case T_ISO_TP:
 			switch (t->p.prot.type) {
-			case T_CMINOR_COTS:
-			case T_CMINOR_CLTS:
-			case T_CMINOR_COTS_ISO:
-			case T_CMINOR_CLTS_ISO:
+			case TP_CMINOR_COTS:
+			case TP_CMINOR_CLTS:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -4129,27 +3753,27 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.tos);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_tos);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.ttl);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.reuseaddr);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.dontroute);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.broadcast);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					olen += _T_SPACE_SIZEOF(t_defaults.ip.addr);
+					olen += _T_SPACE_SIZEOF(t_defaults.ip.ip_addr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4173,7 +3797,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					olen += _T_SPACE_SIZEOF(t_defaults.udp.checksum);
+					olen += _T_SPACE_SIZEOF(t_defaults.udp.udp_checksum);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4268,31 +3892,31 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				if (optlen && optlen != sizeof(t->options.xti.linger))
+				if (optlen && optlen != sizeof(t->options.req.xti.xti_linger))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				if (optlen && optlen != sizeof(t->options.xti.rcvbuf))
+				if (optlen && optlen != sizeof(t->options.req.xti.xti_rcvbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				if (optlen && optlen != sizeof(t->options.xti.rcvlowat))
+				if (optlen && optlen != sizeof(t->options.req.xti.xti_rcvlowat))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				if (optlen && optlen != sizeof(t->options.xti.sndbuf))
+				if (optlen && optlen != sizeof(t->options.req.xti.xti_sndbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				if (optlen && optlen != sizeof(t->options.xti.sndlowat))
+				if (optlen && optlen != sizeof(t->options.req.xti.xti_sndlowat))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
@@ -4302,10 +3926,10 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				continue;
 		case T_ISO_TP:
 			switch (t->p.prot.type) {
-			case T_CMINOR_COTS:
-			case T_CMINOR_CLTS:
-			case T_CMINOR_COTS_ISO:
-			case T_CMINOR_CLTS_ISO:
+			case TP_CMINOR_COTS:
+			case TP_CMINOR_CLTS:
+			case TP_CMINOR_COTS_ISO:
+			case TP_CMINOR_CLTS_ISO:
 				switch (t->p.info.SERV_type) {
 				case T_COTS:
 					switch (ih->name) {
@@ -4314,174 +3938,174 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 						continue;
 					case T_ALLOPT:
 					case T_TCO_THROUGHPUT:
-						if (optlen && optlen != sizeof(t->options.tco.tco_throughput))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_throughput))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_TRANSDEL:
-						if (optlen && optlen != sizeof(t->options.tco.tco_transdel))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_transdel))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RESERRORRATE:
 						if (optlen
-						    && optlen != sizeof(t->options.tco.tco_reserrorrate))
+						    && optlen != sizeof(t->options.req.tco.tco_reserrorrate))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_TRANSFFAILPROB:
 						if (optlen
-						    && optlen != sizeof(t->options.tco.tco_transffailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_transffailprob))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ESTFAILPROB:
 						if (optlen
-						    && optlen != sizeof(t->options.tco.tco_estfailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_estfailprob))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RELFAILPROB:
 						if (optlen
-						    && optlen != sizeof(t->options.tco.tco_relfailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_relfailprob))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ESTDELAY:
-						if (optlen && optlen != sizeof(t->options.tco.tco_estdelay))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_estdelay))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RELDELAY:
-						if (optlen && optlen != sizeof(t->options.tco.tco_reldealy))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_reldelay))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_CONNRESIL:
-						if (optlen && optlen != sizeof(t->options.tco.tco_connresil))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_connresil))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PROTECTION:
-						if (optlen && optlen != sizeof(t->options.tco.tco_protection))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_protection))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PRIORITY:
-						if (optlen && optlen != sizeof(t->options.tco.tco_priority))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_priority))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_EXPD:
-						if (optlen && optlen != sizeof(t->options.tco.tco_expd))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_expd))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_LTPDU:
-						if (optlen && optlen != sizeof(t->options.tco.tco_ltpdu))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_ltpdu))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ACKTIME:
-						if (optlen && optlen != sizeof(t->options.tco.tco_acktime))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_acktime))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_REASTIME:
-						if (optlen && optlen != sizeof(t->options.tco.tco_reastime))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_reastime))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PREFCLASS:
-						if (optlen && optlen != sizeof(t->options.tco.tco_prefclass))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_prefclass))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS1:
-						if (optlen && optlen != sizeof(t->options.tco.tco_altclass1))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_altclass1))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS2:
-						if (optlen && optlen != sizeof(t->options.tco.tco_altclass2))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_altclass2))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS3:
-						if (optlen && optlen != sizeof(t->options.tco.tco_altclass3))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_altclass3))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS4:
-						if (optlen && optlen != sizeof(t->options.tco.tco_altclass4))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_altclass4))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_EXTFORM:
-						if (optlen && optlen != sizeof(t->options.tco.tco_extform))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_extform))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_FLOWCTRL:
-						if (optlen && optlen != sizeof(t->options.tco.tco_flowctrl))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_flowctrl))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_CHECKSUM:
-						if (optlen && optlen != sizeof(t->options.tco.tco_checksum))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_checksum))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NETEXP:
-						if (optlen && optlen != sizeof(t->options.tco.tco_netexp))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_netexp))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NETRECPTCF:
-						if (optlen && optlen != sizeof(t->options.tco.tco_netrecptcf))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_netrecptcf))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_SELECTACK:
-						if (optlen && optlen != sizeof(t->options.tco.tco_selectack))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_selectack))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_REQUESTACK:
-						if (optlen && optlen != sizeof(t->options.tco.tco_requestack))
+						if (optlen && optlen != sizeof(t->options.req.tco.tco_requestack))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NBLKEXPDATA:
 						if (optlen
-						    && optlen != sizeof(t->options.tco.tco_nblkexpdata))
+						    && optlen != sizeof(t->options.req.tco.tco_nblkexpdata))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
@@ -4495,32 +4119,32 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 						continue;
 					case T_ALLOPT:
 					case T_TCL_TRANSDEL:
-						if (optlen && optlen != sizeof(t->options.tcl.tcl_transdel))
+						if (optlen && optlen != sizeof(t->options.req.tcl.tcl_transdel))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_RESERRORRATE:
 						if (optlen
-						    && optlen != sizeof(t->options.tcl.tcl_reserrorrate))
+						    && optlen != sizeof(t->options.req.tcl.tcl_reserrorrate))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_PROTECTION:
-						if (optlen && optlen != sizeof(t->options.tcl.tcl_protection))
+						if (optlen && optlen != sizeof(t->options.req.tcl.tcl_protection))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_PRIORITY:
-						if (optlen && optlen != sizeof(t->options.tcl.tcl_priority))
+						if (optlen && optlen != sizeof(t->options.req.tcl.tcl_priority))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_CHECKSUM:
-						if (optlen && optlen != sizeof(t->options.tcl.tcl_checksum))
+						if (optlen && optlen != sizeof(t->options.req.tcl.tcl_checksum))
 							goto einval;
 						olen += T_SPACE(optlen);
 						if (ih->name != T_ALLOPT)
@@ -4550,43 +4174,43 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-					if (optlen && optlen != sizeof(t->options.ip.options))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_options))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					if (optlen && optlen != sizeof(t->options.ip.tos))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_tos))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					if (optlen && optlen != sizeof(t->options.ip.ttl))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_ttl))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					if (optlen && optlen != sizeof(t->options.ip.reuseaddr))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_reuseaddr))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					if (optlen && optlen != sizeof(t->options.ip.dontroute))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_dontroute))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					if (optlen && optlen != sizeof(t->options.ip.broadcast))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_broadcast))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					if (optlen && optlen != sizeof(t->options.ip.addr))
+					if (optlen && optlen != sizeof(t->options.req.ip.ip_addr))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -4612,7 +4236,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					if (optlen && optlen != sizeof(t->options.udp.checksum))
+					if (optlen && optlen != sizeof(t->options.req.udp.udp_checksum))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -4686,37 +4310,37 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				    && ((optlen % sizeof(t_uscalar_t)) != 0
 					|| optlen > 4 * sizeof(t_uscalar_t)))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.debug);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_debug);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.linger))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.xti.xti_linger))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.linger);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_linger);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.rcvbuf))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.xti.xti_rcvbuf))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.rcvbuf);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.rcvlowat))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.xti.xti_rcvlowat))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.rcvlowat);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.sndbuf))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.xti.xti_sndbuf))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.sndbuf);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.sndlowat))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.xti.xti_sndlowat))
 					goto einval;
-				olen += _T_SPACE_SIZEOF(t->options.xti.sndlowat);
+				olen += _T_SPACE_SIZEOF(t->options.req.xti.xti_sndlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -4737,198 +4361,198 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 					case T_ALLOPT:
 					case T_TCO_THROUGHPUT:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_throughput))
+						    && optlen != sizeof(t->options.req.tco.tco_throughput))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_throughput);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_throughput);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_TRANSDEL:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_transdel))
+						    && optlen != sizeof(t->options.req.tco.tco_transdel))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_transdel);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_transdel);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RESERRORRATE:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_reserrorrate))
+						    && optlen != sizeof(t->options.req.tco.tco_reserrorrate))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reserrorrate);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_reserrorrate);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_TRANSFFAILPROB:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_transffailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_transffailprob))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_transffailprob);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_transffailprob);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ESTFAILPROB:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_estfailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_estfailprob))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_estfailprob);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_estfailprob);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RELFAILPROB:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_relfailprob))
+						    && optlen != sizeof(t->options.req.tco.tco_relfailprob))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_relfailprob);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_relfailprob);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ESTDELAY:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_estdelay))
+						    && optlen != sizeof(t->options.req.tco.tco_estdelay))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_estdelay);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_estdelay);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_RELDELAY:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_reldelay))
+						    && optlen != sizeof(t->options.req.tco.tco_reldelay))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reldelay);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_reldelay);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_CONNRESIL:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_connresil))
+						    && optlen != sizeof(t->options.req.tco.tco_connresil))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_connresil);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_connresil);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PROTECTION:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_protection))
+						    && optlen != sizeof(t->options.req.tco.tco_protection))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_protection);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_protection);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PRIORITY:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_priority))
+						    && optlen != sizeof(t->options.req.tco.tco_priority))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_priority);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_priority);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_EXPD:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_expd))
+						    && optlen != sizeof(t->options.req.tco.tco_expd))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_expd);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_expd);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_LTPDU:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_ltpdu))
+						    && optlen != sizeof(t->options.req.tco.tco_ltpdu))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_ltpdu);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_ltpdu);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ACKTIME:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_acktime))
+						    && optlen != sizeof(t->options.req.tco.tco_acktime))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_acktime);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_acktime);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_REASTIME:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_reastime))
+						    && optlen != sizeof(t->options.req.tco.tco_reastime))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_reastime);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_reastime);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_PREFCLASS:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_prefclass))
+						    && optlen != sizeof(t->options.req.tco.tco_prefclass))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_prefclass);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_prefclass);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS1:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_altclass1))
+						    && optlen != sizeof(t->options.req.tco.tco_altclass1))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass1);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_altclass1);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS2:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_altclass2))
+						    && optlen != sizeof(t->options.req.tco.tco_altclass2))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass2);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_altclass2);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS3:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_altclass3))
+						    && optlen != sizeof(t->options.req.tco.tco_altclass3))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass3);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_altclass3);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_ALTCLASS4:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_altclass4))
+						    && optlen != sizeof(t->options.req.tco.tco_altclass4))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_altclass4);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_altclass4);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_EXTFORM:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_extform))
+						    && optlen != sizeof(t->options.req.tco.tco_extform))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_extform);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_extform);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_FLOWCTRL:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_flowctrl))
+						    && optlen != sizeof(t->options.req.tco.tco_flowctrl))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_flowctrl);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_flowctrl);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_CHECKSUM:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_checksum))
+						    && optlen != sizeof(t->options.req.tco.tco_checksum))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_checksum);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_checksum);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NETEXP:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_netexp))
+						    && optlen != sizeof(t->options.req.tco.tco_netexp))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_netexp);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_netexp);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NETRECPTCF:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_netrecptcf))
+						    && optlen != sizeof(t->options.req.tco.tco_netrecptcf))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_netrecptcf);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_netrecptcf);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_SELECTACK:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_selectack))
+						    && optlen != sizeof(t->options.req.tco.tco_selectack))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_selectack);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_selectack);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_REQUESTACK:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_requestack))
+						    && optlen != sizeof(t->options.req.tco.tco_requestack))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_requestack);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_requestack);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCO_NBLKEXPDATA:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tco.tco_nblkexpdata))
+						    && optlen != sizeof(t->options.req.tco.tco_nblkexpdata))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tco.tco_nblkexpdata);
+						olen += _T_SPACE_SIZEOF(t->options.req.tco.tco_nblkexpdata);
 						if (ih->name != T_ALLOPT)
 							continue;
 					}
@@ -4941,37 +4565,37 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 					case T_ALLOPT:
 					case T_TCL_TRANSDEL:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tcl.tcl_transdel))
+						    && optlen != sizeof(t->options.req.tcl.tcl_transdel))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_transdel);
+						olen += _T_SPACE_SIZEOF(t->options.req.tcl.tcl_transdel);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_RESERRORRATE:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tcl.tcl_reserrorrate))
+						    && optlen != sizeof(t->options.req.tcl.tcl_reserrorrate))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_reserrorrate);
+						olen += _T_SPACE_SIZEOF(t->options.req.tcl.tcl_reserrorrate);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_PROTECTION:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tcl.tcl_protection))
+						    && optlen != sizeof(t->options.req.tcl.tcl_protection))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_protection);
+						olen += _T_SPACE_SIZEOF(t->options.req.tcl.tcl_protection);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_PRIORITY:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tcl.tcl_priority))
+						    && optlen != sizeof(t->options.req.tcl.tcl_priority))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_priority);
+						olen += _T_SPACE_SIZEOF(t->options.req.tcl.tcl_priority);
 						if (ih->name != T_ALLOPT)
 							continue;
 					case T_TCL_CHECKSUM:
 						if (ih->name != T_ALLOPT
-						    && optlen != sizeof(t->options.tcl.tcl_checksum))
+						    && optlen != sizeof(t->options.req.tcl.tcl_checksum))
 							goto einval;
-						olen += _T_SPACE_SIZEOF(t->options.tcl.tcl_checksum);
+						olen += _T_SPACE_SIZEOF(t->options.req.tcl.tcl_checksum);
 						if (ih->name != T_ALLOPT)
 							continue;
 					}
@@ -5006,39 +4630,39 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.tos))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_tos))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.tos);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_tos);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.ttl))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_ttl))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.ttl);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.reuseaddr))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_reuseaddr))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.reuseaddr);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.dontroute))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_dontroute))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.dontroute);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.broadcast))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_broadcast))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.broadcast);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.addr))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.ip.ip_addr))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.ip.addr);
+					olen += _T_SPACE_SIZEOF(t->options.req.ip.ip_addr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5062,9 +4686,9 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.udp.checksum))
+					if (ih->name != T_ALLOPT && optlen != sizeof(t->options.req.udp.udp_checksum))
 						goto einval;
-					olen += _T_SPACE_SIZEOF(t->options.udp.checksum);
+					olen += _T_SPACE_SIZEOF(t->options.req.udp.udp_checksum);
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5166,27 +4790,27 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				continue;
 			case T_ALLOPT:
 			case XTI_DEBUG:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.debug);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_debug);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->status = T_SUCCESS;
-				bcopy(t_defaults.xti.debug, T_OPT_DATA(oh), sizeof(t_defaults.xti.debug));
+				bcopy(t_defaults.xti.xti_debug, T_OPT_DATA(oh), sizeof(t_defaults.xti.xti_debug));
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_LINGER:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.linger);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_linger);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->status = T_SUCCESS;
-				*((struct t_linger *) T_OPT_DATA(oh)) = t_defaults.xti.linger;
+				*((struct t_linger *) T_OPT_DATA(oh)) = t_defaults.xti.xti_linger;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVBUF:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvbuf);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_rcvbuf);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
@@ -5196,17 +4820,17 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVLOWAT:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvlowat);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_rcvlowat);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.rcvlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.xti_rcvlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDBUF:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndbuf);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_sndbuf);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
@@ -5216,17 +4840,17 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDLOWAT:
-				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndlowat);
+				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.xti_sndlowat);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.xti_sndlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-			switch (t->prot.type) {
+			switch (t->p.prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
 			case TP_CMINOR_COTS_ISO:
@@ -5236,7 +4860,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				break;
 			}
 		case T_ISO_TP:
-			switch (t->prot.type) {
+			switch (t->p.prot.type) {
 			case TP_CMINOR_COTS:
 			case TP_CMINOR_CLTS:
 			case TP_CMINOR_COTS_ISO:
@@ -5543,7 +5167,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 						oh->name = T_TCO_NBLKEXPDATA;
 						oh->status = T_SUCCESS;
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t_defaults.tco.tco_NBLKEXPDATA;
+						    t_defaults.tco.tco_nblkexpdata;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -5617,7 +5241,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				}
 				if (ih->level != T_ALLLEVELS)
 					continue;
-				switch (t->prot.type) {
+				switch (t->p.prot.type) {
 				case TP_CMINOR_COTS:
 				case TP_CMINOR_CLTS:
 				case TP_CMINOR_COTS_IP:
@@ -5663,61 +5287,61 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 						goto efault;
 				}
 				case T_IP_TOS:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.tos);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_tos);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
 					oh->status = T_SUCCESS;
-					*((unsigned char *) T_OPT_DATA(oh)) = t_defaults.ip.tos;
+					*((unsigned char *) T_OPT_DATA(oh)) = t_defaults.ip.ip_tos;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ttl);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_ttl);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
 					oh->status = T_SUCCESS;
-					*((unsigned char *) T_OPT_DATA(oh)) = t_defaults.ip.ttl;
+					*((unsigned char *) T_OPT_DATA(oh)) = t_defaults.ip.ip_ttl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_REUSEADDR:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.reuseaddr);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_reuseaddr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.reuseaddr;
+					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.ip_reuseaddr;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_DONTROUTE:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.dontroute);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_dontroute);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.dontroute;
+					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.ip_dontroute;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_BROADCAST:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.broadcast);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_broadcast);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.broadcast;
+					*((unsigned int *) T_OPT_DATA(oh)) = t_defaults.ip.ip_broadcast;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.addr);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ip_addr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->status = T_SUCCESS;
-					*((uint32_t *) T_OPT_DATA(oh)) = t_defaults.ip.addr;
+					*((uint32_t *) T_OPT_DATA(oh)) = t_defaults.ip.ip_addr;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5753,11 +5377,11 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					oh->len = _T_LENGTH_SIZEOF(t_defaults.udp.checksum);
+					oh->len = _T_LENGTH_SIZEOF(t_defaults.udp.udp_checksum);
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.udp.checksum;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.udp.udp_checksum;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5800,7 +5424,6 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 	t_scalar_t overall = T_SUCCESS;
 	const struct t_opthdr *ih;
 	struct t_opthdr *oh, all;
-	struct sock *sk = (t && t->sock) ? t->sock->sk : NULL;
 	int optlen;
 
 	if (ilen == 0) {
@@ -5837,66 +5460,66 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				continue;
 			case T_ALLOPT:
 			case XTI_DEBUG:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.debug);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_debug);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->status = T_SUCCESS;
-				bcopy(t->options.xti.debug, T_OPT_DATA(oh), 4 * sizeof(t_uscalar_t));
+				bcopy(t->options.req.xti.xti_debug, T_OPT_DATA(oh), 4 * sizeof(t_uscalar_t));
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_LINGER:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.linger);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_linger);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((struct t_linger *) T_OPT_DATA(oh)) = t->options.xti.linger;
+				*((struct t_linger *) T_OPT_DATA(oh)) = t->options.req.xti.xti_linger;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVBUF:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvbuf);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_rcvbuf);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.req.xti.xti_rcvbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_RCVLOWAT:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvlowat);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_rcvlowat);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.rcvlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.req.xti.xti_rcvlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDBUF:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndbuf);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_sndbuf);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.sndbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.req.xti.xti_sndbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
 			case XTI_SNDLOWAT:
-				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndlowat);
+				oh->len = _T_LENGTH_SIZEOF(t->options.req.xti.xti_sndlowat);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
 				/* refresh current value */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.xti.sndlowat;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.req.xti.xti_sndlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -5928,326 +5551,326 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 						continue;
 					case T_ALLOPT:
 					case T_TCO_THROUGHPUT:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_throughput);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_throughput);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_THROUGHPUT;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct thrpt *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_throughput;
+						    t->options.req.tco.tco_throughput;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_TRANSDEL:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_transdel);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_transdel);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_TRANSDEL;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct transdel *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_transdel;
+						    t->options.req.tco.tco_transdel;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_RESERRORRATE:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reserrorrate);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_reserrorrate);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_RESERRORRATE;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_reserrorrate;
+						    t->options.req.tco.tco_reserrorrate;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_TRANSFFAILPROB:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_transffailprob);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_transffailprob);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_TRANSFFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_transffailprob;
+						    t->options.req.tco.tco_transffailprob;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ESTFAILPROB:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_estfailprob);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_estfailprob);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ESTFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_estfailprob;
+						    t->options.req.tco.tco_estfailprob;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_RELFAILPROB:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_relfailprob);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_relfailprob);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_RELFAILPROB;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_relfailprob;
+						    t->options.req.tco.tco_relfailprob;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ESTDELAY:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_estdelay);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_estdelay);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ESTDELAY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.tco.tco_estdelay;
+						*(struct rate *) T_OPT_DATA(oh) = t->options.req.tco.tco_estdelay;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_RELDELAY:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reldelay);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_reldelay);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_RELDELAY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(struct rate *) T_OPT_DATA(oh) = t->options.tco.tco_reldelay;
+						*(struct rate *) T_OPT_DATA(oh) = t->options.req.tco.tco_reldelay;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_CONNRESIL:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_connresil);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_connresil);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_CONNRESIL;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_connresil;
+						    t->options.req.tco.tco_connresil;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_PROTECTION:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_protection);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_protection);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_PROTECTION;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_protection;
+						    t->options.req.tco.tco_protection;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_PRIORITY:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_priority);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_priority);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_PRIORITY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_priority;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_priority;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_EXPD:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_expd);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_expd);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_EXPD;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_expd;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_expd;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_LTPDU:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_ltpdu);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_ltpdu);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_LTPDU;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_ltpdu;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_ltpdu;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ACKTIME:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_acktime);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_acktime);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ACKTIME;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_acktime;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_acktime;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_REASTIME:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_reastime);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_reastime);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_REASTIME;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_reastime;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_reastime;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_PREFCLASS:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_prefclass);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_prefclass);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_PREFCLASS;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_prefclass;
+						    t->options.req.tco.tco_prefclass;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ALTCLASS1:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass1);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_altclass1);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ALTCLASS1;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_altclass1;
+						    t->options.req.tco.tco_altclass1;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ALTCLASS2:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass2);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_altclass2);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ALTCLASS2;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_altclass2;
+						    t->options.req.tco.tco_altclass2;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ALTCLASS3:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass3);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_altclass3);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ALTCLASS3;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_altclass3;
+						    t->options.req.tco.tco_altclass3;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_ALTCLASS4:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_altclass4);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_altclass4);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_ALTCLASS4;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_altclass4;
+						    t->options.req.tco.tco_altclass4;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_EXTFORM:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_extform);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_extform);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_EXTFORM;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_extform;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_extform;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_FLOWCTRL:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_flowctrl);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_flowctrl);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_FLOWCTRL;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_flowctrl;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_flowctrl;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_CHECKSUM:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_checksum);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_checksum);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_CHECKSUM;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_checksum;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_checksum;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_NETEXP:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_netexp);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_netexp);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_NETEXP;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tco.tco_netexp;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tco.tco_netexp;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_NETRECPTCF:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_netrecptcf);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_netrecptcf);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_NETRECPTCF;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_netrecptcf;
+						    t->options.req.tco.tco_netrecptcf;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_SELECTACK:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_selectack);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_selectack);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_SELECTACK;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_selectack;
+						    t->options.req.tco.tco_selectack;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_REQUESTACK:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_requestack);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_requestack);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_REQUESTACK;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_requestack;
+						    t->options.req.tco.tco_requestack;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCO_NBLKEXPDATA:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tco.tco_nblkexpdata);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tco.tco_nblkexpdata);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCO_NBLKEXPDATA;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tco.tco_nblkexpdata;
+						    t->options.req.tco.tco_nblkexpdata;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6264,59 +5887,59 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 						continue;
 					case T_ALLOPT:
 					case T_TCL_TRANSDEL:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_transdel);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tcl.tcl_transdel);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCL_TRANSDEL;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct transdel *) T_OPT_DATA(oh) =
-						    t->options.tcl.tcl_transdel;
+						    t->options.req.tcl.tcl_transdel;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCL_RESERRORRATE:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_reserrorrate);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tcl.tcl_reserrorrate);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCL_RESERRORRATE;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(struct rate *) T_OPT_DATA(oh) =
-						    t->options.tcl.tcl_reserrorrate;
+						    t->options.req.tcl.tcl_reserrorrate;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCL_PROTECTION:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_protection);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tcl.tcl_protection);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCL_PROTECTION;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
 						*(t_uscalar_t *) T_OPT_DATA(oh) =
-						    t->options.tcl.tcl_protection;
+						    t->options.req.tcl.tcl_protection;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCL_PRIORITY:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_priority);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tcl.tcl_priority);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCL_PRIORITY;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tcl.tcl_priority;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tcl.tcl_priority;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 							goto efault;
 					case T_TCL_CHECKSUM:
-						oh->len = _T_LENGTH_SIZEOF(t->options.tcl.tcl_checksum);
+						oh->len = _T_LENGTH_SIZEOF(t->options.req.tcl.tcl_checksum);
 						oh->level = T_ISO_TP;
 						oh->name = T_TCL_CHECKSUM;
 						oh->status = T_SUCCESS;
 						/* refresh current value */
-						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.tcl.tcl_checksum;
+						*(t_uscalar_t *) T_OPT_DATA(oh) = t->options.req.tcl.tcl_checksum;
 						if (ih->name != T_ALLOPT)
 							continue;
 						if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6372,67 +5995,67 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 						goto efault;
 				}
 				case T_IP_TOS:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.tos);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_tos);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned char *) T_OPT_DATA(oh)) = t->options.ip.tos;
+					*((unsigned char *) T_OPT_DATA(oh)) = t->options.req.ip.ip_tos;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.ttl);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_ttl);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned char *) T_OPT_DATA(oh)) = t->options.ip.ttl;
+					*((unsigned char *) T_OPT_DATA(oh)) = t->options.req.ip.ip_ttl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_REUSEADDR:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.reuseaddr);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_reuseaddr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) = t->options.ip.reuseaddr;
+					*((unsigned int *) T_OPT_DATA(oh)) = t->options.req.ip.ip_reuseaddr;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_DONTROUTE:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.dontroute);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_dontroute);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) = t->options.ip.dontroute;
+					*((unsigned int *) T_OPT_DATA(oh)) = t->options.req.ip.ip_dontroute;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_BROADCAST:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.broadcast);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_broadcast);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) = t->options.ip.broadcast;
+					*((unsigned int *) T_OPT_DATA(oh)) = t->options.req.ip.ip_broadcast;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					oh->len = _T_LENGTH_SIZEOF(t->options.ip.addr);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.ip.ip_addr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((uint32_t *) T_OPT_DATA(oh)) = t->options.ip.addr;
+					*((uint32_t *) T_OPT_DATA(oh)) = t->options.req.ip.ip_addr;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -6468,12 +6091,12 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					oh->len = _T_LENGTH_SIZEOF(t->options.udp.checksum);
+					oh->len = _T_LENGTH_SIZEOF(t->options.req.udp.udp_checksum);
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.udp.checksum;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = t->options.req.udp.udp_checksum;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -6688,7 +6311,7 @@ tp_addr_parse(struct nsapaddr *nsap, struct snpaaddr *snpa)
 			bcopy(nsap->addr + 3, snpa->addr, 4);
 			snpa->subnet[0] = 0xff;
 			snpa->subnet[1] = 0xff;
-			snpa->lsap = nspa->addr[19];
+			snpa->lsap = nsap->addr[19];
 			break;
 		}
 		break;
@@ -6704,7 +6327,7 @@ tp_addr_parse(struct nsapaddr *nsap, struct snpaaddr *snpa)
 		if (nsap->addr[7] != 0x00 || nsap->addr[8] != 0x00)
 			return (-EINVAL);
 		snpa->type = TP_SNPA_TYPE_MAC;
-		bcopy(nspa->addr + 13, snpa->addr, 6);
+		bcopy(nsap->addr + 13, snpa->addr, 6);
 		snpa->subnet[0] = nsap->addr[11];
 		snpa->subnet[1] = nsap->addr[12];
 		snpa->lsap = nsap->addr[19];
@@ -6783,7 +6406,7 @@ tp_addr_parse(struct nsapaddr *nsap, struct snpaaddr *snpa)
 			return (-EMSGSIZE);
 		snpa->type = TP_SNPA_TYPE_IFNAME;
 		bcopy(nsap->addr + 1, snpa->addr, nsap->len - 2);
-		snpa->addr[nsap - len - 2] = 0x00;	/* zero terminated string */
+		snpa->addr[nsap->len - 2] = 0x00;	/* zero terminated string */
 		snpa->subnet[0] = 0xff;
 		snpa->subnet[1] = 0xff;
 		snpa->lsap = nsap->addr[nsap->len - 1];
@@ -6864,7 +6487,7 @@ tp_addr_type(caddr_t *add, size_t *len, int *grp, unsigned short *sub, unsigned 
 	caddr_t nsap_add, snpa_add = NULL;
 	size_t nsap_len, snpa_len = 0;
 	unsigned short snpa_sub = 0xffff;
-	unsigned char snap_sel = 0xfe;
+	unsigned char snpa_sel = 0xfe;
 
 	if (add == NULL || len == NULL)
 		return (-EFAULT);
@@ -6876,7 +6499,7 @@ tp_addr_type(caddr_t *add, size_t *len, int *grp, unsigned short *sub, unsigned 
 		return (-EMSGSIZE);
 	if (nsap_len < 1)
 		return (-EINVAL);
-	switch (nsap_add[0]) {
+	switch ((unsigned char)nsap_add[0]) {
 /* RFC 4548 NSAPs */
 	case 0x35:		/* ind IANA ICP binary */
 	case 0xb9:		/* grp IANA ICP binary */
@@ -7039,7 +6662,7 @@ tp_addr_type(caddr_t *add, size_t *len, int *grp, unsigned short *sub, unsigned 
 		break;
 	}
 	default:
-		return (-EAFNOSUPPORT)
+		return (-EAFNOSUPPORT);
 	}
 	*add = snpa_add;
 	*len = snpa_len;
@@ -7065,7 +6688,7 @@ tp_addr_size(caddr_t add, size_t len)
 {
 	if (len < 1)
 		return (0);
-	switch (add[0]) {
+	switch ((unsigned char)add[0]) {
 	case 0x35:		/* ind IANA ICP binary */
 	case 0xb9:		/* grp IANA ICP binary */
 		if (len < 20)
@@ -7302,6 +6925,1412 @@ tp_not_state(struct tp *tp, t_scalar_t mask)
 /*
  *  =========================================================================
  *
+ *  Timers
+ *
+ *  =========================================================================
+ */
+enum {
+	tall,				/* all timers */
+	t1,				/* retransmission timer */
+	t2,				/* inactivity timer */
+	t3,				/* window timer */
+	t4				/* reference timer */
+};
+
+static void
+tp_timer_stop(struct tp *tp, const uint timer)
+{
+	int single = 1;
+
+	switch (timer) {
+	case tall:
+		single = 0;
+		/* fall through */
+	case t1:
+		mi_timer_stop(tp->timers.t1);
+		if (single)
+			break;
+		/* fall through */
+	case t2:
+		mi_timer_stop(tp->timers.t2);
+		if (single)
+			break;
+		/* fall through */
+	case t3:
+		mi_timer_stop(tp->timers.t3);
+		if (single)
+			break;
+		/* fall through */
+	case t4:
+		mi_timer_stop(tp->timers.t4);
+		if (single)
+			break;
+		/* fall through */
+		break;
+	default:
+		LOGERR(tp, "bad timer value");
+		break;
+	}
+}
+
+static void
+tp_timer_start(struct tp *tp, queue_t *q, const uint timer)
+{
+	switch (timer) {
+	case t1:
+		((struct tp_timer *)tp->timers.t1->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t1, tp->config.t1);
+		break;
+	case t2:
+		((struct tp_timer *)tp->timers.t2->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t2, tp->config.t2);
+		break;
+	case t3:
+		((struct tp_timer *)tp->timers.t3->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t3, tp->config.t3);
+		break;
+	case t4:
+		((struct tp_timer *)tp->timers.t4->b_rptr)->count = 0;
+		mi_timer(q, tp->timers.t4, tp->config.t4);
+		break;
+	default:
+		LOGERR(tp, "bad timer value");
+		break;
+	}
+}
+
+/*
+ *  =========================================================================
+ *
+ *  SENDMSG and RECVMSG
+ *
+ *  =========================================================================
+ */
+
+/* Class options */
+#define _T_F_CO_RESERVED4	(1<<3)	/* reserved */
+#define _T_F_CO_RESERVED3	(1<<2)	/* reserved */
+#define _T_F_CO_EXTFORM		(1<<1)	/* extended format */
+#define _T_F_CO_FLOWCTRL	(1<<0)	/* explicit flow control */
+
+/* Additional options - XTI doesn't know about these first three */
+#define _T_F_AO_NBLKEXPDATA	(1<<6)	/* non-blocking expedited data */
+#define _T_F_AO_REQUESTACK	(1<<5)	/* request acknowledgement */
+#define _T_F_AO_SELECTACK	(1<<4)	/* selective acknowledgement */
+#define _T_F_AO_NETEXP		(1<<3)	/* network expedited data */
+#define _T_F_AO_NETRECPTCF	(1<<2)	/* receipt confirmation */
+#define _T_F_AO_CHECKSUM	(1<<1)	/* checksum */
+#define _T_F_AO_EXPD		(1<<0)	/* transport expedited data */
+
+/* these are really size = (1<<value) */
+#define _T_TPDU_SIZE_8192	0x0d
+#define _T_TPDU_SIZE_4096	0x0c
+#define _T_TPDU_SIZE_2048	0x0b
+#define _T_TPDU_SIZE_1024	0x0a
+#define _T_TPDU_SIZE_512	0x09
+#define _T_TPDU_SIZE_256	0x08
+#define _T_TPDU_SIZE_128	0x07
+
+/* disconnect reasons, these should be in TPI header file */
+#define _TP_REASON_UNSPECIFIED		0x00
+#define _TP_REASON_TSAP_CONGESTION	0x01
+#define _TP_REASON_TSAP_NO_SESSION	0x02	/* persistent */
+#define _TP_REASON_ADDRESS_UNKNOWN	0x03	/* persistent */
+#define _TP_REASON_NORMAL_DISCONNECT	0x80
+#define _TP_REASON_REMOTE_CONGESTION	0x81
+#define _TP_REASON_NEGOTIATION_FAILED	0x82	/* persistent */
+#define _TP_REASON_DUPLICATE_SREF	0x83
+#define _TP_REASON_MISMATCH_REFS	0x84
+#define _TP_REASON_PROTOCOL_ERROR	0x85
+#define _TP_REASON_NOT_USED1		0x86
+#define _TP_REASON_REFERENCE_OVERFLOW	0x87
+#define _TP_REASON_REFUSED		0x88
+#define _TP_REASON_NOT_USED2		0x89
+#define _TP_REASON_INVALID_LENGTH	0x8a
+
+/* error causes, these should be in TPI header file */
+#define _TP_ERROR_UNSPECIFIED		0x00
+#define _TP_ERROR_INVALID_PARM_TYPE	0x01
+#define _TP_ERROR_INVALID_TPDU_TYPE	0x02
+#define _TP_ERROR_INVALID_PARM_VALUE	0x03
+
+/* message types */
+#define	_TP_MT_ED	0x10		/* can contain data */
+#define	_TP_MT_EA	0x20		/* no data */
+#define _TP_MT_UD	0x40		/* can contain data */
+#define	_TP_MT_RJ	0x50		/* no data */
+#define	_TP_MT_AK	0x60		/* no data */
+#define	_TP_MT_ER	0x70		/* no data */
+#define	_TP_MT_DR	0x80		/* can contain data */
+#define	_TP_MT_DC	0xc0		/* no data */
+#define	_TP_MT_CC	0xd0		/* can contain data */
+#define	_TP_MT_CR	0xe0		/* can contain data */
+#define	_TP_MT_DT	0xf0		/* can contain data */
+
+#define _TP_PT_INVALID_TPDU	0xc1	/* invalid TPDU */
+
+#define _TP_PT_TPDU_SIZE	0xc0	/* TPDU size */
+#define _TP_PT_CGTRANSSEL	0xc1	/* calling transport selector */
+#define _TP_PT_CDTRANSSEL	0xc2	/* called transport selector */
+#define _TP_PT_CHECKSUM		0xc3	/* checksum */
+#define _TP_PT_VERSION		0xc4	/* version number */
+#define _TP_PT_PROTECTION	0xc5	/* protection */
+#define _TP_PT_ADDOPTIONS	0xc6	/* additional options */
+#define _TP_PT_ALTCLASS		0xc7	/* alternative protocol classes */
+
+#define _TP_PT_ACKTIME		0x85	/* acknowledgement time */
+#define _TP_PT_RESERRORRATE	0x86	/* residual error rate */
+#define _TP_PT_PRIORITY		0x87	/* priority */
+#define _TP_PT_TRANSDEL		0x88	/* transit delay */
+#define _TP_PT_THROUGHPUT	0x89	/* throughput */
+#define _TP_PT_SUBSEQUENCE	0x8a	/* subsequence number */
+#define _TP_PT_REASTIME		0x8b	/* reassignment time */
+#define _TP_PT_FLOWCTLCF	0x8c	/* flow control confirmation */
+#define _TP_PT_SELECTACK	0x8f	/* selective acknowledgement */
+
+#define _TP_PT_ED_TPDU_NR	0x90	/* ED-TPDU-NR */
+
+#define _TP_PT_DIAGNOSTIC	0xe0	/* diagnostic */
+
+#define _TP_PT_PREF_TPDU_SIZE	0xf0	/* preferred TPDU size */
+#define _TP_PT_INACTTIME	0xf2	/* inactivity time */
+
+/**
+ * tp_add_checksum - complete the checksum
+ * @mp: message containing TPDU
+ *
+ * Add a checksum parameter to the variable part and calculate a checksum for the resulting TPDU.
+ * This calculation follows the procedures in X.224 Annex D and X.234 Annex C.
+ */
+STATIC INLINE __hot void
+tp_add_checksum(mblk_t *mp)
+{
+	int n;
+	mblk_t *bp;
+	int c0 = 0, c1 = 0, L = 0;
+
+	mp->b_rptr[0] += 4;	/* add 4 to length indicator */
+	*mp->b_wptr++ = _TP_PT_CHECKSUM;
+	*mp->b_wptr++ = 2;
+	n = mp->b_wptr - mp->b_rptr;
+	/* zero checksum to begin with */
+	*mp->b_wptr++ = 0;
+	*mp->b_wptr++ = 0;
+
+	for (bp = mp; bp; bp = bp->b_cont) {
+		register unsigned char *p = bp->b_rptr;
+		register unsigned char *e = bp->b_wptr;
+
+		if (p < e) {
+			L += e - p;
+			while (p < e) {
+				c0 += *p++;
+				c1 += c0;
+			}
+		}
+	}
+
+	mp->b_rptr[n] = -c1 + (L - n) * c0;
+	mp->b_rptr[n + 1] = c1 - (L - n + 1) * c0;
+	return;
+}
+
+/**
+ * tp_pack_cr - create a Connection Request (CR) TPDU
+ * @tp: sending transport endpoint
+ * @q: invoking queue (typically write queue)
+ * @dp: user data to include in connect request
+ *
+ * CDT
+ * DST-REF: (set to zero)
+ * SRC-REF: (set to assigned source reference)
+ * CLASS and OPTIONS:
+ * Calling Transport Selector:
+ * Called Transport Selector:
+ * TPDU size (proposed)
+ * preferred maximum TPDU size (proposed)
+ * version number
+ * protection parameter
+ * checksum
+ * additional options depending on class
+ * alternative protocol class(es)
+ * acknowledgement time
+ * inactivity time
+ * throughput (proposed)
+ * residual error rate (proposed)
+ * priority (proposed)
+ * transit delay (proposed)
+ * reassignment time
+ * user data
+ *
+ * A transport connection is established by means of one transport entity (the
+ * initiator) transmitting a CR-TPDU to the other transport entity (the
+ * responder), which replies with a CC-TPDU.
+ *
+ * Before sneding the CR-TPDU, the intiator assigns the transport connection
+ * being created to one (or more if the splitting procedure is being used)
+ * network connection(s).  It is this set of network connections over which the
+ * TPDUs are sent.
+ *
+ *   NOTE 1 - Even if the initiator assigns the transport connection to more
+ *   than one network connection, all CR-TPDUs (if repeated) or DR-TPDUs with
+ *   DST-REF set to zero which are sent prior to the receipt of the CC-TPDU
+ *   shall be sent on the same network connection, unless an N-DISCONNECT
+ *   indication is received.  (This is necessary because the remote entity may
+ *   not support class 4 and therefore may not recognize splitting.)  If the
+ *   initiator has made other assignments, it will use them only after receive
+ *   of a class 4 CC-TPDU (see also the splitting procedure 6.23).
+ *
+ * During this exchange, all information and parameters need for the transport
+ * entities to operate shall be exchanged or negotiated.
+ *
+ *   NOTE 2 - Except in class 4, it is recommended that the initiator start an
+ *   optional timer TS1 at the time the CR-TPDU is sent.  This timer should be
+ *   stopped when the connection is considered as accepted or refused or
+ *   unsuccessful.  If the timer expires, the intiator should reset or
+ *   disconnect the network connection, and in classes 1 and 3, freeze the
+ *   reference (see 6.18).  For all other transport connection(s) multiplexed
+ *   on the same network connection, the procedures for reset or disconnect as
+ *   appropriate should be followed.
+ *
+ * ...
+ *
+ * The following information is exchanged:
+ *
+ * a) References - Each transport entity chooses a reference to be used by the
+ *    peer entity which is 16-bits long and which is arbitrary under the
+ *    following restrictions:
+ *
+ *    1) it shall not already be in use nor frozen (see 6.18);
+ *    2) it shall not be zero.
+ *
+ *    This mechanism is symmetrical and provide identification of the transport
+ *    connection independent of the network connection.  The range of
+ *    references used for transport connections, in a given transport entity,
+ *    is a local matter.
+ *
+ * b) Calling, Called and Responding Transport-Selectors (optional) - When
+ *    either network address unambiguously defines the transport address, this
+ *    information may be omitted.
+ *
+ * c) Initial credit - Only relevant for classes which include the explicit
+ *    flow control function.
+ *
+ * d) User data - Not available if class 0 is the preferred class (see Note 3).
+ *    Up to 32 octets in other classes.
+ *
+ *    NOTE 3 - If class 0 is a valid response according to Table 3, inclusing
+ *    of user data in the CR-TPDU may cause the responding entity to refuse the
+ *    connection (for example, if it only supports class 0).
+ *
+ * e) Acknowledgement time - Only in class 4.
+ *
+ * f) Checksum paraemter - Only in class 4.
+ *
+ * g) Protection parameter - This parameter and its semantics are user defined.
+ *
+ * h) Inactivity time - Only in class 4.  The inactivity time parameter shall
+ *    not be included in a CC-TPDU if it was not present in the corresponding
+ *    CR-TPDU.
+ *
+ * The following negotiations take place:
+ *
+ * i) The initiator shall propose a preferred class and may propose any number
+ *    of alternative classes which permit a valid response as defined in Table
+ *    3.  The initiator should assume when it sends the CR-TPDU that its
+ *    preferred class will be agreed to, and commence the procedures associated
+ *    with that class, except that if class 0 or class 1 is an alternative
+ *    class, multiplexing shall not commence until a CC-TPDU selecting the use
+ *    of classes 2, 3 or 4 has been received.
+ *
+ *    NOTE 4 - This means, for example, that when the preferred class includes
+ *    resynchronization (see 6.14) the resynchronization will occur if a reset
+ *    is signalled during connection establishment.
+ *
+ *    The responder shall select one class defined in Table 3 as a valid
+ *    response corresponding to the preferred class and to the class(es), if
+ *    any, contained in the alternative class parameter of the CR-TPDU.  It
+ *    shall indicate the selected class in the CC-TPDU and shall follow the
+ *    procedures for the selected class.
+ *
+ *    If the preferred class is not selected, then on receipt of the CC-TPDU,
+ *    the initiator shall adjust its operation according to the procedures of
+ *    the selected class.
+ *
+ *    NOTE 5 - The valid responses indicated in Table 3 result from both
+ *    explicit negotiation, whereby each of the classes proposed is a valid
+ *    response, and implement negotiation whereby:
+ *    - if class 3 or 4 is proposed, then class 2 is a valid response.
+ *    - if class 1 is proposed, then class 0 is a valid response.
+ *
+ *    NOTE 6 - Negotiation from class 2 to class 1 and from any class to a
+ *    higher-numbered class is not valid.
+ *
+ *    NOTE 7 - Redundant combinations are not a protocol error.
+ *
+ * j) TPDU size - The initiator may propose a maimum size for TPDUs, and the
+ *    responder may accept this value or respond with any value between 128 and
+ *    the proposed value in the set of values available [see 13.3.4 b)].
+ *
+ *    NOTE 8 - The length of the CR-TPDU does not exceed 128 octets (see 13.3).
+ *    NOTE 9 - The transport entities may have knowledge, by some local means,
+ *    of the maximum available NSDU size.
+ *
+ * k) Preferred maximum TPDU size - The value of this parameter, multiplied by
+ *    128, yields the proposed or accepted maximum TPDU size in octets.  The
+ *    initiator may propose a preferred maximum size of TPDUs and the responder
+ *    may accept this value or repsond with a smaller value.
+ *
+ *    NOTE 10 - If this parameter is used in a CR-TPDU without also including
+ *    the TPDU size parameter, this will result in a maximum TPDU size of 128
+ *    octets being selected if the remote entity does not recognize the
+ *    preferred TPDU size parameter.  Therefore, it is reocmmended that both
+ *    parameters be included in the CR-TPDU.
+ *
+ *    If the preferred maximum TPDU size parameter is present in a CR-TPDU the
+ *    responder shall either:
+ *
+ *    - ignore the preferred maximum TPDU size parameter and follow TPDU size
+ *      negotiation as defined in 6.5.4 j); or
+ *
+ *    - use the preferrend maximum TPDU size parameter to determine the maximum
+ *      TPDU size requested by the initiator and ignore the TPDU size
+ *      parameter.  In this case the responder shall use the preferred maximum
+ *      TPDU size parameter in the CC-TPDU and shall not include the TPDU size
+ *      parameter in the CC-TPDU.
+ *
+ *    If the preferred maximum TPDU size parameter is not present in the
+ *    CR-TPDU it shall not be included in the corresponding CC-TPDU.  In this
+ *    case TPDU size negotiation is as defined in 6.5.4 j).
+ *
+ * l) Normal or extended format - Either normal or extended format is
+ *    available.  When extended is used, this applies to CDT, TPDU-NR,
+ *    ED-TPDU-NR, YR-TU-NR and YR-EDTU-NR parameters.
+ *
+ * m) Checksum selection - This defines whether or not TPDUs of the connection
+ *    are to include a checksum.
+ *
+ * n) Quality of service parameters - This defines the throughput, transit
+ *    delay, priority and residual error rate.
+ *
+ *    NOTE 11 - The transport service defines transit delay as requiring a
+ *    previously stated average TSDU size as a basis for any specification.
+ *    This protocol as speciied in 13.3.4 m), uses a value at 128 octets.
+ *    Conversion to and from specifications based upon some other value is a
+ *    local matter.
+ *
+ * o) The non-use of explicit flow control in class 2.
+ *
+ * p) The use of network receipt confirmation and network expedited when class
+ *    1 is to be used.
+ *
+ * q) Use of expedited data transfer service - This allows both TS-users to
+ *    negotiate the use or non-use of the expedite data transport service as
+ *    defined in the transport service (see ITU-T Rec. X.214 | ISO/IEC 8072).
+ *
+ * r) The use of selective acknowledgement - This allows the transport entities
+ *    to decide whether to use procedures that allow acknowledgement of
+ *    DT-TPDUs that are received out-of-sequence (only in class 4).
+ *
+ * s) The use of request acknowledgement - This allows both transport entities
+ *    to negotiate the use or non-use of the request acknowledgement facility
+ *    specified in 6.13.4.2 (only in classes 1, 3, 4).
+ *
+ * t) The use of non-blocking expedite data transfer service - This allows both
+ *    transport entities to negotiate the use or non-use of the non-blocking
+ *    expedited data transfer service (only in class 4).  This option will only
+ *    be valid when the option of "use of expedited data transfer service" is
+ *    negotiated.
+ *
+ * The following information is sent only in the CR-TPDU:
+ *
+ * u) Version number - This defines the version of the transport protocol
+ *    standard used for this connection.
+ *
+ * v) Reassignment time parameter - This indicates the time for which the
+ *    intiiator will persist in following the reassignment after failure
+ *    procedure.
+ *     
+ */
+STATIC mblk_t *
+tp_pack_cr(struct tp *tp, queue_t *q, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+
+	/* 128-32 = 96 octets gives enough room for the entire CR-TPDU */
+	if (unlikely((bp = mi_allocb(q, 128, BPRI_MED)) == NULL))
+		return (bp);
+
+	bp->b_datap->db_type = M_DATA;
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_CR | tp->credit;
+	*p++ = 0;
+	*p++ = 0;
+	*p++ = tp->sref >> 8;
+	*p++ = tp->sref >> 0;
+	*p++ = (tp->options.req.tco.tco_prefclass << 4)
+	    | (tp->opts & (_T_F_CO_EXTFORM | _T_F_CO_FLOWCTRL));
+	{
+		*p++ = _TP_PT_CGTRANSSEL;	/* calling transport selector */
+		*p++ = sizeof(tp->src.tsel);
+		bcopy(tp->src.tsel, p, sizeof(tp->src.tsel));
+		p += sizeof(tp->src.tsel);
+	}
+	{
+		*p++ = _TP_PT_CDTRANSSEL;	/* called transport selector */
+		*p++ = sizeof(tp->dst.tsel);
+		bcopy(tp->dst.tsel, p, sizeof(tp->dst.tsel));
+		p += sizeof(tp->dst.tsel);
+	}
+	if (tp->options.req.tco.tco_ltpdu != T_UNSPEC) {
+		int order;
+		t_uscalar_t size;
+
+		size = tp->options.req.tco.tco_ltpdu;
+		for (order = _T_TPDU_SIZE_8192; order >= _T_TPDU_SIZE_128; order--)
+			if ((1 << order) <= size)
+				break;
+		if (order != _T_TPDU_SIZE_128) {
+			*p++ = _TP_PT_TPDU_SIZE;	/* TPDU size */
+			*p++ = 1;
+			*p++ = order;
+		}
+		if (!(size >>= 7))
+			size = 1;
+		*p++ = _TP_PT_PREF_TPDU_SIZE;	/* preferred TPDU size */
+		if (size >= 1 << 24) {
+			*p++ = 4;
+			*p++ = size >> 24;
+			*p++ = size >> 16;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else if (size >= 1 << 16) {
+			*p++ = 3;
+			*p++ = size >> 16;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else if (size >= 1 << 8) {
+			*p++ = 2;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else {
+			*p++ = 1;
+			*p++ = size >> 0;
+		}
+	}
+	if (tp->options.req.tco.tco_prefclass != T_CLASS0) {
+		*p++ = _TP_PT_VERSION;	/* version number */
+		*p++ = 1;
+		*p++ = 1;
+		if (t_tst_bit(_T_BIT_TCO_PROTECTION, tp->options.req.flags) && tp->options.req.tco.tco_protection != T_UNSPEC) {
+			*p++ = _TP_PT_PROTECTION;	/* protection */
+			*p++ = 1;
+			*p++ = tp->options.req.tco.tco_protection & ~T_ABSREQ;
+		}
+		{
+			*p++ = _TP_PT_ADDOPTIONS;	/* additional options */
+			*p++ = 1;
+			*p++ = tp->addopts;
+		}
+#if 0
+		if (tp->network != N_CLNS) {
+			int i, altnum = 0;
+
+			for (i = 0; i < 4; i++)
+				if ((&tp->options.req.tco.tco_altclass1)[i] != T_UNSPEC)
+					altnum++;
+
+			if (altnum) {
+				*p++ = _TP_PT_ALTCLASS;	/* alternative protocol classes */
+				*p++ = altnum;
+				for (i = 0; i < 4; i++) {
+					if ((&tp->options.req.tco.tco_altclass1)[i] != T_UNSPEC)
+						*p++ = (&tp->options.req.tco.tco_altclass1)[i];
+				}
+			}
+		}
+#endif
+		if (tp->options.req.tco.tco_prefclass == T_CLASS4) {
+			*p++ = _TP_PT_ACKTIME;	/* acknowledgement time */
+			*p++ = 2;
+			*p++ = tp->options.req.tco.tco_acktime >> 8;
+			*p++ = tp->options.req.tco.tco_acktime >> 0;
+		}
+		if (tp->flags & _TP_MAX_THROUGHPUT) {
+			*p++ = _TP_PT_THROUGHPUT;	/* throughput */
+			if (!(tp->flags & _TP_AVG_THROUGHPUT)) {
+				*p++ = 12;
+			} else {
+				*p++ = 24;
+			}
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.targetvalue >> 16;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.targetvalue >> 8;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.targetvalue >> 0;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 16;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 8;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 0;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.targetvalue >> 16;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.targetvalue >> 8;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.targetvalue >> 0;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 16;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 8;
+			*p++ = tp->options.req.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 0;
+			if (tp->flags & _TP_AVG_THROUGHPUT) {
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.targetvalue >> 8;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.targetvalue >> 0;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 16;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 16;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 8;
+				*p++ = tp->options.req.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 0;
+			}
+		}
+		if (tp->flags & _TP_RESIDERRRATE) {
+			*p++ = _TP_PT_RESERRORRATE;	/* residual error rate */
+			*p++ = 3;
+			*p++ = tp->options.req.tco.tco_reserrorrate.targetvalue;
+			*p++ = tp->options.req.tco.tco_reserrorrate.minacceptvalue;
+			*p++ = tp->options.req.tco.tco_ltpdu;	/* FIXME */
+		}
+		*p++ = _TP_PT_PRIORITY;	/* priority */
+		*p++ = 2;
+		*p++ = tp->options.req.tco.tco_priority >> 8;
+		*p++ = tp->options.req.tco.tco_priority >> 0;
+		*p++ = _TP_PT_TRANSDEL;	/* transit delay */
+		*p++ = 8;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.called.targetvalue >> 8;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.called.targetvalue >> 0;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.called.minacceptvalue >> 8;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.called.minacceptvalue >> 0;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.calling.targetvalue >> 8;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.calling.targetvalue >> 0;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.calling.minacceptvalue >> 8;
+		*p++ = tp->options.req.tco.tco_transdel.maxdel.calling.minacceptvalue >> 0;
+		if (tp->options.req.tco.tco_prefclass >= T_CLASS3) {
+			*p++ = _TP_PT_REASTIME;	/* reassignment time */
+			*p++ = 2;
+			*p++ = tp->options.req.tco.tco_reastime >> 8;
+			*p++ = tp->options.req.tco.tco_reastime >> 0;
+		}
+		if (tp->options.req.tco.tco_prefclass == T_CLASS4) {
+			*p++ = _TP_PT_INACTTIME;	/* inactivity timer */
+			*p++ = 4;
+			*p++ = tp->inactivity >> 24;
+			*p++ = tp->inactivity >> 16;
+			*p++ = tp->inactivity >> 8;
+			*p++ = tp->inactivity >> 0;
+		}
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+	bp->b_cont = dp;
+	tp_add_checksum(bp);
+
+	return (bp);
+}
+
+/**
+ * tp_pack_cc - create a Connection Confirmation (CC) TPDU
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @dp: data to include in response
+ *
+ * CDT
+ * DST-REF: (SRC-REF received in CR)
+ * SRC-REF: (set to assigned source reference)
+ * CLASS and OPTIONS (selected)
+ * Calling Transport Selector;
+ * Responding Transport Selector;
+ * TPDU size (selected)
+ * the preferred maximum TPDU size (selected)
+ * protection parameter
+ * checksum
+ * additional option selection (selected)
+ * acknowledgement time
+ * inactivity time
+ * throughput (selected)
+ * residual error rate (selected)
+ * priority (selected)
+ * transit delay (selected)
+ * user data
+ */
+STATIC mblk_t *
+tp_pack_cc(struct tp *tp, queue_t *q, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+
+	/* 128-32 = 96 octets gives enough room for the entire CR-TPDU */
+	if ((bp = mi_allocb(q, 96, BPRI_MED)) == NULL)
+		goto enobufs;
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_CC | tp->credit;
+	*p++ = tp->dref >> 8;
+	*p++ = tp->dref >> 0;
+	*p++ = tp->sref >> 8;
+	*p++ = tp->sref >> 0;
+	*p++ = (tp->options.res.tco.tco_prefclass << 4)
+	    | (tp->opts & (_T_F_CO_EXTFORM | _T_F_CO_FLOWCTRL));
+	if (tp->src.tsel[0] > 0) {
+		*p++ = _TP_PT_CGTRANSSEL;	/* calling transport selector */
+		*p++ = 2;
+		bcopy(tp->src.tsel, p, 2);
+		p += 2;
+	}
+	if (tp->dst.tsel[0] > 0) {
+		*p++ = _TP_PT_CDTRANSSEL;	/* called transport selector */
+		*p++ = 2;
+		bcopy(tp->dst.tsel, p, 2);
+		p += 2;
+	}
+	if (tp->options.res.tco.tco_ltpdu != T_UNSPEC) {
+		int order;
+		t_uscalar_t size;
+
+		size = tp->options.res.tco.tco_ltpdu;
+		for (order = _T_TPDU_SIZE_8192; order >= _T_TPDU_SIZE_128; order--)
+			if ((1 << order) <= size)
+				break;
+		if (order != _T_TPDU_SIZE_128) {
+			*p++ = _TP_PT_TPDU_SIZE;	/* TPDU size */
+			*p++ = 1;
+			*p++ = order;
+		}
+		if (!(size >>= 7))
+			size = 1;
+		*p++ = _TP_PT_PREF_TPDU_SIZE;	/* preferred TPDU size */
+		if (size >= 1 << 24) {
+			*p++ = 4;
+			*p++ = size >> 24;
+			*p++ = size >> 16;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else if (size >= 1 << 16) {
+			*p++ = 3;
+			*p++ = size >> 16;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else if (size >= 1 << 8) {
+			*p++ = 2;
+			*p++ = size >> 8;
+			*p++ = size >> 0;
+		} else {
+			*p++ = 1;
+			*p++ = size >> 0;
+		}
+	}
+	if (tp->options.res.tco.tco_prefclass != T_CLASS0) {
+#if 0
+		*p++ = _TP_PT_VERSION;	/* version number */
+		*p++ = 1;
+		*p++ = 1;
+#endif
+		if (tp->options.res.tco.tco_protection) {
+			*p++ = _TP_PT_PROTECTION;	/* protection */
+			*p++ = 1;
+			*p++ = tp->options.res.tco.tco_protection;
+		}
+		*p++ = _TP_PT_ADDOPTIONS;	/* additional options */
+		*p++ = 1;
+		*p++ = tp->addopts;
+#if 0
+		if (tp->network != N_CLNS) {
+			int i, altnum = 0;
+
+			for (i = 0; i < 4; i++)
+				if ((&tp->options.res.tco.tco_altclass1)[i] != T_UNSPEC)
+					altnum++;
+
+			if (altnum) {
+				*p++ = _TP_PT_ALTCLASS;	/* alternative protocol classes */
+				*p++ = altnum;
+				for (i = 0; i < 4; i++) {
+					if ((&tp->options.res.tco.tco_altclass1)[i] != T_UNSPEC)
+						*p++ = (&tp->options.res.tco.tco_altclass1)[i];
+				}
+			}
+		}
+#endif
+		if (tp->options.res.tco.tco_prefclass == T_CLASS4) {
+			*p++ = _TP_PT_ACKTIME;	/* acknowledgement time */
+			*p++ = 2;
+			*p++ = tp->options.res.tco.tco_acktime >> 8;
+			*p++ = tp->options.res.tco.tco_acktime >> 0;
+		}
+		if (tp->flags & _TP_MAX_THROUGHPUT) {
+			*p++ = _TP_PT_THROUGHPUT;	/* throughput */
+			if (!(tp->flags & _TP_AVG_THROUGHPUT)) {
+				*p++ = 12;
+			} else {
+				*p++ = 24;
+			}
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.targetvalue >> 16;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.targetvalue >> 8;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.targetvalue >> 0;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 16;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 8;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 0;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.targetvalue >> 16;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.targetvalue >> 8;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.targetvalue >> 0;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 16;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 8;
+			*p++ = tp->options.res.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 0;
+			if (tp->flags & _TP_AVG_THROUGHPUT) {
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.targetvalue >> 8;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.targetvalue >> 0;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 16;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
+				*p++ =
+				    tp->options.res.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 16;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 8;
+				*p++ = tp->options.res.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 0;
+			}
+		}
+		if (tp->flags & _TP_RESIDERRRATE) {
+			*p++ = _TP_PT_RESERRORRATE;	/* residual error rate */
+			*p++ = 3;
+			*p++ = tp->options.res.tco.tco_reserrorrate.targetvalue;
+			*p++ = tp->options.res.tco.tco_reserrorrate.minacceptvalue;
+			*p++ = tp->options.res.tco.tco_ltpdu;	/* FIXME */
+		}
+		*p++ = _TP_PT_PRIORITY;	/* priority */
+		*p++ = 2;
+		*p++ = tp->options.res.tco.tco_priority >> 8;
+		*p++ = tp->options.res.tco.tco_priority >> 0;
+		*p++ = _TP_PT_TRANSDEL;	/* transit delay */
+		*p++ = 8;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.called.targetvalue >> 8;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.called.targetvalue >> 0;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.called.minacceptvalue >> 8;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.called.minacceptvalue >> 0;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.calling.targetvalue >> 8;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.calling.targetvalue >> 0;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.calling.minacceptvalue >> 8;
+		*p++ = tp->options.res.tco.tco_transdel.maxdel.calling.minacceptvalue >> 0;
+#if 0
+		if (tp->options.res.tco.tco_prefclass >= T_CLASS3) {
+			*p++ = _TP_PT_REASTIME;	/* reassignment time */
+			*p++ = 2;
+			*p++ = tp->options.res.tco.tco_reastime >> 8;
+			*p++ = tp->options.res.tco.tco_reastime >> 0;
+		}
+#endif
+		if (tp->options.res.tco.tco_prefclass == T_CLASS4) {
+			*p = _TP_PT_INACTTIME;	/* inactivity timer */
+			*p++ = 4;
+			*p++ = tp->inactivity >> 24;
+			*p++ = tp->inactivity >> 16;
+			*p++ = tp->inactivity >> 8;
+			*p++ = tp->inactivity >> 0;
+		}
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_dr - Send a Disconnect Request (DR) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @reason: reason for the disconnect
+ * @dp: diagnostic message block (disconnect data)
+ *
+ * Disconnect reasons:
+ * 128 + 0:	Normal disconnect initiated by session entity
+ * 128 + 1:	Remote transport entity congestion at connect request time
+ * 128 + 2:*	Connection negotiation failed [i.e. proposed class(es) not supported].
+ * 128 + 3:	Duplicate source reference detected for same pair of NSAPs.
+ * 128 + 4:	Mismatched references.
+ * 128 + 5:	Protocol error.
+ * 128 + 6:	Not used.
+ * 128 + 7:	Reference overflow.
+ * 128 + 8:	Connection request refused on this network connection.
+ * 128 + 9:	Not used.
+ * 128 + 10:	Header or parameter length invalid.
+ * 0:		Reason not specified.
+ * 1:		Congestion at TSAP.
+ * 2:*		Session entity not attached to TSAP.
+ * 3:*		Address unknown.
+ */
+STATIC mblk_t *
+tp_pack_dr(struct tp *tp, queue_t *q, t_uscalar_t reason, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	struct netbuf diag = {
+		.len = dp ? msgsize(dp) : 0,
+		.buf = dp ? dp->b_rptr : NULL,
+	};
+
+	/* NOTE: the entire size of the DR-TPDU must be within the agree maximum TPDU size or when used in
+	   response to a connection request, 128.  Note that the DDATA_size member of the T_info_ack
+	   structure should be set accordingly.  The DDATA_size may depend upon the setting of the
+	   tco_checksum option, because the checksum consumes an additional 4 octets in the DR-TPDU when
+	   used. */
+	if (unlikely((bp = mi_allocb(q, 13 + diag.len, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_DR;	/* disconnect request */
+	*p++ = tp->dref >> 8;	/* destination reference */
+	*p++ = tp->dref >> 0;
+	*p++ = tp->sref >> 8;	/* source reference */
+	*p++ = tp->sref >> 0;
+	*p++ = reason;
+	if (diag.len > 0 && diag.buf != NULL) {
+		*p++ = _TP_PT_DIAGNOSTIC;	/* diagnostic */
+		*p++ = diag.len;
+		bcopy(diag.buf, p, diag.len);
+		p += diag.len;
+	}
+	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+
+}
+
+/**
+ * tp_pack_dc - Send a Disconnect Confirmation (DC) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @dref: destination reference
+ * @sref: source reference
+ */
+STATIC mblk_t *
+tp_pack_dc(struct tp *tp, queue_t *q, uint16_t dref, uint16_t sref)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+
+	if (unlikely((bp = mi_allocb(q, 10, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_DC;	/* disconnect confirm */
+	*p++ = dref >> 8;	/* destination reference */
+	*p++ = dref >> 0;
+	*p++ = sref >> 8;	/* source reference */
+	*p++ = sref >> 0;
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_dt - Send a Data (DT) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @roa: receipt acknowlegement option
+ * @eot: end of transmission
+ * @nr: sequence number
+ * @ednr: expedited data sequence number
+ */
+STATIC mblk_t *
+tp_pack_dt(struct tp *tp, queue_t *q, uint8_t roa, uint8_t eot, uint32_t nr, int ednr, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+
+	if (unlikely((bp = mi_allocb(q, 1, BPRI_MED)) == NULL)) /* FIXME */
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_DT | roa;	/* data */
+	switch (tp->options.res.tco.tco_prefclass) {
+	case T_CLASS0:
+	case T_CLASS1:
+		*p++ = (eot ? 0x80 : 0x00) | (nr & 0x7f);
+		break;
+	case T_CLASS2:
+	case T_CLASS3:
+	case T_CLASS4:
+		*p++ = tp->dref >> 8;
+		*p++ = tp->dref >> 0;
+		if (!(tp->opts & _T_F_CO_EXTFORM)) {
+			*p++ = (eot ? 0x80 : 0x00) | (nr & 0x7f);
+		} else {
+			*p++ = (eot ? 0x80 : 0x00) | ((nr >> 24) & 0x7f);
+			*p++ = nr >> 16;
+			*p++ = nr >> 8;
+			*p++ = nr >> 0;
+		}
+		if ((tp->addopts & _T_F_AO_NBLKEXPDATA) && ednr != -1) {
+			*p++ = _TP_PT_ED_TPDU_NR;	/* ED-TPDU-NR */
+			if (!(tp->opts & _T_F_CO_EXTFORM)) {
+				*p++ = 2;
+				*p++ = ednr >> 8;
+				*p++ = ednr >> 0;
+			} else {
+				*p++ = 4;
+				*p++ = ednr >> 24;
+				*p++ = ednr >> 16;
+				*p++ = ednr >> 8;
+				*p++ = ednr >> 0;
+			}
+		}
+		break;
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_ed - Send an Expedited Data (ED) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @nr: sequence number
+ */
+STATIC mblk_t *
+tp_pack_ed(struct tp *tp, queue_t *q, uint32_t nr, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+
+	if (unlikely((bp = mi_allocb(q, 0, BPRI_MED)) == NULL)) /* FIXME */
+		goto enobufs;
+
+	// bp->b_datap->db_type = M_DATA; /* redundant */
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_ED;	/* expedited data */
+	*p++ = tp->dref >> 8;
+	*p++ = tp->dref >> 0;
+	assure(tp->options.res.tco.tco_prefclass != T_CLASS0);
+	if (!(tp->opts & _T_F_CO_EXTFORM)) {
+		*p++ = 0x80 | (nr & 0x7f);
+	} else {
+		*p++ = 0x80 | ((nr >> 24) & 0x7f);
+		*p++ = nr >> 16;
+		*p++ = nr >> 8;
+		*p++ = nr >> 0;
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_ak - Send an Acknowledgement (AK) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @dref: destination reference
+ * @credit:
+ * @nr: sequence number
+ * @ssn:
+ */
+STATIC mblk_t *
+tp_pack_ak(struct tp *tp, queue_t *q, mblk_t *dp, unsigned short dref, uint16_t credit, uint32_t nr, int ssn)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	int mlen = 5;
+
+	if (tp->options.res.tco.tco_extform == T_YES)
+		mlen += 5;
+	if (tp->options.res.tco.tco_prefclass == T_CLASS4) {
+		if (ssn != 0)
+			mlen += 4;
+		if (tp->options.res.tco.tco_flowctrl == T_YES)
+			mlen += 12;
+		if (tp->options.res.tco.tco_selectack == T_YES) {
+			if (tp->options.res.tco.tco_extform == T_YES)
+				mlen += 1 + (tp->sackblks << 3);
+			else
+				mlen += 1 + (tp->sackblks << 1);
+		}
+	}
+
+	if ((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL)
+		goto enobufs;
+
+	// bp->b_datap->db_type = M_DATA; /* redundant */
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	if (tp->options.res.tco.tco_extform != T_YES) {
+		*p++ = _TP_MT_AK | (credit & 0x0f);	/* acknowledge */
+	} else {
+		*p++ = _TP_MT_AK;	/* acknowledge */
+	}
+	*p++ = dref >> 8;
+	*p++ = dref >> 0;
+	if (tp->options.res.tco.tco_extform != T_YES) {
+		*p++ = nr & 0x7f;
+	} else {
+		*p++ = (nr >> 24) & 0x7f;
+		*p++ = nr >> 16;
+		*p++ = nr >> 8;
+		*p++ = nr >> 0;
+		*p++ = credit >> 8;
+		*p++ = credit >> 0;
+	}
+	if (tp->options.res.tco.tco_prefclass == T_CLASS4) {
+		if (ssn != 0) {
+			*p++ = _TP_PT_SUBSEQUENCE;	/* subsequence number */
+			*p++ = 2;
+			*p++ = ssn >> 8;
+			*p++ = ssn >> 0;
+		}
+		if (tp->options.res.tco.tco_flowctrl == T_YES) {
+			*p++ = _TP_PT_FLOWCTLCF;	/* flow control confirmation */
+			*p++ = 8;
+			if (tp->options.res.tco.tco_extform != T_YES) {
+				*p++ = 0;
+				*p++ = 0;
+				*p++ = 0;
+				*p++ = tp->rnr & 0x7f;
+			} else {
+				*p++ = (tp->rnr >> 24) & 0x7f;
+				*p++ = tp->rnr >> 16;
+				*p++ = tp->rnr >> 8;
+				*p++ = tp->rnr >> 0;
+			}
+			*p++ = tp->rssn >> 8;
+			*p++ = tp->rssn >> 0;
+			if (tp->options.res.tco.tco_extform != T_YES) {
+				*p++ = 0;
+				*p++ = 0;
+				*p++ = 0;
+				*p++ = credit & 0x7f;
+			} else {
+				*p++ = (credit >> 24) & 0x7f;
+				*p++ = credit >> 16;
+				*p++ = credit >> 8;
+				*p++ = credit >> 0;
+			}
+		}
+		if (tp->options.res.tco.tco_selectack == T_YES) {
+			*p++ = _TP_PT_SELECTACK;	/* selective acknowledgement */
+			if (tp->options.res.tco.tco_extform != T_YES) {
+				*p++ = tp->sackblks << 1;
+				while (FIXME) {
+					*p++ = blk->beg & 0x7f;
+					*p++ = blk->end & 0x7f;
+				}
+			} else {
+				*p++ = tp->sackblks << 3;
+				while (FIXME) {
+					*p++ = (blk->beg >> 24) & 0x7f;
+					*p++ = blk->beg >> 16;
+					*p++ = blk->beg >> 8;
+					*p++ = blk->beg >> 0;
+					*p++ = (blk->end >> 24) & 0x7f;
+					*p++ = blk->end >> 16;
+					*p++ = blk->end >> 8;
+					*p++ = blk->end >> 0;
+				}
+			}
+		}
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_ea - Send an Expedited Data Acknowledgement (EA) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @dref: destination reference
+ * @nr: sequence number
+ * @ssn:
+ */
+STATIC mblk_t *
+tp_pack_ea(struct tp *tp, queue_t *q, unsigned short dref, uint32_t nr, int ssn)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	int mlen = 5;
+
+	if (tp->options.res.tco.tco_extform == T_YES)
+		mlen += 3;
+
+	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_EA;	/* expedited data acknowledge */
+	*p++ = dref >> 8;
+	*p++ = dref >> 0;
+	if (tp->options.res.tco.tco_extform != T_YES) {
+		*p++ = nr & 0x7f;
+	} else {
+		*p++ = (nr >> 24) & 0x7f;
+		*p++ = nr >> 16;
+		*p++ = nr >> 8;
+		*p++ = nr >> 0;
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = NULL;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_rj - Send a Reject (RJ) Message
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @nr: sequence number
+ * @ssn:
+ */
+STATIC mblk_t *
+tp_pack_rj(struct tp *tp, queue_t *q, mblk_t *dp, uint32_t nr, int ssn)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	int mlen = 5;
+
+	if (tp->options.res.tco.tco_extform == T_YES)
+		mlen += 5;
+
+	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	if (tp_normal(tp)) {
+		*p++ = _TP_MT_RJ | (tp->credit & 0x0f);	/* reject */
+	} else {
+		*p++ = _TP_MT_RJ;	/* reject */
+	}
+	*p++ = tp->dref >> 8;
+	*p++ = tp->dref >> 0;
+	if (tp_normal(tp)) {
+		*p++ = nr & 0x7f;
+	} else {
+		*p++ = (nr >> 24) & 0x7f;
+		*p++ = nr >> 16;
+		*p++ = nr >> 8;
+		*p++ = nr >> 0;
+		*p++ = tp->credit >> 8;
+		*p++ = tp->credit >> 0;
+	}
+	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_er - Create an Error (ER) TPDU
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ * @cause: reject cause
+ */
+STATIC mblk_t *
+tp_pack_er(struct tp *tp, queue_t *q, mblk_t *dp, uint32_t cause, struct netbuf *tpdu)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	int mlen = 5;
+
+	if (tpdu->len > 0 && tpdu->buf != NULL)
+		mlen += 2 + tpdu->len;
+
+	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* fix up later */
+	*p++ = _TP_MT_ER;	/* error */
+	*p++ = tp->dref >> 8;
+	*p++ = tp->dref >> 0;
+	*p++ = cause;
+	if (tpdu->len > 0 && tpdu->buf != NULL) {
+		*p++ = _TP_PT_INVALID_TPDU;	/* invalid TPDU */
+		*p++ = tpdu->len;
+		bcopy(tpdu->buf, p, tpdu->len);
+		p += tpdu->len;
+	}
+	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tco.tco_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+/**
+ * tp_pack_ud - Create a Unit Data (UD) TPDU
+ * @tp: sending transport endpoint
+ * @q: invoking queue
+ */
+STATIC INLINE fastcall __hot_put mblk_t *
+tp_pack_ud(struct tp *tp, queue_t *q, mblk_t *dp)
+{
+	register unsigned char *p;
+	mblk_t *bp;
+	size_t mlen = 2;
+
+	if (tp->dst.tsel[0] > 0)
+		mlen += 2 + tp->dst.nsap.len + 2;
+	if (tp->src.tsel[0] > 0)
+		mlen += 2 + tp->src.nsap.len + 2;
+
+	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
+		goto enobufs;
+
+	p = bp->b_wptr;
+	*p++ = 0;		/* length indicator - fix up later */
+	*p++ = _TP_MT_UD;	/* unitdata */
+	if (tp->dst.tsel[0] > 0) {
+		*p++ = _TP_PT_CDTRANSSEL;
+		*p++ = 2;
+		bcopy(tp->dst.tsel, p, 2);
+		p += 2;
+	}
+	if (tp->src.tsel[0] > 0) {
+		*p++ = _TP_PT_CGTRANSSEL;
+		*p++ = 2;
+		bcopy(tp->src.tsel, p, 2);
+		p += 2;
+	}
+	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
+	bp->b_wptr = p;
+#if 0
+	/* FIXME: caller must do this */
+	bp->b_cont = dp;
+	if (tp->options.res.tcl.tcl_checksum == T_YES)
+		tp_add_checksum(bp);
+#endif
+      enobufs:
+	return (bp);
+}
+
+static void
+tp_queue_xmit(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[1] == _TP_MT_UD) {
+		if (tp->options.res.tcl.tcl_checksum == T_YES)
+			tp_add_checksum(mp);
+	} else {
+		if (tp->options.res.tco.tco_checksum == T_YES)
+			tp_add_checksum(mp);
+	}
+
+	/* FIXME: actually send the message now... */
+
+	return;
+}
+
+/**
+ * tp_resend - resend the previously sent message
+ * @tp: private structure (locked)
+ * @q: active queue
+ */
+static void
+tp_resend(struct tp *tp, queue_t *q)
+{
+	tp_timer_stop(tp, t1);
+	tp_timer_start(tp, q, t1);
+	tp->count++;
+	tp_queue_xmit(tp, q, tp->sent);
+}
+
+/**
+ * tp_repeat - repeat sending of message based on retransmission timer
+ * @tp: private structure (locked)
+ * @q: active queue
+ * @mp: message to repeat send
+ */
+static void
+tp_repeat(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	freemsg(tp->sent);
+	tp->sent = mp;
+	tp->count = 0;
+	tp_resend(tp, q);
+}
+
+/*
+ *  =========================================================================
+ *
  *  Protocol Actions
  *
  *  =========================================================================
@@ -7407,7 +8436,7 @@ tp_lookup(uint16_t dref, uint16_t sref, uint16_t dsel, uint16_t ssel, struct snp
 
 	if ((tp = tp_lookup_conn(dref, sref, daddr, saddr)))
 		return (tp);
-	if ((tp = tp_lookup_bind(dsel, ssel, daddr, saddr)))
+	if ((tp = tp_lookup_bind(dsel, daddr)))
 		return (tp);
 	return (NULL);
 }
@@ -7500,7 +8529,7 @@ tp_assign_lref(struct tp *tp)
 		struct tp *up;
 		struct tp_chash_bucket *hp;
 
-		hp = &tp_chash[tp_chashfn(tp->lref)];
+		hp = &tp_chash[tp_chashfn(tp->lref, 0)];
 		write_lock(&hp->lock);
 		for (up = hp->list; up; up = up->cnext)
 			if (up->lref == tp->lref)
@@ -7603,7 +8632,7 @@ tp_disconnect(struct tp *tp)
 STATIC int
 tp_accept(struct tp *tp, queue_t *q, struct tp *ap, mblk_t *cp)
 {
-	mblk_t *mp;
+	mblk_t *mp, *dp = NULL;
 	int err;
 
 	if ((err = tp_assign_lref(ap)))
@@ -7958,7 +8987,7 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, mb
 {
 	struct T_ok_ack *p;
 	int err = 0;
-	mblk_t *bp;
+	mblk_t *mp;
 
 	if (unlikely(!(mp = mi_allocb(q, sizeof(*p), BPRI_MED))))
 		goto enobufs;
@@ -7970,7 +8999,7 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, mb
 	mp->b_wptr += sizeof(*p);
 	switch (tp_get_state(tp)) {
 	case TS_WACK_UREQ:
-		if ((err = tp_unbind(tp)))
+		if ((err = tp_unbind(tp, q)))
 			goto free_error;
 		/* TPI spec says that if the provider must flush both queues before responding with a
 		   T_OK_ACK primitive when responding to a T_UNBIND_REQ. This is to flush queued data for
@@ -8007,7 +9036,7 @@ t_ok_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, mb
 	case TS_WACK_DREQ7:
 		ensure(cp, goto free_error);
 		/* NOTE: we should suck all of this into tp_refuse() */
-		if ((err = tp_refuse(tp, q, cp)))
+		if ((err = tp_refuse(tp, q, cp, dp)))
 			goto free_error;
 		if (bufq_length(&tp->conq))
 			tp_set_state(tp, TS_WRES_CIND);
@@ -8073,9 +9102,9 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *cp)
 {
 	mblk_t *mp;
 	struct T_conn_ind *p;
-	t_scalar_t OPT_length, SRC_length;
 	size_t src_len = tp->p.info.ADDR_size;
 	size_t opt_len = tp_size_conn_opts(tp);
+	unsigned char *src;
 	int err;
 
 	if (unlikely(tp_not_state(tp, TSM_LISTEN)))
@@ -8084,7 +9113,7 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *cp)
 		goto eagain;
 	if (unlikely(!canputnext(tp->rq)))
 		goto ebusy;
-	if (unlikely(!(mp = mi_allocb(q, sizeof(*p) + sizeof(*src) + opt_len, BPRI_MED))))
+	if (unlikely(!(mp = mi_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))))
 		goto enobufs;
 	DB_TYPE(mp) = M_PROTO;
 	p = (typeof(p)) mp->b_wptr;
@@ -8092,17 +9121,18 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *cp)
 	p->SRC_length = src_len;
 	p->SRC_offset = src_len ? sizeof(*p) : 0;
 	p->OPT_length = opt_len;
-	p->OPT_offset = opt_len ? sizeof(*p) + sizeof(*src) : 0;
+	p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
 	p->SEQ_number = (t_uscalar_t) (long) cp;
 	mp->b_wptr += sizeof(*p);
 
 	/* place source address from CR-TPDU in connection indication */
+	src = cp->b_rptr + FIXME; /* FIXME find address in CR-TPDU */
 	bcopy(src, mp->b_wptr, src_len);
 	mp->b_wptr += src_len;
 
 	/* place options from CR-TPDU in connection indication */
 	if (opt_len) {
-		if ((err = t_build_conn_opts(tp, mp->b_wptr, opt_len)) < 0)
+		if ((err = t_build_conn_opts(tp, &tp->options.req, &tp->options.res, mp->b_wptr, opt_len, 1)) < 0)
 			goto badopt;
 		mp->b_wptr += opt_len;
 	}
@@ -8171,7 +9201,7 @@ t_conn_con(struct tp *tp, queue_t *q)
 		mp->b_wptr += res_len;
 	}
 	if (opt_len) {
-		if ((err = t_build_conn_opts(tp, mp->b_wptr, opt_len)) >= 0)
+		if ((err = t_build_conn_opts(tp, &tp->options.req, &tp->options.res, mp->b_wptr, opt_len, 0)) >= 0)
 			mp->b_wptr += opt_len;
 		else {
 			freemsg(mp);
@@ -8254,14 +9284,14 @@ t_discon_ind(struct tp *tp, queue_t *q, t_scalar_t reason, mblk_t *cp)
 	default:
 		LOGERR(tp, "SWERR: out of state: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 		/* remove it anyway and feign success */
-		if (cp && (err = tp_refuse(tp, q, cp)))
+		if (cp && (err = tp_refuse(tp, q, cp, NULL)))
 			goto error;
 		return (0);
 	}
 	if (unlikely(!(mp = mi_allocb(q, sizeof(*p), BPRI_MED))))
 		goto enobufs;
 
-	if (unlikely(cp && (err = tp_refuse(tp, q, cp)))) {
+	if (unlikely(cp && (err = tp_refuse(tp, q, cp, NULL)))) {
 		freemsg(mp);
 		goto error;
 	}
@@ -8710,1347 +9740,6 @@ t_capability_ack(struct tp *tp, queue_t *q, mblk_t *msg, t_uscalar_t caps, int t
 /*
  *  =========================================================================
  *
- *  SENDMSG and RECVMSG
- *
- *  =========================================================================
- */
-
-/* Class options */
-#define _T_F_CO_RESERVED4	(1<<3)	/* reserved */
-#define _T_F_CO_RESERVED3	(1<<2)	/* reserved */
-#define _T_F_CO_EXTFORM		(1<<1)	/* extended format */
-#define _T_F_CO_FLOWCTRL	(1<<0)	/* explicit flow control */
-
-/* Additional options - XTI doesn't know about these first three */
-#define _T_F_AO_NBLKEXPDATA	(1<<6)	/* non-blocking expedited data */
-#define _T_F_AO_REQUESTACK	(1<<5)	/* request acknowledgement */
-#define _T_F_AO_SELECTACK	(1<<4)	/* selective acknowledgement */
-#define _T_F_AO_NETEXP		(1<<3)	/* network expedited data */
-#define _T_F_AO_NETRECPTCF	(1<<2)	/* receipt confirmation */
-#define _T_F_AO_CHECKSUM	(1<<1)	/* checksum */
-#define _T_F_AO_EXPD		(1<<0)	/* transport expedited data */
-
-/* these are really size = (1<<value) */
-#define _T_TPDU_SIZE_8192	0x0d
-#define _T_TPDU_SIZE_4096	0x0c
-#define _T_TPDU_SIZE_2048	0x0b
-#define _T_TPDU_SIZE_1024	0x0a
-#define _T_TPDU_SIZE_512	0x09
-#define _T_TPDU_SIZE_256	0x08
-#define _T_TPDU_SIZE_128	0x07
-
-/* disconnect reasons, these should be in TPI header file */
-#define _TP_REASON_UNSPECIFIED		0x00
-#define _TP_REASON_TSAP_CONGESTION	0x01
-#define _TP_REASON_TSAP_NO_SESSION	0x02	/* persistent */
-#define _TP_REASON_ADDRESS_UNKNOWN	0x03	/* persistent */
-#define _TP_REASON_NORMAL_DISCONNECT	0x80
-#define _TP_REASON_REMOTE_CONGESTION	0x81
-#define _TP_REASON_NEGOTIATION_FAILED	0x82	/* persistent */
-#define _TP_REASON_DUPLICATE_SREF	0x83
-#define _TP_REASON_MISMATCH_REFS	0x84
-#define _TP_REASON_PROTOCOL_ERROR	0x85
-#define _TP_REASON_NOT_USED1		0x86
-#define _TP_REASON_REFERENCE_OVERFLOW	0x87
-#define _TP_REASON_REFUSED		0x88
-#define _TP_REASON_NOT_USED2		0x89
-#define _TP_REASON_INVALID_LENGTH	0x8a
-
-/* error causes, these should be in TPI header file */
-#define _TP_ERROR_UNSPECIFIED		0x00
-#define _TP_ERROR_INVALID_PARM_TYPE	0x01
-#define _TP_ERROR_INVALID_TPDU_TYPE	0x02
-#define _TP_ERROR_INVALID_PARM_VALUE	0x03
-
-/* message types */
-#define	_TP_MT_ED	0x10		/* can contain data */
-#define	_TP_MT_EA	0x20		/* no data */
-#define _TP_MT_UD	0x40		/* can contain data */
-#define	_TP_MT_RJ	0x50		/* no data */
-#define	_TP_MT_AK	0x60		/* no data */
-#define	_TP_MT_ER	0x70		/* no data */
-#define	_TP_MT_DR	0x80		/* can contain data */
-#define	_TP_MT_DC	0xc0		/* no data */
-#define	_TP_MT_CC	0xd0		/* can contain data */
-#define	_TP_MT_CR	0xe0		/* can contain data */
-#define	_TP_MT_DT	0xf0		/* can contain data */
-
-#define _TP_PT_INVALID_TPDU	0xc1	/* invalid TPDU */
-
-#define _TP_PT_TPDU_SIZE	0xc0	/* TPDU size */
-#define _TP_PT_CGTRANSSEL	0xc1	/* calling transport selector */
-#define _TP_PT_CDTRANSSEL	0xc2	/* called transport selector */
-#define _TP_PT_CHECKSUM		0xc3	/* checksum */
-#define _TP_PT_VERSION		0xc4	/* version number */
-#define _TP_PT_PROTECTION	0xc5	/* protection */
-#define _TP_PT_ADDOPTIONS	0xc6	/* additional options */
-#define _TP_PT_ALTCLASS		0xc7	/* alternative protocol classes */
-
-#define _TP_PT_ACKTIME		0x85	/* acknowledgement time */
-#define _TP_PT_RESERRORRATE	0x86	/* residual error rate */
-#define _TP_PT_PRIORITY		0x87	/* priority */
-#define _TP_PT_TRANSDEL		0x88	/* transit delay */
-#define _TP_PT_THROUGHPUT	0x89	/* throughput */
-#define _TP_PT_SUBSEQUENCE	0x8a	/* subsequence number */
-#define _TP_PT_REASTIME		0x8b	/* reassignment time */
-#define _TP_PT_FLOWCTLCF	0x8c	/* flow control confirmation */
-#define _TP_PT_SELECTACK	0x8f	/* selective acknowledgement */
-
-#define _TP_PT_ED_TPDU_NR	0x90	/* ED-TPDU-NR */
-
-#define _TP_PT_DIAGNOSTIC	0xe0	/* diagnostic */
-
-#define _TP_PT_PREF_TPDU_SIZE	0xf0	/* preferred TPDU size */
-#define _TP_PT_INACTTIME	0xf2	/* inactivity time */
-
-/**
- * tp_add_checksum - complete the checksum
- * @mp: message containing TPDU
- *
- * Add a checksum parameter to the variable part and calculate a checksum for the resulting TPDU.
- * This calculation follows the procedures in X.224 Annex D and X.234 Annex C.
- */
-STATIC INLINE __hot void
-tp_add_checksum(mblk_t *mp)
-{
-	int n;
-	mblk_t *bp;
-	int c0 = 0, c1 = 0, L = 0;
-
-	mp->b_rptr[0] += 4;	/* add 4 to length indicator */
-	*mp->b_wptr++ = _TP_PT_CHECKSUM;
-	*mp->b_wptr++ = 2;
-	n = mp->b_wptr - mp->b_rptr;
-	/* zero checksum to begin with */
-	*mp->b_wptr++ = 0;
-	*mp->b_wptr++ = 0;
-
-	for (bp = mp; bp; bp = bp->b_cont) {
-		register unsigned char *p = bp->b_rptr;
-		register unsigned char *e = bp->b_wptr;
-
-		if (p < e) {
-			L += e - p;
-			while (p < e) {
-				c0 += *p++;
-				c1 += c0;
-			}
-		}
-	}
-
-	mp->b_rptr[n] = -c1 + (L - n) * c0;
-	mp->b_rptr[n + 1] = c1 - (L - n + 1) * c0;
-	return;
-}
-
-/**
- * tp_pack_cr - create a Connection Request (CR) TPDU
- * @tp: sending transport endpoint
- * @q: invoking queue (typically write queue)
- * @dp: user data to include in connect request
- *
- * CDT
- * DST-REF: (set to zero)
- * SRC-REF: (set to assigned source reference)
- * CLASS and OPTIONS:
- * Calling Transport Selector:
- * Called Transport Selector:
- * TPDU size (proposed)
- * preferred maximum TPDU size (proposed)
- * version number
- * protection parameter
- * checksum
- * additional options depending on class
- * alternative protocol class(es)
- * acknowledgement time
- * inactivity time
- * throughput (proposed)
- * residual error rate (proposed)
- * priority (proposed)
- * transit delay (proposed)
- * reassignment time
- * user data
- *
- * A transport connection is established by means of one transport entity (the
- * initiator) transmitting a CR-TPDU to the other transport entity (the
- * responder), which replies with a CC-TPDU.
- *
- * Before sneding the CR-TPDU, the intiator assigns the transport connection
- * being created to one (or more if the splitting procedure is being used)
- * network connection(s).  It is this set of network connections over which the
- * TPDUs are sent.
- *
- *   NOTE 1 - Even if the initiator assigns the transport connection to more
- *   than one network connection, all CR-TPDUs (if repeated) or DR-TPDUs with
- *   DST-REF set to zero which are sent prior to the receipt of the CC-TPDU
- *   shall be sent on the same network connection, unless an N-DISCONNECT
- *   indication is received.  (This is necessary because the remote entity may
- *   not support class 4 and therefore may not recognize splitting.)  If the
- *   initiator has made other assignments, it will use them only after receive
- *   of a class 4 CC-TPDU (see also the splitting procedure 6.23).
- *
- * During this exchange, all information and parameters need for the transport
- * entities to operate shall be exchanged or negotiated.
- *
- *   NOTE 2 - Except in class 4, it is recommended that the initiator start an
- *   optional timer TS1 at the time the CR-TPDU is sent.  This timer should be
- *   stopped when the connection is considered as accepted or refused or
- *   unsuccessful.  If the timer expires, the intiator should reset or
- *   disconnect the network connection, and in classes 1 and 3, freeze the
- *   reference (see 6.18).  For all other transport connection(s) multiplexed
- *   on the same network connection, the procedures for reset or disconnect as
- *   appropriate should be followed.
- *
- * ...
- *
- * The following information is exchanged:
- *
- * a) References - Each transport entity chooses a reference to be used by the
- *    peer entity which is 16-bits long and which is arbitrary under the
- *    following restrictions:
- *
- *    1) it shall not already be in use nor frozen (see 6.18);
- *    2) it shall not be zero.
- *
- *    This mechanism is symmetrical and provide identification of the transport
- *    connection independent of the network connection.  The range of
- *    references used for transport connections, in a given transport entity,
- *    is a local matter.
- *
- * b) Calling, Called and Responding Transport-Selectors (optional) - When
- *    either network address unambiguously defines the transport address, this
- *    information may be omitted.
- *
- * c) Initial credit - Only relevant for classes which include the explicit
- *    flow control function.
- *
- * d) User data - Not available if class 0 is the preferred class (see Note 3).
- *    Up to 32 octets in other classes.
- *
- *    NOTE 3 - If class 0 is a valid response according to Table 3, inclusing
- *    of user data in the CR-TPDU may cause the responding entity to refuse the
- *    connection (for example, if it only supports class 0).
- *
- * e) Acknowledgement time - Only in class 4.
- *
- * f) Checksum paraemter - Only in class 4.
- *
- * g) Protection parameter - This parameter and its semantics are user defined.
- *
- * h) Inactivity time - Only in class 4.  The inactivity time parameter shall
- *    not be included in a CC-TPDU if it was not present in the corresponding
- *    CR-TPDU.
- *
- * The following negotiations take place:
- *
- * i) The initiator shall propose a preferred class and may propose any number
- *    of alternative classes which permit a valid response as defined in Table
- *    3.  The initiator should assume when it sends the CR-TPDU that its
- *    preferred class will be agreed to, and commence the procedures associated
- *    with that class, except that if class 0 or class 1 is an alternative
- *    class, multiplexing shall not commence until a CC-TPDU selecting the use
- *    of classes 2, 3 or 4 has been received.
- *
- *    NOTE 4 - This means, for example, that when the preferred class includes
- *    resynchronization (see 6.14) the resynchronization will occur if a reset
- *    is signalled during connection establishment.
- *
- *    The responder shall select one class defined in Table 3 as a valid
- *    response corresponding to the preferred class and to the class(es), if
- *    any, contained in the alternative class parameter of the CR-TPDU.  It
- *    shall indicate the selected class in the CC-TPDU and shall follow the
- *    procedures for the selected class.
- *
- *    If the preferred class is not selected, then on receipt of the CC-TPDU,
- *    the initiator shall adjust its operation according to the procedures of
- *    the selected class.
- *
- *    NOTE 5 - The valid responses indicated in Table 3 result from both
- *    explicit negotiation, whereby each of the classes proposed is a valid
- *    response, and implement negotiation whereby:
- *    - if class 3 or 4 is proposed, then class 2 is a valid response.
- *    - if class 1 is proposed, then class 0 is a valid response.
- *
- *    NOTE 6 - Negotiation from class 2 to class 1 and from any class to a
- *    higher-numbered class is not valid.
- *
- *    NOTE 7 - Redundant combinations are not a protocol error.
- *
- * j) TPDU size - The initiator may propose a maimum size for TPDUs, and the
- *    responder may accept this value or respond with any value between 128 and
- *    the proposed value in the set of values available [see 13.3.4 b)].
- *
- *    NOTE 8 - The length of the CR-TPDU does not exceed 128 octets (see 13.3).
- *    NOTE 9 - The transport entities may have knowledge, by some local means,
- *    of the maximum available NSDU size.
- *
- * k) Preferred maximum TPDU size - The value of this parameter, multiplied by
- *    128, yields the proposed or accepted maximum TPDU size in octets.  The
- *    initiator may propose a preferred maximum size of TPDUs and the responder
- *    may accept this value or repsond with a smaller value.
- *
- *    NOTE 10 - If this parameter is used in a CR-TPDU without also including
- *    the TPDU size parameter, this will result in a maximum TPDU size of 128
- *    octets being selected if the remote entity does not recognize the
- *    preferred TPDU size parameter.  Therefore, it is reocmmended that both
- *    parameters be included in the CR-TPDU.
- *
- *    If the preferred maximum TPDU size parameter is present in a CR-TPDU the
- *    responder shall either:
- *
- *    - ignore the preferred maximum TPDU size parameter and follow TPDU size
- *      negotiation as defined in 6.5.4 j); or
- *
- *    - use the preferrend maximum TPDU size parameter to determine the maximum
- *      TPDU size requested by the initiator and ignore the TPDU size
- *      parameter.  In this case the responder shall use the preferred maximum
- *      TPDU size parameter in the CC-TPDU and shall not include the TPDU size
- *      parameter in the CC-TPDU.
- *
- *    If the preferred maximum TPDU size parameter is not present in the
- *    CR-TPDU it shall not be included in the corresponding CC-TPDU.  In this
- *    case TPDU size negotiation is as defined in 6.5.4 j).
- *
- * l) Normal or extended format - Either normal or extended format is
- *    available.  When extended is used, this applies to CDT, TPDU-NR,
- *    ED-TPDU-NR, YR-TU-NR and YR-EDTU-NR parameters.
- *
- * m) Checksum selection - This defines whether or not TPDUs of the connection
- *    are to include a checksum.
- *
- * n) Quality of service parameters - This defines the throughput, transit
- *    delay, priority and residual error rate.
- *
- *    NOTE 11 - The transport service defines transit delay as requiring a
- *    previously stated average TSDU size as a basis for any specification.
- *    This protocol as speciied in 13.3.4 m), uses a value at 128 octets.
- *    Conversion to and from specifications based upon some other value is a
- *    local matter.
- *
- * o) The non-use of explicit flow control in class 2.
- *
- * p) The use of network receipt confirmation and network expedited when class
- *    1 is to be used.
- *
- * q) Use of expedited data transfer service - This allows both TS-users to
- *    negotiate the use or non-use of the expedite data transport service as
- *    defined in the transport service (see ITU-T Rec. X.214 | ISO/IEC 8072).
- *
- * r) The use of selective acknowledgement - This allows the transport entities
- *    to decide whether to use procedures that allow acknowledgement of
- *    DT-TPDUs that are received out-of-sequence (only in class 4).
- *
- * s) The use of request acknowledgement - This allows both transport entities
- *    to negotiate the use or non-use of the request acknowledgement facility
- *    specified in 6.13.4.2 (only in classes 1, 3, 4).
- *
- * t) The use of non-blocking expedite data transfer service - This allows both
- *    transport entities to negotiate the use or non-use of the non-blocking
- *    expedited data transfer service (only in class 4).  This option will only
- *    be valid when the option of "use of expedited data transfer service" is
- *    negotiated.
- *
- * The following information is sent only in the CR-TPDU:
- *
- * u) Version number - This defines the version of the transport protocol
- *    standard used for this connection.
- *
- * v) Reassignment time parameter - This indicates the time for which the
- *    intiiator will persist in following the reassignment after failure
- *    procedure.
- *     
- */
-STATIC mblk_t *
-tp_pack_cr(struct tp *tp, queue_t *q, mblk_t *dp)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-
-	/* 128-32 = 96 octets gives enough room for the entire CR-TPDU */
-	if (unlikely((bp = mi_allocb(q, 128, BPRI_MED)) == NULL))
-		return (bp);
-
-	bp->b_datap->db_type = M_DATA;
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_CR | tp->credit;
-	*p++ = 0;
-	*p++ = 0;
-	*p++ = tp->sref >> 8;
-	*p++ = tp->sref >> 0;
-	*p++ = (tp->opts.tco.tco_prefclass << 4)
-	    | (tp->options & (_T_F_CO_EXTFORM | _T_F_CO_FLOWCTRL));
-	{
-		*p++ = _TP_PT_CGTRANSSEL;	/* calling transport selector */
-		*p++ = sizeof(tp->src.tsel);
-		bcopy(tp->src.tsel, p, sizeof(tp->src.tsel));
-		p += sizeof(tp->src.tsel);
-	}
-	{
-		*p++ = _TP_PT_CDTRANSSEL;	/* called transport selector */
-		*p++ = sizeof(tp->dst.tsel);
-		bcopy(tp->dst.tsel, p, sizeof(tp->dst.tsel));
-		p += sizeof(tp->dst.tsel);
-	}
-	if (tp->opts.tco.tco_ltpdu != T_UNSPEC) {
-		int order, t_uscalar_t size;
-
-		size = tp->opts.tco.tco_ltpdu;
-		for (order = _T_TPDU_SIZE_8192; order >= _T_TPDU_SIZE_128; order--)
-			if ((1 << order) <= size)
-				break;
-		if (order != _T_TPDU_SIZE_128) {
-			*p++ = _TP_PT_TPDU_SIZE;	/* TPDU size */
-			*p++ = 1;
-			*p++ = order;
-		}
-		if (!(size >>= 7))
-			size = 1;
-		*p++ = _TP_PT_PREF_TPDU_SIZE;	/* preferred TPDU size */
-		if (size >= 1 << 24) {
-			*p++ = 4;
-			*p++ = size >> 24;
-			*p++ = size >> 16;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else if (size >= 1 << 16) {
-			*p++ = 3;
-			*p++ = size >> 16;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else if (size >= 1 << 8) {
-			*p++ = 2;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else {
-			*p++ = 1;
-			*p++ = size >> 0;
-		}
-	}
-	if (tp->opts.tco.tco_prefclass != T_CLASS0) {
-		*p++ = _TP_PT_VERSION;	/* version number */
-		*p++ = 1;
-		*p++ = 1;
-		if ((tp->opts.flags & _T_BIT_TCO_PROTECTION) && tp->opts.tco.tco_protection != T_UNSPEC) {
-			*p++ = _TP_PT_PROTECTION;	/* protection */
-			*p++ = 1;
-			*p++ = tp->opts.tco.tco_protection & ~T_ABSREQ;
-		}
-		{
-			t_uscalar_t addopts = 0;
-
-			*p++ = _TP_PT_ADDOPTIONS;	/* additional options */
-			*p++ = 1;
-			*p++ = tp->addopts;
-		}
-		if (tp->network != N_CLNS) {
-			int i, altnum = 0;
-
-			for (i = 0; i < 4; i++)
-				if ((&tp->opts.tco.tco_altclass1)[i] != T_UNSPEC)
-					altnum++;
-
-			if (altnum) {
-				*p++ = _TP_PT_ALTCLASS;	/* alternative protocol classes */
-				*p++ = altnum;
-				for (i = 0; i < 4; i++) {
-					if ((&tp->opts.tco.tco_altclass1)[i] != T_UNSPEC)
-						*p++ = (&tp->opts.tcp.tco_altclass1)[i];
-				}
-			}
-		}
-		if (tp->opts.tco.tco_prefclass == T_CLASS4) {
-			*p++ = _TP_PT_ACKTIME;	/* acknowledgement time */
-			*p++ = 2;
-			*p++ = tp->opts.tco.tco_acktime >> 8;
-			*p++ = tp->opts.tco.tco_acktime >> 0;
-		}
-		if (tp->flags & _TP_MAX_THROUGHPUT) {
-			*p++ = _TP_PT_THROUGHPUT;	/* throughput */
-			if (!(tp->flags & _TP_AVG_THROUGHPUT)) {
-				*p++ = 12;
-			} else {
-				*p++ = 24;
-			}
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.targetvalue >> 16;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.targetvalue >> 8;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.targetvalue >> 0;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 16;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 8;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 0;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.targetvalue >> 16;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.targetvalue >> 8;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.targetvalue >> 0;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 16;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 8;
-			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 0;
-			if (tp->flags & _TP_AVG_THROUGHPUT) {
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 0;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 0;
-			}
-		}
-		if (tp->flags & _TP_RESIDERRRATE) {
-			*p++ = _TP_PT_RESERRORRATE;	/* residual error rate */
-			*p++ = 3;
-			*p++ = tp->opts.tco.tco_reserrorrate.targetvalue;
-			*p++ = tp->opts.tco.tco_reserrorrate.minacceptvalue;
-			*p++ = tp->opts.tco.tco_ltpdu;	/* FIXME */
-		}
-		*p++ = _TP_PT_PRIORITY;	/* priority */
-		*p++ = 2;
-		*p++ = tp->opts.tco.tco_priority >> 8;
-		*p++ = tp->opts.tco.tco_priority >> 0;
-		*p++ = _PT_TP_TRANSDEL;	/* transit delay */
-		*p++ = 8;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.called.targetvalue >> 8;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.called.targetvalue >> 0;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.called.minacceptvalue >> 8;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.called.minacceptvalue >> 0;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.calling.targetvalue >> 8;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.calling.targetvalue >> 0;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.calling.minacceptvalue >> 8;
-		*p++ = tp->opts.tco.tco_transdel.maxdel.calling.minacceptvalue >> 0;
-		if (tp->opts.tco.tco_prefclass >= T_CLASS3) {
-			*p++ = _TP_PT_REASTIME;	/* reassignment time */
-			*p++ = 2;
-			*p++ = tp->opts.tco.tco_reastime >> 8;
-			*p++ = tp->opts.tco.tco_reastime >> 0;
-		}
-		if (tp->opts.tco.tco_prefclass == T_CLASS4) {
-			*p++ = _TP_PT_INACTTIME;	/* inactivity timer */
-			*p++ = 4;
-			*p++ = tp->intactivty >> 24;
-			*p++ = tp->intactivty >> 16;
-			*p++ = tp->intactivty >> 8;
-			*p++ = tp->intactivty >> 0;
-		}
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-	bp->b_cont = dp;
-	tp_add_checksum(bp);
-
-	return (bp);
-}
-
-/**
- * tp_pack_cc - create a Connection Confirmation (CC) TPDU
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @dp: data to include in response
- *
- * CDT
- * DST-REF: (SRC-REF received in CR)
- * SRC-REF: (set to assigned source reference)
- * CLASS and OPTIONS (selected)
- * Calling Transport Selector;
- * Responding Transport Selector;
- * TPDU size (selected)
- * the preferred maximum TPDU size (selected)
- * protection parameter
- * checksum
- * additional option selection (selected)
- * acknowledgement time
- * inactivity time
- * throughput (selected)
- * residual error rate (selected)
- * priority (selected)
- * transit delay (selected)
- * user data
- */
-STATIC mblk_t *
-tp_pack_cc(struct tp *tp, queue_t *q, mblk_t *dp)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn, n = -1;
-
-	/* 128-32 = 96 octets gives enough room for the entire CR-TPDU */
-	if ((bp = mi_allocb(q, 96, BPRI_MED)) == NULL)
-		goto enobufs;
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_CC | tp->credit;
-	*p++ = tp->dref >> 8;
-	*p++ = tp->dref >> 0;
-	*p++ = tp->sref >> 8;
-	*p++ = tp->sref >> 0;
-	*p++ = (tp->tp_options.tco.tco_prefclass << 4)
-	    | (tp->options & (_T_F_CO_EXTFORM | _T_F_CO_FLOWCTRL));
-	if (cgts_len > 0) {
-		*p++ = _TP_PT_CGTRANSSEL;	/* calling transport selector */
-		*p++ = cgts_len;
-		bcopy(cgts_ptr, p, cgts_len);
-		p += cgts_len;
-	}
-	if (cdts_len > 0) {
-		*p++ = _TP_PT_CDTRANSSEL;	/* called transport selector */
-		*p++ = cdts_len;
-		bcopy(cdts_ptr, p, cdts_len);
-		p += cdts_len;
-	}
-	if (tp->tp_options.tco.tco_ltpdu != T_UNSPEC) {
-		int order, t_uscalar_t size;
-
-		size = tp->tp_options.tco.tco_ltpdu;
-		for (order = _T_TPDU_SIZE_8192; order >= _T_TPDU_SIZE_128; order--)
-			if ((1 << order) <= size)
-				break;
-		if (order != _T_TPDU_SIZE_128) {
-			*p++ = _TP_PT_TPDU_SIZE;	/* TPDU size */
-			*p++ = 1;
-			*p++ = order;
-		}
-		if (!(size >>= 7))
-			size = 1;
-		*p++ = _TP_PT_PREF_TPDU_SIZE;	/* preferred TPDU size */
-		if (size >= 1 << 24) {
-			*p++ = 4;
-			*p++ = size >> 24;
-			*p++ = size >> 16;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else if (size >= 1 << 16) {
-			*p++ = 3;
-			*p++ = size >> 16;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else if (size >= 1 << 8) {
-			*p++ = 2;
-			*p++ = size >> 8;
-			*p++ = size >> 0;
-		} else {
-			*p++ = 1;
-			*p++ = size >> 0;
-		}
-	}
-	if (tp->tp_options.tco.tco_prefclass != T_CLASS0) {
-#if 0
-		*p++ = _TP_PT_VERSION;	/* version number */
-		*p++ = 1;
-		*p++ = 1;
-#endif
-		if (tp->tp_options.tco.tco_protection) {
-			*p++ = _TP_PT_PROTECTION;	/* protection */
-			*p++ = 1;
-			*p++ = tp->tp_options.tco.tco_protection;
-		}
-		*p++ = _TP_PT_ADDOPTIONS;	/* additional options */
-		*p++ = 1;
-		*p++ = tp->addopts;
-#if 0
-		if (tp->network != N_CLNS) {
-			int i, altnum = 0;
-
-			for (i = 0; i < 4; i++)
-				if ((&tp->tp_options.tco.tco_altclass1)[i] != T_UNSPEC)
-					altnum++;
-
-			if (altnum) {
-				*p++ = _TP_PT_ALTCLASS;	/* alternative protocol classes */
-				*p++ = altnum;
-				for (i = 0; i < 4; i++) {
-					if ((&tp->tp_options.tco.tco_altclass1)[i] != T_UNSPEC)
-						*p++ = (&tp->tp_options.tcp.tco_altclass1)[i];
-				}
-			}
-		}
-#endif
-		if (tp->tp_options.tco.tco_prefclass == T_CLASS4) {
-			*p++ = _TP_PT_ACKTIME;	/* acknowledgement time */
-			*p++ = 2;
-			*p++ = tp->tp_options.tco.tco_acktime >> 8;
-			*p++ = tp->tp_options.tco.tco_acktime >> 0;
-		}
-		if (tp->flags & _TP_MAX_THROUGHPUT) {
-			*p++ = _TP_PT_THROUGHPUT;	/* throughput */
-			if (!(tp->flags & _TP_AVG_THROUGHPUT)) {
-				*p++ = 12;
-			} else {
-				*p++ = 24;
-			}
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.targetvalue >> 16;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.targetvalue >> 8;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.targetvalue >> 0;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 16;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 8;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.called.minacceptvalue >> 0;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.targetvalue >> 16;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.targetvalue >> 8;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.targetvalue >> 0;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 16;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 8;
-			*p++ = tp->tp_options.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 0;
-			if (tp->flags & _TP_AVG_THROUGHPUT) {
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.targetvalue >> 8;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.targetvalue >> 0;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 16;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
-				*p++ =
-				    tp->tp_options.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 16;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 8;
-				*p++ = tp->tp_options.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 0;
-			}
-		}
-		if (tp->flags & _TP_RESIDERRRATE) {
-			*p++ = _TP_PT_RESERRORRATE;	/* residual error rate */
-			*p++ = 3;
-			*p++ = tp->tp_options.tco.tco_reserrorrate.targvalue;
-			*p++ = tp->tp_options.tco.tco_reserrorrate.minacceptvalue;
-			*p++ = tp->tp_options.tco.tco_ltpdu;	/* FIXME */
-		}
-		*p++ = _TP_PT_PRIORITY;	/* priority */
-		*p++ = 2;
-		*p += = tp->tp_options.tco.tco_priority >> 8;
-		*p += = tp->tp_options.tco.tco_priority >> 0;
-		*p++ = _PT_TP_TRANSDEL;	/* transit delay */
-		*p++ = 8;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.called.targetvalue >> 8;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.called.targetvalue >> 0;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.called.minacceptvalue >> 8;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.called.minacceptvalue >> 0;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.calling.targetvalue >> 8;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.calling.targetvalue >> 0;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.calling.minacceptvalue >> 8;
-		*p++ = tp->tp_options.tco.tco_transdel.maxdel.calling.minacceptvalue >> 0;
-#if 0
-		if (tp->tp_options.tco.tco_prefclass >= T_CLASS3) {
-			*p++ = _TP_PT_REASTIME;	/* reassignment time */
-			*p++ = 2;
-			*p++ = tp->tp_options.tco.tco_reastime >> 8;
-			*p++ = tp->tp_options.tco.tco_reastime >> 0;
-		}
-#endif
-		if (tp->tp_options.tco.tco_prefclass == T_CLASS4) {
-			*p = _TP_PT_INACTTIME;	/* inactivity timer */
-			*p++ = 4;
-			*p++ = tp->intactivty >> 24;
-			*p++ = tp->intactivty >> 16;
-			*p++ = tp->intactivty >> 8;
-			*p++ = tp->intactivty >> 0;
-		}
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_dr - Send a Disconnect Request (DR) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @reason: reason for the disconnect
- * @dp: diagnostic message block (disconnect data)
- *
- * Disconnect reasons:
- * 128 + 0:	Normal disconnect initiated by session entity
- * 128 + 1:	Remote transport entity congestion at connect request time
- * 128 + 2:*	Connection negotiation failed [i.e. proposed class(es) not supported].
- * 128 + 3:	Duplicate source reference detected for same pair of NSAPs.
- * 128 + 4:	Mismatched references.
- * 128 + 5:	Protocol error.
- * 128 + 6:	Not used.
- * 128 + 7:	Reference overflow.
- * 128 + 8:	Connection request refused on this network connection.
- * 128 + 9:	Not used.
- * 128 + 10:	Header or parameter length invalid.
- * 0:		Reason not specified.
- * 1:		Congestion at TSAP.
- * 2:*		Session entity not attached to TSAP.
- * 3:*		Address unknown.
- */
-STATIC mblk_t *
-tp_pack_dr(struct tp *tp, queue_t *q, t_uscalar_t reason, mblk_t *dp)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn;
-	struct netbuf diag = {
-		.len = dp ? msgsize(dp) : 0,
-		.buf = dp ? dp->b_rptr : NULL,
-	};
-
-	/* NOTE: the entire size of the DR-TPDU must be within the agree maximum TPDU size or when used in
-	   response to a connection request, 128.  Note that the DDATA_size member of the T_info_ack
-	   structure should be set accordingly.  The DDATA_size may depend upon the setting of the
-	   tco_checksum option, because the checksum consumes an additional 4 octets in the DR-TPDU when
-	   used. */
-	if (unlikely((bp = mi_allocb(q, 13 + diag.len, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_DR;	/* disconnect request */
-	*p++ = tp->dref >> 8;	/* destination reference */
-	*p++ = tp->dref >> 0;
-	*p++ = tp->sref >> 8;	/* source reference */
-	*p++ = tp->sref >> 0;
-	*p++ = reason;
-	if (diag.len > 0 && diag.buf != NULL) {
-		*p++ = _TP_PT_DIAGNOSTIC;	/* diagnostic */
-		*p++ = diag.len;
-		bcopy(diag.buf, p, diag.len);
-		p += diag.len;
-	}
-	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-
-}
-
-/**
- * tp_pack_dc - Send a Disconnect Confirmation (DC) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @dref: destination reference
- * @sref: source reference
- */
-STATIC mblk_t *
-tp_pack_dc(struct tp *tp, queue_t *q, uint16_t dref, uint16_t sref)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn;
-
-	if (unlikely((bp = mi_allocb(q, 10, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_DC;	/* disconnect confirm */
-	*p++ = dref >> 8;	/* destination reference */
-	*p++ = dref >> 0;
-	*p++ = sref >> 8;	/* source reference */
-	*p++ = sref >> 0;
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_dt - Send a Data (DT) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @roa: receipt acknowlegement option
- * @eot: end of transmission
- * @nr: sequence number
- * @ednr: expedited data sequence number
- */
-STATIC mblk_t *
-tp_pack_dt(struct tp *tp, queue_t *q, mblk_t *dp, uint8_t roa, uint8_t eot, uint32_t nr, int ednr, mblk_t *dp)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn;
-
-	if (unlikely((bp = mi_allocb(q, FIXME, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_DT | roa;	/* data */
-	switch (tp->tp_options.tco.tco_prefclass) {
-	case T_CLASS0:
-	case T_CLASS1:
-		*p++ = (eot ? 0x80 : 0x00) | (nr & 0x7f);
-		break;
-	case T_CLASS2:
-	case T_CLASS3:
-	case T_CLASS4:
-		*p++ = tp->dref >> 8;
-		*p++ = tp->dref >> 0;
-		if (!(tp->options & _T_F_CO_EXTFORM)) {
-			*p++ = (eot ? 0x80 : 0x00) | (nr & 0x7f);
-		} else {
-			*p++ = (eot ? 0x80 : 0x00) | ((nr >> 24) & 0x7f);
-			*p++ = nr >> 16;
-			*p++ = nr >> 8;
-			*p++ = nr >> 0;
-		}
-		if ((tp->addopts & _T_F_AO_NBLKEXPDATA) && ednr != -1) {
-			*p++ = _TP_PT_ED_TPDU_NR;	/* ED-TPDU-NR */
-			if (!(tp->options & _T_F_CO_EXTFORM)) {
-				*p++ = 2;
-				*p++ = ednr >> 8;
-				*p++ = ednr >> 0;
-			} else {
-				*p++ = 4;
-				*p++ = ednr >> 24;
-				*p++ = ednr >> 16;
-				*p++ = ednr >> 8;
-				*p++ = ednr >> 0;
-			}
-		}
-		break;
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_ed - Send an Expedited Data (ED) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @nr: sequence number
- */
-STATIC mblk_t *
-tp_pack_ed(queue_t *q, uint32_t nr, mblk_t *dp)
-{
-	register unsigned char *p;
-	struct tp *tp = TP_PRIV(q);
-	mblk_t *bp;
-	int rtn;
-
-	if (unlikely((bp = mi_allocb(q, FIXME, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	// bp->b_datap->db_type = M_DATA; /* redundant */
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MD_ED;	/* expedited data */
-	*p++ = tp->dref >> 8;
-	*p++ = tp->dref >> 0;
-	assure(tp->tp_options.tco.tco_prefclass != T_CLASS0);
-	if (!(tp->options & _T_F_CO_EXTFORM)) {
-		*p++ = 0x80 | (nr & 0x7f);
-	} else {
-		*p++ = 0x80 | ((nr >> 24) & 0x7f);
-		*p++ = nr >> 16;
-		*p++ = nr >> 8;
-		*p++ = nr >> 0;
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_ak - Send an Acknowledgement (AK) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @dref: destination reference
- * @credit:
- * @nr: sequence number
- * @ssn:
- */
-STATIC mblk_t *
-tp_pack_ak(struct tp *tp, queue_t *q, mblk_t *dp, unsigned short dref, uint16_t credit, uint32_t nr, int ssn)
-{
-	register unsigned char *p;
-	struct tp *tp = TP_PRIV(q);
-	mblk_t *bp;
-	int rtn;
-	int mlen = 5;
-
-	if (tp->options.tco.tco_extform == T_YES)
-		mlen += 5;
-	if (tp->options.tco.tco_prefclass == T_CLASS4) {
-		if (ssn != 0)
-			mlen += 4;
-		if (tp->options.tco.tco_flowctrl == T_YES)
-			mlen += 12;
-		if (tp->options.tco.tco_selectack == T_YES) {
-			if (tp->options.tco.tco_extform == T_YES)
-				mlen += 1 + (tp->sackblks << 3);
-			else
-				mlen += 1 + (tp->sackblks << 1);
-		}
-	}
-
-	if ((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL)
-		goto enobufs;
-
-	// bp->b_datap->db_type = M_DATA; /* redundant */
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	if (tp->options.tco.tco_extform != T_YES) {
-		*p++ = _TP_MT_AK | (credit & 0x0f);	/* acknowledge */
-	} else {
-		*p++ = _TP_MT_AK;	/* acknowledge */
-	}
-	*p++ = dref >> 8;
-	*p++ = dref >> 0;
-	if (tp->options.tco.tco_extform != T_YES) {
-		*p++ = nr & 0x7f;
-	} else {
-		*p++ = (nr >> 24) & 0x7f;
-		*p++ = nr >> 16;
-		*p++ = nr >> 8;
-		*p++ = nr >> 0;
-		*p++ = credit >> 8;
-		*p++ = credit >> 0;
-	}
-	if (tp->tp_options.tco.tco_prefclass == T_CLASS4) {
-		if (ssn != 0) {
-			*p++ = _TP_PT_SUBSEQUENCE;	/* subsequence number */
-			*p++ = 2;
-			*p++ = ssn >> 8;
-			*p++ = ssn >> 0;
-		}
-		if (tp->options.tco.tco_flowctrl == T_YES) {
-			*p++ = _TP_PT_FLOWCTLCF;	/* flow control confirmation */
-			*p++ = 8;
-			if (tp->options.tco.tco_extform != T_YES) {
-				*p++ = 0;
-				*p++ = 0;
-				*p++ = 0;
-				*p++ = rnr & 0x7f;
-			} else {
-				*p++ = (rnr >> 24) & 0x7f;
-				*p++ = rnr >> 16;
-				*p++ = rnr >> 8;
-				*p++ = rnr >> 0;
-			}
-			*p++ = rssn >> 8;
-			*p++ = rssn >> 0;
-			if (tp->options.tco.tco_extform != T_YES) {
-				*p++ = 0;
-				*p++ = 0;
-				*p++ = 0;
-				*p++ = credit & 0x7f;
-			} else {
-				*p++ = (credit >> 24) & 0x7f;
-				*p++ = credit >> 16;
-				*p++ = credit >> 8;
-				*p++ = credit >> 0;
-			}
-		}
-		if (tp->options.tco.tco_selectack == T_YES) {
-			*p++ = _TP_PT_SELECTACK;	/* selective acknowledgement */
-			if (tp->options.tco.tco_extform != T_YES) {
-				*p++ = tp->sackblks << 1;
-				while (FIXME) {
-					*p++ = blk->beg & 0x7f;
-					*p++ = blk->end & 0x7f;
-				}
-			} else {
-				*p++ = tp->sackblks << 3;
-				while (FIXME) {
-					*p++ = (blk->beg >> 24) & 0x7f;
-					*p++ = blk->beg >> 16;
-					*p++ = blk->beg >> 8;
-					*p++ = blk->beg >> 0;
-					*p++ = (blk->end >> 24) & 0x7f;
-					*p++ = blk->end >> 16;
-					*p++ = blk->end >> 8;
-					*p++ = blk->end >> 0;
-				}
-			}
-		}
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_ea - Send an Expedited Data Acknowledgement (EA) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @dref: destination reference
- * @nr: sequence number
- * @ssn:
- */
-STATIC mblk_t *
-tp_pack_ea(struct tp *tp, queue_t *q, unsigned short dref, uint32_t nr, int ssn)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn;
-	int mlen = 5;
-
-	if (tp->options.tco.tco_extform == T_YES)
-		mlen += 3;
-
-	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_EA;	/* expedited data acknowledge */
-	*p++ = dref >> 8;
-	*p++ = dref >> 0;
-	if (tp->options.tco.tco_extform != T_YES) {
-		*p++ = nr & 0x7f;
-	} else {
-		*p++ = (nr >> 24) & 0x7f;
-		*p++ = nr >> 16;
-		*p++ = nr >> 8;
-		*p++ = nr >> 0;
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = NULL;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_rj - Send a Reject (RJ) Message
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @nr: sequence number
- * @ssn:
- */
-STATIC mblk_t *
-tp_pack_rj(struct tp *tp, queue_t *q, mblk_t *dp, uint32_t nr, int ssn)
-{
-	register unsigned char *p;
-	struct tp *tp = TP_PRIV(q);
-	mblk_t *bp;
-	int rtn;
-	int mlen = 5;
-
-	if (tp->options.tco.tco_extform == T_YES)
-		mlen += 5;
-
-	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	if (tp_normal(tp)) {
-		*p++ = _TP_MT_RJ | (tp->credit & 0x0f);	/* reject */
-	} else {
-		*p++ = _TP_MT_RJ;	/* reject */
-	}
-	*p++ = tp->dref >> 8;
-	*p++ = tp->dref >> 0;
-	if (tp_normal(tp)) {
-		*p++ = nr & 0x7f;
-	} else {
-		*p++ = (nr >> 24) & 0x7f;
-		*p++ = nr >> 16;
-		*p++ = nr >> 8;
-		*p++ = nr >> 0;
-		*p++ = tp->credit >> 8;
-		*p++ = tp->credit >> 0;
-	}
-	bp->b_rptr[0] = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_er - Create an Error (ER) TPDU
- * @tp: sending transport endpoint
- * @q: invoking queue
- * @cause: reject cause
- */
-STATIC mblk_t *
-tp_pack_er(struct tp *tp, queue_t *q, mblk_t *dp, uint32_t cause, struct netbuf *tpdu)
-{
-	register unsigned char *p;
-	struct tp *tp = TP_PRIV(q);
-	mblk_t *bp;
-	int rtn, n = -1;
-	int mlen = 5;
-
-	if (tpdu->len > 0 && tpdu->buf != NULL)
-		mlen += 2 + tdpu->len;
-
-	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* fix up later */
-	*p++ = _TP_MT_ER;	/* error */
-	*p++ = tp->dref >> 8;
-	*p++ = tp->dref >> 0;
-	*p++ = cause;
-	if (tpud->len > 0 && tpdu->buf != NULL) {
-		*p++ = _TP_PT_INVALID_TPDU;	/* invalid TPDU */
-		*p++ = tpud->len;
-		bcopy(tpdu->buf, p, tpud->len);
-		p += tpud->len;
-	}
-	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tco.tco_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-/**
- * tp_pack_ud - Create a Unit Data (UD) TPDU
- * @tp: sending transport endpoint
- * @q: invoking queue
- */
-STATIC INLINE fastcall __hot_put mblk_t *
-tp_pack_ud(struct tp *tp, queue_t *q, mblk_t *dp)
-{
-	register unsigned char *p;
-	mblk_t *bp;
-	int rtn, n = -1;
-	size_t mlen = 2;
-
-	if (tp->dst.len > 0)
-		mlen += 2 + tp->dst.nsap.len + 2;
-	if (tp->src.len > 0)
-		mlen += 2 + tp->src.nsap.len + 2;
-
-	if (unlikely((bp = mi_allocb(q, mlen, BPRI_MED)) == NULL))
-		goto enobufs;
-
-	p = bp->b_wptr;
-	*p++ = 0;		/* length indicator - fix up later */
-	*p++ = _TP_MT_UD;	/* unitdata */
-	if (tp->dst.len > 0) {
-		*p++ = _TP_PT_CDTRANSSEL;
-		*p++ = tp->dst.len;
-		bcopy(tp->dst.buf, p, tp->dst.len);
-		p += tp->dst.len;
-	}
-	if (tp->src.len > 0) {
-		*p++ = _TP_PT_CGTRANSSEL;
-		*p++ = tp->src.len;
-		bcopy(tp->src.buf, p, tp->src.len);
-		p += tp->src.len;
-	}
-	*bp->b_rptr = p - bp->b_rptr - 1;	/* set length indicator */
-	bp->b_wptr = p;
-#if 0
-	/* FIXME: caller must do this */
-	bp->b_cont = dp;
-	if (tp->options.tcl.tcl_checksum == T_YES)
-		tp_add_checksum(bp);
-#endif
-      enobufs:
-	return (bp);
-}
-
-static void
-tp_queue_xmit(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	if (mp->b_rptr[1] == _TP_MT_UD) {
-		if (tp->options.tcl.tcl_checksum == T_YES)
-			tp_add_checksum(mp);
-	} else {
-		if (tp->options.tco.tco_checksum == T_YES)
-			tp_add_checksum(mp);
-	}
-
-	/* FIXME: actually send the message now... */
-
-	return;
-}
-
-/**
- * tp_resend - resend the previously sent message
- * @tp: private structure (locked)
- * @q: active queue
- */
-static void
-tp_resend(struct tp *tp, queue_t *q)
-{
-	tp_timer_stop(tp, t1);
-	tp_timer_start(tp, q, t1);
-	tp->count++;
-	tp_queue_xmit(tp, q, tp->sent);
-}
-
-/**
- * tp_repeat - repeat sending of message based on retransmission timer
- * @tp: private structure (locked)
- * @q: active queue
- * @mp: message to repeat send
- */
-static void
-tp_repeat(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	freemsg(tp->sent);
-	tp->sent = mp;
-	tp->count = 0;
-	tp_resend(tp, q);
-}
-
-/*
- *  =========================================================================
- *
  *  IP T-User --> T-Provider Primitives (Request and Response)
  *
  *  =========================================================================
@@ -10108,7 +9797,7 @@ t_conn_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		/* For now we need an IETF NSAP address that identifies an IPv4 address */
 		break;
 	default:
-		LOGNO(tp, "address format incorrect %u", tp->p.prot.afi);
+		LOGNO(tp, "address format incorrect %u", tp->p.prot.family);
 		goto badaddr;
 	}
 	if (unlikely((err = t_parse_conn_opts(tp, mp->b_rptr + p->OPT_offset, p->OPT_length, 1)) < 0)) {
@@ -10129,7 +9818,7 @@ t_conn_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		mlen = msgdsize(mp->b_cont);
 		if (mlen > 0) {
 			/* User data not available in Class 0 */
-			if (tp->options.tco.tco_prefclass == T_CLASS0)
+			if (tp->options.res.tco.tco_prefclass == T_CLASS0)
 				goto baddata;
 			/* Up to 32 octets in other classes */
 			if (mlen > 32)
@@ -10144,7 +9833,7 @@ t_conn_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		/* FIXME need to generate connect with data */
 	}
 	tp_set_state(tp, TS_WACK_CREQ);
-	return t_ok_ack(tp, q, mp, T_CONN_REQ, NULL, NULL);
+	return t_ok_ack(tp, q, mp, T_CONN_REQ, NULL, NULL, NULL);
 
       baddata:
 	err = TBADDATA;
@@ -10305,7 +9994,7 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *mp)
 	   swapped.  See t_ok_ack for details. */
 	/* FIXME: The accepting socket does not have to be in the bound state. The socket will be autobound
 	   to the correct address already. */
-	err = t_ok_ack(tp, q, mp, T_CONN_RES, cp, ap);
+	err = t_ok_ack(tp, q, mp, T_CONN_RES, cp, NULL, ap);
 	if (ap && ap != tp) {
 		read_lock(&tp_lock);
 		mi_release((caddr_t) ap);
@@ -10357,9 +10046,9 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *mp)
 	LOGNO(tp, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       unlock_error:
-	if (as && as != tp) {
+	if (ap && ap != tp) {
 		read_lock(&tp_lock);
-		mi_release((caddr_t) as);
+		mi_release((caddr_t) ap);
 		read_unlock(&tp_lock);
 	}
 	goto error;
@@ -10439,7 +10128,7 @@ t_discon_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		tp_set_state(tp, TS_WACK_DREQ11);
 		break;
 	}
-	return t_ok_ack(tp, q, mp, T_DISCON_REQ, cp, NULL);
+	return t_ok_ack(tp, q, mp, T_DISCON_REQ, cp, NULL, NULL);
 
       badseq:
 	err = TBADSEQ;
@@ -10650,15 +10339,17 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	}
 	if (p->ADDR_length < 1 || p->ADDR_length > 22)
 		goto badaddr;
-	bcopy(mp->b_rtpr + p->ADDR_offset, tp->src.tsel, p->ADDR_length);
+	bcopy(mp->b_rptr + p->ADDR_offset, tp->src.tsel, p->ADDR_length);
 	tp->src.nsap.len = p->ADDR_length - 2;
 	if ((err = tp_addr_parse(&tp->src.nsap, &tp->loc)) < 0)
 		goto badaddr;
 	switch (__builtin_expect(tp->p.prot.protocol, 0)) {
+#if 0
 	case 0:		/* not determined yet */
 		/* For now we need a local NSAP address that identifies a MAC address or an IETF NSAP address 
 		   that identifies an IPv4 address.  We cannot use ISO-UDP from this minor device. */
 		break;
+#endif
 	case T_ISO_TP:
 		/* For now we need a local NSAP address that identifies a MAC address */
 		switch (tp->loc.type) {
@@ -10690,22 +10381,24 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		}
 		break;
 	default:
-		LOGNO(tp, "address format incorrect %u", tp->p.prot.afi);
+		LOGNO(tp, "address format incorrect %u", tp->p.prot.family);
 		goto badaddr;
 	}
-	if (unlikely((err = tp_bind(tp, mp->b_rptr + p->ADDR_offset, p->ADDR_length))))
-		goto error_close;
+	if (unlikely((err = tp_bind(tp, q, &tp->src, &tp->loc))))
+		goto error;
 	tp->conind = 0;
 	if (p->CONIND_number && tp->p.info.SERV_type == T_CLTS)
-		if ((err = tp_listen(tp, p->CONIND_number)))
-			goto error_close;
+		if ((err = tp_listen(tp, q, p->CONIND_number)))
+			goto error;
 	return t_bind_ack(tp, q, mp, (unsigned char *) &tp->src,
 			  (t_uscalar_t) (sizeof(tp->src.tsel) + tp->src.nsap.len), p->CONIND_number);
 
+#if 0
       acces:
 	err = TACCES;
 	LOGNO(tp, "ERROR: no permission for address");
 	goto error;
+#endif
       noaddr:
 	err = TNOADDR;
 	LOGNO(tp, "ERROR: address could not be assigned");
@@ -10728,8 +10421,6 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	LOGNO(tp, "ERROR: primitive not supported for T_CLTS");
 	goto error;
 #endif
-      error_close:
-	tp_socket_put(&tp->sock);
       error:
 	return t_error_ack(tp, q, mp, T_BIND_REQ, err);
 }
@@ -10749,7 +10440,7 @@ t_unbind_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		goto outstate;
 
 	tp_set_state(tp, TS_WACK_UREQ);
-	return t_ok_ack(tp, q, mp, T_UNBIND_REQ, NULL, NULL);
+	return t_ok_ack(tp, q, mp, T_UNBIND_REQ, NULL, NULL, NULL);
 
       outstate:
 	LOGNO(tp, "ERROR: would place i/f out of state");
@@ -10818,12 +10509,14 @@ t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	}
 	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
 	return (0);
+#if 0
       badopt:
 	LOGNO(tp, "ERROR: bad options");
 	goto error;
       acces:
 	LOGNO(tp, "ERROR: no permission to address or options");
 	goto error;
+#endif
       badadd:
 	LOGNO(tp, "ERROR: bad destination address");
 	goto error;
@@ -11044,12 +10737,14 @@ t_optdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		else
 			return tp_send_ed(tp, q, mp->b_cont, p->DATA_flag & T_ODF_MORE);
 	}
+#if 0
       badopt:
 	LOGNO(tp, "ERROR: bad options");
 	goto error;
       acces:
 	LOGNO(tp, "ERROR: no permission to options");
 	goto error;
+#endif
       emsgsize:
 	LOGNO(tp, "ERROR: message too large %ld > %ld", mlen, mmax);
 	goto error;
@@ -11341,9 +11036,11 @@ tp_t2_timeout(struct tp *tp, queue_t *q, mblk_t *bp)
 		}
 	}
 	return (0);
+#if 0
       enobufs:
 	err = -ENOBUFS;
 	goto error;
+#endif
       error:
 	return (err);
 }
@@ -11460,10 +11157,10 @@ __tp_w_proto_slow(struct tp *tp, queue_t *q, mblk_t *mp, t_scalar_t prim)
 	case T_EXDATA_REQ:
 	case T_UNITDATA_REQ:
 	case T_OPTDATA_REQ:
-		LOGDA(tp, "-> %s", tp_primname(prim));
+		LOGDA(tp, "-> %s", tpi_primname(prim));
 		break;
 	default:
-		LOGRX(tp, "-> %s", tp_primname(prim));
+		LOGRX(tp, "-> %s", tpi_primname(prim));
 		break;
 	}
 	switch (prim) {
@@ -11570,7 +11267,7 @@ tp_w_proto_slow(queue_t *q, mblk_t *mp, t_scalar_t prim)
  * for the entire service procedure run.
  */
 static inline fastcall __hot_write int
-__tp_w_proto(struct tp *tp, queue * q, mblk_t *mp)
+__tp_w_proto(struct tp *tp, queue_t * q, mblk_t *mp)
 {
 	if (likely(MBLKL(mp) >= sizeof(t_scalar_t))) {
 		t_scalar_t prim = *(t_scalar_t *) mp->b_rptr;
@@ -11611,7 +11308,7 @@ static inline fastcall __hot_write int
 tp_w_proto(queue_t *q, mblk_t *mp)
 {
 	if (likely(MBLKL(mp) >= sizeof(t_scalar_t))) {
-		t_scalar_t prim = *(t_scalar_t) mp->b_rptr;
+		t_scalar_t prim = *(t_scalar_t *) mp->b_rptr;
 
 		if (likely(prim == T_DATA_REQ)) {
 		} else if (likely(prim == T_UNITDATA_REQ)) {
@@ -11733,7 +11430,7 @@ tp_w_flush(queue_t *q, mblk_t *mp)
 	}
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rtpr[1], FLUSHDATA);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
 			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
@@ -11775,6 +11472,28 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
+static int
+do_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct tp_timer *t = (typeof(t)) mp->b_rptr;
+	switch (t->timer) {
+	case t1:
+		LOGTO(tp, "t1 expiry at %lu", jiffies);
+		return tp_t1_timeout(tp, q, mp);
+	case t2:
+		LOGTO(tp, "t2 expiry at %lu", jiffies);
+		return tp_t2_timeout(tp, q, mp);
+	case t3:
+		LOGTO(tp, "t3 expiry at %lu", jiffies);
+		return tp_t3_timeout(tp, q, mp);
+	case t4:
+		LOGTO(tp, "t4 expiry at %lu", jiffies);
+		return tp_t4_timeout(tp, q, mp);
+	default:
+		return (0);
+	}
+}
+
 noinline fastcall int
 __tp_r_sig(struct tp *tp, queue_t *q, mblk_t *mp)
 {
@@ -11804,7 +11523,6 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 		err = -EDEADLK;
 	return (err);
 }
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -11871,7 +11589,7 @@ tp_w_prim_put(queue_t *q, mblk_t *mp)
 	case M_IOCDATA:
 		return tp_w_ioctl(q, mp);
 	}
-	LOGERR(tp, "SWERR: %s %s: %d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(PRIV(q), "SWERR: %s %s: %d", __FUNCTION__, __FILE__, __LINE__);
 	freemsg(mp);
 	return (0);
 }
@@ -11930,7 +11648,7 @@ tp_w_prim_srv(struct tp *tp, queue_t *q, mblk_t *mp)
  * from soft interrupt.  In tp_v4_rcv() and tp_v4_err() messages are placed directly
  * on the queue with putq().
  */
-STATIC streamscall __hot_int int
+STATIC streamscall __hot_in int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(!putq(q, mp))) {
@@ -12105,9 +11823,8 @@ static fastcall __unlikely int
 tp_alloc_qbands(queue_t *q, int cminor)
 {
 	int err;
-	psw_t pl;
 
-	pl = freezestr(q);
+	freezestr(q);
 	{
 		/* Pre-allocate queue band structures on the read side. */
 		if ((err = strqset(q, QHIWAT, 1, STRHIGH))) {
@@ -12118,7 +11835,7 @@ tp_alloc_qbands(queue_t *q, int cminor)
 			       "ERROR: could not allocate queue band 2 structure, err = %d", err);
 		}
 	}
-	unfreezestr(q, pl);
+	unfreezestr(q);
 	return (err);
 }
 
@@ -12162,7 +11879,7 @@ tp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		tp->cred = *crp;
 		bufq_init(&tp->conq);
 		if (!(tp->timers.t1 = mi_timer_alloc(sizeof(*t))))
-			goto enobufs;
+			return (ENOBUFS);
 	}
 	sflag = CLONEOPEN;
 	cminor = FREE_CMINOR;	/* start at the first free minor device number */
@@ -12219,105 +11936,6 @@ tp_qclose(queue_t *q, int oflags, cred_t *crp)
 /*
  *  =========================================================================
  *
- *  Timers
- *
- *  =========================================================================
- */
-enum {
-	tall,				/* all timers */
-	t1,				/* retransmission timer */
-	t2,				/* inactivity timer */
-	t3,				/* window timer */
-	t4				/* reference timer */
-};
-
-static void
-tp_timer_stop(struct tp *tp, const uint timer)
-{
-	int single = 1;
-
-	switch (timer) {
-	case tall:
-		single = 0;
-		/* fall through */
-	case t1:
-		mi_timer_stop(tp->timers.t1);
-		if (single)
-			break;
-		/* fall through */
-	case t2:
-		mi_timer_stop(tp->timers.t2);
-		if (single)
-			break;
-		/* fall through */
-	case t3:
-		mi_timer_stop(tp->timers.t3);
-		if (single)
-			break;
-		/* fall through */
-	case t4:
-		mi_timer_stop(tp->timers.t4);
-		if (single)
-			break;
-		/* fall through */
-		break;
-	default:
-		LOGERR(tp, "bad timer value");
-		break;
-	}
-}
-
-static void
-tp_timer_start(struct tp *tp, queue_t *q, const uint timer)
-{
-	switch (timer) {
-	case t1:
-		((struct tp_timer *)tp->timers.t1->b_rptr)->count = 0;
-		mi_timer(q, tp->timers.t1, tp->config.t1);
-		break;
-	case t2:
-		((struct tp_timer *)tp->timers.t2->b_rptr)->count = 0;
-		mi_timer(q, tp->timers.t2, tp->config.t2);
-		break;
-	case t3:
-		((struct tp_timer *)tp->timers.t3->b_rptr)->count = 0;
-		mi_timer(q, tp->timers.t3, tp->config.t3);
-		break;
-	case t4:
-		((struct tp_timer *)tp->timers.t4->b_rptr)->count = 0;
-		mi_timer(q, tp->timers.t4, tp->config.t4);
-		break;
-	default:
-		LOGERR(tp, "bad timer value");
-		break;
-	}
-}
-
-static int
-do_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	struct tp_timer *t = (typeof(t)) mp->b_rptr;
-	switch (t->timer) {
-	case t1:
-		LOGTO(tp, "t1 expiry at %lu", jiffies);
-		return tp_t1_timeout(tp, q, mp);
-	case t2:
-		LOGTO(tp, "t2 expiry at %lu", jiffies);
-		return tp_t2_timeout(tp, q, mp);
-	case t3:
-		LOGTO(tp, "t3 expiry at %lu", jiffies);
-		return tp_t3_timeout(tp, q, mp);
-	case t4:
-		LOGTO(tp, "t4 expiry at %lu", jiffies);
-		return tp_t4_timeout(tp, q, mp);
-	default:
-		return (0);
-	}
-}
-
-/*
- *  =========================================================================
- *
  *  Received message handling:
  *
  *  =========================================================================
@@ -12335,7 +11953,6 @@ do_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
 STATIC INLINE __hot int
 tp_tst_checksum(mblk_t *mp)
 {
-	int n;
 	mblk_t *bp;
 	int c0 = 0, c1 = 0, L = 0;
 
@@ -12407,11 +12024,9 @@ static int
 tp_recv_cr(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register unsigned char *m;
-	int hlen, plen, mlen, dlen;
+	int hlen, mlen;
 	uint16_t dref, sref;
 	int li, acceptable = 1, copt, credit, extf;
-	mblk_t *bp, *cp;
-	int err;
 
 	/* Note that checksum is always present in CR */
 	if (unlikely(!tp_tst_checksum(mp)))
@@ -12508,8 +12123,8 @@ tp_recv_cr(struct tp *tp, queue_t *q, mblk_t *mp)
 		/* We are waiting for a response from the user, this is likely a repeat. */
 		break;
 	case _TP_STATE_AKWAIT:
-		/* We have already received a CR-TPDU to which we have sent a CC-TPDU.  Send the CC-TPDU
-		   again and stay in this state. */
+		/* We have already received a CR-TPDU to which we have sent a CC-TPDU.  Send the
+		   CC-TPDU again and stay in this state. */
 		tp_resend(tp, q);
 		break;
 	case _TP_STATE_CLOSING:
@@ -12520,12 +12135,19 @@ tp_recv_cr(struct tp *tp, queue_t *q, mblk_t *mp)
 	}
 	freemsg(mp);
 	return (0);
+
+      badpdu:
+	LOGRX(tp, "discarding bad CR-TPDU");
+	freemsg(mp);
+	return (0);
+#if 0
       enobufs:
 	err = -ENOBUFS;
 	goto error;
 
       error:
 	return (err);
+#endif
       duplicate:
 	LOGRX(tp, "discarding multiple CR-TPDU");
 	freemsg(mp);
@@ -12573,13 +12195,14 @@ tp_recv_cc(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
 		}
 	}
 #endif
+	return (0);
 }
 
 /**
@@ -12615,13 +12238,14 @@ tp_recv_er(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
 		}
 	}
 #endif
+	return (0);
 }
 
 /**
@@ -12673,7 +12297,7 @@ tp_recv_dr(struct tp *tp, queue_t *q, mblk_t *dp)
 
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(dp)) {
 			freemsg(dp);
 			return (0);
@@ -12751,7 +12375,7 @@ tp_recv_dc(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
@@ -12769,6 +12393,7 @@ tp_recv_dc(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		break;
 	}
+	return (0);
 }
 
 /**
@@ -12793,13 +12418,14 @@ tp_recv_ea(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
 		}
 	}
 #endif
+	return (0);
 }
 
 /**
@@ -12828,13 +12454,14 @@ static int
 tp_recv_dt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register unsigned char *m;
-	int hlen, plen, mlen, dlen;
-	int err, roa, eot;
-	uint16_t dref, uint32_t seq;
+	int hlen, mlen, dlen;
+	int roa, eot;
+	uint16_t dref;
+	uint32_t seq;
 
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
@@ -12862,7 +12489,7 @@ tp_recv_dt(struct tp *tp, queue_t *q, mblk_t *mp)
 	dref = (m[0] << 8) | m[1];
 	m += 2;
 	hlen -= 2;
-	if (!(tp->options & _T_F_CO_EXTFORM)) {
+	if (!(tp->opts & _T_F_CO_EXTFORM)) {
 		/* short form */
 		eot = ((m[0] & 0x80) != 0);
 		seq = ((m[0] << 0) & 0x7f);
@@ -12885,15 +12512,15 @@ tp_recv_dt(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (0);
 	case _TP_STATE_OPEN:
 	case _TP_STATE_AKWAIT:
-		tp_stop_timer(tp, _TP_INACT);
-		tp_start_timer(tp, _TP_INACT);
+		tp_timer_stop(tp, t2);
+		tp_timer_start(tp, q, t2);
 		tp->pstate = _TP_STATE_OPEN;
-		qenable(tp->qw);
+		qenable(tp->rq);
 		/* FIXME: perform data transfer procedure */
 		break;
 	case _TP_STATE_CLOSING:
 		freemsg(mp);
-		return tp_send_dr(tp, q, 0, NULL);	/* optional */
+		return tp_send_dr(tp, q, NULL);	/* optional */
 	}
 	return (0);
 
@@ -12932,13 +12559,14 @@ tp_recv_ak(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
 		}
 	}
 #endif
+	return (0);
 }
 
 /**
@@ -12968,13 +12596,14 @@ tp_recv_ed(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tco.tco_checksum == T_YES) {
+	if (tp->options.res.tco.tco_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
 		}
 	}
 #endif
+	return (0);
 }
 
 /**
@@ -12991,11 +12620,10 @@ tp_recv_ud(struct tp *tp, queue_t *q, mblk_t *mp, struct tsapaddr *saddr)
 	register unsigned char *m;
 	int hlen, plen, mlen, dlen;
 	struct netbuf src, opt;
-	int err;
 
 #if 0
 	/* FIXME: caller must do this */
-	if (tp->options.tcl.tcl_checksum == T_YES) {
+	if (tp->options.res.tcl.tcl_checksum == T_YES) {
 		if (!tp_tst_checksum(mp)) {
 			freemsg(mp);
 			return (0);
@@ -13003,7 +12631,7 @@ tp_recv_ud(struct tp *tp, queue_t *q, mblk_t *mp, struct tsapaddr *saddr)
 	}
 #endif
 	src.buf = (typeof(src.buf)) saddr;
-	src.len = saddr.nsap.len + 2;
+	src.len = saddr->nsap.len + 2;
 
 	opt.buf = NULL;
 	opt.len = 0;		/* FIXME: put checksum in here eventually */
@@ -13067,10 +12695,12 @@ tp_recv_ud(struct tp *tp, queue_t *q, mblk_t *mp, struct tsapaddr *saddr)
 	/* ignore out of state messages */
 	freemsg(mp);
 	return (0);
+#if 0
       enobufs:
 	return (-ENOBUFS);
       ebusy:
 	return (-EBUSY);
+#endif
 }
 
 /**
@@ -13100,7 +12730,7 @@ t_read(struct tp *tp, queue_t *q, mblk_t *mp)
 	case _TP_MT_EA:
 		return tp_recv_ea(tp, q, mp);
 	case _TP_MT_UD:
-		return tp_recv_ud(tp, q, mp);
+		return tp_recv_ud(tp, q, mp, &tp->dst);
 	case _TP_MT_RJ:
 		return tp_recv_rj(tp, q, mp);
 	case _TP_MT_AK:
@@ -13287,11 +12917,11 @@ tp_tp4_v4_rcv(struct sk_buff *skb)
 		struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 		printd(("%s: mp %p lookup of stream\n", __FUNCTION__, mp));
-		if (!(tp = tp_lookup(th, iph->daddr, iph->saddr)))
+		if (!(tp = tp_lookup(tp->dref, tp->sref, *(uint16_t *)tp->src.tsel, *(uint16_t *)tp->dst.tsel, &tp->loc, &tp->rem)))
 			goto no_stream;
 	}
 	/* perform the stream-specific checksum */
-	FIXME;
+	// FIXME;
 	skb->dev = NULL;
 	if (!tp->rq || !canput(tp->rq))
 		goto flow_controlled;
@@ -13300,9 +12930,11 @@ tp_tp4_v4_rcv(struct sk_buff *skb)
 	printd(("%s: mp %p put to stream %p\n", __FUNCTION__, mp, tp));
 	tp_put(tp);
 	return (0);
+#if 0
       bad_checksum:
 	ptrace(("ERROR: Bad checksum\n"));
 	goto free_it;
+#endif
       no_stream:
 	ptrace(("ERROR: No stream\n"));
 	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
@@ -13473,11 +13105,11 @@ tp_iso_v4_rcv(struct sk_buff *skb)
 		struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 		printd(("%s: mp %p lookup of stream\n", __FUNCTION__, mp));
-		if (!(tp = tp_lookup(th, iph->daddr, iph->saddr)))
+		if (!(tp = tp_lookup(tp->dref, tp->sref, *(uint16_t *)tp->src.tsel, *(uint16_t *)tp->dst.tsel, &tp->loc, &tp->rem)))
 			goto no_stream;
 	}
 	/* perform the stream-specific checksum */
-	FIXME;
+	// FIXME;
 	skb->dev = NULL;
 	if (!tp->rq || !canput(tp->rq))
 		goto flow_controlled;
@@ -13699,6 +13331,7 @@ tp_udp_v4_rcv(struct sk_buff *skb)
 //      IP_INC_STATS_BH(IpInDiscards);
 	/* decrement IpInDelivers ??? */
 	// goto linear_fail;
+      wrong_protocol:
       no_buffers:
       linear_fail:
 	if (tp)
@@ -13887,6 +13520,7 @@ tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt)
 		tp_put(tp);
 		return (0);
 	}
+      wrong_protocol:
       no_buffers:
       linear_fail:
 	if (tp)
@@ -14290,6 +13924,44 @@ static __init int
 tp_init(void)
 {
 	int err;
+
+	(void) tp_alloc_qbands;
+	(void) tp_info;
+	(void) tp_lock;
+	(void) tp_opens;
+	(void) tp_bhash;
+	(void) tp_bhash_size;
+	(void) tp_bhash_order;
+	(void) tp_chash;
+	(void) tp_chash_size;
+	(void) tp_chash_order;
+	(void) tp_hash_lock;
+	(void) tp_prot_lock;
+	(void) tp_prots;
+	(void) tp_bind_cachep;
+	(void) tp_prot_cachep;
+	(void) tpi_primname;
+	(void) tp_timer_stop;
+	(void) tp_timer_start;
+	(void) t_set_options;
+	(void) tp_addr_type;
+	(void) tp_pack_ak;
+	(void) tp_pack_rj;
+	(void) tp_pack_er;
+	(void) t_conn_ind;
+	(void) t_conn_con;
+	(void) t_ordrel_ind;
+	(void) tp_pack_ea;
+	(void) t_conn_res;
+	(void) t_discon_req;
+	(void) t_info_req;
+	(void) t_bind_req;
+	(void) t_unbind_req;
+	(void) t_optmgmt_req;
+	(void) t_ordrel_req;
+	(void) t_addr_req;
+	(void) t_capability_req;
+	(void) t_capability_req;
 
 	if ((err = tp_register_strdev(major)) < 0) {
 		cmn_err(CE_WARN, "%s could not register STREAMS device, err = %d", DRV_NAME, err);
