@@ -52,6 +52,8 @@ bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='pacman --sync groff'}
 bld_cv_pkg_cmd_SWIG=${bld_cv_pkg_cmd_SWIG='pacman --sync swig'}
+bld_cv_pkg_cmd_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_cmd_SYMSETS_3_19_3_3_ARCH_TAR_GZ='pacman --sync openss7-modules-git'}
+bld_cv_pkg_cmd_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_cmd_SYMVERS_3_19_3_3_ARCH_GZ='pacman --sync openss7-modules-git'}
 bld_cv_pkg_cmd_SYSTEMCTL=${bld_cv_pkg_cmd_SYSTEMCTL='pacman --sync systemd'}
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='pacman --sync groff'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='pacman --sync tcl'}
@@ -166,6 +168,8 @@ bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
 bld_cv_pkg_name_SWIG=${bld_cv_pkg_name_SWIG=swig}
+bld_cv_pkg_name_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_name_SYMSETS_3_19_3_3_ARCH_TAR_GZ=openss7-modules-git}
+bld_cv_pkg_name_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_name_SYMVERS_3_19_3_3_ARCH_GZ=openss7-modules-git}
 bld_cv_pkg_name_SYSTEMCTL=${bld_cv_pkg_name_SYSTEMCTL=systemd}
 bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl}
@@ -233,6 +237,8 @@ bld_cv_pkg_path_LSB_RELEASE=${bld_cv_pkg_path_LSB_RELEASE=/etc/lsb-release}
 bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/usr/lib/modules/3.19.3-3-ARCH/modules.dep}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/lib/modules/3.19.3-3-ARCH/build/Module.symvers}
 bld_cv_pkg_path_PACMAN_CONF=${bld_cv_pkg_path_PACMAN_CONF=/etc/pacman.conf}
+bld_cv_pkg_path_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_path_SYMSETS_3_19_3_3_ARCH_TAR_GZ=/boot/symsets-3.19.3-3-ARCH.tar.gz}
+bld_cv_pkg_path_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_path_SYMVERS_3_19_3_3_ARCH_GZ=/boot/symvers-3.19.3-3-ARCH.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/usr/lib/modules/3.19.3-3-ARCH/build/vmlinux}
@@ -407,6 +413,8 @@ bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.23-1}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.23-1}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.22.3-3}
 bld_cv_pkg_ver_SWIG=${bld_cv_pkg_ver_SWIG=3.0.5-1}
+bld_cv_pkg_ver_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_ver_SYMSETS_3_19_3_3_ARCH_TAR_GZ=1.1.8.1.g60a8f80-1}
+bld_cv_pkg_ver_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_ver_SYMVERS_3_19_3_3_ARCH_GZ=1.1.8.1.g60a8f80-1}
 bld_cv_pkg_ver_SYSTEMCTL=${bld_cv_pkg_ver_SYSTEMCTL=218-2}
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.22.3-3}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6.4-1}
