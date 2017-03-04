@@ -8185,7 +8185,7 @@ struct test_stream test_case_2_3_3_iut = { preamble_aspup, test_2_3_3_iut, posta
 Checks that a routing key can be registered from the ASP Up state."
 
 int
-test_3_1_1_ptu(child)
+test_3_1_1_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_REG_REQ) != __RESULT_SUCCESS) {
@@ -8208,7 +8208,7 @@ test_3_1_1_ptu(child)
 }
 
 int
-test_3_1_1_iut(child)
+test_3_1_1_iut(int child)
 {
 	if (do_signal(child, __TEST_REG_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8235,7 +8235,7 @@ struct test_stream test_case_3_1_1_iut = { preamble_aspup, test_3_1_1_iut, posta
 Checks that a routing key can be registered from the ASP Up state."
 
 int
-test_3_1_2_ptu(child)
+test_3_1_2_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_REG_REQ) != __RESULT_SUCCESS) {
@@ -8262,7 +8262,7 @@ test_3_1_2_ptu(child)
 }
 
 int
-test_3_1_2_iut(child)
+test_3_1_2_iut(int child)
 {
 	if (do_signal(child, __TEST_REG_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8311,7 +8311,7 @@ struct test_stream test_case_3_1_2_iut = { preamble_aspup, test_3_1_2_iut, posta
 Checks that a routing key can be deregistered from the ASP Up state."
 
 int
-test_3_2_1_ptu(child)
+test_3_2_1_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_DEREG_REQ) != __RESULT_SUCCESS) {
@@ -8334,7 +8334,7 @@ test_3_2_1_ptu(child)
 }
 
 int
-test_3_2_1_iut(child)
+test_3_2_1_iut(int child)
 {
 	if (do_signal(child, __TEST_DEREG_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8361,7 +8361,7 @@ struct test_stream test_case_3_2_1_iut = { preamble_reg, test_3_2_1_iut, postamb
 Checks that a routing key can be deregistered from the ASP Up state."
 
 int
-test_3_2_2_ptu(child)
+test_3_2_2_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_DEREG_REQ) != __RESULT_SUCCESS) {
@@ -8387,7 +8387,7 @@ test_3_2_2_ptu(child)
 }
 
 int
-test_3_2_2_iut(child)
+test_3_2_2_iut(int child)
 {
 	if (do_signal(child, __TEST_DEREG_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8439,7 +8439,7 @@ struct test_stream test_case_3_2_2_iut = { preamble_reg, test_3_2_2_iut, postamb
 Checks that an ASP can be activated from the inactive state."
 
 int
-test_4_1_1_ptu(child)
+test_4_1_1_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_ASPAC_REQ) != __RESULT_SUCCESS) {
@@ -8461,7 +8461,7 @@ test_4_1_1_ptu(child)
 }
 
 int
-test_4_1_1_iut(child)
+test_4_1_1_iut(int child)
 {
 	if (do_signal(child, __TEST_ASPAC_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8488,7 +8488,7 @@ struct test_stream test_case_4_1_1_iut = { preamble_reg, test_4_1_1_iut, postamb
 Checks that an ASP can be activated from the inactive state."
 
 int
-test_4_1_2_ptu(child)
+test_4_1_2_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_ASPAC_REQ) != __RESULT_SUCCESS) {
@@ -8513,7 +8513,7 @@ test_4_1_2_ptu(child)
 }
 
 int
-test_4_1_2_iut(child)
+test_4_1_2_iut(int child)
 {
 	if (do_signal(child, __TEST_ASPAC_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8565,7 +8565,7 @@ struct test_stream test_case_4_1_2_iut = { preamble_reg, test_4_1_2_iut, postamb
 Checks that an ASP can be deactivated from the active state."
 
 int
-test_4_2_1_ptu(child)
+test_4_2_1_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_ASPIA_REQ) != __RESULT_SUCCESS) {
@@ -8589,7 +8589,7 @@ test_4_2_1_ptu(child)
 }
 
 int
-test_4_2_1_iut(child)
+test_4_2_1_iut(int child)
 {
 	if (do_signal(child, __TEST_ASPIA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -8616,7 +8616,7 @@ struct test_stream test_case_4_2_1_iut = { preamble_active, test_4_2_1_iut, post
 Checks that an ASP can be deactivated from the active state."
 
 int
-test_4_2_2_ptu(child)
+test_4_2_2_ptu(int child)
 {
 	for (;;) {
 		if (expect(child, INFINITE_WAIT, __TEST_ASPIA_REQ) != __RESULT_SUCCESS) {
@@ -8644,7 +8644,7 @@ test_4_2_2_ptu(child)
 }
 
 int
-test_4_2_2_iut(child)
+test_4_2_2_iut(int child)
 {
 	if (do_signal(child, __TEST_ASPIA_REQ) != __RESULT_SUCCESS)
 		goto failure;
