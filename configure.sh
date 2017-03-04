@@ -25,11 +25,33 @@ case "`uname -m`" in
 	;;
 esac
 
+_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
+
 ./configure \
-	--enable-maintainer-mode \
-	--enable-dependency-tracking \
+	syslibdir=/usr/lib \
+	sysbindir=/usr/bin \
+	syssbindir=/usr/bin \
 	--prefix=/usr \
 	--sysconfdir=/etc \
+	--libdir=/usr/lib \
+	--bindir=/usr/bin \
+	--sbindir=/usr/bin \
+	--libexecdir=/usr/lib \
+	--docdir=/usr/share/doc/openss7 \
+	--enable-maintainer-mode \
+	--enable-dependency-tracking \
+	--disable-static \
+	--disable-sysvinit \
+	--disable-k-abi-support \
+	--disable-k-weak-symbols \
+	--enable-k-weak-modules \
+	--disable-specfs-lock \
+	--with-k-release=$_kvr \
+	--with-k-optimize=speed \
+	--with-optimize=speed \
+	--with-gnu-ld \
+	--disable-docs \
+	--disable-tools \
 	CPPFLAGS="$CPPFLAGS" \
 	CFLAGS="$DEBUG_CFLAGS -Wall -Werror $CFLAGS" \
 	CXXFLAGS="$DEBUG_CXXFLAGS -Wall -Werror $CXXFLAGS" \
