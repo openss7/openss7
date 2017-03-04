@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2017  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -139,7 +139,13 @@ ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep)
 		return (NULL);
 	while ((size >>= 1) != 0)
 		order <<= 1;
+#if defined HAVE_KMACRO___GFP_WAIT
 	gfp_mask = GFP_USER & ~(flag & DDI_UMEM_NOSLEEP ? __GFP_WAIT : 0);
+#elif defined HAVE_KMACRO___GFP_RECLAIM
+	gfp_mask = GFP_USER & ~(flag & DDI_UMEM_NOSLEEP ? __GFP_RECLAIM : 0);
+#else
+	gfp_mask = GFP_USER;
+#endif
 	if ((umem = (void *) __get_free_pages(gfp_mask, order))) {
 		cookiep->gfp = gfp_mask;
 		cookiep->order = order;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2017  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -5946,11 +5946,13 @@ kstreamd_unpark(unsigned int cpu)
 {
 }
 
+#ifdef HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK
 /* called from outside the kthread before it is unparked */
 STATIC void
 kstreamd_pre_unpark(unsigned int cpu)
 {
 }
+#endif
 
 STATIC struct smp_hotplug_thread streams_threads = {
 	.store = &kstreamd_proc,
@@ -5961,7 +5963,9 @@ STATIC struct smp_hotplug_thread streams_threads = {
 	.cleanup = kstreamd_cleanup,
 	.park = kstreamd_park,
 	.unpark = kstreamd_unpark,
+#ifdef HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK
 	.pre_unpark = kstreamd_pre_unpark,
+#endif
 	.selfparking = 0,
 	.thread_comm = "kstreamd/%u",
 };
