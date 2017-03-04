@@ -3521,6 +3521,29 @@ dnl----------------------------------------------------------------------------
 		    [[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, struct sock *) = &ip_route_output_flow;]]) ],
 		    [linux_cv_have_ip_route_output_flow_rtable_return='yes'],
 		    [linux_cv_have_ip_route_output_flow_rtable_return='no'])
+	    if test :$linux_cv_have_ip_route_output_flow_rtable_return = :no ; then
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+			[[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, const struct sock *) = &ip_route_output_flow;]]) ],
+			[linux_cv_have_ip_route_output_flow_rtable_return='yes'],
+			[linux_cv_have_ip_route_output_flow_rtable_return='no'])
+	    fi
 	])
 	if test :$linux_cv_have_ip_route_output_flow_rtable_return = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN], [1], [Define if function
