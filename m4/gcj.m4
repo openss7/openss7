@@ -735,9 +735,12 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
 		 [CNIFLAGS="-findirect-dispatch"],
 		 [CNIFLAGS=])
     GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -fsource=([[^[:space:]]]*),,g'`
+    AC_LANG_FLAG([-fsource=1.5],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fsource=1.5"],
+		 [
     AC_LANG_FLAG([-fsource=1.4],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fsource=1.4"],
-		 [])
+		 [])])
     GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?out-of-date,,g'`
     AC_LANG_FLAG([-Wno-out-of-date],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-out-of-date"],
