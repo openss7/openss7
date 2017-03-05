@@ -10621,8 +10621,8 @@ sccp_dec_ludts(uchar *p, uchar *e, struct sccp_msg *m)
 	if ((rtn = unpack_cdpa(p, e, m)) < 0)
 		return (rtn);	/* CDPA V */
 	if ((pp = p + *p) > e) if ((ep = pp + *pp) > e)
-        p++; pp++;
 		return (-EMSGSIZE);
+        p++; pp++;
 	if ((rtn = unpack_cgpa(p, e, m)) < 0)
 		return (rtn);	/* CGPA V */
 	if ((pp = p + *p) + 1 > e)
