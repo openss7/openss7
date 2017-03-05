@@ -1245,6 +1245,7 @@ dnl----------------------------------------------------------------------------
 	struct packet_type.list,
 	struct packet_type.next,
 	struct pci_dev.is_pcie,
+	struct request_sock_queue.rskq_lock,
 	struct sk_buff.h.sh,
 	struct sk_buff.transport_header,
 	struct skb_frag_struct.page.p,
@@ -3315,6 +3316,38 @@ dnl----------------------------------------------------------------------------
 #endif
 #include <net/sock.h>
     ])
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel sock_sendmsg with 2 arguments], [linux_cv_sock_sendmsg_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>
+#include <linux/tcp.h>]],
+		[[int (*my_autoconf_function_pointer)(struct socket *, struct msghdr *) = &sock_sendmsg;]]) ],
+		[linux_cv_sock_sendmsg_2_args='yes'],
+		[linux_cv_sock_sendmsg_2_args='no'])
+	])
+    ])
+    if test :$linux_cv_sock_sendmsg_2_args = :yes ; then
+	AC_DEFINE([HAVE_KFUNC_SOCK_SENDMSG_2_ARGS], [1], [Define to 1 if
+	    function sock_sendmsg only accepts two arguments.])
+    fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel function tcp_set_skb_tso_segs with sock argument], [linux_cv_tcp_set_skb_tso_segs_sock], [
