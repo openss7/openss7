@@ -4428,7 +4428,11 @@ t_tpi_disconnect(struct tpi *tpi)
 
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
+#if defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+t_tpi_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
+#else
 t_tpi_queue_xmit(struct sk_buff *skb)
+#endif
 {
 	struct rtable *rt = skb_rtable(skb);
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
@@ -4451,6 +4455,8 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 #endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
 #endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
@@ -4596,9 +4602,13 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 				th->check = htonl(cksum_generate(th, plen));
 			// TCP_INC_STATS(UdpOutPackets);
 #if defined HAVE_KFUNC_DST_OUTPUT
-			t_tpi_queue_xmit(skb);
-#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+#if defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, t_tpi_queue_xmit);
+#else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, t_tpi_queue_xmit);
+#endif
+#else				/* !defined HAVE_KFUNC_DST_OUTPUT */
+			t_tpi_queue_xmit(skb);
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 			return (QR_DONE);
 		}
