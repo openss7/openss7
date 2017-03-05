@@ -14114,7 +14114,6 @@ tp_init(void)
 	(void) tp_prots;
 	(void) tp_bind_cachep;
 	(void) tp_prot_cachep;
-	(void) tpi_primname;
 	(void) tp_timer_stop;
 	(void) tp_timer_start;
 	(void) t_set_options;
