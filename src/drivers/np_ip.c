@@ -1186,7 +1186,8 @@ np_ip_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
-#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS || \
+    defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
 	__ip_select_ident(iph, dst, 0);
 #elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
 	ip_select_ident_more(skb, dst, NULL, 0);
