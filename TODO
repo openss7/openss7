@@ -1,6 +1,6 @@
-OpenSS7 -- things to do.  2015-04-18
+OpenSS7 -- things to do.  2017-03-04
 $Id: TODO,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2015  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2017  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -477,17 +477,13 @@ STREAMS Things to Do
      controls:
 
      'I_SWROPT(7)'    'I_GWROPT(7)'    'I_LIST(7)'
-     (*note           (*note           (*note
-     (*manpages*)I_SWROPT(7)::)(*manpages*)I_GWROPT(7)::)(*manpages*)I_LIST(7)::)
+     (*note (*manpages*)I_SWROPT(7)::)(*note (*manpages*)I_GWROPT(7)::)(*note (*manpages*)I_LIST(7)::)
      'I_FLUSHBAND(7)' 'I_CKBAND(7)'    'I_GETBAND(7)'
-     (*note           (*note           (*note
-     (*manpages*)I_FLUSHBAND(7)::)(*manpages*)I_CKBAND(7)::)(*manpages*)I_GETBAND(7)::)
+     (*note (*manpages*)I_FLUSHBAND(7)::)(*note (*manpages*)I_CKBAND(7)::)(*note (*manpages*)I_GETBAND(7)::)
      'I_ATMARK(7)'    'I_SETCLTIME(7)' 'I_GETCLTIME(7)'
-     (*note           (*note           (*note
-     (*manpages*)I_ATMARK(7)::)(*manpages*)I_SETCLTIME(7)::)(*manpages*)I_GETCLTIME(7)::)
+     (*note (*manpages*)I_ATMARK(7)::)(*note (*manpages*)I_SETCLTIME(7)::)(*note (*manpages*)I_GETCLTIME(7)::)
      'I_CANPUT(7)'
-     (*note
-     (*manpages*)I_CANPUT(7)::)
+     (*note (*manpages*)I_CANPUT(7)::)
 
      'System V Release 4' UNIX(R) vendors use one set and 'OSF' UNIX(R)
      vendors use another.  Namely 'HP-UX', 'OSF/1.2', 'AIX', 'Mac
@@ -705,14 +701,14 @@ TTY Things to Do
    - Create a library 'libtty(3)' (*note (*manpages*)libtty(3)::) to
      hold the library functions for use with this package:
 
-          'openpt(3)' (*note
-          (*manpages*)openpt(3)::)
-          'grantpt(3)' (*note
-          (*manpages*)grantpt(3)::)
-          'ptsname(3)' (*note
-          (*manpages*)ptsname(3)::)
-          'unlockpt(3)' (*note
-          (*manpages*)unlockpt(3)::)
+          'openpt(3)'
+          (*note (*manpages*)openpt(3)::)
+          'grantpt(3)'
+          (*note (*manpages*)grantpt(3)::)
+          'ptsname(3)'
+          (*note (*manpages*)ptsname(3)::)
+          'unlockpt(3)'
+          (*note (*manpages*)unlockpt(3)::)
 
      _*todo*_
 
