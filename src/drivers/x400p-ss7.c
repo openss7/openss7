@@ -4569,6 +4569,9 @@ xp_remove(struct pci_dev *dev)
 #ifdef IRQF_DISABLED
 #undef SA_INTERRUPT
 #define SA_INTERRUPT IRQF_DISABLED
+#else
+#undef SA_INTERRUPT
+#define SA_INTERRUPT 0
 #endif
 
 #ifdef IRQF_SHARED

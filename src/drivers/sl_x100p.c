@@ -4116,7 +4116,7 @@ sl_daedt_transmission_request(queue_t *q, struct xp *xp)
 			int len = msgdsize(mp);
 			int hlen = (xp->option.popt & SS7_POPT_XSN) ? 6 : 3;
 			int mlen = hlen + 2;
-			if (!xp->sdt.tb.q_count < 512 && xp->iq->q_count)
+			if (!(xp->sdt.tb.q_count < 512) && xp->iq->q_count)
 				qenable(xp->iq);	/* back-enable */
 			if (mlen < len)
 				goto dont_repeat;
@@ -9754,6 +9754,9 @@ xp_remove(struct pci_dev *dev)
 #ifdef IRQF_DISABLED
 #undef SA_INTERRUPT
 #define SA_INTERRUPT IRQF_DISABLED
+#else
+#undef SA_INTERRUPT
+#define SA_INTERRUPT 0
 #endif
 
 #ifdef IRQF_SHARED

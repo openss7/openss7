@@ -9383,7 +9383,7 @@ sl_daedt_transmission_request(struct ch *ch)
 			int hlen = (ch->option.popt & SS7_POPT_XSN) ? 6 : 3;
 			int mlen = hlen + 2;
 
-			if (!ch->sdt.tb.q_count < 512 && sl_count_rq(ch))
+			if (!(ch->sdt.tb.q_count < 512) && sl_count_rq(ch))
 				sl_enable_rq(ch);	/* back-enable */
 			if (mlen < len)
 				goto dont_repeat;
@@ -32229,6 +32229,9 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 #ifdef IRQF_DISABLED
 #undef SA_INTERRUPT
 #define SA_INTERRUPT IRQF_DISABLED
+#else
+#undef SA_INTERRUPT
+#define SA_INTERRUPT 0
 #endif
 
 #ifdef IRQF_SHARED
