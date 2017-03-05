@@ -2702,6 +2702,32 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS], [1], [Define if
 		function __ip_select_ident takes 2 arguments (with segs).])
 	fi
+	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments (segs).], [linux_cv_have___ip_select_ident_3_args_segs], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[void (*my_autoconf_function_pointer)(struct net *, struct iphdr *, int) = &__ip_select_ident;]]) ],
+		[linux_cv_have___ip_select_ident_3_args_segs='yes'],
+		[linux_cv_have___ip_select_ident_3_args_segs='no'])
+	])
+	if test :$linux_cv_have___ip_select_ident_3_args_segs = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS], [1], [Define if
+		function __ip_select_ident takes 3 arguments (with segs).])
+	fi
 dnl 	if test :"${linux_cv_have___ip_select_ident_2_args:-no}" = :no \
 dnl 	     -a :"${linux_cv_have___ip_select_ident_3_args:-no}" = :no
 dnl 	then
@@ -3521,9 +3547,14 @@ dnl----------------------------------------------------------------------------
 		    [[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, struct sock *) = &ip_route_output_flow;]]) ],
 		    [linux_cv_have_ip_route_output_flow_rtable_return='yes'],
 		    [linux_cv_have_ip_route_output_flow_rtable_return='no'])
-	    if test :$linux_cv_have_ip_route_output_flow_rtable_return = :no ; then
-		AC_COMPILE_IFELSE([
-		    AC_LANG_PROGRAM([[
+	])
+	if test :$linux_cv_have_ip_route_output_flow_rtable_return = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN], [1], [Define if function
+	    ip_route_output_flow() returns a pointer to struct rtable.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_output_flow rtable return with const sock], [linux_cv_have_ip_route_output_flow_const_sock], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
 #endif
@@ -3540,14 +3571,14 @@ dnl----------------------------------------------------------------------------
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
 #include <linux/ip.h>]],
-			[[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, const struct sock *) = &ip_route_output_flow;]]) ],
-			[linux_cv_have_ip_route_output_flow_rtable_return='yes'],
-			[linux_cv_have_ip_route_output_flow_rtable_return='no'])
-	    fi
+		    [[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *, const struct sock *) = &ip_route_output_flow;]]) ],
+		    [linux_cv_have_ip_route_output_flow_const_sock='yes'],
+		    [linux_cv_have_ip_route_output_flow_const_sock='no'])
 	])
-	if test :$linux_cv_have_ip_route_output_flow_rtable_return = :yes ; then
-	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN], [1], [Define if function
-	    ip_route_output_flow() returns a pointer to struct rtable.])
+	if test :$linux_cv_have_ip_route_output_flow_const_sock = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_CONST_SOCK], [1], [Define if function
+	    ip_route_output_flow() returns a pointer to struct rtable but takes a constant sock
+	    structure pointer.])
 	fi
     ])
     fi

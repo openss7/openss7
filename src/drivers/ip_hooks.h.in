@@ -111,10 +111,14 @@ extern struct icmp_mib *icmp_statistics[];
 /* Define if function ip_route_output_flow() returns a pointer to struct
    rtable. */
 #undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
+/* Define if function ip_route_output_flow() returns a pointer to struct
+   rtable but takes a constant sock structure pointer. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_CONST_SOCK
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS && \
     !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS && \
-    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
-#error Do not know how many arguments ip_route_output_flow() takes.
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_CONST_SOCK
+#error Do not know what arguments ip_route_output_flow() takes.
 #endif
 /* Symbol ip_route_output_flow is supported. */
 #undef HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT
@@ -126,6 +130,8 @@ extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *
 				struct sock *sk, int flags);
 #elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
 extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_CONST_SOCK
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, const struct sock *);
 #endif
 #else
 #if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS
@@ -135,6 +141,8 @@ extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *
 				struct sock *sk, int flags);
 #elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_RTABLE_RETURN
 extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, struct sock *);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_CONST_SOCK
+extern struct rtable *ip_route_output_flow(struct net *, struct flowi4 *, const struct sock *);
 #endif
 #endif
 #endif
@@ -717,11 +725,16 @@ skb_rtable(struct sk_buff *skb)
 #undef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 /* Define if function __ip_select_ident takes 2 arguments (with segs). */
 #undef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+/* Define if function __ip_select_ident takes 3 arguments (with segs). */
+#undef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
 
 /* Symbol __ip_select_ident is available. */
 #undef HAVE___IP_SELECT_IDENT_SYMBOL
 #ifdef HAVE___IP_SELECT_IDENT_SYMBOL
-#if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS && !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
+#if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && \
+    !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS && \
+    !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS && \
+    !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
 #error Cannot tell how many arguments function __ip_select_ident() takes.
 #endif
 /* Symbol __ip_select_ident is supported. */
@@ -736,6 +749,9 @@ extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more
 #elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS
 extern void __ip_select_ident(struct iphdr *iph, int segs);
 #define __ip_select_ident(a,b,c) __ip_select_ident(a,c ? 16 : 1)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
+extern void __ip_select_ident(struct net *net, struct iphdr *iph, int segs);
+#define __ip_select_ident(a,b,c) __ip_select_ident(&init_net,a,c ? 16 : 1)
 #endif
 #else
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
@@ -771,6 +787,17 @@ static inline void __ip_select_ident_(struct iphdr *iph, int segs)
 	return;
 }
 #define __ip_select_ident(a,b,c) __ip_select_ident_(a,c ? 16 : 1)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
+extern void __ip_select_ident(struct net *net, struct iphdr *iph, int segs)
+    __attribute__((__weak__));
+static inline void __ip_select_ident_(struct net *net, struct iphdr *iph, int segs)
+{
+	if (__ip_select_ident)
+		return __ip_select_ident(net, iph, segs);
+	iph->id = (iph->daddr ^ -jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(&init_net,a,c ? 16 : 1)
 #endif
 #endif
 #else
