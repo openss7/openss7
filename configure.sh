@@ -8,6 +8,7 @@
 
 case "`uname -m`" in
 	i686)
+		KCC="gcc-5"
 		CPPFLAGS="-D_FORTIFY_SOURCE"
 		CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
 		CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
@@ -16,6 +17,7 @@ case "`uname -m`" in
 		DEBUG_CXXFLAGS="-g -ggdb -fvar-tracking-assignments"
 	;;
 	x86_64)
+		KCC="gcc-5"
 		CPPFLAGS="-D_FORTIFY_SOURCE=2"
 		CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
 		CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
@@ -25,9 +27,17 @@ case "`uname -m`" in
 	;;
 esac
 
-_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
+#_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
+_kvr="3.16.41-1-lts316"
 
 ./configure \
+	KCC="$KCC" \
+	CPPFLAGS="$CPPFLAGS" \
+	CFLAGS="$CFLAGS" \
+	CXXFLAGS="$CXXFLAGS" \
+	LDFLAGS="$LDFLAGS" \
+	DEBUG_CFLAGS="$DEBUG_CFLAGS" \
+	DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS" \
 	syslibdir=/usr/lib \
 	sysbindir=/usr/bin \
 	syssbindir=/usr/bin \
