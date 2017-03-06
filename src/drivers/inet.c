@@ -341,17 +341,23 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define sock_defer_accept(_sk)		(inet_csk(_sk)->icsk_accept_queue.rskq_defer_accept)
 #define sock_accept_queue_head(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_head)
 #define sock_accept_queue_tail(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_tail)
-#ifndef HAVE_KMEMB_STRUCT_REQUEST_SOCK_QUEUE_RSKQ_LOCK
-#define sock_accept_queue_lock(_sk)	write_lock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
-#define sock_accept_queue_unlock(_sk)	write_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
-#define open_request request_sock
-#define tcp_openreq_fastfree(__req)	__reqsk_free(__req)
+#ifdef HAVE_KMEMB_STRUCT_REQUEST_SOCK_QUEUE_RSKQ_LOCK
+ #define sock_accept_queue_lock(_sk)	spin_lock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
+ #define sock_accept_queue_unlock(_sk)	spin_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
+ #define open_request request_sock
+ #define tcp_openreq_fastfree(__req)	while (0) { } /* FIXME */
 #else
-#define sock_accept_queue_lock(_sk)	spin_lock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
-#define sock_accept_queue_unlock(_sk)	spin_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
-#define open_request request_sock
-/* FIXME */
-#define tcp_openreq_fastfree(__req)	while (0) { }
+ #ifdef HAVE_KTYPE_SYN_WAIT_LOCK_SPIN_LOCK
+  #define sock_accept_queue_lock(_sk)	spin_lock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+  #define sock_accept_queue_unlock(_sk)	spin_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+  #define open_request request_sock
+  #define tcp_openreq_fastfree(__req)	while (0) { } /* FIXME */
+ #else
+  #define sock_accept_queue_lock(_sk)	write_lock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+  #define sock_accept_queue_unlock(_sk)	write_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.syn_wait_lock)
+  #define open_request request_sock
+  #define tcp_openreq_fastfree(__req)	__reqsk_free(__req)
+ #endif
 #endif
 #endif
 
