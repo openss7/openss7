@@ -1180,7 +1180,9 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length, str
 
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE __hot_out int
-#if defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+np_ip_queue_xmit(struct sock *sk, struct sk_buff *skb)
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
 np_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 np_ip_queue_xmit(struct sk_buff *skb)
@@ -1207,6 +1209,12 @@ np_ip_queue_xmit(struct sk_buff *skb)
 #endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
+#elif defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+#if defined HAVE_KFUNC_DST_OUTPUT_SK
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, dst->dev, dst_output_sk);
+#else
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, dst->dev, dst_output);
+#endif
 #elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, dst->dev, dst_output);
 #else
@@ -1540,7 +1548,9 @@ np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 #endif
 			_printd(("sending message %p\n", skb));
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#ifdef HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, np_ip_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, np_ip_queue_xmit);
 #else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, np_ip_queue_xmit);

@@ -1671,23 +1671,40 @@ npi_disconnect(struct np *np, struct sockaddr_in *res, mblk_t *seq, np_ulong rea
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || HAVE_KFUNC_DST_OUTPUT_SK
+npi_ip_queue_xmit(struct sock *sk, struct sk_buff *skb)
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+npi_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
+#else
 npi_ip_queue_xmit(struct sk_buff *skb)
+#endif
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-#ifdef NETIF_F_TSO
-#if defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
-	ip_select_ident_more(skb, rt_dst(rt), NULL, 0);
+#if defined NETIF_F_TSO
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS || \
+    defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
+	__ip_select_ident(iph, dst, 0);
+#elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
+	ip_select_ident_more(skb, dst, NULL, 0);
 #else				/* !defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
-	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
+	ip_select_ident_more(iph, dst, NULL, 0);
 #endif				/* defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF */
-#else
-	ip_select_ident(iph, rt_dst(rt), NULL);
-#endif
+#else				/* !defined NETIF_F_TSO */
+	ip_select_ident(iph, dst, NULL);
+#endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
-#ifdef HAVE_KFUNC_IP_DST_OUTPUT
+#if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
+#elif defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || HAVE_KFUNC_DST_OUTPUT_SK
+#if defined HAVE_KFUNC_DST_OUTPUT_SK
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, rt_dst(rt)->dev, dst_output_sk);
+#else
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
+#endif
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
 #else
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
 #endif
@@ -1778,7 +1795,13 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 					rare();
 			}
 #ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, npi_ip_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, npi_ip_queue_xmit);
+#else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, npi_ip_queue_xmit);
+#endif
 #else
 			npi_ip_queue_xmit(skb);
 #endif

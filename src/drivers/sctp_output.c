@@ -245,7 +245,15 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, rt_dst(rt), 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
@@ -259,7 +267,17 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			sh->check = 0;
 			sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
+#ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
+#else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#endif
+#else
+			sctp_queue_xmit(skb);
+#endif
 		} else
 			rare();
 	} else
@@ -325,7 +343,15 @@ sctp_xmit_msg(daddr, mp, sp)
 			iph->protocol = sp->ip_proto;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
+#ifndef HAVE_KFUNC_DST_OUTPUT
+#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+			__ip_select_ident(iph, rt_dst(rt), 0);
+#else
+#error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
+#endif
+#endif
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
@@ -340,7 +366,17 @@ sctp_xmit_msg(daddr, mp, sp)
 			sh->check = 0;
 			sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
+#ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
+#else
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#endif
+#else
+			sctp_queue_xmit(skb);
+#endif
 		} else
 			rare();
 	} else
@@ -492,7 +528,17 @@ sctp_send_msg(sp, sd, mp)
 				sh->check = 0;
 				sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
+#ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
+#else
 				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
+#endif
+#else
+				sctp_queue_xmit(skb);
+#endif
 				/* 
 				 *  Whenever we transmit something, we expect a reply to our v_tag, so
 				 *  we put ourselves in the 1st level vtag caches expecting a quick
