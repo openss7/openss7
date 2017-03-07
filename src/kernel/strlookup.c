@@ -1560,10 +1560,20 @@ __streams_module_address(unsigned long addr)
 		}
 		if (!is_module_name(mod->name))
 			return NULL;
+#ifdef HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
+		if ((unsigned long) mod->init_layout.base <= addr && addr < (unsigned long) mod->init_layout.base + mod->init_layout.size)
+			return mod;
+#else
 		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
 			return mod;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_MODULE_CORE_LAYOUT
+		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
+			return mod;
+#else
 		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
 			return mod;
+#endif
 	}
 	return NULL;
 }
@@ -1647,10 +1657,20 @@ __streams_module_address(unsigned long addr)
 		}
 		if (!is_module_name(mod->name))
 			return NULL;
+#ifdef HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
+		if ((unsigned long) mod->init_layout.base <= addr && addr < (unsigned long) mod->init_layout.base + mod->init_layout.size)
+			return mod;
+#else
 		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
 			return mod;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_MODULE_CORE_LAYOUT
+		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
+			return mod;
+#else
 		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
 			return mod;
+#endif
 	}
 	return NULL;
 }
