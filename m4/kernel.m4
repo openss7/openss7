@@ -2576,6 +2576,13 @@ dnl
 		linux_cv_k_bldflags="'-DKBUILD_STR(s)=s'"
 		;;
 	esac
+dnl	
+dnl	As of 4.9.13 kernel, KBUILD_STR() no longer appears in the makefile, but must still
+dnl	stringify KBUILD_BASENAME anyway.
+dnl	
+	if test ${linux_cv_k_major:-0} -ge 4 -a ${linux_cv_k_minor} -ge 9 ; then
+		linux_cv_k_bldflags="'-DKBUILD_STR(s)=\#s'"
+	fi
 	# the escapes and quotes here are delicate: don't change them!
 	linux_cv_k_bldflags="${linux_cv_k_bldflags} '-DKBUILD_BASENAME=KBUILD_STR('\`echo [\$][@] | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'\`')'"
     ])
