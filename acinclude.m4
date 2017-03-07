@@ -1057,6 +1057,7 @@ dnl----------------------------------------------------------------------------
 	write_trylock \
 	__GFP_WAIT \
 	__GFP_RECLAIM \
+	NET_XMIT_POLICED \
     ], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -1234,10 +1235,18 @@ dnl----------------------------------------------------------------------------
 	struct kobject.kref,
 	struct kstatfs.f_type,
 	struct module.next,
+	struct module.init_layout,
+	struct module.core_layout,
 	struct msghdr.msg_iter,
 	struct net.dev_base_head,
+	struct netdev_queue.trans_start,
 	struct net_device.hard_header,
 	struct net_device.rebuild_header,
+	struct net_device.trans_start,
+	struct netns_ipv4.sysctl_ip_default_ttl,
+	struct netns_ipv4.sysctl_ip_nonlocal_bind,
+	struct netns_ipv4.sysctl_ip_dynaddr,
+	struct netns_ipv4.sysctl_tcp_fin_timeout,
 	struct net_protocol.next,
 	struct net_protocol.no_policy,
 	struct net_protocol.proto,
@@ -3403,11 +3412,40 @@ dnl----------------------------------------------------------------------------
 		[linux_cv_sock_sendmsg_2_args='yes'],
 		[linux_cv_sock_sendmsg_2_args='no'])
 	])
+	if test :$linux_cv_sock_sendmsg_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SOCK_SENDMSG_2_ARGS], [1], [Define to 1 if
+		function sock_sendmsg only accepts two arguments, instead of three.])
+	fi
+	AC_CACHE_CHECK([for kernel sock_recvmsg with 3 arguments], [linux_cv_sock_recvmsg_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/tcp.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>
+#include <linux/tcp.h>]],
+		[[int (*my_autoconf_function_pointer)(struct socket *, struct msghdr *, int) = &sock_recvmsg;]]) ],
+		[linux_cv_sock_recvmsg_3_args='yes'],
+		[linux_cv_sock_recvmsg_3_args='no'])
+	])
+	if test :$linux_cv_sock_recvmsg_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_SOCK_RECVMSG_3_ARGS], [1], [Define to 1 if
+		function sock_recvmsg only accepts three arguments, instead of four.])
+	fi
     ])
-    if test :$linux_cv_sock_sendmsg_2_args = :yes ; then
-	AC_DEFINE([HAVE_KFUNC_SOCK_SENDMSG_2_ARGS], [1], [Define to 1 if
-	    function sock_sendmsg only accepts two arguments.])
-    fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel function tcp_set_skb_tso_segs with sock argument], [linux_cv_tcp_set_skb_tso_segs_sock], [
