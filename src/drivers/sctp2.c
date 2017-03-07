@@ -12039,10 +12039,14 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 					   SCTP_CAUSE_NO_RESOURCE, NULL, 0);
 		if (err == -ERESTART)
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifndef NET_INC_STATS_BH
+			__NET_INC_STATS(sp->net, LINUX_MIB_LISTENOVERFLOWS);
+#else
 #ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
 			NET_INC_STATS_BH(sp->net, LINUX_MIB_LISTENOVERFLOWS);
 #else
 			NET_INC_STATS_BH(LINUX_MIB_LISTENOVERFLOWS);
+#endif
 #endif
 #else
 			NET_INC_STATS_BH(ListenOverflows);
@@ -29983,10 +29987,14 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 	goto drop;
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifndef ICMP_INC_STATS_BH
+	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 #ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
 	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);

@@ -234,6 +234,9 @@ static inline __u32 sysctl_wmem_max_(void)
 #endif
 
 #ifndef sysctl_tcp_fin_timeout
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_TCP_FIN_TIMEOUT
+#define sysctl_tcp_fin_timeout init_net.ipv4.sysctl_tcp_fin_timeout
+#else
 #ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_SYMBOL
 #if defined HAVE_SYSCTL_TCP_FIN_TIMEOUT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern inet sysctl_tcp_fin_timeout;
@@ -251,6 +254,7 @@ sysctl_tcp_fin_timeout_(void)
 #endif
 #else
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
+#endif
 #endif
 #endif
 
@@ -275,6 +279,9 @@ unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 
 #ifndef sysctl_ip_dynaddr
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_DYNADDR
+#define sysctl_ip_dynaddr init_net.ipv4.sysctl_ip_dynaddr
+#else
 #ifdef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
 #if defined HAVE_SYSCTL_IP_DYNADDR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_dynaddr;
@@ -293,8 +300,12 @@ sysctl_ip_dynaddr_(void)
 #else
 #define sysctl_ip_dynaddr 0
 #endif
+#endif
 
 #ifndef sysctl_ip_nonlocal_bind
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_NONLOCAL_BIND
+#define sysctl_ip_nonlocal_bind init_net.ipv4.sysctl_ip_nonlocal_bind
+#else
 /* Symbol sysctl_ip_nonlocal_bind is available. */
 #undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
@@ -318,12 +329,16 @@ sysctl_ip_nonlocal_bind_(void)
 #define sysctl_ip_nonlocal_bind 0
 #endif
 #endif
+#endif
 
 #ifndef IPDEFTTL
 #define IPDEFTTL 64
 #endif
 
 #ifndef sysctl_ip_default_ttl
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_DEFAULT_TTL
+#define sysctl_ip_default_ttl init_net.ipv4.sysctl_ip_default_ttl
+#else
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
 #if defined HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_default_ttl;
@@ -341,6 +356,7 @@ sysctl_ip_default_ttl_(void)
 #endif
 #else
 #define sysctl_ip_default_ttl IPDEFTTL
+#endif
 #endif
 
 #ifndef tcp_set_skb_tso_segs

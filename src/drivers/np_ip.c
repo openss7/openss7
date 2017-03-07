@@ -6039,10 +6039,14 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	ptrace(("ERROR: could not find stream for ICMP message\n"));
 	np_v4_err_next(skb, info);
 #ifdef HAVE_KINC_LINUX_SNMP_H
+#ifndef ICMP_INC_STATS_BH
+	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 #ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
 	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
 	ICMP_INC_STATS_BH(ICMP_MIB_INERRORS);
+#endif
 #endif
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
