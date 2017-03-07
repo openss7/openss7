@@ -1377,6 +1377,10 @@ spec_put_super(struct super_block *sb)
 
 #define SPECFS_MAGIC 0xDEADBEEF
 
+#ifndef PAGE_CACHE_SIZE
+#define PAGE_CACHE_SIZE PAGE_SIZE
+#endif
+
 /**
  *  spec_statfs: - provide statfs information
  *  @sb:	super block
