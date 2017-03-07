@@ -207,6 +207,9 @@ extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif
 
 #ifndef sysctl_ip_dynaddr
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_DYNADDR
+#define sysctl_ip_dynaddr init_net.ipv4.sysctl_ip_dynaddr
+#else
 /* Symbol sysctl_ip_dynaddr is available. */
 #undef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
 #ifdef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
@@ -230,8 +233,12 @@ sysctl_ip_dynaddr_(void)
 #define sysctl_ip_dynaddr 0
 #endif
 #endif
+#endif
 
 #ifndef sysctl_ip_nonlocal_bind
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_NONLOCAL_BIND
+#define sysctl_ip_nonlocal_bind init_net.ipv4.sysctl_ip_nonlocal_bind
+#else
 /* Symbol sysctl_ip_nonlocal_bind is available. */
 #undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
@@ -255,12 +262,16 @@ sysctl_ip_nonlocal_bind_(void)
 #define sysctl_ip_nonlocal_bind 0
 #endif
 #endif
+#endif
 
 #ifndef IPDEFTTL
 #define IPDEFTTL 64
 #endif
 
 #ifndef sysctl_ip_default_ttl
+#ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_IP_DEFAULT_TTL
+#define sysctl_ip_default_ttl init_net.ipv4.sysctl_ip_default_ttl
+#else
 /* Symbol sysctl_ip_default_ttl is available. */
 #undef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
@@ -282,6 +293,7 @@ sysctl_ip_default_ttl_(void)
 #endif
 #else
 #define sysctl_ip_default_ttl IPDEFTTL
+#endif
 #endif
 #endif
 
