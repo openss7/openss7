@@ -1236,6 +1236,10 @@ ip2xinet_hw_tx(unsigned char *buf, int len, struct ip2xinet_dev *dev)
 int
 ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 {
+#ifdef HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START
+	struct netdev_queue *txq;
+#endif
+
 	if (skb == NULL) {
 		return 0;
 	}
@@ -1249,7 +1253,13 @@ ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 		return -EBUSY;
 	}
 
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_TRANS_START
 	dev->trans_start = jiffies;	/* save the timestamp */
+#endif
+#ifdef HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START
+	txq = skb_get_tx_queue(dev, skb);
+	txq->trans_start = jiffies;
+#endif
 	ip2xinet_hw_tx(skb->data, skb->len, (struct ip2xinet_dev*) dev);
 	spin_unlock(&ip2xinet_lock);
 	dev_kfree_skb(skb);	/* release it */
