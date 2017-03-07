@@ -1451,7 +1451,9 @@ ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 			return RETRY;
 
 		case NET_XMIT_CN:
+#ifdef HAVE_KMACRO_NET_XMIT_POLICED
 		case NET_XMIT_POLICED:
+#endif
 			ret = DONE;
 			break;
 		}
