@@ -1221,9 +1221,9 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length, str
 
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE __hot_out int
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS
+#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 np_udp_queue_xmit(struct sock *sk, struct sk_buff *skb)
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 np_udp_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 np_udp_queue_xmit(struct sk_buff *skb)

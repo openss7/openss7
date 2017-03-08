@@ -5490,9 +5490,9 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS
+#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 sctp_queue_xmit(struct sock *sk, struct sk_buff *skb)
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 sctp_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 sctp_queue_xmit(struct sk_buff *skb)

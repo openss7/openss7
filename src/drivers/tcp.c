@@ -4428,9 +4428,9 @@ t_tpi_disconnect(struct tpi *tpi)
 
 #if defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS
+#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 t_tpi_queue_xmit(struct sock *sk, struct sk_buff *skb)
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 t_tpi_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 t_tpi_queue_xmit(struct sk_buff *skb)

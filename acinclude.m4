@@ -2785,7 +2785,7 @@ dnl 	fi
 	AH_VERBATIM([dst_output_], m4_text_wrap([Define which dst_output
 	    function to call: either dst_output or dst_output_sk. */],
 	    [   ], [/* ])[
-#fndef dst_output_
+#ifndef dst_output_
 #undef dst_output_
 #endif])
 	AC_CACHE_CHECK([for kernel NF_HOOK prototype original], [linux_cv_have_nf_hook_original], [dnl
@@ -2813,6 +2813,8 @@ dnl 	fi
 	if test :$linux_cv_have_nf_hook_original = :yes ; then
 	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,skb,in,out,okfn)])
 	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output])
+	    AC_DEFINE([HAVE_KFUNC_NF_HOOK_OKFN_1_ARG], [1], [Define when the NF_HOOK
+		output kernel function takes one argument.])
 	fi
 	AC_CACHE_CHECK([for kernel NF_HOOK takes struct sock pointer], [linux_cv_have_nf_hook_takes_sock], [dnl
 	    AC_COMPILE_IFELSE([
@@ -2839,6 +2841,8 @@ dnl 	fi
 	if test :$linux_cv_have_nf_hook_takes_sock = :yes ; then
 	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,NULL,skb,in,out,okfn)])
 	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output_sk])
+	    AC_DEFINE([HAVE_KFUNC_NF_HOOK_OKFN_2_ARG], [1], [Define when the NF_HOOK
+		output kernel function takes two arguments.])
 	fi
 	AC_CACHE_CHECK([for kernel NF_HOOK takes struct net and sock pointer], [linux_cv_have_nf_hook_takes_net_sock], [dnl
 	    AC_COMPILE_IFELSE([
@@ -2865,6 +2869,8 @@ dnl 	fi
 	if test :$linux_cv_have_nf_hook_takes_net_sock = :yes ; then
 	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,&init_net,NULL,skb,in,out,okfn)])
 	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output])
+	    AC_DEFINE([HAVE_KFUNC_NF_HOOK_OKFN_3_ARG], [1], [Define when the NF_HOOK
+		output kernel function takes three arguments.])
 	fi
 	AC_CACHE_CHECK([for kernel dst_output with 2 arguments], [linux_cv_have_dst_output_2_args], [dnl
 	    AC_COMPILE_IFELSE([

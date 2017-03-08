@@ -1671,9 +1671,9 @@ npi_disconnect(struct np *np, struct sockaddr_in *res, mblk_t *seq, np_ulong rea
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || HAVE_KFUNC_DST_OUTPUT_SK
+#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 npi_ip_queue_xmit(struct sock *sk, struct sk_buff *skb)
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 npi_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 npi_ip_queue_xmit(struct sk_buff *skb)
