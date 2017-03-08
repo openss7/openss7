@@ -3720,7 +3720,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 STATIC INLINE __hot_out int
 #if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 tp_ip_queue_xmit(struct sock *sk, struct sk_buff *skb)
-#elif defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 tp_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 #else
 tp_ip_queue_xmit(struct sk_buff *skb)
