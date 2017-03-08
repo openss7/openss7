@@ -917,6 +917,7 @@ dnl----------------------------------------------------------------------------
 	simple_statfs \
 	skb_dst \
 	skb_dst_set \
+	skb_get_tx_queue \
 	skb_rtable \
 	skb_transport_header \
 	sleep_on \
@@ -1788,7 +1789,7 @@ dnl----------------------------------------------------------------------------
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
     _LINUX_KERNEL_ENV([dnl
-	AC_CACHE_CHECK([for rcu_note_context_switch with no args],
+	AC_CACHE_CHECK([for kernel rcu_note_context_switch with no args],
 		       [linux_cv_rcu_note_context_switch_no_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2438,7 +2439,7 @@ dnl 	])
     fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
-	AC_CACHE_CHECK([for ip_rt_update_pmtu takes 4 arguments], [linux_cv_ip_rt_update_pmtu_4_args], [dnl
+	AC_CACHE_CHECK([for kernel ip_rt_update_pmtu takes 4 arguments], [linux_cv_ip_rt_update_pmtu_4_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -2774,6 +2775,96 @@ dnl 	fi
 	if test :$linux_cv_have_ip_select_ident_more_sk_buff = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF], [1], [Define if
 		function ip_select_ident_more takes sk_buff.])
+	fi
+	AH_VERBATIM([NF_HOOK_], m4_text_wrap([Define how to call the actual
+	    NF_HOOK function whenever it is provided by a function call
+	    instead of a macro. */], [   ], [/* ])[
+#ifndef NF_HOOK_
+#undef NF_HOOK_
+#endif])
+	AH_VERBATIM([dst_output_], m4_text_wrap([Define which dst_output
+	    function to call: either dst_output or dst_output_sk. */],
+	    [   ], [/* ])[
+#fndef dst_output_
+#undef dst_output_
+#endif])
+	AC_CACHE_CHECK([for kernel NF_HOOK prototype original], [linux_cv_have_nf_hook_original], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[int (*my_autoconf_function_pointer)(uint8_t, unsigned int, struct sk_buff *, struct net_device *, struct net_device*, int(*)(struct sk_buff *)) = &NF_HOOK;]]) ],
+		[linux_cv_have_nf_hook_original='yes'],
+		[linux_cv_have_nf_hook_original='no'])
+	])
+	if test :$linux_cv_have_nf_hook_original = :yes ; then
+	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,skb,in,out,okfn)])
+	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output])
+	fi
+	AC_CACHE_CHECK([for kernel NF_HOOK takes struct sock pointer], [linux_cv_have_nf_hook_takes_sock], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[int (*my_autoconf_function_pointer)(uint8_t, unsigned int, struct sock *, struct sk_buff *, struct net_device *, struct net_device*, int(*)(struct sock *, struct sk_buff *)) = &NF_HOOK;]]) ],
+		[linux_cv_have_nf_hook_takes_sock='yes'],
+		[linux_cv_have_nf_hook_takes_sock='no'])
+	])
+	if test :$linux_cv_have_nf_hook_takes_sock = :yes ; then
+	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,NULL,skb,in,out,okfn)])
+	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output_sk])
+	fi
+	AC_CACHE_CHECK([for kernel NF_HOOK takes struct net and sock pointer], [linux_cv_have_nf_hook_takes_net_sock], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>]],
+		[[int (*my_autoconf_function_pointer)(uint8_t, unsigned int, struct net *, struct sock *, struct sk_buff *, struct net_device *, struct net_device*, int(*)(struct net *, struct sock *, struct sk_buff *)) = &NF_HOOK;]]) ],
+		[linux_cv_have_nf_hook_takes_net_sock='yes'],
+		[linux_cv_have_nf_hook_takes_net_sock='no'])
+	])
+	if test :$linux_cv_have_nf_hook_takes_net_sock = :yes ; then
+	    AC_DEFINE_UNQUOTED([NF_HOOK_(pf,hook,skb,in,out,okfn)], [NF_HOOK(pf,hook,&init_net,NULL,skb,in,out,okfn)])
+	    AC_DEFINE_UNQUOTED([dst_output_], [dst_output])
 	fi
 	AC_CACHE_CHECK([for kernel dst_output with 2 arguments], [linux_cv_have_dst_output_2_args], [dnl
 	    AC_COMPILE_IFELSE([
