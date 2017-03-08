@@ -268,13 +268,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 			sctp_queue_xmit(skb);
 #endif
@@ -367,13 +361,7 @@ sctp_xmit_msg(daddr, mp, sp)
 			sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 			sctp_queue_xmit(skb);
 #endif
@@ -529,13 +517,7 @@ sctp_send_msg(sp, sd, mp)
 				sh->check = htonl(crc32c(~0UL, (unsigned char *) sh, plen));
 
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-				NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+				NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 				sctp_queue_xmit(skb);
 #endif

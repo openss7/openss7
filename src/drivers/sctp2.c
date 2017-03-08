@@ -5490,7 +5490,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
  */
 #ifdef HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
+#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS
 sctp_queue_xmit(struct sock *sk, struct sk_buff *skb)
 #elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
 sctp_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
@@ -5518,17 +5518,9 @@ sctp_queue_xmit(struct sk_buff *skb)
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
 #ifdef HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
-#elif defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-#if defined HAVE_KFUNC_DST_OUTPUT_SK
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, rt_dst(rt)->dev, dst_output_sk);
+	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
 #else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
-#endif
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
-#else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
+	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output_);
 #endif
 }
 #else
@@ -5677,13 +5669,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 				sh->check = htonl(cksum_generate(sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 			sctp_queue_xmit(skb);
 #endif
@@ -5807,13 +5793,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 				sh->check = htonl(cksum(sp, sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 			sctp_queue_xmit(skb);
 #endif
@@ -6015,13 +5995,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 			sh->check = htonl(cksum(sp, sh, plen));
 		SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, sctp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, sctp_queue_xmit);
-#else
-		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
-#endif
+		NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 #else
 		sctp_queue_xmit(skb);
 #endif

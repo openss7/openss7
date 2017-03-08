@@ -2121,17 +2121,9 @@ np_rtp_queue_xmit(struct sk_buff *skb)
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
-#elif defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-#if defined HAVE_KFUNC_DST_OUTPUT_SK
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, dst->dev, dst_output_sk);
+	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
 #else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, sk, skb, NULL, dst->dev, dst_output);
-#endif
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, dst->dev, dst_output);
-#else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, dst_output);
+	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, dst_output_);
 #endif
 }
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
@@ -2485,13 +2477,7 @@ np_senddata(struct np *np, uint8_t protocol, const unsigned short dport, uint32_
 #endif
 			_printd(("sending message %p\n", skb));
 #ifdef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC_DST_OUTPUT_2_ARGS || defined HAVE_KFUNC_DST_OUTPUT_SK
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, NULL, skb, NULL, dev, np_rtp_queue_xmit);
-#elif defined HAVE_KFUNC_DST_OUTPUT_3_ARGS
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, &init_net, NULL, skb, NULL, dev, np_rtp_queue_xmit);
-#else
-			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, np_rtp_queue_xmit);
-#endif
+			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, np_rtp_queue_xmit);
 #else
 			np_rtp_queue_xmit(skb);
 #endif

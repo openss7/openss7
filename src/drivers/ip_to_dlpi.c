@@ -1236,7 +1236,7 @@ ip2xinet_hw_tx(unsigned char *buf, int len, struct ip2xinet_dev *dev)
 int
 ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 {
-#ifdef HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START
+#if defined HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START && defined HAVE_KFUNC_SKB_GET_TX_QUEUE
 	struct netdev_queue *txq;
 #endif
 
@@ -1256,7 +1256,7 @@ ip2xinet_tx(struct sk_buff *skb, struct net_device *dev)
 #ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_TRANS_START
 	dev->trans_start = jiffies;	/* save the timestamp */
 #endif
-#ifdef HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START
+#if defined HAVE_KMEMB_STRUCT_NETDEV_QUEUE_TRANS_START && defined HAVE_KFUNC_SKB_GET_TX_QUEUE
 	txq = skb_get_tx_queue(dev, skb);
 	txq->trans_start = jiffies;
 #endif
