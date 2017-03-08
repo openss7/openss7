@@ -23,7 +23,7 @@ bld_cv_pkg_cmd_JAVAC=${bld_cv_pkg_cmd_JAVAC='pacman --sync gcc-gcj'}
 bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='pacman --sync gjdoc'}
 bld_cv_pkg_cmd_JAVAH=${bld_cv_pkg_cmd_JAVAH='pacman --sync gcc-gcj'}
 bld_cv_pkg_cmd_KEYTOOL=${bld_cv_pkg_cmd_KEYTOOL='pacman --sync gcc-gcj'}
-bld_cv_pkg_cmd_KGENKSYMS=${bld_cv_pkg_cmd_KGENKSYMS='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd_KGENKSYMS=${bld_cv_pkg_cmd_KGENKSYMS='pacman --sync linux-lts41-headers'}
 bld_cv_pkg_cmd_LATEX2HTML=${bld_cv_pkg_cmd_LATEX2HTML='pacman --sync latex2html'}
 bld_cv_pkg_cmd_LATEX=${bld_cv_pkg_cmd_LATEX='pacman --sync texlive-bin'}
 bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='pacman --sync glibc'}
@@ -34,8 +34,8 @@ bld_cv_pkg_cmd_MAKEPKG=${bld_cv_pkg_cmd_MAKEPKG='pacman --sync pacman'}
 bld_cv_pkg_cmd_MAKEWHATIS=${bld_cv_pkg_cmd_MAKEWHATIS='pacman --sync man-db'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='pacman --sync kmod'}
-bld_cv_pkg_cmd_MODULES_DEP=${bld_cv_pkg_cmd_MODULES_DEP='pacman --sync linux-lts'}
-bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd_MODULES_DEP=${bld_cv_pkg_cmd_MODULES_DEP='pacman --sync linux-lts41'}
+bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='pacman --sync linux-lts41-headers'}
 bld_cv_pkg_cmd_OPENSSL=${bld_cv_pkg_cmd_OPENSSL='pacman --sync openssl'}
 bld_cv_pkg_cmd_PACMAN=${bld_cv_pkg_cmd_PACMAN='pacman --sync pacman'}
 bld_cv_pkg_cmd_PACMAN_CONF=${bld_cv_pkg_cmd_PACMAN_CONF='pacman --sync pacman'}
@@ -52,64 +52,38 @@ bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='pacman --sync groff'}
 bld_cv_pkg_cmd_SWIG=${bld_cv_pkg_cmd_SWIG='pacman --sync swig'}
-bld_cv_pkg_cmd_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_cmd_SYMSETS_3_19_3_3_ARCH_TAR_GZ='pacman --sync openss7-modules-git'}
-bld_cv_pkg_cmd_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_cmd_SYMVERS_3_19_3_3_ARCH_GZ='pacman --sync openss7-modules-git'}
 bld_cv_pkg_cmd_SYSTEMCTL=${bld_cv_pkg_cmd_SYSTEMCTL='pacman --sync systemd'}
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='pacman --sync groff'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='pacman --sync tcl'}
 bld_cv_pkg_cmd_TEX=${bld_cv_pkg_cmd_TEX='pacman --sync texlive-bin'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='pacman --sync net-snmp'}
-bld_cv_pkg_cmd_VMLINUX=${bld_cv_pkg_cmd_VMLINUX='pacman --sync linux-lts'}
+bld_cv_pkg_cmd_VMLINUX=${bld_cv_pkg_cmd_VMLINUX='pacman --sync linux-lts41'}
 bld_cv_pkg_cmd_XZ_CMD=${bld_cv_pkg_cmd_XZ_CMD='pacman --sync xz'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='pacman --sync zip'}
-bld_cv_pkg_cmd__CONFIG=${bld_cv_pkg_cmd__CONFIG='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__CONFIG=${bld_cv_pkg_cmd__CONFIG='pacman --sync linux-lts41-headers'}
 bld_cv_pkg_cmd__ETC_INIT_D=${bld_cv_pkg_cmd__ETC_INIT_D='pacman --sync pacemaker'}
 bld_cv_pkg_cmd__ETC_PACMAN_D=${bld_cv_pkg_cmd__ETC_PACMAN_D='pacman --sync pacman-mirrorlist'}
 bld_cv_pkg_cmd__ETC_RC_D=${bld_cv_pkg_cmd__ETC_RC_D='pacman --sync snort'}
 bld_cv_pkg_cmd__ETC_SSL=${bld_cv_pkg_cmd__ETC_SSL='pacman --sync ca-certificates-utils'}
 bld_cv_pkg_cmd__ETC_SYSCONFIG=${bld_cv_pkg_cmd__ETC_SYSCONFIG='pacman --sync monitorix'}
-bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX=${bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX='pacman --sync linux-unx'}
-bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD='pacman --sync linux-unx-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH='pacman --sync linux-unx-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86='pacman --sync linux-unx-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310=${bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310='pacman --sync linux-lts310'}
-bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD='pacman --sync linux-lts310-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH='pacman --sync linux-lts310-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86='pacman --sync linux-lts310-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312=${bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312='pacman --sync linux-lts312'}
-bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD='pacman --sync linux-lts312-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH='pacman --sync linux-lts312-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86='pacman --sync linux-lts312-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS=${bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS='pacman --sync linux-lts'}
-bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD='pacman --sync linux-lts'}
-bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH='pacman --sync linux-lts-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86='pacman --sync linux-lts-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH='pacman --sync linux'}
-bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD='pacman --sync linux'}
-bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34=${bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34='pacman --sync linux-lts34'}
-bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD=${bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD='pacman --sync linux-lts34-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=${bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH='pacman --sync linux-lts34-headers'}
-bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=${bld_cv_pkg_cmd__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86='pacman --sync linux-lts34-headers'}
 bld_cv_pkg_cmd__USR_LIB32=${bld_cv_pkg_cmd__USR_LIB32='pacman --sync gcc-multilib'}
 bld_cv_pkg_cmd__USR_LIB_MODPROBE_D=${bld_cv_pkg_cmd__USR_LIB_MODPROBE_D='pacman --sync bluez'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD='pacman --sync linux'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86='pacman --sync linux-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS='pacman --sync linux-lts'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD='pacman --sync linux-lts'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH='pacman --sync linux-lts-headers'}
-bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316='pacman --sync linux-lts316'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD='pacman --sync linux-lts316'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH='pacman --sync linux-lts316-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86='pacman --sync linux-lts316-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41='pacman --sync linux-lts41'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD='pacman --sync linux-lts41'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH='pacman --sync linux-lts41-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86='pacman --sync linux-lts41-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44='pacman --sync linux-lts44'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD='pacman --sync linux-lts44'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH='pacman --sync linux-lts44-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86='pacman --sync linux-lts44-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS='pacman --sync linux-lts'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD='pacman --sync linux-lts'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH='pacman --sync linux-lts-headers'}
+bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_cmd__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86='pacman --sync linux-lts-headers'}
 bld_cv_pkg_cmd__USR_LIB_MODULES_LOAD_D=${bld_cv_pkg_cmd__USR_LIB_MODULES_LOAD_D='pacman --sync cdrtools'}
 bld_cv_pkg_cmd__USR_LIB_SYSCTL_D=${bld_cv_pkg_cmd__USR_LIB_SYSCTL_D='pacman --sync libvirt'}
 bld_cv_pkg_cmd__USR_LIB_SYSTEMD=${bld_cv_pkg_cmd__USR_LIB_SYSTEMD='pacman --sync accel-ppp'}
@@ -135,7 +109,6 @@ bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
 bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff}
 bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
-bld_cv_pkg_name_INITTAB=${bld_cv_pkg_name_INITTAB=initscripts}
 bld_cv_pkg_name_ISSUE=${bld_cv_pkg_name_ISSUE=filesystem}
 bld_cv_pkg_name_JAR=${bld_cv_pkg_name_JAR=gcc-gcj}
 bld_cv_pkg_name_JARSIGNER=${bld_cv_pkg_name_JARSIGNER=gcc-gcj}
@@ -143,7 +116,7 @@ bld_cv_pkg_name_JAVAC=${bld_cv_pkg_name_JAVAC=gcc-gcj}
 bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=gjdoc}
 bld_cv_pkg_name_JAVAH=${bld_cv_pkg_name_JAVAH=gcc-gcj}
 bld_cv_pkg_name_KEYTOOL=${bld_cv_pkg_name_KEYTOOL=gcc-gcj}
-bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=linux-lts-headers}
+bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=linux-lts41-headers}
 bld_cv_pkg_name_LATEX2HTML=${bld_cv_pkg_name_LATEX2HTML=latex2html}
 bld_cv_pkg_name_LATEX=${bld_cv_pkg_name_LATEX=texlive-bin}
 bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc}
@@ -155,8 +128,8 @@ bld_cv_pkg_name_MAKEPKG=${bld_cv_pkg_name_MAKEPKG=pacman}
 bld_cv_pkg_name_MAKEWHATIS=${bld_cv_pkg_name_MAKEWHATIS=man-db}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=kmod}
-bld_cv_pkg_name_MODULES_DEP=${bld_cv_pkg_name_MODULES_DEP=linux-lts}
-bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=linux-lts-headers}
+bld_cv_pkg_name_MODULES_DEP=${bld_cv_pkg_name_MODULES_DEP=linux-lts41}
+bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=linux-lts41-headers}
 bld_cv_pkg_name_OPENSSL=${bld_cv_pkg_name_OPENSSL=openssl}
 bld_cv_pkg_name_PACMAN=${bld_cv_pkg_name_PACMAN=pacman}
 bld_cv_pkg_name_PACMAN_CONF=${bld_cv_pkg_name_PACMAN_CONF=pacman}
@@ -173,66 +146,38 @@ bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
 bld_cv_pkg_name_SWIG=${bld_cv_pkg_name_SWIG=swig}
-bld_cv_pkg_name_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_name_SYMSETS_3_19_3_3_ARCH_TAR_GZ=openss7-modules-git}
-bld_cv_pkg_name_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_name_SYMVERS_3_19_3_3_ARCH_GZ=openss7-modules-git}
 bld_cv_pkg_name_SYSTEMCTL=${bld_cv_pkg_name_SYSTEMCTL=systemd}
 bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl}
 bld_cv_pkg_name_TEX=${bld_cv_pkg_name_TEX=texlive-bin}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp}
-bld_cv_pkg_name_VMLINUX=${bld_cv_pkg_name_VMLINUX=linux-lts}
+bld_cv_pkg_name_VMLINUX=${bld_cv_pkg_name_VMLINUX=linux-lts41}
 bld_cv_pkg_name_XZ_CMD=${bld_cv_pkg_name_XZ_CMD=xz}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
-bld_cv_pkg_name__CONFIG=${bld_cv_pkg_name__CONFIG=linux-lts-headers}
+bld_cv_pkg_name__CONFIG=${bld_cv_pkg_name__CONFIG=linux-lts41-headers}
 bld_cv_pkg_name__ETC_INIT_D=${bld_cv_pkg_name__ETC_INIT_D=pacemaker}
 bld_cv_pkg_name__ETC_PACMAN_D=${bld_cv_pkg_name__ETC_PACMAN_D=pacman-mirrorlist}
 bld_cv_pkg_name__ETC_RC_D=${bld_cv_pkg_name__ETC_RC_D=snort}
 bld_cv_pkg_name__ETC_SSL=${bld_cv_pkg_name__ETC_SSL=ca-certificates-utils}
 bld_cv_pkg_name__ETC_SYSCONFIG=${bld_cv_pkg_name__ETC_SYSCONFIG=monitorix}
-bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX=${bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX=linux-unx}
-bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD=linux-unx-headers}
-bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=linux-unx-headers}
-bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=linux-unx-headers}
-bld_cv_pkg_name__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_36_1_LTS_BUILD=linux-lts-headers}
-bld_cv_pkg_name__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_0_57_1_LTS_BUILD=linux-lts-headers}
-bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310=${bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310=linux-lts310}
-bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD=linux-lts310-headers}
-bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=linux-lts310-headers}
-bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=linux-lts310-headers}
-bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312=${bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312=linux-lts312}
-bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD=linux-lts312-headers}
-bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=linux-lts312-headers}
-bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=linux-lts312-headers}
-bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS=${bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS=linux-lts}
-bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD=linux-lts}
-bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=linux-lts-headers}
-bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=linux-lts-headers}
-bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH=linux}
-bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD=linux}
-bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=linux-headers}
-bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=linux-headers}
-bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34=${bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34=linux-lts34}
-bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD=${bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD=linux-lts34-headers}
-bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=${bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=linux-lts34-headers}
-bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=${bld_cv_pkg_name__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=linux-lts34-headers}
 bld_cv_pkg_name__USR_LIB32=${bld_cv_pkg_name__USR_LIB32=gcc-multilib}
 bld_cv_pkg_name__USR_LIB_MODPROBE_D=${bld_cv_pkg_name__USR_LIB_MODPROBE_D=bluez}
-bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=linux}
-bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=linux-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS=linux-lts}
-bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=linux-lts}
-bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=linux-lts-headers}
-bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=linux-lts-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316=${bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316=linux-lts316}
+bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=linux-lts316}
+bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=linux-lts316-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=linux-lts316-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41=${bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41=linux-lts41}
+bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=linux-lts41}
+bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=linux-lts41-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=linux-lts41-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44=linux-lts44}
+bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=linux-lts44}
+bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=linux-lts44-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=linux-lts44-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS=${bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS=linux-lts}
+bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=${bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=linux-lts}
+bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=${bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=linux-lts-headers}
+bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_name__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=linux-lts-headers}
 bld_cv_pkg_name__USR_LIB_MODULES_LOAD_D=${bld_cv_pkg_name__USR_LIB_MODULES_LOAD_D=cdrtools}
 bld_cv_pkg_name__USR_LIB_SYSCTL_D=${bld_cv_pkg_name__USR_LIB_SYSCTL_D=libvirt}
 bld_cv_pkg_name__USR_LIB_SYSTEMD=${bld_cv_pkg_name__USR_LIB_SYSTEMD=accel-ppp}
@@ -241,76 +186,38 @@ bld_cv_pkg_name__USR_SHARE_PACMAN_KEYRINGS=${bld_cv_pkg_name__USR_SHARE_PACMAN_K
 bld_cv_pkg_path_ARCH_RELEASE=${bld_cv_pkg_path_ARCH_RELEASE=/etc/arch-release}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/core_perl/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/6.3.1/gcj/cni.h}
-bld_cv_pkg_path_INITTAB=${bld_cv_pkg_path_INITTAB=/etc/inittab}
 bld_cv_pkg_path_ISSUE=${bld_cv_pkg_path_ISSUE=/etc/issue}
 bld_cv_pkg_path_LSB_RELEASE=${bld_cv_pkg_path_LSB_RELEASE=/etc/lsb-release}
-bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/usr/lib/modules/4.4.52-1-lts/modules.dep}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/lib/modules/4.4.52-1-lts/build/Module.symvers}
+bld_cv_pkg_path_MODULES_DEP=${bld_cv_pkg_path_MODULES_DEP=/usr/lib/modules/4.1.35-1-lts41/modules.dep}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/lib/modules/4.1.35-1-lts41/build/Module.symvers}
 bld_cv_pkg_path_PACMAN_CONF=${bld_cv_pkg_path_PACMAN_CONF=/etc/pacman.conf}
-bld_cv_pkg_path_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_path_SYMSETS_3_19_3_3_ARCH_TAR_GZ=/boot/symsets-3.19.3-3-ARCH.tar.gz}
-bld_cv_pkg_path_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_path_SYMVERS_3_19_3_3_ARCH_GZ=/boot/symvers-3.19.3-3-ARCH.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
-bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/usr/lib/modules/4.4.52-1-lts/build/vmlinux}
-bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/usr/lib/modules/4.4.52-1-lts/build/.config}
-bld_cv_pkg_path__ETC_CONF_D=${bld_cv_pkg_path__ETC_CONF_D=/etc/conf.d}
+bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/usr/lib/modules/4.1.35-1-lts41/build/vmlinux}
+bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/usr/lib/modules/4.1.35-1-lts41/build/.config}
 bld_cv_pkg_path__ETC_INIT_D=${bld_cv_pkg_path__ETC_INIT_D=/etc/init.d}
-bld_cv_pkg_path__ETC_KERNEL=${bld_cv_pkg_path__ETC_KERNEL=/etc/kernel}
 bld_cv_pkg_path__ETC_PACMAN_D=${bld_cv_pkg_path__ETC_PACMAN_D=/etc/pacman.d}
 bld_cv_pkg_path__ETC_RC_D=${bld_cv_pkg_path__ETC_RC_D=/etc/rc.d}
 bld_cv_pkg_path__ETC_SSL=${bld_cv_pkg_path__ETC_SSL=/etc/ssl}
 bld_cv_pkg_path__ETC_SYSCONFIG=${bld_cv_pkg_path__ETC_SYSCONFIG=/etc/sysconfig}
-bld_cv_pkg_path__LIB32=${bld_cv_pkg_path__LIB32=/lib32}
-bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX=${bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX=/lib/modules/3.0.101-2-unx}
-bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD=/lib/modules/3.0.101-2-unx/build}
-bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=/lib/modules/3.0.101-2-unx/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=/lib/modules/3.0.101-2-unx/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS=/lib/modules/3.0.36-1-lts}
-bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD=/lib/modules/3.0.36-1-lts/build}
-bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH=/lib/modules/3.0.36-1-lts/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_36_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.36-1-lts/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS=/lib/modules/3.0.57-1-lts}
-bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD=/lib/modules/3.0.57-1-lts/build}
-bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH=/lib/modules/3.0.57-1-lts/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_0_57_1_LTS_BUILD_ARCH_X86=/lib/modules/3.0.57-1-lts/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310=${bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310=/lib/modules/3.10.64-1-lts310}
-bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD=/lib/modules/3.10.64-1-lts310/build}
-bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=/lib/modules/3.10.64-1-lts310/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=/lib/modules/3.10.64-1-lts310/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312=${bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312=/lib/modules/3.12.35-1-lts312}
-bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD=/lib/modules/3.12.35-1-lts312/build}
-bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=/lib/modules/3.12.35-1-lts312/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=/lib/modules/3.12.35-1-lts312/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS=${bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS=/lib/modules/3.14.28-1-lts}
-bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD=/lib/modules/3.14.28-1-lts/build}
-bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=/lib/modules/3.14.28-1-lts/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=/lib/modules/3.14.28-1-lts/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH=/lib/modules/3.17.6-1-ARCH}
-bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD=/lib/modules/3.17.6-1-ARCH/build}
-bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=/lib/modules/3.17.6-1-ARCH/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=/lib/modules/3.17.6-1-ARCH/build/arch/x86}
-bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34=${bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34=/lib/modules/3.4.92-1-lts34}
-bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD=${bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD=/lib/modules/3.4.92-1-lts34/build}
-bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=${bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=/lib/modules/3.4.92-1-lts34/build/arch}
-bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=${bld_cv_pkg_path__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=/lib/modules/3.4.92-1-lts34/build/arch/x86}
 bld_cv_pkg_path__USR_LIB32=${bld_cv_pkg_path__USR_LIB32=/usr/lib32}
 bld_cv_pkg_path__USR_LIB_MODPROBE_D=${bld_cv_pkg_path__USR_LIB_MODPROBE_D=/usr/lib/modprobe.d}
-bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH=/usr/lib/modules/3.17.6-1-ARCH}
-bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=/usr/lib/modules/3.17.6-1-ARCH/build}
-bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=/usr/lib/modules/3.17.6-1-ARCH/build/arch}
-bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=/usr/lib/modules/3.17.6-1-ARCH/build/arch/x86}
-bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH=/usr/lib/modules/3.18.2-2-ARCH}
-bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=/usr/lib/modules/3.18.2-2-ARCH/build}
-bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=/usr/lib/modules/3.18.2-2-ARCH/build/arch}
-bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=/usr/lib/modules/3.18.2-2-ARCH/build/arch/x86}
-bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH=/usr/lib/modules/3.19.3-3-ARCH}
-bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=/usr/lib/modules/3.19.3-3-ARCH/build}
-bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=/usr/lib/modules/3.19.3-3-ARCH/build/arch}
-bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=/usr/lib/modules/3.19.3-3-ARCH/build/arch/x86}
-bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS=/usr/lib/modules/4.4.52-1-lts}
-bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=/usr/lib/modules/4.4.52-1-lts/build}
-bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=/usr/lib/modules/4.4.52-1-lts/build/arch}
-bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=/usr/lib/modules/4.4.52-1-lts/build/arch/x86}
+bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316=${bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316=/usr/lib/modules/3.16.41-1-lts316}
+bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=/usr/lib/modules/3.16.41-1-lts316/build}
+bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=/usr/lib/modules/3.16.41-1-lts316/build/arch}
+bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=/usr/lib/modules/3.16.41-1-lts316/build/arch/x86}
+bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41=${bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41=/usr/lib/modules/4.1.35-1-lts41}
+bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=/usr/lib/modules/4.1.35-1-lts41/build}
+bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=/usr/lib/modules/4.1.35-1-lts41/build/arch}
+bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=/usr/lib/modules/4.1.35-1-lts41/build/arch/x86}
+bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44=/usr/lib/modules/4.4.52-1-lts44}
+bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=/usr/lib/modules/4.4.52-1-lts44/build}
+bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=/usr/lib/modules/4.4.52-1-lts44/build/arch}
+bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=/usr/lib/modules/4.4.52-1-lts44/build/arch/x86}
+bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS=${bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS=/usr/lib/modules/4.9.13-1-lts}
+bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=${bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=/usr/lib/modules/4.9.13-1-lts/build}
+bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=${bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=/usr/lib/modules/4.9.13-1-lts/build/arch}
+bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_path__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=/usr/lib/modules/4.9.13-1-lts/build/arch/x86}
 bld_cv_pkg_path__USR_LIB_MODULES_LOAD_D=${bld_cv_pkg_path__USR_LIB_MODULES_LOAD_D=/usr/lib/modules-load.d}
 bld_cv_pkg_path__USR_LIB_SYSCTL_D=${bld_cv_pkg_path__USR_LIB_SYSCTL_D=/usr/lib/sysctl.d}
 bld_cv_pkg_path__USR_LIB_SYSTEMD=${bld_cv_pkg_path__USR_LIB_SYSTEMD=/usr/lib/systemd}
@@ -374,7 +281,7 @@ bld_cv_pkg_ver_ARCH_RELEASE=${bld_cv_pkg_ver_ARCH_RELEASE=2016.12-2}
 bld_cv_pkg_ver_AUTOM4TE=${bld_cv_pkg_ver_AUTOM4TE=2.69-4}
 bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=2016.41290-10}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6-6}
-bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.9.7.9-1}
+bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.9.7.10-1}
 bld_cv_pkg_ver_C_REHASH=${bld_cv_pkg_ver_C_REHASH=1.0.2.k-1}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=24-1}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.8.13-1}
@@ -387,10 +294,9 @@ bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=6.3.1-2}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=6.3.1-2}
 bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=6.3.1-2}
 bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=5.0.5-2}
-bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.1.18-2}
+bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.1.19-1}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.22.3-7}
 bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.8-2}
-bld_cv_pkg_ver_INITTAB=${bld_cv_pkg_ver_INITTAB=2012.10.1-1}
 bld_cv_pkg_ver_ISSUE=${bld_cv_pkg_ver_ISSUE=2016.12-2}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=6.3.1-2}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=6.3.1-2}
@@ -398,7 +304,7 @@ bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=6.3.1-2}
 bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=0.7.9-5}
 bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=6.3.1-2}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=6.3.1-2}
-bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=4.4.52-1}
+bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=4.1.35-1}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2017.2-1}
 bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=2016.41290-10}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.24-2}
@@ -410,8 +316,8 @@ bld_cv_pkg_ver_MAKEPKG=${bld_cv_pkg_ver_MAKEPKG=5.0.1-4}
 bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.7.6.1-2}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.26-1}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=24-1}
-bld_cv_pkg_ver_MODULES_DEP=${bld_cv_pkg_ver_MODULES_DEP=4.4.52-1}
-bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=4.4.52-1}
+bld_cv_pkg_ver_MODULES_DEP=${bld_cv_pkg_ver_MODULES_DEP=4.1.35-1}
+bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=4.1.35-1}
 bld_cv_pkg_ver_OPENSSL=${bld_cv_pkg_ver_OPENSSL=1.0.2.k-1}
 bld_cv_pkg_ver_PACMAN=${bld_cv_pkg_ver_PACMAN=5.0.1-4}
 bld_cv_pkg_ver_PACMAN_CONF=${bld_cv_pkg_ver_PACMAN_CONF=5.0.1-4}
@@ -428,68 +334,40 @@ bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.26-1}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.26-1}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.22.3-7}
 bld_cv_pkg_ver_SWIG=${bld_cv_pkg_ver_SWIG=3.0.12-1}
-bld_cv_pkg_ver_SYMSETS_3_19_3_3_ARCH_TAR_GZ=${bld_cv_pkg_ver_SYMSETS_3_19_3_3_ARCH_TAR_GZ=1.1.8.1.g60a8f80-1}
-bld_cv_pkg_ver_SYMVERS_3_19_3_3_ARCH_GZ=${bld_cv_pkg_ver_SYMVERS_3_19_3_3_ARCH_GZ=1.1.8.1.g60a8f80-1}
 bld_cv_pkg_ver_SYSTEMCTL=${bld_cv_pkg_ver_SYSTEMCTL=232-8}
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.22.3-7}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6.6-1}
 bld_cv_pkg_ver_TEX=${bld_cv_pkg_ver_TEX=2016.41290-10}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.7.3-3}
-bld_cv_pkg_ver_VMLINUX=${bld_cv_pkg_ver_VMLINUX=4.4.52-1}
+bld_cv_pkg_ver_VMLINUX=${bld_cv_pkg_ver_VMLINUX=4.1.35-1}
 bld_cv_pkg_ver_XZ_CMD=${bld_cv_pkg_ver_XZ_CMD=5.2.3-1}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0-7}
-bld_cv_pkg_ver__CONFIG=${bld_cv_pkg_ver__CONFIG=4.4.52-1}
+bld_cv_pkg_ver__CONFIG=${bld_cv_pkg_ver__CONFIG=4.1.35-1}
 bld_cv_pkg_ver__ETC_INIT_D=${bld_cv_pkg_ver__ETC_INIT_D=1.1.16-2}
 bld_cv_pkg_ver__ETC_PACMAN_D=${bld_cv_pkg_ver__ETC_PACMAN_D=20170211-1}
 bld_cv_pkg_ver__ETC_RC_D=${bld_cv_pkg_ver__ETC_RC_D=2.9.9.0-1}
 bld_cv_pkg_ver__ETC_SSL=${bld_cv_pkg_ver__ETC_SSL=20160507-1}
 bld_cv_pkg_ver__ETC_SYSCONFIG=${bld_cv_pkg_ver__ETC_SYSCONFIG=3.9.0-1}
-bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX=${bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX=3.0.101-2}
-bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD=3.0.101-2}
-bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH=3.0.101-2}
-bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_0_101_2_UNX_BUILD_ARCH_X86=3.0.101-2}
-bld_cv_pkg_ver__LIB_MODULES_3_0_36_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_36_1_LTS_BUILD=3.0.36-1}
-bld_cv_pkg_ver__LIB_MODULES_3_0_57_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_0_57_1_LTS_BUILD=3.0.57-1}
-bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310=${bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310=3.10.64-1}
-bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD=3.10.64-1}
-bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH=3.10.64-1}
-bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_10_64_1_LTS310_BUILD_ARCH_X86=3.10.64-1}
-bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312=${bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312=3.12.35-1}
-bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD=3.12.35-1}
-bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH=3.12.35-1}
-bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_12_35_1_LTS312_BUILD_ARCH_X86=3.12.35-1}
-bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS=${bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS=3.14.28-1}
-bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD=3.14.28-1}
-bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH=3.14.28-1}
-bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_14_28_1_LTS_BUILD_ARCH_X86=3.14.28-1}
-bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH=3.17.6-1}
-bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD=3.17.6-1}
-bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=3.17.6-1}
-bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=3.17.6-1}
-bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34=${bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34=3.4.92-1}
-bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD=${bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD=3.4.92-1}
-bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=${bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH=3.4.92-1}
-bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=${bld_cv_pkg_ver__LIB_MODULES_3_4_92_1_LTS34_BUILD_ARCH_X86=3.4.92-1}
 bld_cv_pkg_ver__USR_LIB32=${bld_cv_pkg_ver__USR_LIB32=6.3.1-1}
 bld_cv_pkg_ver__USR_LIB_MODPROBE_D=${bld_cv_pkg_ver__USR_LIB_MODPROBE_D=5.44-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH=3.17.6-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD=3.17.6-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH=3.17.6-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_3_17_6_1_ARCH_BUILD_ARCH_X86=3.17.6-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH=3.18.2-2}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD=3.18.2-2}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH=3.18.2-2}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_3_18_2_2_ARCH_BUILD_ARCH_X86=3.18.2-2}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH=3.19.3-3}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD=3.19.3-3}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH=3.19.3-3}
-bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_3_19_3_3_ARCH_BUILD_ARCH_X86=3.19.3-3}
-bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS=4.4.52-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD=4.4.52-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH=4.4.52-1}
-bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS_BUILD_ARCH_X86=4.4.52-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316=${bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316=3.16.41-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD=3.16.41-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH=3.16.41-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_3_16_41_1_LTS316_BUILD_ARCH_X86=3.16.41-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41=${bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41=4.1.35-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD=4.1.35-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH=4.1.35-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_4_1_35_1_LTS41_BUILD_ARCH_X86=4.1.35-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44=4.4.52-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD=4.4.52-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH=4.4.52-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_4_4_52_1_LTS44_BUILD_ARCH_X86=4.4.52-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS=${bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS=4.9.13-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=${bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD=4.9.13-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=${bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH=4.9.13-1}
+bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=${bld_cv_pkg_ver__USR_LIB_MODULES_4_9_13_1_LTS_BUILD_ARCH_X86=4.9.13-1}
 bld_cv_pkg_ver__USR_LIB_MODULES_LOAD_D=${bld_cv_pkg_ver__USR_LIB_MODULES_LOAD_D=3.02a07-2}
-bld_cv_pkg_ver__USR_LIB_SYSCTL_D=${bld_cv_pkg_ver__USR_LIB_SYSCTL_D=3.0.0-1}
+bld_cv_pkg_ver__USR_LIB_SYSCTL_D=${bld_cv_pkg_ver__USR_LIB_SYSCTL_D=3.1.0-1}
 bld_cv_pkg_ver__USR_LIB_SYSTEMD=${bld_cv_pkg_ver__USR_LIB_SYSTEMD=1.11.1-1}
 bld_cv_pkg_ver__USR_SHARE_CA_CERTIFICATES=${bld_cv_pkg_ver__USR_SHARE_CA_CERTIFICATES=20140824-4}
 bld_cv_pkg_ver__USR_SHARE_PACMAN_KEYRINGS=${bld_cv_pkg_ver__USR_SHARE_PACMAN_KEYRINGS=20170104-1}
