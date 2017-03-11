@@ -9,4 +9,4 @@ rm -f cscope.*
 #make V=0 cscope
 #cscope -b
 #make V=0 clean all README
-make V=1
+make V=0

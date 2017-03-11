@@ -8,7 +8,6 @@
 
 case "`uname -m`" in
 	i686)
-		KCC="gcc-5"
 		CPPFLAGS="-D_FORTIFY_SOURCE"
 		CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
 		CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
@@ -17,7 +16,6 @@ case "`uname -m`" in
 		DEBUG_CXXFLAGS="-g -ggdb -fvar-tracking-assignments"
 	;;
 	x86_64)
-		KCC="gcc-5"
 		CPPFLAGS="-D_FORTIFY_SOURCE=2"
 		CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
 		CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
@@ -28,13 +26,22 @@ case "`uname -m`" in
 esac
 
 #_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
-_kvr="3.16.41-1-lts316"
+_kvr="$(pacman -Qi linux-lts41|awk '/^Version/{print$3}')-lts41"
+KCC="gcc"
+_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
+KCC="gcc-5"
+_kvr="$(pacman -Qi linux-lts44|awk '/^Version/{print$3}')-lts44"
+KCC="gcc"
+_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
+KCC="gcc"
+_kvr="$(pacman -Qi linux|awk '/^Version/{print$3}')-ARCH"
+KCC="gcc"
 
 ./configure \
 	KCC="$KCC" \
 	CPPFLAGS="$CPPFLAGS" \
-	CFLAGS="$CFLAGS" \
-	CXXFLAGS="$CXXFLAGS" \
+	CFLAGS="$DEBUG_CFLAGS -Wall -Werror $CFLAGS" \
+	CXXFLAGS="$DEBUG_CXXFLAGS -Wall -Werror $CXXFLAGS" \
 	LDFLAGS="$LDFLAGS" \
 	DEBUG_CFLAGS="$DEBUG_CFLAGS" \
 	DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS" \
@@ -61,10 +68,4 @@ _kvr="3.16.41-1-lts316"
 	--with-optimize=speed \
 	--with-gnu-ld \
 	--disable-docs \
-	--disable-tools \
-	CPPFLAGS="$CPPFLAGS" \
-	CFLAGS="$DEBUG_CFLAGS -Wall -Werror $CFLAGS" \
-	CXXFLAGS="$DEBUG_CXXFLAGS -Wall -Werror $CXXFLAGS" \
-	LDFLAGS="$LDFLAGS" \
-	DEBUG_CFLAGS="$DEBUG_CFLAGS" \
-	DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS"
+	--disable-tools
