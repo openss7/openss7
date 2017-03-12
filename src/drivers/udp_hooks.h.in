@@ -432,8 +432,13 @@ ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
 	struct flowi4 fl4;
 	struct rtable *rt;
 
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+	flowi4_init_output(&fl4, oif, 0, tos, RT_SCOPE_UNIVERSE, protocol, flags,
+			   dst, src, dport, sport, (kuid_t){ 0 });
+#else
 	flowi4_init_output(&fl4, oif, 0, tos, RT_SCOPE_UNIVERSE, protocol, flags,
 			   dst, src, dport, sport);
+#endif
 	if (!dst || !src) {
 		rt = __ip_route_output_key(&init_net, &fl4);
 		if (IS_ERR(rt)) {
