@@ -75,6 +75,10 @@ static char const ident[] = "src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #include <sys/cmn_err.h>
 
 #include <sys/pfmod.h>
+#ifdef HAVE_KTYPE_STRUCT_BPF_INSN
+#undef BPF_MAXINSNS
+#define bpf_insn _bpf_insn
+#endif
 #include <net/bpf.h>
 
 #include "sys/config.h"

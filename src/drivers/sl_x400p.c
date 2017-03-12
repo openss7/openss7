@@ -90,6 +90,10 @@ static char const ident[] = "src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE
 #include <linux/if.h>
 #include <net/lif.h>
 #include <net/nit_if.h>
+#ifdef HAVE_KTYPE_STRUCT_BPF_INSN
+#undef BPF_MAXINSNS
+#define bpf_insn _bpf_insn
+#endif
 #include <net/bpf.h>
 
 #undef LMI_DEFAULT

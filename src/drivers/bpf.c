@@ -70,6 +70,10 @@ static char const ident[] = "src/drivers/bpf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 
+#ifdef HAVE_KTYPE_STRUCT_BPF_INSN
+#undef BPF_MAXINSNS
+#define bpf_insn _bpf_insn
+#endif
 #include <net/bpf.h>		/* extern verification */
 
 #include "sys/config.h"
