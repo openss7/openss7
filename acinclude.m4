@@ -908,6 +908,7 @@ dnl----------------------------------------------------------------------------
 	put_pid \
 	rcu_read_lock \
 	read_trylock \
+	register_cpu_notifier \
 	register_ioctl32_conversion \
 	request_dma \
 	session_of_pgrp \
@@ -942,6 +943,7 @@ dnl----------------------------------------------------------------------------
 	tcp_set_skb_tso_segs_sock \
 	to_kdev_t \
 	try_module_get \
+	unregister_cpu_notifier \
 	unregister_ioctl32_conversion \
 	vfree \
 	vmalloc \
@@ -1126,6 +1128,7 @@ dnl----------------------------------------------------------------------------
 	uchar,
 	struct pid,
 	pm_message_t,
+	struct bpf_insn,
 	struct sockaddr_storage,
 	struct inet_protocol,
 	struct net_protocol,
@@ -3717,6 +3720,34 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN_NS], [1], [Define if function
 		ip_route_connect() returns a pointer to an rtable structure, and cannot sleep,
 		which is the case from 3.14.x.])
+	fi
+	AC_CACHE_CHECK([for kernel flowi4_init_output with 12 args], [linux_cv_have_flowi4_init_output_12_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[void (*my_autoconf_function_pointer)(struct flowi4 *, int, __u32, __u8, __u8, __u8, __u8, __be32, __be32, __be16, __be16, kuid_t) = &flowi4_init_output;]]) ],
+		[linux_cv_have_flowi4_init_output_12_args='yes'],
+		[linux_cv_have_flowi4_init_output_12_args='no'])
+	])
+	if test :$linux_cv_have_flowi4_init_output_12_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS], [1], [Define if function
+		flowi4_init_output takes 12 arguments, which is the case beginning with
+		4.10 kernels.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
