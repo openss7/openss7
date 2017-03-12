@@ -5753,6 +5753,7 @@ str_init_caches(void)
 
 #if defined HAVE_KFUNC_SMPBOOT_REGISTER_PERCPU_THREAD
 
+#ifdef HAVE_KFUNC_REGISTER_CPU_NOTIFIER
 #ifdef CONFIG_HOTPLUG_CPU
 STATIC __unlikely void
 takeover_strsched(unsigned int cpu)
@@ -5841,6 +5842,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 STATIC struct notifier_block str_cpu_nfb = {
 	.notifier_call = str_cpu_callback,
 };
+#endif				/* HAVE_KFUNC_REGISTER_CPU_NOTIFIER */
 
 DEFINE_PER_CPU(struct task_struct *, kstreamd_proc);
 
@@ -5973,7 +5975,9 @@ STATIC struct smp_hotplug_thread streams_threads = {
 STATIC __unlikely int
 spawn_kstreamd(void)
 {
+#ifdef HAVE_KFUNC_REGISTER_CPU_NOTIFIER
 	register_cpu_notifier(&str_cpu_nfb);
+#endif
 
 	BUG_ON(smpboot_register_percpu_thread(&streams_threads));
 
@@ -5985,7 +5989,9 @@ kill_kstreamd(void)
 {
 	smpboot_unregister_percpu_thread(&streams_threads);
 
+#ifdef HAVE_KFUNC_UNREGISTER_CPU_NOTIFIER
 	unregister_cpu_notifier(&str_cpu_nfb);
+#endif
 }
 
 #else				/* defined HAVE_KFUNC_SMPBOOT_REGISTER_PERCPU_THREAD */
