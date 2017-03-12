@@ -1483,7 +1483,11 @@ np_route_output_slow(struct np *np, const uint32_t daddr, struct rtable **rtp)
 		struct flowi4 fl4;
 		struct rtable *rt;
 
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, daddr, np->qos.saddr, 0, 0, (kuid_t){ 0 });
+#else
 		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, daddr, np->qos.saddr, 0, 0);
+#endif
 		rt = __ip_route_output_key(&init_net, &fl4);
 		if (IS_ERR(rt))
 			return PTR_ERR(rt);

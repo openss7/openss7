@@ -5278,8 +5278,14 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 				struct flowi4 fl4;
 				struct rtable *rt2;
 
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport,
+						   (kuid_t){ 0 });
+#else
 				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
 						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport);
+#endif
 				rt2 = __ip_route_output_key(&init_net, &fl4);
 				if (IS_ERR(rt2)) {
 					err = PTR_ERR(rt2);
@@ -13266,8 +13272,14 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 #if defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
 				struct flowi4 fl4;
 
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+				flowi4_init_output(&fl4, 0, 0, RT_TOS(iph->tos), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, iph->daddr, iph->saddr, 0, 0,
+						   (kuid_t){ 0 });
+#else
 				flowi4_init_output(&fl4, 0, 0, RT_TOS(iph->tos), RT_SCOPE_UNIVERSE,
 						   IPPROTO_SCTP, 0, iph->daddr, iph->saddr, 0, 0);
+#endif
 
 				__ip_rt_update_pmtu((struct rtable *)sd->dst_cache, &fl4, mtu);
 #else				/* defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS */

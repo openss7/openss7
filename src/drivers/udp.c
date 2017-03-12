@@ -4451,7 +4451,11 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 		struct flowi4 fl4;
 		struct rtable *rt;
 
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, opt->ip.daddr, opt->ip.addr, 0, 0, (kuid_t){ 0 });
+#else
 		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, opt->ip.daddr, opt->ip.addr, 0, 0);
+#endif
 		rt = __ip_route_output_key(&init_net, &fl4);
 		if (IS_ERR(rt))
 			return PTR_ERR(rt);
