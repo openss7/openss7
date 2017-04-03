@@ -175,7 +175,7 @@ dnl
 	    ${libdir}/modprobe.d
 	    ${syslibdir}/modprobe.d
 	    ${sysconfdir}/modprobe.d], [], [no])
-    _BLD_FIND_DIR([for systemd modules-load.d directory], [init_cv_moduleloadd], [
+    _BLD_FIND_DIR([for systemd modules-load.d directory], [init_cv_modulesloadd], [
 	    ${libdir}/modules-load.d
 	    ${syslibdir}/modules-load.d
 	    ${sysconfdir}/modules-load.d], [], [no])
