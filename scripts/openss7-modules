@@ -499,16 +499,16 @@ function rpmlessthan(ver1,ver2,	    seg1,seg2,n,n1,n2,i,num1,num2,m,m1,m2,j,s1,s
 		    x2 = s2; sub(/^0*/, "", x2); sub(/[^[:digit:]].*$/, "", x2)
 		    if (length(x1) < length(x2)) return 1
 		    if (length(x2) > length(x1)) return 0
-		    if (x1 < x2) return 1
-		    if (x2 < x1) return 0
+		    if (x1+0 < x2+0) return 1
+		    if (x2+0 < x1+0) return 0
 		    sub(/^0*[[:digit:]]*/, "", s1)
 		    sub(/^0*[[:digit:]]*/, "", s2)
 		} else {
 		    x1 = s1; sub(/[^[:alpha:]].*$/, "", x1)
 		    x2 = s2; sub(/[^[:alpha:]].*$/, "", x2)
 		    if (x1 == "" && x2 == "") break
-		    if (x1 < x2) return 1
-		    if (x2 < x1) return 0
+		    if (x1+0 < x2+0) return 1
+		    if (x2+0 < x1+0) return 0
 		    sub(/^([[:alpha:]]*)/, "", s1)
 		    sub(/^([[:alpha:]]*)/, "", s2)
 		}
