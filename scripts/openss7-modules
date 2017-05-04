@@ -613,7 +613,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     h = 0; l = 0; u = 0; k = 0
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
-	command = "find " dirs " -maxdepth 2 -type d 2>/dev/null"
+	command = "find -L " dirs " -maxdepth 2 -type d 2>/dev/null"
 	while ((command | getline path) == 1) {
 	    print_debug(5,pfx "directory " path)
 	    if (path"/"!~/\/lib\/modules\/[234]\.[0-9]+/) { continue }
@@ -645,7 +645,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
 	ph = 0; pl = 0
-	command = "find " dirs " -name '*.ko' -o -name '*.ko.gz' 2>/dev/null"
+	command = "find -L " dirs " -name '*.ko' -o -name '*.ko.gz' 2>/dev/null"
 	while ((command | getline file) == 1) {
 	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
 	    print_debug(4,pfx "module " file)
@@ -998,7 +998,7 @@ function readkernel(kversion,
     print_vinfo(2, pfx "version = " kversion)
     tmpdir = "/var/tmp/" me "." PROCINFO["pid"] ".modules"
     system_command("mkdir -p -- " tmpdir)
-    find = "find /lib/modules/" kversion "/kernel -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    find = "find -L /lib/modules/" kversion "/kernel -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
     if (system("test -d /lib/modules/" kversion "/kernel") != 0) {
 	system_command("rm -rf -- " tmpdir)
 	return
