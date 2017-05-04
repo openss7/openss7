@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2017  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -544,7 +544,7 @@ function pathversion(module,			pfx,kversion)
     kversion = module
     if (sub(/^.*\/lib\/modules\//, "", kversion)) {
 	sub(/\/.*$/, "", kversion)
-	if (kversion!~/^[23]\.[0-9]+/) {
+	if (kversion!~/^[234]\.[0-9]+/) {
 	    kversion = ""
 	}
     } else {
@@ -615,7 +615,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	print_vinfo(2, pfx "dirs = " dirs)
 	command = "find " dirs " -maxdepth 2 -type d 2>/dev/null"
 	while ((command | getline) == 1) {
-	    if ($0"/"!~/\/lib\/modules\/[23]\.[0-9]+/) continue
+	    if ($0"/"!~/\/lib\/modules\/[234]\.[0-9]+/) continue
 	    if (/\/kernel/) {
 		kversion = pathversion($0)
 		if (kversion && !(kversion in kversions)) {
@@ -3123,7 +3123,7 @@ function add_kernels(kversion,
     pfx = "p: addkerns,  "
     if  (!kversion) {
 	command = "ls /lib/modules"
-	while ((command | getline) == 1) { if (/^[23]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+	while ((command | getline) == 1) { if (/^[234]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
 	close(command)
     }
     getstructure()
@@ -3175,7 +3175,7 @@ function link_modules(kversion,
     delete kinserts
     kversion = ""
     command = "ls /lib/modules"
-    while ((command | getline) == 1) { if (/^[23]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    while ((command | getline) == 1) { if (/^[234]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
     link_kernels(kversion)
 }
