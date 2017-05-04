@@ -610,7 +610,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	if (system_command("test -d " dir) == 0)
 	    if (dirs == "") { dirs = dir } else { dirs = dirs " " dir }
     }
-    k = 0
+    h = 0; l = 0; u = 0; k = 0
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
 	command = "find " dirs " -maxdepth 2 -type d 2>/dev/null"
@@ -636,10 +636,11 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     }
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
-	h = 0; l = 0; u = 0; ph = 0; pl = 0
+	ph = 0; pl = 0
 	command = "find " dirs " -name '*.ko' -o -name '*.ko.gz' 2>/dev/null"
 	while ((command | getline file) == 1) {
 	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
+	    print_debug(4,pfx "module " file)
 	    name = file; sub(/^.*\//, "", name)
 	    if (!(name in names)) { names[name] = 1; u++ }
 	    kversion = pathversion(file)
