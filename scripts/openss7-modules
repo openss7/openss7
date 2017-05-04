@@ -614,24 +614,32 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
 	command = "find " dirs " -maxdepth 2 -type d 2>/dev/null"
-	while ((command | getline) == 1) {
-	    if ($0"/"!~/\/lib\/modules\/[234]\.[0-9]+/) continue
-	    if (/\/kernel/) {
-		kversion = pathversion($0)
+	while ((command | getline path) == 1) {
+	    print_debug(5,pfx "directory " path)
+	    if (path"/"!~/\/lib\/modules\/[234]\.[0-9]+/) { continue }
+	    else { print_debug(5,pfx "directory " path "/ matches requirement") }
+	    if (path~/\/kernel/) {
+		kversion = pathversion(path)
 		if (kversion && !(kversion in kversions)) {
 		    kversions[kversion] = 1; k++
 		}
+	    } else {
+		print_debug(5,pfx "directory " path " is not a kernel path")
 	    }
-	    if ($0"/"!~"/(extra|updates|openss7|" subdir ")/") continue
-	    paths[$0] = 1
+	    if ((path"/")!~("/(extra|updates|openss7|" subdir ")/")) { continue }
+	    else { print_debug(5,pfx "directory " path " is a weak modules path") }
+	    print_debug(5,pfx "directory " path " adding tp paths")
+	    paths[path] = 1
 	}
 	close(command)
     }
     dirs = ""
     for (path in paths) {
+	print_debug(5,pfx "adding path " path)
 	if (dirs == "") { dirs = path } else { dirs = dirs " " path }
     }
     if (values["test"]) {
+	print_debug(5,pfx "adding path " "`pwd`")
 	if (dirs == "") { dirs = "`pwd`" } else { dirs = "`pwd`" " " dirs }
     }
     if (dirs != "") {
@@ -698,6 +706,8 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	    }
 	}
 	close(command)
+    } else {
+	print_warns(pfx "no module paths!")
     }
     print_vinfo(2, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
     counts["hard"] = h
