@@ -504,6 +504,21 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 	ac_configure_args="KCC=\"$KCC\"${ac_configure_args:+ $ac_configure_args}"
     fi
     AC_SUBST([KCC])dnl
+    AC_CACHE_CHECK([for kernel pre-processor], [linux_cv_k_cpp], [dnl
+	if test ":${KCPP+set}" != :set ; then
+	    KCPP="${KCC:-gcc} -E"
+	fi
+	linux_cv_k_cpp="$KCPP"
+    ])
+    if test ":${KCPP+set}" != :set ; then
+	KCPP="${linux_cv_k_cpp:-gcc -E}"
+    fi
+    if test ":${KCPP:-gcc -E}" != ":gcc -E"; then
+	PACKAGE_RPMOPTIONS="KCPP=\"$KCPP\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="KCPP=\"$KCPP\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="KCPP=\"$KCPP\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([KCPP])dnl
     tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])

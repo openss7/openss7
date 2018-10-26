@@ -117,7 +117,7 @@ MY_SUFFIXES		+= .c .ver
 .c.ver:
 if am__fastdepCC
 ## am__fastdepCC
-	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@ ) \
+	if ( $(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@ ) \
 	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
 ## am__fastdepCC
 else
@@ -127,7 +127,7 @@ if AMDEP
 	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 ## AMDEP
 endif
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@
+	$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(KGENKSYMS) > $@
 ## !am__fastdepCC
 endif
 
@@ -140,9 +140,9 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
-		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
+		$(ECHO_V) "$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	date -uIseconds > $@
 ## am__fastdepCC
@@ -154,11 +154,11 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
 		$(ECHO_V) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	date -uIseconds > $@
 ## AMDEP
@@ -168,9 +168,9 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
-		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
+		$(ECHO_V) "$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	date -uIseconds > $@
 ## !AMDEP
@@ -186,7 +186,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
 		$(ECHO_V) "echo '/* dummy load script */' > \"$$r.ver\"" ; \
 		echo '/* dummy load script */' > "$$r.ver" ; \
 	done ; \
@@ -289,7 +289,7 @@ MY_SUFFIXES		+= .c .ver
 .c.ver:
 if am__fastdepCC
 ## am__fastdepCC
-	if ( $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@ ) \
+	if ( $(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MMD -MP -MF "$(DEPDIR)/$*.TPver" `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@ ) \
 	then $(am__mv) "$(DEPDIR)/$*.TPver" "$(DEPDIR)/$*.Pver"; else rm -f -- "$(DEPDIR)/$*.TPver"; exit 1; fi
 ## am__fastdepCC
 else
@@ -299,7 +299,7 @@ if AMDEP
 	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 ## AMDEP
 endif
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@
+	$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@
 ## !am__fastdepCC
 endif
 
@@ -335,9 +335,9 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
-		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
+		$(ECHO_V) "$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v/$$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## am__fastdepCC
 else
@@ -350,11 +350,11 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
 		$(ECHO_V) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
 		source="$$s" object="$$v/$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## AMDEP
 else
@@ -365,9 +365,9 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`echo "$$s" | sed 's,^.*/,,;s,\.c$$,,'` ; \
-		$(ECHO_Q) "  CPP   " $$r.ver ; \
-		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
-		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
+		$(ECHO_Q) "  KCPP  " $$r.ver ; \
+		$(ECHO_V) "$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
+		$(KCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## !AMDEP
 endif
