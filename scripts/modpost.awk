@@ -798,7 +798,7 @@ function read_modobject(command, dir, own, src,
 	    if (SECTION == "SYMBOL TABLE") {
 		if (NF<4)
 		    continue
-		flags = substr($0, length($1)+2, 7)
+		flags = substr($0, length($1 " "), 7)
 		val = $1; sec = $(NF-2); offset = $(NF-1); sym = $NF
 		if (substr(flags,1,1) == "l") {
 		    if (substr(flags,7,1) == "O") {
