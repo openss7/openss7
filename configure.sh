@@ -28,23 +28,28 @@ esac
 #_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
 _kvr="$(pacman -Qi linux-lts41|awk '/^Version/{print$3}')-lts41"
 KCC="gcc"
-_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
-KCC="gcc-5"
 _kvr="$(pacman -Qi linux-lts44|awk '/^Version/{print$3}')-lts44"
 KCC="gcc"
 _kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
 KCC="gcc"
 _kvr="$(pacman -Qi linux|awk '/^Version/{print$3}')-ARCH"
 KCC="gcc"
+_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
+KCC="gcc-5"
 
 ./configure \
 	KCC="$KCC" \
+	GCJ="gcj" \
+	CXX="g++-6" \
 	CPPFLAGS="$CPPFLAGS" \
-	CFLAGS="$DEBUG_CFLAGS -Wall -Werror $CFLAGS" \
-	CXXFLAGS="$DEBUG_CXXFLAGS -Wall -Werror $CXXFLAGS" \
+	CFLAGS="$DEBUG_CFLAGS -Wall -Werror -Wno-missing-braces $CFLAGS" \
+	CXXFLAGS="$DEBUG_CXXFLAGS -Wall -Werror -Wno-missing-braces $CXXFLAGS" \
+	GCJFLAGS="$DEBUG_GCJFLAGS -Wall -Wno-suppress -Wno-unused-function $GCJFLAGS" \
 	LDFLAGS="$LDFLAGS" \
 	DEBUG_CFLAGS="$DEBUG_CFLAGS" \
 	DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS" \
+	MODPOST_DEBUG=5 \
+	MODPOST_VERBOSE=5 \
 	syslibdir=/usr/lib \
 	sysbindir=/usr/bin \
 	syssbindir=/usr/bin \
@@ -66,6 +71,7 @@ KCC="gcc"
 	--with-k-release=$_kvr \
 	--with-k-optimize=speed \
 	--with-optimize=speed \
-	--with-gnu-ld \
-	--disable-docs \
-	--disable-tools
+	--with-gnu-ld
+#	--disable-docs \
+#	--disable-tools \
+#	--disable-java
