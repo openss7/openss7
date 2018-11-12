@@ -1,0 +1,7 @@
+*.java
+*.class
+*.cc
+*.h
+*.db
+*.jar
+api-docs/
