@@ -1377,7 +1377,7 @@ cat >$makenodes <<EOF
 
 static char const ident[] = "$makenodes (" PACKAGE_ENVR " " PACKAGE_DATE ")";
 
-#if defined(LINUX)
+#if defined(linux)
 #	include <sys/types.h>
 #	include <sys/stat.h>
 #	include <sys/sysmacros.h>
@@ -1402,7 +1402,7 @@ static char const ident[] = "$makenodes (" PACKAGE_ENVR " " PACKAGE_DATE ")";
 #include <unistd.h>
 #include <stdlib.h>
 
-#if !defined(LINUX)
+#if !defined(linux)
 #	include <fcntl.h>
 #endif
 

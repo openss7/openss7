@@ -1065,7 +1065,7 @@ function write_makenodes(file) {
 \n\
 static char const ident[] = \"makenodes (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\";\n\
 \n\
-#if defined(LINUX)\n\
+#if defined(linux)\n\
 #	include <sys/types.h>\n\
 #	include <sys/stat.h>\n\
 #	include <sys/sysmacros.h>\n\
@@ -1090,7 +1090,7 @@ static char const ident[] = \"makenodes (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\
 #include <unistd.h>\n\
 #include <stdlib.h>\n\
 \n\
-#if !defined(LINUX)\n\
+#if !defined(linux)\n\
 #	include <fcntl.h>\n\
 #endif\n\
 \n\
