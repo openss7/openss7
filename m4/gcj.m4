@@ -610,14 +610,14 @@ dnl
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVADOC], [javadoc gjdoc], [${am_missing4_run}gjdoc], [$tmp_PATH], [dnl
+    _BLD_PATH_PROGS([JAVADOC], [gjdoc javadoc], [${am_missing4_run}gjdoc], [$tmp_PATH], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVADOC], [
 ***
-*** Configure could not find the Java documentation program 'javadoc'
-*** (nor 'gjdoc').  This program is part of the GNU Compiler Colleciton,
-*** but is not always loaded on recent distributions.  It is also part
-*** of most Java SDKs.
+*** Configure could not find the Java documentation program 'gjdoc'
+*** (nor 'javadoc').  This program is part of the GNU Compiler Colleciton,
+*** but is not always loaded on recent distributions.  The alternative is
+*** also part of most Java SDKs.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'aptitude install gcj'.
@@ -778,6 +778,14 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
     GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?raw,,g'`
     AC_LANG_FLAG([-Wno-raw],
 		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-raw"],
+		 [])
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?suppress,,g'`
+    AC_LANG_FLAG([-Wno-suppress],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-suppress"],
+		 [])
+    GCJFLAGS=`echo " $GCJFLAGS" | sed -r -e 's, -W(no-)?unused-function , ,g'`
+    AC_LANG_FLAG([-Wno-unused-function],
+		 [GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-Wno-unused-function"],
 		 [])
     AC_LANG_POP([Java])
     JNIFLAGS=`echo "$JNIFLAGS" | sed -r -e 's,^[[[:space:]]]*,,;s,[[[:space:]]][$],,'`
