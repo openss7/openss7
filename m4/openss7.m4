@@ -526,6 +526,9 @@ AC_DEFUN([_OPENSS7_CACHE], [dnl
 # _OPENSS7_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS], [dnl
+    AC_MSG_NOTICE([+--------------------------+])
+    AC_MSG_NOTICE([| OpenSS7 Packaging Checks |])
+    AC_MSG_NOTICE([+--------------------------+])
     _OPENSS7_OPTIONS_CHECK
     _OPENSS7_OPTIONS_DOCS
     _OPENSS7_OPTIONS_GPG
@@ -839,7 +842,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_TOOLS], [dnl
     AC_ARG_ENABLE([tools],
 	[AS_HELP_STRING([--disable-tools],
 	    [user packages @<:@default=enabled@:>@])],
-	[], [enable_tools=yes])
+	[enable_java=no], [enable_tools=yes])
     AC_MSG_RESULT([${enable_tools:-yes}])
     AM_CONDITIONAL([PKG_BUILD_USER], [test ":${enable_tools:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_PKG_TOOLS
