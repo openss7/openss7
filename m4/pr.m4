@@ -54,11 +54,13 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AUTOPR], [dnl
     AC_REQUIRE([_DISTRO])
-    AC_MSG_NOTICE([+---------------------------+])
-    AC_MSG_NOTICE([| Problem Report Generation |])
-    AC_MSG_NOTICE([+---------------------------+])
-    _AUTOPR_SETUP
-    _AUTOPR_OUTPUT
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+---------------------------+])
+	AC_MSG_NOTICE([| Problem Report Generation |])
+	AC_MSG_NOTICE([+---------------------------+])
+	_AUTOPR_SETUP
+	_AUTOPR_OUTPUT
+    fi
 ])# _AUTOPR
 # =============================================================================
 
