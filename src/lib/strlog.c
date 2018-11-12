@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/strlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/strlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define rpl_realloc realloc /* hah! */
 
@@ -1046,7 +1046,7 @@ __streams_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 				*tp = '\0';
 				break;
 			}
-			if (tp == '\0')
+			if (*tp == '\0')
 				break;
 			if (tp > timebuf + sizeof(timebuf) - 1) {
 				*tp = '\0';
