@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-xnsl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-xnsl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
@@ -5834,10 +5834,10 @@ do_tests(int num_tests)
 				if (duration > tests[i].duration) {
 					if (tests[i].duration && duration > tests[i].duration)
 						duration = tests[i].duration;
-				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
-					goto inconclusive;
+					if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+						goto inconclusive;
 					result = test_run(tests[i].stream, duration);
-				(*tests[i].stop) (i);
+					(*tests[i].stop) (i);
 				} else
 					result = __RESULT_SKIPPED;
 				if (result == tests[i].expect) {

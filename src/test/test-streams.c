@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-streams.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-streams.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -12888,7 +12888,7 @@ struct test_stream test_2_48_6 = { &preamble_2, &test_case_2_48_6, &postamble_2 
 #define test_case_2_48_6_stream_1 (NULL)
 #define test_case_2_48_6_stream_2 (NULL)
 
-static const char test_group_3[] = "Perform information transfer on one Stream";
+static const char test_group_3[] __attribute__ ((unused)) = "Perform information transfer on one Stream";
 
 static const char test_group_3_1[] = "Perform READ on one Stream";
 static const char sref_case_3_1[] = "POSIX 1003.1 2003/SUSv3 read(2p) reference page.";

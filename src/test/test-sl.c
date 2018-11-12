@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <stropts.h>
 #include <stdlib.h>

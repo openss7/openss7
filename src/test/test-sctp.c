@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* 
  *  This file is for testing the sctp_n driver.

@@ -161,7 +161,7 @@ static const char *shortname = "M3UA/SCTP";
 
 static char devname[256] = "/dev/streams/clone/sctp_t";
 
-static const int test_level = T_INET_SCTP;
+static const int test_level __attribute__ ((unused)) = T_INET_SCTP;
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -4153,7 +4153,8 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd,
+			icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -4173,7 +4174,8 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd,
+			icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -4265,13 +4267,13 @@ test_isastream(int child)
 
 	print_syscall(child, "isastream(2)--");
 	for (;;) {
-	if ((result = last_retval = isastream(test_fd[child])) == -1) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -4285,15 +4287,15 @@ test_poll(int child, const short events, short *revents, long ms)
 
 	print_poll(child, events);
 	for (;;) {
-	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_poll_value(child, last_retval, pfd.revents);
-	if (last_retval == 1 && revents)
-		*revents = pfd.revents;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
 		break;
 	}
 	return (__RESULT_SUCCESS);

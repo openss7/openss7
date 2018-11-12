@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-pipe.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-pipe.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2450,7 +2450,7 @@ struct test_stream test_0_1 = { &preamble_none, &test_case_0_1, &postamble_none 
  *  Open and Close 1 pipe.
  */
 static const char test_group_1[] = "Open and close a pipe.";
-static const char sref_group_1[] = "POSIX 1003.1 2004/SUSv3 open(2p) reference page, pipes.";
+static const char sref_group_1[] __attribute__ ((unused)) = "POSIX 1003.1 2004/SUSv3 open(2p) reference page, pipes.";
 
 #define tgrp_case_1_1 test_group_1
 #define sgrp_case_1_1 NULL
@@ -2477,7 +2477,7 @@ struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
 #define test_case_1_1_stream_2 (NULL)
 
 static const char test_group_2[] = "IOCTL on a pipe";
-static const char sref_group_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, pipe.";
+static const char sref_group_2[] __attribute__ ((unused)) = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, pipe.";
 
 static const char sref_case_2_1[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_LOOK.";
 

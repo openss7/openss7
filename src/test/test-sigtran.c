@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-sigtran.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-sigtran.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define TEST_M2PA   0
 #define TEST_X400   0

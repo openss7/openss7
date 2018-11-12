@@ -196,7 +196,7 @@ static const char *shortname = "SCTP";
 static char devname[256] = "/dev/streams/clone/sctp_t";
 static char modname[256] = "sctp_t";
 
-static const int test_level = T_INET_SCTP;
+static const int test_level __attribute__ ((unused)) = T_INET_SCTP;
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;

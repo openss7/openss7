@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-sockpath.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-sockpath.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #include <sys/types.h>
 #include <stropts.h>

@@ -1646,15 +1646,15 @@ test_ioctl(int child, int cmd, intptr_t arg)
 {
 	print_ioctl(child, cmd, arg);
 	for (;;) {
-	if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-		print_errno(child, (last_errno = errno));
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-		return (__RESULT_FAILURE);
-	}
+			return (__RESULT_FAILURE);
+		}
 		if (show && verbose > 3)
-	print_success_value(child, last_retval);
-	return (__RESULT_SUCCESS);
+			print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
 	}
 }
 
@@ -1778,13 +1778,13 @@ test_write(int child, const void *buf, size_t len)
 {
 	print_datcall(child, "write(2)------", len);
 	for (;;) {
-	if ((last_retval = write(test_fd[child], buf, len)) == -1) {
+		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1795,13 +1795,13 @@ test_writev(int child, const struct iovec *iov, int num)
 {
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
-	if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
+		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1812,13 +1812,13 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 {
 	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
 	for (;;) {
-	if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1829,13 +1829,13 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 {
 	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
 	for (;;) {
-	if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1846,13 +1846,13 @@ test_read(int child, void *buf, size_t count)
 {
 	print_datcall(child, "read(2)-------", count);
 	for (;;) {
-	if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1863,13 +1863,13 @@ test_readv(int child, const struct iovec *iov, int count)
 {
 	print_syscall(child, "readv(2)------");
 	for (;;) {
-	if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1882,24 +1882,24 @@ test_nonblock(int child)
 
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-	if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-	if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1912,24 +1912,24 @@ test_block(int child)
 
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-	if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-	if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1942,13 +1942,13 @@ test_isastream(int child)
 
 	print_syscall(child, "isastream(2)--");
 	for (;;) {
-	if ((result = last_retval = isastream(test_fd[child])) == -1) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_success_value(child, last_retval);
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1962,15 +1962,15 @@ test_poll(int child, const short events, short *revents, long ms)
 
 	print_poll(child, events);
 	for (;;) {
-	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
 			if (last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_poll_value(child, last_retval, pfd.revents);
-	if (last_retval == 1 && revents)
-		*revents = pfd.revents;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1982,17 +1982,17 @@ test_pipe(int child)
 	int fds[2];
 
 	for (;;) {
-	print_pipe(child);
-	if (pipe(fds) >= 0) {
-		test_fd[child + 0] = fds[0];
-		test_fd[child + 1] = fds[1];
-		print_success(child);
-		return (__RESULT_SUCCESS);
-	}
+		print_pipe(child);
+		if (pipe(fds) >= 0) {
+			test_fd[child + 0] = fds[0];
+			test_fd[child + 1] = fds[1];
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
 		if (last_errno == ERESTART)
 			continue;
-	print_errno(child, (last_errno = errno));
-	return (__RESULT_FAILURE);
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
 	}
 }
 
@@ -2028,14 +2028,14 @@ test_open(int child, const char *name, int flags)
 	int fd;
 
 	for (;;) {
-	if ((fd = test_fopen(child, name, flags)) >= 0) {
-		test_fd[child] = fd;
-		return (__RESULT_SUCCESS);
-	}
+		if ((fd = test_fopen(child, name, flags)) >= 0) {
+			test_fd[child] = fd;
+			return (__RESULT_SUCCESS);
+		}
 		if (last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
-	return (__RESULT_FAILURE);
+		return (__RESULT_FAILURE);
 	}
 }
 
@@ -2689,7 +2689,7 @@ struct test_stream test_1_7_2_rd = { NULL, &test_case_1_7_2_rd, NULL };
 #define test_case_1_7_2_stream_2 (NULL)
 
 static const char test_group_2[] = "IOCTL on a FIFO";
-static const char sref_group_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, FIFOs.";
+static const char sref_group_2[] __attribute__ ((unused)) = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, FIFOs.";
 
 static const char sref_case_2_1[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_LOOK.";
 

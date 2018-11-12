@@ -1976,15 +1976,15 @@ test_poll(int child, const short events, short *revents, long ms)
 
 	print_poll(child, events);
 	for (;;) {
-	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
-		print_errno(child, (last_errno = errno));
-		return (__RESULT_FAILURE);
-	}
-	print_poll_value(child, last_retval, pfd.revents);
-	if (last_retval == 1 && revents)
-		*revents = pfd.revents;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -1996,17 +1996,17 @@ test_pipe(int child)
 	int fds[2];
 
 	for (;;) {
-	print_pipe(child);
-	if (pipe(fds) >= 0) {
-		test_fd[child + 0] = fds[0];
-		test_fd[child + 1] = fds[1];
-		print_success(child);
-		return (__RESULT_SUCCESS);
-	}
+		print_pipe(child);
+		if (pipe(fds) >= 0) {
+			test_fd[child + 0] = fds[0];
+			test_fd[child + 1] = fds[1];
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
 		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
-	print_errno(child, (last_errno = errno));
-	return (__RESULT_FAILURE);
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
 	}
 }
 
@@ -2042,14 +2042,14 @@ test_open(int child, const char *name, int flags)
 	int fd;
 
 	for (;;) {
-	if ((fd = test_fopen(child, name, flags)) >= 0) {
-		test_fd[child] = fd;
-		return (__RESULT_SUCCESS);
-	}
+		if ((fd = test_fopen(child, name, flags)) >= 0) {
+			test_fd[child] = fd;
+			return (__RESULT_SUCCESS);
+		}
 		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
-	return (__RESULT_FAILURE);
+		return (__RESULT_FAILURE);
 	}
 }
 

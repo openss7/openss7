@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-timod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-timod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the

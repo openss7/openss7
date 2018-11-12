@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a ferry-clip PFMOD conformance test program for testing the OpenSS7

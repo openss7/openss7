@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-pf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-pf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  This is a ferry-clip PF conformance test program for testing the OpenSS7

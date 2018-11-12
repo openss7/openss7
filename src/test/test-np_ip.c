@@ -60,7 +60,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/test/test-np_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/test/test-np_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  *  Simple test program for NPI-IP streams.
