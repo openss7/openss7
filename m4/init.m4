@@ -53,12 +53,14 @@
 # _INIT_SCRIPTS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INIT_SCRIPTS], [dnl
-    AC_MSG_NOTICE([+--------------------+])
-    AC_MSG_NOTICE([| Init Script Checks |])
-    AC_MSG_NOTICE([+--------------------+])
     _INIT_SCRIPTS_ARGS
-    _INIT_SCRIPTS_SETUP
-    _INIT_SCRIPTS_OPTIONS
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+--------------------+])
+	AC_MSG_NOTICE([| Init Script Checks |])
+	AC_MSG_NOTICE([+--------------------+])
+	_INIT_SCRIPTS_SETUP
+	_INIT_SCRIPTS_OPTIONS
+    fi
     _INIT_SCRIPTS_OUTPUT
 ])# _INIT_SCRIPTS
 # =============================================================================
