@@ -58,13 +58,32 @@
 # directories.  If we cannot find them, assume that TCL interfaces cannot build.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TCL_EXTENSIONS], [dnl
-    AC_MSG_NOTICE([+-----------------------+])
-    AC_MSG_NOTICE([| TCL Extension Support |])
-    AC_MSG_NOTICE([+-----------------------+])
+    _TCL_EXTENSIONS_ARGS
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+-----------------------+])
+	AC_MSG_NOTICE([| TCL Extension Support |])
+	AC_MSG_NOTICE([+-----------------------+])
+	_TCL_EXTENSIONS_SETUP
+    fi
+    _TCL_EXTENSIONS_OUTPUT
+])# _TCL_EXTENSIONS
+# =============================================================================
+
+# =============================================================================
+# _TCL_EXTENSIONS_ARGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TCL_EXTENSIONS_ARGS], [dnl
     AC_ARG_WITH([tcl],
 	[AS_HELP_STRING([--with-tcl=HEADERS],
 	    [the TCL header directory @<:@default=search@:>@])],
 	[], [with_tcl=search])
+])# _TCL_EXTENSIONS_ARGS
+# =============================================================================
+
+# =============================================================================
+# _TCL_EXTENSIONS_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TCL_EXTENSIONS_SETUP], [dnl
     _BLD_FIND_DIR([tcl include directory], [tcl_cv_includedir], [
 	    ${includedir}
 	    ${rootdir}${oldincludedir}
@@ -103,7 +122,6 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
     else
 	tclincludedir="$tcl_cv_includedir"
     fi
-    AM_CONDITIONAL([WITH_TCL], [test :"${with_tcl:-search}" != :no])
     AC_SUBST([tclincludedir])dnl
     AC_CACHE_CHECK([for tcl cppflags], [tcl_cv_cppflags], [dnl
 	if test -n "$tclincludedir" ; then
@@ -114,7 +132,15 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
     ])
     TCL_CPPFLAGS="$tcl_cv_cppflags"
     AC_SUBST([TCL_CPPFLAGS])dnl
-])# _TCL_EXTENSIONS
+])# _TCL_EXTENSIONS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _TCL_EXTENSIONS_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TCL_EXTENSIONS_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_TCL], [test :"${with_tcl:-search}" != :no])
+])# _TCL_EXTENSIONS_OUTPUT
 # =============================================================================
 
 # =============================================================================
