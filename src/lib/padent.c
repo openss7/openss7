@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/padent.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/padent.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600

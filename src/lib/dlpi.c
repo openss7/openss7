@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* This file can be processed by doxygen(1). */
 

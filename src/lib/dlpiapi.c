@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/dlpiapi.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/dlpiapi.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM dlpiapi library.  It builds

@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/pthread.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/pthread.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /* This file can be processed with doxygen(1). */
 

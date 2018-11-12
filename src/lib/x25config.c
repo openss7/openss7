@@ -47,7 +47,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "src/lib/x25config.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
+static char const ident[] __attribute__ ((unused)) = "src/lib/x25config.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 struct link_data;
 struct config_ident;
