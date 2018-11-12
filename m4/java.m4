@@ -89,8 +89,8 @@ AC_DEFUN([_JAVA_SETUP], [dnl
 	CLASSPATH='${javaclasspath}'
     fi # java.m4 95
     AC_SUBST([javaclasspath])dnl
-    _JAVA_SETUP_GCJ
     if test :${enable_java:-yes} = :yes ; then
+	_JAVA_SETUP_GCJ
 	_JAVA_SETUP_JAR
     fi # java.m4 98
 ])# _JAVA_SETUP
