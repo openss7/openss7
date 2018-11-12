@@ -65,12 +65,14 @@
 # _INFO
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INFO], [dnl
-    AC_MSG_NOTICE([+-----------------------------+])
-    AC_MSG_NOTICE([| Info File Generation Checks |])
-    AC_MSG_NOTICE([+-----------------------------+])
     _INFO_ARGS
-    _INFO_SETUP
-    _INFO_OPTIONS
+    if test :${enable_docs:-yes} = :yes ; then
+	AC_MSG_NOTICE([+-----------------------------+])
+	AC_MSG_NOTICE([| Info File Generation Checks |])
+	AC_MSG_NOTICE([+-----------------------------+])
+	_INFO_SETUP
+	_INFO_OPTIONS
+    fi
     _INFO_OUTPUT
 ]) # _INFO
 # =============================================================================
