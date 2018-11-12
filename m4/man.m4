@@ -53,12 +53,14 @@
 # _MAN_CONVERSION
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION], [dnl
-    AC_MSG_NOTICE([+------------------------+])
-    AC_MSG_NOTICE([| Manual Page Generation |])
-    AC_MSG_NOTICE([+------------------------+])
     _MAN_CONVERSION_ARGS
-    _MAN_CONVERSION_SETUP
-    _MAN_CONVERSION_OPTIONS
+    if test :${enable_docs:-yes} = :yes ; then
+	AC_MSG_NOTICE([+------------------------+])
+	AC_MSG_NOTICE([| Manual Page Generation |])
+	AC_MSG_NOTICE([+------------------------+])
+	_MAN_CONVERSION_SETUP
+	_MAN_CONVERSION_OPTIONS
+    fi
     _MAN_CONVERSION_OUTPUT
 ])# _MAN_CONVERSION
 # =========================================================================
