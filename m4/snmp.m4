@@ -66,9 +66,28 @@
 # SNMP agents.  Without SNMP header files, the SNMP agent will no be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP], [dnl
-    _SNMP_HEADERS
-    _SNMP_LIBRARIES
+    _SNMP_ARGS
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+---------------------+])
+	AC_MSG_NOTICE([| SNMP Support Checks |])
+	AC_MSG_NOTICE([+---------------------+])
+	_SNMP_HEADERS
+	_SNMP_LIBRARIES
+    fi
+    _SNMP_OUTPUT
 ])# _SNMP
+# =============================================================================
+
+# =============================================================================
+# _SNMP_ARGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SNMP_ARGS], [dnl
+    # allow the user to specify the header file location.
+    AC_ARG_WITH([snmp],
+	[AS_HELP_STRING([--with-snmp=HEADERS],
+	    [SNMP header directory @<:@default=search@:>@])],
+	[], [with_snmp=search])
+])# _SNMP_ARGS
 # =============================================================================
 
 AC_DEFUN([_SNMP_MSG_WARN],
@@ -126,11 +145,6 @@ EOF])dnl
 # to the CPPFLAGS before testing.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_HEADERS], [dnl
-    # allow the user to specify the header file location.
-    AC_ARG_WITH([snmp],
-	[AS_HELP_STRING([--with-snmp=HEADERS],
-	    [SNMP header directory @<:@default=search@:>@])],
-	[], [with_snmp=search])
     _BLD_FIND_DIR([snmp include directory], [snmp_cv_includedir], [
 	    ${includedir}
 	    ${rootdir}${oldincludedir}
@@ -172,7 +186,6 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
     else
 	snmpincludedir="$snmp_cv_includedir"
     fi
-    AM_CONDITIONAL([WITH_SNMP], [test :"${with_snmp:-search}" != :no])
     AC_SUBST([snmpincludedir])dnl
     AC_CACHE_CHECK([for snmp cppflags], [snmp_cv_cppflags], [dnl
 	if test -n "$snmpincludedir" ; then
@@ -281,7 +294,7 @@ EOF])dnl
 # _SNMP_LIBRARIES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_LIBRARIES], [dnl
-    AC_REQUIRE([_PERL_LIBRARIES])
+dnl AC_REQUIRE([_PERL_LIBRARIES])
     AC_CACHE_CHECK([for snmp libs], [snmp_cv_libs], [dnl
 	AC_MSG_RESULT([checking])
 	snmp_save_LIBS="$LIBS"
@@ -367,6 +380,14 @@ int deny_severity = 0;
     SNMP_LDFLAGS="$snmp_cv_ldflags"
     AC_SUBST([SNMP_LDFLAGS])dnl
 ])# _SNMP_LIBRARIES
+# =============================================================================
+
+# =============================================================================
+# _SNMP_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SNMP_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_SNMP], [test :"${with_snmp:-search}" != :no])
+])# _SNMP_OUTPUT
 # =============================================================================
 
 # =============================================================================
