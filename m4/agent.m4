@@ -58,6 +58,16 @@
 # _AGENT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AGENT], [dnl
+    _AGENT_EXTENSIONS
+])# _AGENT
+# =============================================================================
+
+# =============================================================================
+# _AGENT_EXTENSIONS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_AGENT_EXTENSIONS], [dnl
+    _AGENT_EXTENSIONS_ARGS
+    if test :${enable_tools:-yes} = :yes ; then
 dnl
 dnl Building SNMP agents requires the presence of perl libraries.  Note that
 dnl only fedora, redhat and other broken packaging of net-snmp needs perl
@@ -65,16 +75,33 @@ dnl libraries.  The Debian 4.0 (Etch) packaging have proper load dependencies
 dnl between libraries, so loading the SNMP agent libraries properly loads
 dnl dependent libraries.
 dnl
-    AC_REQUIRE([_PERL_LIBRARIES])
+dnl	AC_REQUIRE([_PERL_LIBRARIES])
 dnl
 dnl Building SNMP agents requires the presence of snmp libraries.
 dnl
-    AC_REQUIRE([_SNMP])
-    AC_MSG_NOTICE([+-------------------+])
-    AC_MSG_NOTICE([| SNMP Agent Checks |])
-    AC_MSG_NOTICE([+-------------------+])
-    _AGENT_EXTENSIONS
-])# _AGENT
+	AC_REQUIRE([_SNMP])
+
+	AC_MSG_NOTICE([+-------------------+])
+	AC_MSG_NOTICE([| SNMP Agent Checks |])
+	AC_MSG_NOTICE([+-------------------+])
+	_AGENT_EXTENSIONS_SETUP
+    fi
+    _AGENT_EXTENSIONS_OUTPUT
+])# _AGENT_EXTENSIONS
+# =============================================================================
+
+# =============================================================================
+# _AGENT_EXTENSIONS_ARGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_AGENT_EXTENSIONS_ARGS], [dnl
+    # It is not necessary to compile the SNMP agents.  This option
+    # decides whether to do so or not.
+    AC_ARG_WITH([snmp-agent],
+	[AS_HELP_STRING([--with-snmp-agent=HEADERS, --without-snmp-agent],
+	    [SNMP agent header directory @<:@default=$INCLUDEDIR@:>@])]
+	[AS_HELP_STRING([--without-snmp-agent],
+	    [suppress SNMP agents @<:@default=enabled@:>@])])
+])# _AGENT_EXTENSIONS_ARGS
 # =============================================================================
 
 AC_DEFUN([_AGENT_MSG_WARN],
@@ -115,17 +142,9 @@ EOF])dnl
 ])
 
 # =============================================================================
-# _AGENT_EXTENSIONS
+# _AGENT_EXTENSIONS_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_AGENT_EXTENSIONS], [dnl
-    # It is not necessary to compile the SNMP agents.  This option
-    # decides whether to do so or not.
-    AC_ARG_WITH([snmp-agent],
-	[AS_HELP_STRING([--with-snmp-agent=HEADERS, --without-snmp-agent],
-	    [SNMP agent header directory @<:@default=$INCLUDEDIR@:>@])]
-	[AS_HELP_STRING([--without-snmp-agent],
-	    [suppress SNMP agents @<:@default=enabled@:>@])])
-    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${with_snmp_agent:-yes}" != :no])dnl
+AC_DEFUN([_AGENT_EXTENSIONS_SETUP], [dnl
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [],
 	[_AGENT_MSG_WARN([ucd-snmp/ucd-snmp-config.h])])
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [],
@@ -176,7 +195,15 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 #include <ucd-snmp/default_store.h>
 #include <ucd-snmp/snmp_alarm.h>
 ])
-])# _AGENT_EXTENSIONS
+])# _AGENT_EXTENSIONS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _AGENT_EXTENSIONS_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_AGENT_EXTENSIONS_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${with_snmp_agent:-yes}" != :no])dnl
+])# _AGENT_EXTENSIONS_OUTPUT
 # =============================================================================
 
 # =============================================================================
