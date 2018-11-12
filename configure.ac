@@ -53,8 +53,8 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.69)
-AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([1.1 (2015-01-24 12:41:59)])
+AC_INIT([OpenSS7],[1.1.8],[bugs@openss7.org],[openss7])
+AC_REVISION([1.1.8])
 
 AC_LANG_DEFINES_PROVIDED
 
@@ -104,47 +104,59 @@ if test :${RPM_OPT_FLAGS:+set} = :set; then
     USER_CXXFLAGS=${USER_CXXFLAGS:+$USER_CXXFLAGS }$RPM_OPT_FLAGS
 fi
 
+AM_PROG_AS
+AM_PROG_AR
+AC_PROG_AWK
+AC_PROG_INSTALL
+AM_PROG_INSTALL_STRIP
+AC_ARG_VAR([LD], [Linker loader command])
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_MKDIR_P
+AM_PROG_LEX
+AC_PROG_YACC
+
+LT_PREREQ([2.4.2])
+LT_INIT([dlopen])
+LT_PATH_LD
+dnl LT_LANG([C++])
+dnl LT_LANG([Java])
+AC_SUBST([LIBTOOL_DEPS])
+AM_GNU_GETTEXT_VERSION([0.19.8])
+AM_GNU_GETTEXT([external])
+
 m4_include([m4/swig.m4])
 dnl
 dnl Checks for programs.
 dnl
-AM_PROG_AS
-AM_PROG_AR
-AC_PROG_AWK
-AC_PROG_CXX([g++3 g++])
 AC_PROG_CC
 AC_PROG_CPP
 AM_PROG_CC_C_O
-AC_PROG_INSTALL
-AM_PROG_INSTALL_STRIP
-AC_ARG_VAR([LD], [Linker loader command])
-LT_PATH_LD
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_MKDIR_P
-AC_PROG_LEX
-AC_PROG_YACC
 AC_PROG_SWIG
 
 m4_include([m4/gcj.m4])
 m4_include([m4/java.m4])
+
 dnl
 dnl older systems that have gcj3 and gcj should use the newer version
 dnl
-AC_PROG_GCJ
-AM_PROG_GCJ
-AC_PROG_GCJH
-AC_PROG_JAVAC
-AC_PROG_JAVAH
-AC_PROG_JAVA
-
-LT_PREREQ([2.4.2])
-LT_INIT([dlopen])
-LT_LANG([C++])
-LT_LANG([Java])
-AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.18.2])
-AM_GNU_GETTEXT([external])
+if test :${enable_java:-yes} = :yes ; then
+    AC_PROG_CXX([g++3 g++])
+    AC_PROG_GCJ
+    AM_PROG_GCJ
+    AC_PROG_GCJH
+    AC_PROG_JAVAC
+    AC_PROG_JAVAH
+    AC_PROG_JAVA
+    AM_CONDITIONAL([am__fastdepJAVAC], [/bin/true])
+else
+    AM_CONDITIONAL([am__fastdepCXX],   [/bin/false])
+    AM_CONDITIONAL([am__fastdepGCJ],   [/bin/false])
+    AM_CONDITIONAL([am__fastdepJAVAC], [/bin/false])
+    AM_CONDITIONAL([WITH_GCJDBTOOL],   [/bin/false])
+    AM_CONDITIONAL([WITH_LIBGCJ],      [/bin/false])
+    AM_CONDITIONAL([WITH_JAVA],        [/bin/false])
+fi
 
 dnl
 dnl Checks for libraries.
