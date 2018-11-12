@@ -60,7 +60,6 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PERL], [dnl
     _PERL_EXTENSIONS
-    _PERL_LIBRARIES
 ])# _PERL
 # =============================================================================
 
@@ -74,13 +73,33 @@ AC_DEFUN([_PERL], [dnl
 # build.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PERL_EXTENSIONS], [dnl
-    AC_MSG_NOTICE([+------------------------+])
-    AC_MSG_NOTICE([| Perl Extension Support |])
-    AC_MSG_NOTICE([+------------------------+])
+    _PERL_EXTENSIONS_ARGS
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+------------------------+])
+	AC_MSG_NOTICE([| Perl Extension Support |])
+	AC_MSG_NOTICE([+------------------------+])
+	_PERL_EXTENSIONS_SETUP
+	_PERL_LIBRARIES
+    fi
+    _PERL_EXTENSIONS_OUTPUT
+])# _PERL_EXTENSIONS
+# =============================================================================
+
+# =============================================================================
+# _PERL_EXTENSIONS_ARGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_PERL_EXTENSIONS_ARGS], [dnl
     AC_ARG_WITH([perl],
 	[AS_HELP_STRING([--with-perl=@<:@HEADERS@:>@],
 	    [PERL header directory @<:@default=search@:>@])],
 	[], [with_perl=search])
+])# _PERL_EXTENSIONS_ARGS
+# =============================================================================
+
+# =============================================================================
+# _PERL_EXTENSIONS_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_PERL_EXTENSIONS_SETUP], [dnl
     _BLD_FIND_DIR([perl headers], [perl_cv_includedir], [
 	    ${libdir}/perl5
 	    ${libdir}/perl
@@ -119,7 +138,6 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
     else
 	perlincludedir="$perl_cv_includedir"
     fi
-    AM_CONDITIONAL([WITH_PERL], [test :"${with_perl:-search}" != :no])
     AC_SUBST([perlincludedir])dnl
     AC_CACHE_CHECK([for perl cppflags], [perl_cv_cppflags], [dnl
 	if test -n "$perlincludedir" ; then
@@ -130,7 +148,15 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
     ])
     PERL_CPPFLAGS="$perl_cv_cppflags"
     AC_SUBST([PERL_CPPFLAGS])
-])# _PERL_EXTENSIONS
+])# _PERL_EXTENSIONS_SETUP
+# =============================================================================
+
+# =============================================================================
+# _PERL_EXTENSIONS_OUTPUT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_PERL_EXTENSIONS_OUTPUT], [dnl
+    AM_CONDITIONAL([WITH_PERL], [test :"${with_perl:-search}" != :no])
+])# _PERL_EXTENSIONS_OUTPUT
 # =============================================================================
 
 AC_DEFUN([_PERL_LIB_ERROR],
