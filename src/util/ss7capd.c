@@ -92,14 +92,14 @@ int cap_fd = -1;
 
 int link_state = 0;
 
-char outfile[256] = "";
-char errfile[256] = "";
+char outfile[127] = "";
+char errfile[127] = "";
 char outpath[256] = "";
 char errpath[256] = "";
-char lnkname[256] = "";
-char cfgfile[256] = "";
-char outpdir[256] = "/var/log/ss7capd";
-char devname[256] = "/dev/streams/clone/x400p-sl";
+char lnkname[64] = "";
+char cfgfile[127] = "";
+char outpdir[127] = "/var/log/ss7capd";
+char devname[127] = "/dev/streams/clone/x400p-sl";
 
 #define BUFSIZE 512
 
@@ -404,7 +404,7 @@ ftimestamp(void)
 void
 output_header(void)
 {
-	char buf[128] = "";
+	char buf[256] = "";
 	struct utsname uts;
 
 	ftimestamp();

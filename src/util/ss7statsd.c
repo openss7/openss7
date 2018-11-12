@@ -150,23 +150,23 @@ long interval = 300000;			/* 5 minutes in milliseconds. */
 #define SS7STATSD_DEFAULT_EVTISUP "/dev/streams/isup/events"
 #endif				/* SS7STATSD_DEFAULT_EVTISUP */
 
-char outpdir[MAX_PATH_LENGTH] = "";
-char outfile[MAX_PATH_LENGTH] = "";
-char errfile[MAX_PATH_LENGTH] = "";
-char cfgfile[MAX_PATH_LENGTH] = "";
+char outpdir[127] = "";
+char outfile[127] = "";
+char errfile[127] = "";
+char cfgfile[127] = "";
 char outpath[MAX_PATH_LENGTH] = "";
 char errpath[MAX_PATH_LENGTH] = "";
 
-char devslmx[MAX_PATH_LENGTH] = "";
-char evtslmx[MAX_PATH_LENGTH] = "";
-char devmtpx[MAX_PATH_LENGTH] = "";
-char evtmtpx[MAX_PATH_LENGTH] = "";
-char devsccp[MAX_PATH_LENGTH] = "";
-char evtsccp[MAX_PATH_LENGTH] = "";
-char devtcap[MAX_PATH_LENGTH] = "";
-char evttcap[MAX_PATH_LENGTH] = "";
-char devisup[MAX_PATH_LENGTH] = "";
-char evtisup[MAX_PATH_LENGTH] = "";
+char devslmx[64] = "";
+char evtslmx[64] = "";
+char devmtpx[64] = "";
+char evtmtpx[64] = "";
+char devsccp[64] = "";
+char evtsccp[64] = "";
+char devtcap[64] = "";
+char evttcap[64] = "";
+char devisup[64] = "";
+char evtisup[64] = "";
 
 int slmx_fd = -1;			/* signalling link multiplexer */
 int mtpx_fd = -1;			/* message transfer part */
@@ -548,7 +548,7 @@ ftimestamp(void)
 void
 stats_header(void)
 {
-	char buf[128] = "";
+	char buf[256] = "";
 	struct utsname uts;
 
 	ftimestamp();
@@ -1524,7 +1524,7 @@ main(int argc, char *argv[])
 				strncpy(evtslmx, SS7STATSD_DEFAULT_EVTSLMX, sizeof(evtslmx));
 			}
 			if (evtslmx[0] == '\0')
-				strncpy(evtslmx, devslmx, sizeof(devslmx));
+				strncpy(evtslmx, devslmx, sizeof(evtslmx));
 			break;
 		case 'M':	/* -M, --mtpx [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
@@ -1539,7 +1539,7 @@ main(int argc, char *argv[])
 				strncpy(evtmtpx, SS7STATSD_DEFAULT_EVTMTPX, sizeof(evtmtpx));
 			}
 			if (evtmtpx[0] == '\0')
-				strncpy(evtmtpx, devmtpx, sizeof(devmtpx));
+				strncpy(evtmtpx, devmtpx, sizeof(evtmtpx));
 			break;
 		case 'S':	/* -S, --sccp [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
@@ -1554,7 +1554,7 @@ main(int argc, char *argv[])
 				strncpy(evtsccp, SS7STATSD_DEFAULT_EVTSCCP, sizeof(evtsccp));
 			}
 			if (evtsccp[0] == '\0')
-				strncpy(evtsccp, devsccp, sizeof(devsccp));
+				strncpy(evtsccp, devsccp, sizeof(evtsccp));
 			break;
 		case 'T':	/* -T, --tcap [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
@@ -1569,7 +1569,7 @@ main(int argc, char *argv[])
 				strncpy(evttcap, SS7STATSD_DEFAULT_EVTTCAP, sizeof(evttcap));
 			}
 			if (evttcap[0] == '\0')
-				strncpy(evttcap, devtcap, sizeof(devtcap));
+				strncpy(evttcap, devtcap, sizeof(evttcap));
 			break;
 		case 'I':	/* -I, --isup [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
@@ -1584,7 +1584,7 @@ main(int argc, char *argv[])
 				strncpy(evtisup, SS7STATSD_DEFAULT_EVTISUP, sizeof(evtisup));
 			}
 			if (evtisup[0] == '\0')
-				strncpy(evtisup, devisup, sizeof(devisup));
+				strncpy(evtisup, devisup, sizeof(evtisup));
 			break;
 		case 'q':	/* -q, --quiet */
 			verbose -= verbose > 1 ? 1 : verbose;

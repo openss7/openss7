@@ -90,16 +90,16 @@ static int output = 1;			/* default normal output */
 
 int strlog_fd = -1;
 
-char outfile[256] = "";
-char errfile[256] = "";
+char outfile[127] = "";
+char errfile[127] = "";
 char outpath[256] = "";
 char errpath[256] = "";
-char basname[256] = "";
-char cfgfile[256] = "";
-char outpdir[256] = "/var/log/streams";
-char devname[256] = "";
-char mailuid[256] = "";
-char pidfile[256] = "";
+char basname[64] = "";
+char cfgfile[127] = "";
+char outpdir[127] = "/var/log/streams";
+char devname[127] = "";
+char mailuid[127] = "";
+char pidfile[127] = "";
 
 /* search path for log devices */
 static const char *logdevices[] = {
@@ -633,7 +633,7 @@ strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 				*tp = '\0';
 				break;
 			}
-			if (tp == '\0')
+			if (*tp == '\0')
 				break;
 			if (tp > timebuf + sizeof(timebuf) - 1) {
 				*tp = '\0';
@@ -1169,29 +1169,29 @@ main(int argc, char *argv[])
 		case 'a':	/* -a, --admin MAILID */
 			if (debug)
 				fprintf(stderr, "%s: setting mail id to %s\n", argv[0], optarg);
-			strncpy(mailuid, optarg, 256);
+			strncpy(mailuid, optarg, 127);
 			break;
 		case 'd':	/* -d, --directory DIRECTORY */
-			strncpy(outpdir, optarg, 256);
+			strncpy(outpdir, optarg, 127);
 			break;
 		case 'b':	/* -b, --basename BASNAME */
-			strncpy(basname, optarg, 256);
+			strncpy(basname, optarg, 64);
 			break;
 		case 'o':	/* -o, --outfile OUTFILE */
-			strncpy(outfile, optarg, 256);
+			strncpy(outfile, optarg, 127);
 			break;
 		case 'e':	/* -e, --errfile ERRFILE */
-			strncpy(errfile, optarg, 256);
+			strncpy(errfile, optarg, 127);
 			break;
 		case 'p':	/* -p, --pidfile PIDFILE */
 			if (debug)
 				fprintf(stderr, "%s: setting pid file to %s\n", argv[0], optarg);
-			strncpy(pidfile, optarg, 256);
+			strncpy(pidfile, optarg, 127);
 			break;
 		case 'l':	/* -l, --logdev DEVNAME */
 			if (debug)
 				fprintf(stderr, "%s: setting device name to %s\n", argv[0], optarg);
-			strncpy(devname, optarg, 256);
+			strncpy(devname, optarg, 127);
 			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)

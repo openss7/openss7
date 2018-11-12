@@ -83,13 +83,13 @@ static int logging = 1;
 static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 
-char outfile[256] = "";
-char errfile[256] = "";
+char outfile[127] = "";
+char errfile[127] = "";
 char outpath[256] = "";
 char errpath[256] = "";
-char basname[256] = "";
-char outpdir[256] = "/var/log/streams";
-char devname[256] = "";
+char basname[64] = "";
+char outpdir[127] = "/var/log/streams";
+char devname[127] = "";
 
 static void
 copying(int argc, char *argv[])
