@@ -62,12 +62,14 @@
 # _PAPERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAPERS], [dnl
-    AC_MSG_NOTICE([+-------------------------------+])
-    AC_MSG_NOTICE([| Latex Paper Generation Checks |])
-    AC_MSG_NOTICE([+-------------------------------+])
     _PAPERS_ARGS
-    _PAPERS_SETUP
-    _PAPERS_OPTIONS
+    if test :${enable_docs:-yes} = :yes ; then
+	AC_MSG_NOTICE([+-------------------------------+])
+	AC_MSG_NOTICE([| Latex Paper Generation Checks |])
+	AC_MSG_NOTICE([+-------------------------------+])
+	_PAPERS_SETUP
+	_PAPERS_OPTIONS
+    fi
     _PAPERS_OUTPUT
 ]) # _PAPERS
 # =============================================================================
