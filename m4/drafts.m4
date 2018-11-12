@@ -62,12 +62,14 @@
 # _DRAFTS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DRAFTS], [dnl
-    AC_MSG_NOTICE([+------------------------------+])
-    AC_MSG_NOTICE([| IETF Draft Generation Checks |])
-    AC_MSG_NOTICE([+------------------------------+])
     _DRAFTS_ARGS
-    _DRAFTS_SETUP
-    _DRAFTS_OPTIONS
+    if test :${enable_docs:-yes} = :yes ; then
+	AC_MSG_NOTICE([+------------------------------+])
+	AC_MSG_NOTICE([| IETF Draft Generation Checks |])
+	AC_MSG_NOTICE([+------------------------------+])
+	_DRAFTS_SETUP
+	_DRAFTS_OPTIONS
+    fi
     _DRAFTS_OUTPUT
 ]) # _DRAFTS
 # =============================================================================
