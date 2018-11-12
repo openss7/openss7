@@ -53,11 +53,13 @@
 # _SSL
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SSL], [dnl
-    AC_MSG_NOTICE([+------------------+])
-    AC_MSG_NOTICE([| SSL Certificates |])
-    AC_MSG_NOTICE([+------------------+])
     _SSL_OPTIONS
-    _SSL_SETUP
+    if test :${enable_tools:-yes} = :yes ; then
+	AC_MSG_NOTICE([+------------------+])
+	AC_MSG_NOTICE([| SSL Certificates |])
+	AC_MSG_NOTICE([+------------------+])
+	_SSL_SETUP
+    fi
     _SSL_OUTPUT
 ])# _SSL
 # =============================================================================
