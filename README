@@ -1,6 +1,6 @@
-OpenSS7 -- read me first file.  2017-03-04
+OpenSS7 -- read me first file.  2018-10-30
 $Id: README,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2017  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2018  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.8.8.20150415 was released under AGPLv3 2017-03-04.
+Package openss7-1.1.8.8.20150415 was released under AGPLv3 2018-10-30.
 
 This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,7 +50,7 @@ should build and install for other architectures as well.
 Release
 -------
 
-This is the 'openss7-1.1.8.8.20150415' package, released 2017-03-04.
+This is the 'openss7-1.1.8.8.20150415' package, released 2018-10-30.
 This '1.1.8.8.20150415' release, and the latest version, can be obtained
 from the download area (http://www.openss7.org/download.html) of The
 OpenSS7 Project website using a command such as:
