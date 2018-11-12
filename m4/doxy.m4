@@ -141,7 +141,6 @@ AC_DEFUN([_DOXY_SETUP], [dnl
 	       [doxygen command. @<:@default=doxygen@:>@])
     _BLD_PATH_PROG([DOXYGEN], [doxygen], [${am_missing2_run}doxygen], [$tmp_PATH], [dnl
 	AC_MSG_WARN([Cannot find doxygen program in PATH.])])
-    AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
 # =============================================================================
 
@@ -176,9 +175,12 @@ dnl    ])
 # _DOXY
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY], [dnl
-    _DOXY_OPTIONS
-    _DOXY_SETUP
-    _DOXY_OUTPUT
+    if test :${enable_tools:-yes} = :yes ; then
+	_DOXY_OPTIONS
+	_DOXY_SETUP
+	_DOXY_OUTPUT
+    fi
+    AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY
 # =============================================================================
 
