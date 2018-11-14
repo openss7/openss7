@@ -3710,11 +3710,13 @@ EXTRA_DIST			+= cache/arch-os-i686-config.cache \
 				   cache/ubuntu-lucid-amd64-config.cache \
 				   cache/ubuntu-lucid-x86_64-config.cache \
 				   configs/configure.arch \
+				   configs/configure.arch.lts316 \
 				   configs/configure.debian-squeeze \
 				   configs/configure.debian-testing \
 				   configs/configure.debian-wheezy \
 				   configs/configure.fc2 \
 				   configs/configure.generic \
+				   configs/configure.rhel7 \
 				   configs/configure.slackware \
 				   configs/configure.ubuntu-lucid \
 				   configs/sh.arch
