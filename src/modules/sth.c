@@ -6724,12 +6724,12 @@ file_fiogetown(struct file *file, struct stdata *sd, unsigned long arg)
 			pid_t owner;
 
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
-			qread_lock(&file->f_owner.lock);
+			read_lock(&file->f_owner.lock);
 			if (file->f_owner.pid_type == PIDTYPE_PGID)
 				owner = pid_nr(file->f_owner.pid);
 			else
 				owner = 0;
-			qread_unlock(&file->f_owner.lock);
+			read_unlock(&file->f_owner.lock);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			owner = file->f_owner.pid;
 			owner = (owner < 0) ? -owner : 0;
