@@ -33,7 +33,6 @@ config.cache
 config.h
 config.h.in
 Config.master
-configs/configure.arch.lts316
 config.site
 config.status
 configure

@@ -1,0 +1,69 @@
+#!/bin/bash
+set -x
+where=`dirname $0`
+srcdir=`(cd $where/..; pwd)`
+
+# need --enable-maintainer-mode to be able to run in place
+#      must be disabled to build an installable package
+
+# *FLAGS are what Arch Linux makepkg uses with the exception
+#      that -Wall -Werror is added
+
+case "`uname -m`" in
+	i686)
+		CPPFLAGS="-D_FORTIFY_SOURCE"
+		CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+		CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro"
+		DEBUG_CFLAGS="-g -fvar-tracking-assignments"
+		DEBUG_CXXFLAGS="-g -fvar-tracking-assignments"
+	;;
+	x86_64)
+		CPPFLAGS="-D_FORTIFY_SOURCE=2"
+		CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+		CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
+		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro"
+		DEBUG_CFLAGS="-g -fvar-tracking-assignments"
+		DEBUG_CXXFLAGS="-g -fvar-tracking-assignments"
+	;;
+esac
+
+_kvv="$(pacman -Si linux-lts316|awk '/^Version/{print$3}')"
+_kvr="${_kvv:+${_kvv}-lts316}"
+_kvx="$(echo $_kvr|sed -e 's,\.[0-9][0-9]*-.*,,')"
+
+# use native tools for arch
+$srcdir/configure \
+	GCC="gcc" \
+	KCC="gcc-5" \
+	WFLAGS='-Wno-unused-const-variable -Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+	CPPFLAGS="$CPPFLAGS" \
+	CFLAGS="-Wall -Werror $WFLAGS $CFLAGS" \
+	CXXFLAGS="-Wall -Werror $WFLAGS $CXXFLAGS" \
+	LDFLAGS="$LDFLAGS" \
+	DEBUG_CFLAGS="$DEBUG_CFLAGS" \
+	DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS" \
+	MODPOST_DEBUG=5 \
+	MODPOST_VERBOSE=5 \
+	syslibdir=/usr/lib \
+	sysbindir=/usr/bin \
+	syssbindir=/usr/bin \
+	--prefix=/usr \
+	--libdir=/usr/lib \
+	--sysconfdir=/etc \
+	--bindir=/usr/bin \
+	--sbindir=/usr/bin \
+	--libexecdir=/usr/lib \
+	--docdir=/usr/share/doc/openss7 \
+	--disable-static \
+	--disable-sysvinit \
+	--disable-k-abi-support \
+	--disable-k-weak-symbols \
+	--enable-k-weak-modules \
+	--disable-specfs-lock \
+	--with-k-release=$_kvr \
+	--with-k-optimize=speed \
+	--with-optimize=speed \
+        --with-gnu-ld \
+	$* \
+	2>&1 | tee configure.log
