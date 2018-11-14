@@ -1424,7 +1424,11 @@ struct net_device_ops ip2xinet_dev_ops =
     .ndo_start_xmit = ip2xinet_tx,
     .ndo_do_ioctl = ip2xinet_ioctl,
     .ndo_get_stats = ip2xinet_stats,
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_OPS_NDO_CHANGE_MTU_RH74
+    .ndo_change_mtu_rh74 = ip2xinet_change_mtu,
+#else
     .ndo_change_mtu = ip2xinet_change_mtu,
+#endif
 };
 #endif
 
