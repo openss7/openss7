@@ -1017,16 +1017,13 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* RHEL7 uses special qrwlock_t */
-#ifdef HAVE_KTYPE_QRWLOCK_T
-#undef rwlock_t
-#define rwlock_t qrwlock_t
-#undef read_lock
-#define read_lock qread_lock
-#undef read_unlock
-#define read_unlock qread_unlock
+#ifndef HAVE_KTYPE_QRWLOCK_T
+#define qrwlock_t rwlock_t
+#define qread_lock read_lock
+#define qread_unlock read_unlock
 #endif
 
-extern rwlock_t tasklist_lock;
+extern qrwlock_t tasklist_lock;
 
 #ifdef HAVE_SESSION_OF_PGRP_ADDR
 #ifdef HAVE_KFUNC_SESSION_OF_PGRP_STRUCT_ARG
@@ -1043,9 +1040,9 @@ pgrp_session(pid_t pgrp)
 #ifdef HAVE_KFUNC_SESSION_OF_PGRP_STRUCT_ARG
 	pid_t pid;
 
-	read_lock(&tasklist_lock);
+	qread_lock(&tasklist_lock);
 	pid = pid_nr(session_of_pgrp(find_pid(pgrp)));
-	read_unlock(&tasklist_lock);
+	qread_unlock(&tasklist_lock);
 	return (pid);
 #else
 	return (session_of_pgrp(pgrp));
@@ -1884,7 +1881,7 @@ str_find_thread_group_leader(struct task_struct *procp)
 	struct task_struct *p = procp;
 
 	if (!thread_group_leader(p)) {
-		read_lock(&tasklist_lock);
+		qread_lock(&tasklist_lock);
 		do {
 			p = next_thread(p);
 			if (p == procp) {
@@ -1892,7 +1889,7 @@ str_find_thread_group_leader(struct task_struct *procp)
 				break;
 			}
 		} while (!thread_group_leader(p));
-		read_unlock(&tasklist_lock);
+		qread_unlock(&tasklist_lock);
 	}
 	return ((struct task_struct *) p);
 }
@@ -1918,7 +1915,7 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 #ifdef WITH_KO_MODULES
 	spin_lock(&files->file_lock);
 #else
-	read_lock(&files->file_lock);
+	qread_lock(&files->file_lock);
 #endif
 	max = files->max_fdset;
 	for (fd = 0; fd <= max && files->fd[fd] != file; fd++) ;
@@ -1927,7 +1924,7 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 #ifdef WITH_KO_MODULES
 	spin_unlock(&files->file_lock);
 #else
-	read_unlock(&files->file_lock);
+	qread_unlock(&files->file_lock);
 #endif
 #else
 #ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
@@ -6727,12 +6724,12 @@ file_fiogetown(struct file *file, struct stdata *sd, unsigned long arg)
 			pid_t owner;
 
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
-			read_lock(&file->f_owner.lock);
+			qread_lock(&file->f_owner.lock);
 			if (file->f_owner.pid_type == PIDTYPE_PGID)
 				owner = pid_nr(file->f_owner.pid);
 			else
 				owner = 0;
-			read_unlock(&file->f_owner.lock);
+			qread_unlock(&file->f_owner.lock);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			owner = file->f_owner.pid;
 			owner = (owner < 0) ? -owner : 0;
