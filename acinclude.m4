@@ -1248,6 +1248,7 @@ dnl----------------------------------------------------------------------------
 	struct net_device.hard_header,
 	struct net_device.rebuild_header,
 	struct net_device.trans_start,
+	struct net_device_ops.ndo_change_mtu_rh74,
 	struct netns_ipv4.sysctl_ip_default_ttl,
 	struct netns_ipv4.sysctl_ip_nonlocal_bind,
 	struct netns_ipv4.sysctl_ip_dynaddr,
