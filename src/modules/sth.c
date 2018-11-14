@@ -1016,6 +1016,16 @@ strcopyin(const void __user *from, void *to, size_t len)
 #define pid_nr(_x_) _x_
 #endif
 
+/* RHEL7 uses special qrwlock_t */
+#ifdef HAVE_KTYPE_QRWLOCK_T
+#undef rwlock_t
+#define rwlock_t qrwlock_t
+#undef read_lock
+#define read_lock qread_lock
+#undef read_unlock
+#define read_unlock qread_unlock
+#endif
+
 extern rwlock_t tasklist_lock;
 
 #ifdef HAVE_SESSION_OF_PGRP_ADDR
