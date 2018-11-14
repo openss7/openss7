@@ -1132,7 +1132,8 @@ dnl----------------------------------------------------------------------------
 	struct sockaddr_storage,
 	struct inet_protocol,
 	struct net_protocol,
-	struct net_device_ops], [:], [:], [
+	struct net_device_ops,
+	qrwlock_t], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
