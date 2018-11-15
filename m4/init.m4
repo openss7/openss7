@@ -174,21 +174,21 @@ dnl This is where we need to add specfs as a early-boot module load.
 dnl
     disable_systemd=
     _BLD_FIND_DIR([for modprobe.d directory], [init_cv_modprobed], [
-	    ${libdir}/modprobe.d
-	    ${syslibdir}/modprobe.d
-	    ${sysconfdir}/modprobe.d], [], [no])
+	    ${rootdir}/usr/lib/modprobe.d
+	    ${rootdir}/lib/modprobe.d
+	    ${rootdir}/etc/modprobe.d], [], [no])
     _BLD_FIND_DIR([for systemd modules-load.d directory], [init_cv_modulesloadd], [
-	    ${libdir}/modules-load.d
-	    ${syslibdir}/modules-load.d
-	    ${sysconfdir}/modules-load.d], [], [no])
+	    ${rootdir}/usr/lib/modules-load.d
+	    ${rootdir}/lib/modules-load.d
+	    ${rootdir}/etc/modules-load.d], [], [no])
     _BLD_FIND_DIR([for systemd sysctl.d directory], [init_cv_sysctld], [
-	    ${libdir}/sysctl.d
-	    ${syslibdir}/sysctl.d
-	    ${sysconfdir}/sysctl.d], [], [no])
+	    ${rootdir}/usr/lib/sysctl.d
+	    ${rootdir}/lib/sysctl.d
+	    ${rootdir}/etc/sysctl.d], [], [no])
     _BLD_FIND_DIR([for systemd directory], [init_cv_systemd_dir], [
-	    ${libdir}/systemd
-	    ${syslibdir}/systemd
-	    ${sysconfdir}/sysctl.d], [], [no], [dnl
+	    ${rootdir}/usr/lib/systemd
+	    ${rootdir}/lib/systemd
+	    ${rootdir}/etc/systemd], [], [no], [dnl
 	    disable_systemd=yes])
     tmp_PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     _BLD_VAR_PATH_PROG([SYSTEMCTL], [systemctl], [$tmp_PATH],
