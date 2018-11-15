@@ -5162,7 +5162,7 @@ Requires:           %{name} = %{baseversion}-%{baserelease}
 
 %if %{NEED_base}
 Requires:           %{name}-base    = %{baseversion}-%{baserelease}
-Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
+#equires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
 Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
 Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
 Requires(preun):    %{name}-base    = %{baseversion}-%{baserelease}
