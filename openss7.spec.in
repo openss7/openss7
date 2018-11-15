@@ -92,7 +92,7 @@
 %global sendpr      %{nil}
 %global mibfiles    *.mib
 %global snmpmods    strMIB
-#global gdmos       %{nil}
+#global gdmos       #{nil}
 %global netconfig   %{base}
 %global sock2path   %{base}
 %global snmpconf    strMIB.conf
@@ -107,7 +107,7 @@
 %{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
 
 # there are three ways to pass kernel version to the build process:
-#    global _kversion in /usr/lib/rpm/macros, %_sysconfdir/rpm/macros or ~/.rpmmacros
+#    global _kversion in /usr/lib/rpm/macros, #_sysconfdir/rpm/macros or ~/.rpmmacros
 #    global _kversion on the rpmbuild command line
 #    global PACKAGE_KVERSION environment variable
 #    just let it default to `uname -r`
@@ -210,8 +210,8 @@
 %{!?_reposubdir:            %{expand: %%global HAVE_urpmirepo 0}}
 %{!?_reposubdir:            %{expand: %%global HAVE_zypprepo  0}}
 
-#global HAVE_lcacerts       %(if [ -d '%{_cacertdir}'  ] ; then echo 1; else echo 0; fi)
-#global HAVE_sslcerts       %(if [ -d '%{_sslcertdir}' ] ; then echo 1; else echo 0; fi)
+#global HAVE_lcacerts       #(if [ -d '#{_cacertdir}'  ] ; then echo 1; else echo 0; fi)
+#global HAVE_sslcerts       #(if [ -d '#{_sslcertdir}' ] ; then echo 1; else echo 0; fi)
 %global HAVE_lcacerts       0
 %global HAVE_sslcerts       0
 
@@ -490,9 +490,9 @@
 
 # Try to reduce the side of the -doc package: skip txt, dvi and ps.
 %global FILES_infofiles     %{HAVE_manuals}
-#global FILES_txtfiles      %{HAVE_manuals}
-#global FILES_dvifiles      %{HAVE_manuals}
-#global FILES_psfiles       %{HAVE_manuals}
+#global FILES_txtfiles      #{HAVE_manuals}
+#global FILES_dvifiles      #{HAVE_manuals}
+#global FILES_psfiles       #{HAVE_manuals}
 # FIXME: Skip documentation for texting
 %global FILES_txtfiles      0
 %global FILES_dvifiles      0
@@ -501,10 +501,10 @@
 %global FILES_htmlfiles     0
 %global FILES_pngfiles      0
 %global FILES_cssfiles      0
-#global FILES_pdffiles      %{HAVE_manuals}
-#global FILES_htmlfiles     %{HAVE_manuals}
-#global FILES_pngfiles      %{HAVE_pngfiles}
-#global FILES_cssfiles      %{HAVE_cssfiles}
+#global FILES_pdffiles      #{HAVE_manuals}
+#global FILES_htmlfiles     #{HAVE_manuals}
+#global FILES_pngfiles      #{HAVE_pngfiles}
+#global FILES_cssfiles      #{HAVE_cssfiles}
 
 # These are the defaults for the WITH_zzz macros.  These
 # defaults can be changed by passing --with-zzz or --without-zzz
@@ -1050,10 +1050,10 @@
 %if %{HAVE_configfiles}
 %global NEED_base       1
 %endif
-#if %{HAVE_netconfig}
+#if #{HAVE_netconfig}
 #global NEED_base       1
 #endif
-#if %{HAVE_sock2path}
+#if #{HAVE_sock2path}
 #global NEED_base       1
 #endif
 %if %{HAVE_oldmods}
@@ -1102,10 +1102,10 @@
 %if %{FILES_configfiles}
 %global WANT_base       1
 %endif
-#if %{FILES_netconfig}
+#if #{FILES_netconfig}
 #global WANT_base       1
 #endif
-#if %{FILES_sock2path}
+#if #{FILES_sock2path}
 #global WANT_base       1
 #endif
 %if %{FILES_oldprel}
@@ -1251,7 +1251,7 @@
 %if %{HAVE_libraries}
 %global NEED_lib        1
 %endif
-#if %{HAVE_lib32compat}
+#if #{HAVE_lib32compat}
 #global NEED_lib        1
 #endif
 %if %{HAVE_netconfig}
@@ -1275,7 +1275,7 @@
 %if %{HAVE_testfiles}
 %global NEED_lib        1
 %endif
-#if %{HAVE_test32files}
+#if #{HAVE_test32files}
 #global NEED_lib        1
 #endif
 %if %{HAVE_snmpconf}
@@ -1284,7 +1284,7 @@
 %if %{HAVE_snmpmods}
 %global NEED_lib        1
 %endif
-#if %{HAVE_snmp32mods}
+#if #{HAVE_snmp32mods}
 #global NEED_lib        1
 #endif
 
@@ -1303,7 +1303,7 @@
 %if %{FILES_libraries}
 %global WANT_lib        1
 %endif
-#if %{FILES_lib32compat}
+#if #{FILES_lib32compat}
 #global WANT_lib        1
 #endif
 %if %{FILES_netconfig}
@@ -1327,7 +1327,7 @@
 %if %{FILES_testfiles}
 %global WANT_lib        1
 %endif
-#if %{FILES_test32files}
+#if #{FILES_test32files}
 #global WANT_lib        1
 #endif
 %if %{FILES_snmpconf}
@@ -1336,7 +1336,7 @@
 %if %{FILES_snmpmods}
 %global WANT_lib        1
 %endif
-#if %{FILES_snmp32mods}
+#if #{FILES_snmp32mods}
 #global WANT_lib        1
 #endif
 
@@ -2184,7 +2184,7 @@ Group:          System Environment/Kernel
 %{?_gif_icon:Icon: %{_gif_icon}}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
-#Source:         %{name}-%{baseversion}.tar.bz2
+#Source:         #{name}-#{baseversion}.tar.bz2
 %{?__xz:Source:         http://www.openss7.org/tarballs/%{name}-%{baseversion}.tar.xz}
 %{!?__xz:Source:         http://www.openss7.org/tarballs/%{name}-%{baseversion}.tar.bz2}
 %{!?buildroot:BuildRoot: %{_tmppath}/%{name}-%{baseversion}-%{specrelease}-root}
@@ -2707,7 +2707,7 @@ make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
 %{?files_htmlfiles:make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" install-html}
 
 # copy out our devices list
-# cp -pf %{mybuilddir}/%{makedev} .
+# cp -pf #{mybuilddir}/#{makedev} .
 
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir" || :
@@ -2738,8 +2738,8 @@ cat System.symvers Module.symvers | gzip > $d/%{kernel_symvers}
 # copy in symbol sets file
 cp -p %{kernel_symsets} $d
 # copy in symbol sets file to boot directory as well
-#mkdir -p %{buildroot}/boot
-#cp -p %{kernel_symsets} %{buildroot}/boot
+#mkdir -p #{buildroot}/boot
+#cp -p #{kernel_symsets} #{buildroot}/boot
 # copy in modpost cache file for reference
 cp -p %{_builddir}/%{mpost_file} $d
 %endif
@@ -2785,7 +2785,7 @@ export EXCLUDE_FROM_COMPRESS
 %endif
 
 # stupid suse check compresses everything (including our macro files)
-#{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
+#{?suse_check: #{expand: ##define suse_check echo "SuSE Check skipped"}}
 
 %clean
 # ---------------------------------------------------------------------------
@@ -2795,7 +2795,7 @@ export EXCLUDE_FROM_COMPRESS
 %if %{PACKAGE_virt}
 %files
 # ---------------------------------------------------------------------------
-# A big problem with using the %doc macro is that it cleans out _docdir before
+# A big problem with using the #doc macro is that it cleans out _docdir before
 # copying in the files.  We have all our openss7-doc package files in there so
 # there is an error when the openss7-doc package tries to move its files.  So,
 # we do not do that, but we still want a virtual package, so leave and empty
@@ -2852,27 +2852,27 @@ Autoreq:            true
 Autoprov:           true
 
 %if %{FILES_yumrepo}
-#refix:             %{_yumrepodir}
-#refix:             %{_rpmgpgdir}
+#refix:             #{_yumrepodir}
+#refix:             #{_rpmgpgdir}
 Prefix:             %{_yumplugdir}
 Prefix:             %{_yumconfdir}
 %endif
 
 %if %{FILES_zypprepo}
-#refix:             %{_zypprepodir}
+#refix:             #{_zypprepodir}
 %endif
 %if %{FILES_urpmirepo}
-#refix:             %{_rpmgpgdir}
-#refix:             %{_urpmirepodir}
+#refix:             #{_rpmgpgdir}
+#refix:             #{_urpmirepodir}
 %endif
 %if %{FILES_aptrepo}
-#refix:             %{_aptrepodir}
+#refix:             #{_aptrepodir}
 %endif
 %if %{FILES_lcacerts}
-#refix:             %{_lcacertdir}
+#refix:             #{_lcacertdir}
 %endif
 %if %{FILES_sslcerts}
-#refix:             %{_sslcertdir}
+#refix:             #{_sslcertdir}
 %endif
 
 %if %{FILES_yumrepo}
@@ -3370,14 +3370,14 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_localstatedir}/lib/%{name}
-#{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
-#{?files_yumrepo:%{_rpmgpgdir}/*}
-#{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
+#{?files_yumrepo:#config(noreplace) #{_yumrepodir}/*}
+#{?files_yumrepo:#{_rpmgpgdir}/*}
+#{?files_zypprepo:#config(noreplace) #{_zypprepodir}/*}
 %{?files_yumrepo:%{_yumplugdir}/*.py*}
 %{?files_yumrepo:%config(noreplace) %{_yumconfdir}/*.conf}
-#{?files_urpmirepo:%{_rpmgpgdir}/*}
-#{?files_urpmirepo:%config(noreplace) %{_urpmirepodir}/*}
-#{?files_aptrepo:%config(noreplace) %{_aptrepodir}/*}
+#{?files_urpmirepo:#{_rpmgpgdir}/*}
+#{?files_urpmirepo:#config(noreplace) #{_urpmirepodir}/*}
+#{?files_aptrepo:#config(noreplace) #{_aptrepodir}/*}
 %{?files_sslcerts:%{_sslcertdir}/*}
 %{?files_lcacerts:%{_lcacertdir}/*}
 %endif
@@ -3415,14 +3415,14 @@ Prefix:             %{_initrddir}
 %if %{FILES_devscripts}
 Prefix:             %{_sbindir}
 %endif
-#if %{FILES_netconfig}
-#refix:             %{_sysconfdir}/nslconfig.d
+#if #{FILES_netconfig}
+#refix:             #{_sysconfdir}/nslconfig.d
 #endif
-#if %{FILES_sock2path}
-#refix:             %{_sysconfdir}/sock2path.d
+#if #{FILES_sock2path}
+#refix:             #{_sysconfdir}/sock2path.d
 #endif
-#if %{FILES_snmpconf}
-#refix:             %{_snmpconfdir}
+#if #{FILES_snmpconf}
+#refix:             #{_snmpconfdir}
 #endif
 %if %{FILES_oldmods}
 Prefix:             %{_modutildir}
@@ -3433,8 +3433,8 @@ Prefix:             %{_pkglibexecdir}
 %if %{FILES_sendpr}
 Prefix:             %{_pkglibexecdir}
 %endif
-#if %{FILES_infofiles}
-#refix:             %{_infodir}
+#if #{FILES_infofiles}
+#refix:             #{_infodir}
 #endif
 %if %{FILES_manpages}
 Prefix:             %{_mandir}
@@ -3448,7 +3448,7 @@ Conflicts:          texinfo < 3.11
 %if %{USE_makedev}
 Requires:           dev >= 3.3
 %endif
-#if %{FILES_manpages}
+#if #{FILES_manpages}
 #equires(post):     /usr/sbin/makewhatis
 #equires(postun):   /usr/sbin/makewhatis
 #endif
@@ -3902,13 +3902,13 @@ fi
 %files base %{?devicesfile:%{devicesfile}}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
+#{?files_snmpconf:#config(noreplace) #{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-##{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-#{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
-#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
-#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-#{?files_oldmods:%config(noreplace) %{_modutildir}/*}
+##{?files_netconfig:#config(noreplace) #{_sysconfdir}/netconfig.xnsl}
+#{?files_netconfig:#config(noreplace) #{_sysconfdir}/nslconfig.d/#{netconfig}}
+#{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path}
+#{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path.d/#{sock2path}}
+#{?files_oldmods:#config(noreplace) #{_modutildir}/*}
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_initrddir}/*}
 %{?files_devscripts:%{_sbindir}/@STRCONF_DEVICES@}
@@ -3979,14 +3979,14 @@ Requires(pre):      /sbin/install-info
 Requires(post):     /sbin/install-info
 Requires(preun):    /sbin/install-info
 %endif
-#if %{FILES_manpages}
+#if #{FILES_manpages}
 #equires(post):     /usr/sbin/makewhatis
 #equires(postun):   /usr/sbin/makewhatis
 #endif
 
 Conflicts:          texinfo < 3.11
 
-# The %{name}-base package contains the man page references and macros
+# The #{name}-base package contains the man page references and macros
 # and is required.  Other packages are unnecessary.
 %if %{HAVE_manmacros}
 Requires:           %{_mandir}/%{manmacros}
@@ -4111,8 +4111,8 @@ fi
 %{?files_cssfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.css}
 %{?files_infofiles:%docdir %{_infodir}}
 %{?files_infofiles:%{_infodir}/*.info*}
-#{?files_manrefs:%{_mandir}/%{manrefs}*}
-#{?files_manmacros:%{_mandir}/%{manmacros}*}
+#{?files_manrefs:#{_mandir}/#{manrefs}*}
+#{?files_manmacros:#{_mandir}/#{manmacros}*}
 %{?files_manpages:%docdir %{_mandir}}
 %{?files_manpages:%{_mandir}/man[2379]*/*}
 %endif
@@ -4153,8 +4153,8 @@ Prefix:             %{_syssbindir}
 Prefix:             %{_libdir}
 Prefix:             %{_syslibdir}
 %endif
-#if %{FILES_lib32compat}
-#refix:             %{_lib32dir}
+#if #{FILES_lib32compat}
+#refix:             #{_lib32dir}
 #endif
 %if %{FILES_netconfig}
 Prefix:             %{_sysconfdir}/nslconfig.d
@@ -4171,8 +4171,8 @@ Prefix:             %{_pkgtcllibdir}
 %if %{FILES_testfiles}
 Prefix:             %{_pkglibexecdir}
 %endif
-#if %{FILES_test32files}
-#refix:             %{_pkglibexec32dir}
+#if #{FILES_test32files}
+#refix:             #{_pkglibexec32dir}
 #endif
 %if %{FILES_snmpconf}
 Prefix:             %{_snmpconfdir}
@@ -4180,8 +4180,8 @@ Prefix:             %{_snmpconfdir}
 %if %{FILES_snmpmods}
 Prefix:             %{_snmpdlmoddir}
 %endif
-#if %{FILES_snmp32mods}
-#refix:             %{_snmpdlmod32dir}
+#if #{FILES_snmp32mods}
+#refix:             #{_snmpdlmod32dir}
 #endif
 %if %{FILES_locales}
 Prefix:             %{_localedir}
@@ -4431,9 +4431,9 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
         fi
     fi
 %endif
-#if %{FILES_tcllibs}
+#if #{FILES_tcllibs}
 #   if [ -x "`which tclsh 2>/dev/null`" ]; then
-#       for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+#       for d in `find #{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
 #           echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
 #       done
 #   fi
@@ -4673,9 +4673,9 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     fi
 %endif
 fi
-#if %{FILES_tcllibs}
+#if #{FILES_tcllibs}
 #f [ $1 -eq 0 ] ; then : # final removal
-#   files="%{_pkgtcllibdir}/pkgIndex.tcl %{_pkgtcllibdir}/*/pkgIndex.tcl" f d
+#   files="#{_pkgtcllibdir}/pkgIndex.tcl #{_pkgtcllibdir}/*/pkgIndex.tcl" f d
 #   for f in $files; do
 #       if [ -f $f ]; then
 #           rm -f -- $f || :
@@ -4700,11 +4700,11 @@ fi
 %{?files_libraries:%{_libdir}/*.la}
 %{?files_libraries:%{_syslibdir}/*.so*}
 %{?files_libraries:%{_syslibdir}/*.la}
-#{?files_lib32compat:%{_lib32dir}/*.so*}
-#{?files_lib32compat:%{_lib32dir}/*.la}
-#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+#{?files_lib32compat:#{_lib32dir}/*.so*}
+#{?files_lib32compat:#{_lib32dir}/*.la}
+#{?files_netconfig:#config(noreplace) #{_sysconfdir}/netconfig.xnsl}
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
-#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
+#{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?files_perlmods:%dir %{_perldir}/auto/Xti}
 %{?files_perlmods:%{_perldir}/auto/Xti/*}
@@ -4719,7 +4719,7 @@ fi
 %{?files_locales:%{_localedir}/*}
 %{?files_gdmofiles:%{_pkglibexecdir}/gdmo}
 %{?files_testfiles:%{_pkglibexecdir}/%{testfiles}}
-#{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
+#{?files_test32files:#{_pkglibexec32dir}/#{testfiles}}
 %{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_snmpmods:%{_snmpdlmoddir}/*}
 %endif
@@ -4850,10 +4850,10 @@ Prefix:             %{_syslibdir}
 Prefix:             %{_lib32dir}
 Prefix:             %{_syslib32dir}
 %endif
-#if %{FILES_debugfiles}
-#{?files_binaries:Prefix:               %{_usrsrc}/debug}
-#{?files_binaries:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
-#{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+#if #{FILES_debugfiles}
+#{?files_binaries:Prefix:               #{_usrsrc}/debug}
+#{?files_binaries:#{?_lib32dir:Prefix:  #{_lib32dir}/debug}}
+#{?files_binaries:#{!?_lib32dir:Prefix: #{_libdir}/debug}}
 #endif
 
 Conflicts:          texinfo < 3.11
@@ -4943,9 +4943,9 @@ fi
 %{?files_libstatic:%{_syslibdir}/*.a}
 %{?files_lib32static:%{_lib32dir}/*.a}
 %{?files_lib32static:%{_syslib32dir}/*.a}
-#{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
-#{?files_debugfiles:%{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
-#{?files_debugfiles:%{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
+#{?files_debugfiles:#{?files_binaries: #{_usrsrc}/debug}}
+#{?files_debugfiles:#{?files_binaries: #{?_lib32dir:#{_lib32dir}/debug}}}
+#{?files_debugfiles:#{?files_binaries: #{!?_lib32dir:#{_libdir}/debug}}}
 %endif
 
 # ===========================================================================
@@ -5045,36 +5045,36 @@ this package.
 # ===========================================================================
 %package -n %{kernel_package}
 # ---------------------------------------------------------------------------
-# Note that we should not call this just %{name}-%{_kversion}.  The package
+# Note that we should not call this just #{name}-#{_kversion}.  The package
 # should be named for proper automatic kernel module package loading under
 # various distros.  This varies fairly widely for Fedora, CentOS, RHEL, SLES,
 # and others.  The Provides tags follow the naming conventions used by these
 # various packages, but virtual package names don't seem to cut it.
 # ---------------------------------------------------------------------------
 # Autoupdating kernel modules when kernels are updated.  CentOS 5 approach:
-# - name the kernel module package kmod-%{name}
-# - give it version %{baseversion}
-# - provides: %{name}-kmod = %{baseversion}
-# - provides: kmod-%{name} = %{baseversion}
-# - provides: kernel-modules = %{_kversion}
+# - name the kernel module package kmod-#{name}
+# - give it version #{baseversion}
+# - provides: #{name}-kmod = #{baseversion}
+# - provides: kmod-#{name} = #{baseversion}
+# - provides: kernel-modules = #{_kversion}
 # - require the kernel version (because symbol sets are screwed on both SLES
 #   and RHEL due to broken scripts).
 # ---------------------------------------------------------------------------
 # Autoupdating kernel modules when kernel are updated. SUSE approach:
-# - name the kernel module package %{name}-kmp%{kernel_flavor} (note that
-#   %{kernel_flavor} includes a dash.)
-# - give it version %{baseversion}%{kernel_string}, where %{kernel_string} is
+# - name the kernel module package #{name}-kmp#{kernel_flavor} (note that
+#   #{kernel_flavor} includes a dash.)
+# - give it version #{baseversion}#{kernel_string}, where #{kernel_string} is
 #   the version of the kernel, without the flavor, with underscores substitued
 #   for dashes (and possibly .0 added to the kernel version), prefixed by _.
-# - give it release %{release}
-# - Provides: %{name}-kmp%{kernel_flavor} (This might work instead of renaming.)
-# - Provides: %{name}-kmp = %{baseversion}%{kernel_string} (note no flavor)
+# - give it release #{release}
+# - Provides: #{name}-kmp#{kernel_flavor} (This might work instead of renaming.)
+# - Provides: #{name}-kmp = #{baseversion}#{kernel_string} (note no flavor)
 # - Provides: multiversion(kernel)  (But maybe not, because this might trigger
 #   trying to adapt kernel modules to a new kernel.)
 # - Requires: coreutils grep
-# - Enhances: kernel%{kernel_flavor}  (Note that this is problematic because
+# - Enhances: kernel#{kernel_flavor}  (Note that this is problematic because
 #   only some recent rpms support the Enhances: keyword.)
-# - Requires: kernel%{kernel_flavor}  (This is the only way without the
+# - Requires: kernel#{kernel_flavor}  (This is the only way without the
 #   Enchances keyword, but has to be done.)
 #
 
@@ -5093,11 +5093,11 @@ Autoprov:           true
 Prefix:             %{_kmoduledir}/%{_ksubdir}
 %endif
 
-#bsoletes:          %{name}-kernel
-#bsoletes:          %{name}-kmp%{kernel_flavor}
-#bsoletes:          kmod%{kernel_flavor}
-#bsoletes:          kernel-module-%{name}%{kernel_flavor}
-#bsoletes:          %{name}-kmod%{kernel_flavor}
+#bsoletes:          #{name}-kernel
+#bsoletes:          #{name}-kmp#{kernel_flavor}
+#bsoletes:          kmod#{kernel_flavor}
+#bsoletes:          kernel-module-#{name}#{kernel_flavor}
+#bsoletes:          #{name}-kmod#{kernel_flavor}
 
 # SuSE puts lsof in /usr/bin
 Requires(pre):      lsof
@@ -5571,26 +5571,26 @@ Group:              Development/Kernel
 Autoreq:            true
 Autoprov:           true
 
-#if %{FILES_modules}
-#refix:             %{_kmoduledir}
+#if #{FILES_modules}
+#refix:             #{_kmoduledir}
 #endif
 %if %{FILES_oldmods}
 Prefix:             %{_includedir}/%{name}/%{kernel_version}
 %endif
-#if %{FILES_kdebugfiles}
-#{?files_modules:Prefix:               %{_usrsrc}/debug}
-#{?files_modules:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
-#{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+#if #{FILES_kdebugfiles}
+#{?files_modules:Prefix:               #{_usrsrc}/debug}
+#{?files_modules:#{?_lib32dir:Prefix:  #{_lib32dir}/debug}}
+#{?files_modules:#{!?_lib32dir:Prefix: #{_libdir}/debug}}
 #endif
 
-#bsoletes:          %{name}-devel-kernel
-#bsoletes:          %{name}-kmp%{kernel_flavor}-devel
-#bsoletes:          kmod%{kernel_flavor}-devel
-#bsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
-#bsoletes:          %{name}-devel-kmod%{kernel_flavor}
+#bsoletes:          #{name}-devel-kernel
+#bsoletes:          #{name}-kmp#{kernel_flavor}-devel
+#bsoletes:          kmod#{kernel_flavor}-devel
+#bsoletes:          kernel-module-#{name}-devel#{kernel_flavor}
+#bsoletes:          #{name}-devel-kmod#{kernel_flavor}
 
 # The development package requires that the actual kernel be installed so that
-# /boot/System.map-%{_kversion} is available.  Also, the specific kernel
+# /boot/System.map-#{_kversion} is available.  Also, the specific kernel
 # development package is also required.
 %if %{HAVE_rhatkmps}
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
@@ -5691,20 +5691,20 @@ fi
 %files -n %{kernel_develop}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
-#{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
-#{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
+#{?files_modules:#{?files_kdebugfiles:#{_usrsrc}/debug}}
+#{?files_modules:#{?files_kdebugfiles:#{?_lib32dir:#{_lib32dir}/debug}}}
+#{?files_modules:#{?files_kdebugfiles:#{!?_lib32dir:#{_libdir}/debug}}}
 %{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
-#{?files_modules:%{_kmoduledir}/%{base}/Module*}
+#{?files_modules:#{_kmoduledir}/#{base}/Module*}
 %{?files_kinfo:%dir %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.mkvars}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{csite_file}}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}}
-#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers}
-#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers}
-#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}}
-#{?files_symvers:/boot/%{kernel_symsets}}
+#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/System.symvers}
+#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/Module.symvers}
+#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/#{kernel_symvers}}
+#{?files_symvers:/boot/#{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{mpost_file}}
@@ -5986,11 +5986,11 @@ Prefix:             %{_usrsrc}/%{name}
 Prefix:             %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
 %endif
 
-#bsoletes:          %{name}-source-kernel
-#bsoletes:          %{name}-kmp%{kernel_flavor}-source
-#bsoletes:          kmod%{kernel_flavor}-source
-#bsoletes:          kernel-module-%{name}-source%{kernel_flavor}
-#bsoletes:          %{name}-source-kmod%{kernel_flavor}
+#bsoletes:          #{name}-source-kernel
+#bsoletes:          #{name}-kmp#{kernel_flavor}-source
+#bsoletes:          kmod#{kernel_flavor}-source
+#bsoletes:          kernel-module-#{name}-source#{kernel_flavor}
+#bsoletes:          #{name}-source-kmod#{kernel_flavor}
 
 %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhnaces}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
@@ -6139,8 +6139,8 @@ Requires(postun):   /usr/bin/rebuild-jar-repository
 %endif
 
 # Requirements will be automatic.
-#if %{NEED_lib}
-#equires:           %{name}-lib     = %{baseversion}-%{baserelease}
+#if #{NEED_lib}
+#equires:           #{name}-lib     = #{baseversion}-#{baserelease}
 #endif
 
 %if %{HAVE_suggests}
