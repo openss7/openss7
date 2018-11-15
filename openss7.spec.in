@@ -116,7 +116,7 @@
 
 %global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,;s,-tmb-(desktop586|desktop|laptop|server)-,-tmb-,;s,-(netbook|server|desktop|desktop586)-,-,')
+%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,;s,-tmb-(desktop586|desktop|laptop|server)-,-tmb-,;s,-(netbook|server|desktop|desktop586)-,-,;s,\.%{_build_arch}$,,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_majnum %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*-tmb-desktop-.*,-tmb-desktop,;t;s,.*-tmb-desktop586-.*,-tmb-desktop586,;t;s,-tmb-laptop-.*,-tmb-laptop,;t;s,.*-tmb-server-.*,-tmb-server,;t;s,.*-vserver-.*,-vserver,;t;s,.*-xen-pvops-.*,-xen-pvops,;t;s,.*-desktop-.*,-desktop,;t;s,.*-desktop586-.*,-desktop586,;t;s,.*-server-.*,-server,;t;s,.*-netbook-.*,-netbook,;t;s,.*-linus-.*,-linus,;t;s,.*,,')
@@ -2228,7 +2228,8 @@ BuildRequires:    kernel-devel = %{kernel_source}
 BuildRequires:    kernel-source = %{kernel_source}
 %endif
 %if %{BUILD_modules}
-BuildRequires:    modutils >= 2.4.12
+#uildRequires:    modutils >= 2.4.12
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/depmod --qf "BuildRequires: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
 
 %if %{HAVE_oldmods}
@@ -3525,6 +3526,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Stopping non-rpm init script, $i" >&2
+            [ -x "`which systemctl   2>/dev/null`" ] && { systemctl   stop $i && continue || :; }
 	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
 	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
 	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || :; }
@@ -3538,10 +3540,11 @@ if [ $1 -eq 1 ] ; then : # fresh install
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Deregistering non-rpm init script, $i" >&2
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || :; }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || :; }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || :; }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || :; }
+            [ -x /usr/bin/systemctl        ] && { /usr/bin/systemctl        disable $i && continue || :; }
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i         && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i         && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i         && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove  && continue || :; }
 	fi
     done
 %endif
@@ -3720,6 +3723,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     initfiles='%{initfiles}'
     for i in $initfiles; do
 	if [ -f %_initrddir/$i ]; then
+            [ -x /usr/bin/systemctl         ] && { /usr/bin/systemctl  enable $i       && continue || :; }
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || :; }
 	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || :; }
 	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || :; }
@@ -3830,6 +3834,7 @@ if [ $1 -eq 0 ] ; then : # final removal
     done
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
+            [ -x "`which systemctl   2>/dev/null`" ] && { systemctl   stop $i && continue || :; }
             [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
             [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
             [ -x %_initrddir/$i                    ] && { %_initrddir/$i stop && continue || :; }
@@ -3837,10 +3842,11 @@ if [ $1 -eq 0 ] ; then : # final removal
     done
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || :; }
+            [ -x /usr/bin/systemctl        ] && { /usr/bin/ssytemctl        disable $i 2>&1 && continue || :; }
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i         2>&1 && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i         2>&1 && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i         2>&1 && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove  2>&1 && continue || :; }
 	fi
     done
 %endif
@@ -4457,6 +4463,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
 	    if [ -L $l ]; then start=yes; break; fi
 	done
 	[ $start = yes ] || continue
+        [ -x "`which systemctl   2>/dev/null`" ] && { systemctl   start $i && continue || break; }
 	[ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
 	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
 	[ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break; }
@@ -5345,6 +5352,7 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 	    if [ -L $l ]; then start=yes; break; fi
 	done
 	[ $start = yes ] || continue
+        [ -x "`which systemctl   2>/dev/null`" ] && { systemctl     start $i && continue || break; }
 	[ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
 	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
 	[ -x %{_initrddir}/$i                  ] && { %{_initrddir}/$i start && continue || break; }
@@ -5392,6 +5400,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
                 if [ -L $l ]; then start=yes; break; fi
             done
             [ $start = yes ] || continue
+            [ -x "`which systemctl   2>/dev/null`" ] && { systemctl     start $i && continue || break; }
             [ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
             [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
             [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break; }
@@ -5436,6 +5445,7 @@ if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
         done
         for i in $reverse; do
             if [ -f %{_initrddir}/$i ] ; then
+                [ -x "`which systemctl   2>/dev/null`" ] && { systemctl     stop $i && continue || :; }
                 [ -x "`which service     2>/dev/null`" ] && { service       $i stop && continue || :; }
                 [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i stop && continue || :; }
                 [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i stop && continue || :; }
