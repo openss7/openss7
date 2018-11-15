@@ -140,22 +140,25 @@ m4_include([m4/java.m4])
 dnl
 dnl older systems that have gcj3 and gcj should use the newer version
 dnl
-if test :${enable_java:-yes} = :yes ; then
+if test :${enable_tools:-yes} = :yes ; then
     AC_PROG_CXX([g++3 g++])
-    AC_PROG_GCJ
-    AM_PROG_GCJ
-    AC_PROG_GCJH
-    AC_PROG_JAVAC
-    AC_PROG_JAVAH
-    AC_PROG_JAVA
-    AM_CONDITIONAL([am__fastdepJAVAC], [/bin/true])
+    if test :${enable_java:-yes} = :yes ; then
+	AC_PROG_GCJ
+	AM_PROG_GCJ
+	AC_PROG_GCJH
+	AC_PROG_JAVAC
+	AC_PROG_JAVAH
+	AC_PROG_JAVA
+	AM_CONDITIONAL([am__fastdepJAVAC], [/bin/true])
+    else
+	AM_CONDITIONAL([am__fastdepGCJ],   [/bin/false])
+	AM_CONDITIONAL([am__fastdepJAVAC], [/bin/false])
+	AM_CONDITIONAL([WITH_GCJDBTOOL],   [/bin/false])
+	AM_CONDITIONAL([WITH_LIBGCJ],      [/bin/false])
+	AM_CONDITIONAL([WITH_JAVA],        [/bin/false])
+    fi
 else
-    AM_CONDITIONAL([am__fastdepCXX],   [/bin/false])
-    AM_CONDITIONAL([am__fastdepGCJ],   [/bin/false])
-    AM_CONDITIONAL([am__fastdepJAVAC], [/bin/false])
-    AM_CONDITIONAL([WITH_GCJDBTOOL],   [/bin/false])
-    AM_CONDITIONAL([WITH_LIBGCJ],      [/bin/false])
-    AM_CONDITIONAL([WITH_JAVA],        [/bin/false])
+    AM_CONDITIONAL([am__fastdepCXX],[/bin/false])
 fi
 
 dnl
