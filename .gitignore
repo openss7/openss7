@@ -788,6 +788,7 @@ po/boldquot.sed
 po/de.gmo
 po/en@boldquot.header
 po/en@quot.header
+po/insert-header.sed
 po/insert-header.sin
 po/Makefile
 po/Makefile.in.in
@@ -796,6 +797,7 @@ po/openss7.pot
 po/*.po
 po/POTFILES
 po/quot.sed
+po/remove-potcdate.sed
 po/remove-potcdate.sin
 po/Rules-quot
 po/stamp-po
