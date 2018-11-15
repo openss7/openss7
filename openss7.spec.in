@@ -718,8 +718,8 @@
 # Calculate which files were not built (and are not included)
 # ---------------------------------------------------------------------------
 
-%global kernel_fedora       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[1]?[1-9].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el[56].*$,1,;t;s,.*$,0,')
-%global kernel_others       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[1]?[1-9].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el[56].*$,0,;t;s,.*$,1,')
+%global kernel_fedora       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[1]?[1-9].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el[567].*$,1,;t;s,.*$,0,')
+%global kernel_others       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[1]?[1-9].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el[567].*$,0,;t;s,.*$,1,')
 
 %{!?VIRT_virt:  %{expand: %%global VIRT_virt       0}}
 %{!?VIRT_repo:  %{expand: %%global VIRT_repo       0}}
