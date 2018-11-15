@@ -2922,6 +2922,7 @@ Requires(prereq):   update-ca-certificates
 %endif
 
 %if %{FILES_repo}
+Requires:           wget
 Requires(prereq):   wget
 Requires(pre):      %(which wget 2>/dev/null)
 Requires(pre):      %(which sed  2>/dev/null)
@@ -5160,6 +5161,7 @@ Requires:           %{name} = %{baseversion}-%{baserelease}
 %endif
 
 %if %{NEED_base}
+Requires:           %{name}-base    = %{baseversion}-%{baserelease}
 Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
 Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
 Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
