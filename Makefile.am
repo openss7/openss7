@@ -1036,6 +1036,8 @@ EXTRA_TEX			+= scripts/texinfo.cnf \
 EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3 scripts/missing4
 EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3 scripts/missing4
+dist_noinst_SCRIPTS		+= scripts/pslatex
+EXTRA_SCRIPTS			+= scripts/pslatex
 
 ##
 ## Rules for building kernel objects
