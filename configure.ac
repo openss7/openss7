@@ -53,8 +53,8 @@ dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.69)
-AC_INIT([OpenSS7],[1.1.8],[bugs@openss7.org],[openss7])
-AC_REVISION([1.1.8])
+AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
+AC_REVISION([1.1])
 
 AC_LANG_DEFINES_PROVIDED
 
