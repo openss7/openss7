@@ -554,6 +554,7 @@ doc/drafts/loadsel-03.fig6.pic
 doc/drafts/loadsel-03.fig7.pic
 doc/drafts/loadsel-03.fig8.pic
 doc/drafts/loadsel-03.fig9.pic
+doc/drafts/Makefile
 doc/drafts/regext-01.fig1.pic
 doc/drafts/regext-01.fig2.pic
 doc/drafts/regext-01.fig3.pic
@@ -673,6 +674,7 @@ doc/papers/chan/WARNINGS
 doc/papers/inet/index.html
 doc/papers/inet/internals.pl
 doc/papers/inet/labels.pl
+doc/papers/inet/Makefile
 doc/papers/inet/netperf_centos_comp.fig
 doc/papers/inet/netperf_centos_delay.fig
 doc/papers/inet/netperf_centos_perf.fig
@@ -730,6 +732,7 @@ doc/papers/optranex/WARNINGS
 doc/papers/sctp/index.html
 doc/papers/sctp/internals.pl
 doc/papers/sctp/labels.pl
+doc/papers/sctp/Makefile
 doc/papers/sctp/netperf_centos_comp.fig
 doc/papers/sctp/netperf_centos_delay.fig
 doc/papers/sctp/netperf_centos_perf.fig
@@ -767,6 +770,7 @@ doc/papers/sctp/WARNINGS
 doc/papers/sigtran/index.html
 doc/papers/sigtran/internals.pl
 doc/papers/sigtran/labels.pl
+doc/papers/sigtran/Makefile
 doc/papers/sigtran/sigtranimp.bbl
 doc/papers/sigtran/sigtranimp.blg
 doc/papers/sigtran/sigtranimp.css
@@ -776,6 +780,7 @@ doc/papers/sigtran/WARNINGS
 doc/papers/streams/index.html
 doc/papers/streams/internals.pl
 doc/papers/streams/labels.pl
+doc/papers/streams/Makefile
 doc/papers/streams/perftest_centos_comp.fig
 doc/papers/streams/perftest_centos_delay.fig
 doc/papers/streams/perftest_centos_perf.fig
@@ -1050,6 +1055,9 @@ OpenSS7.dox
 openss7.lsm
 openss7_mknod
 openss7.spec
+openss7-*.tar.bz2
+openss7-*.tar.gz
+openss7-*.tar.xz
 os7osi.spec
 osid
 *.pdf
@@ -1085,6 +1093,7 @@ README-alpha
 README-cvs
 README-make
 README-nexusware
+repo/
 rtgconfig
 rtgstat
 rtl
