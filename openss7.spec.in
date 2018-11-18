@@ -3930,7 +3930,7 @@ fi
 #{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path.d/#{sock2path}}
 #{?files_oldmods:#config(noreplace) #{_modutildir}/*}
 %if %{HAVE_systemd}
-%{?files_initscripts:%config(noreplace) %{_confgidir}/*}
+%{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_unitdir}/*}
 %else
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
