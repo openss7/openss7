@@ -174,7 +174,7 @@ FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
 FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
 FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
-MY_SECONDARY	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_PNGS) $(FIG_JPGS) $(FIG_TXTS)
+MY_SECONDARY	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_PNGS) $(FIG_JPGS)
 
 #.fig.eps:; $(AM_V_GEN)$(FIG2DEV) -L eps -p dummy $< $@ || $(CONVERT) $< $@
 #.fig.ps :; $(AM_V_GEN)$(FIG2DEV) -L  ps -p dummy $< $@ || $(CONVERT) $< $@
@@ -244,7 +244,7 @@ PNG_PDFS = $(PNG_PNGS:%.png=%.pdf)
 PNG_JPGS = $(PNG_PNGS:%.png=%.jpg)
 PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
 
-MY_SECONDARY	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS) $(PNG_JPGS) $(PNG_TXTS)
+MY_SECONDARY	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS) $(PNG_JPGS)
 
 #.png.ps :; $(AM_V_GEN)$(CONVERT) -density 144 $< $@
 #.png.jpg:; $(AM_V_GEN)$(CONVERT) -density 144 $< $@
@@ -263,7 +263,7 @@ PS_PNGS = $(PS_PSS:%.ps=%.png)
 PS_JPGS = $(PS_PSS:%.ps=%.jpg)
 PS_TXTS = $(PS_PSS:%.ps=%.txt)
 
-MY_SECONDARY	+= $(PS_EPSS) $(PS_PDFS) $(PS_PNGS) $(PS_JPGS) $(PS_TXTS)
+MY_SECONDARY	+= $(PS_EPSS) $(PS_PDFS) $(PS_PNGS) $(PS_JPGS)
 
 #.ps.eps :; $(AM_V_GEN)$(PS2EPSI) $< $@ || $(CONVERT) $< $@
 
@@ -291,7 +291,7 @@ IMG_JPGS = @WITH_TEXINFO_TRUE@@WITH_TEXINFO_HTML_TRUE@@DEVELOPMENT_TRUE@@DOCUMEN
 
 HTMLS = $(htmls) $(IMG_PNGS)
 
-MY_SECONDARY	+=  $(IMG_TXTS) $(IMG_EPSS) $(IMG_PDFS)
+MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PDFS)
 
 MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
 
@@ -320,7 +320,7 @@ clean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(FIG_FIGS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.fig||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-figs
@@ -329,7 +329,7 @@ clean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(TBL_TBLS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.tbl||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.txt\n$$d.ps\n$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-tbls
@@ -338,7 +338,7 @@ clean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PNG_PNGS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.png||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-pngs
@@ -347,7 +347,7 @@ clean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PS_PSS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.ps||'` ; \
-		echo -e "$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-pss
@@ -365,7 +365,7 @@ distclean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(FIG_FIGS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.fig||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-figs
@@ -374,7 +374,7 @@ distclean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(TBL_TBLS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.tbl||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.txt\n$$d.ps\n$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-tbls
@@ -383,7 +383,7 @@ distclean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PNG_PNGS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.png||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-pngs
@@ -392,7 +392,7 @@ distclean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PS_PSS)" ; for i in $$list ; do \
 		d=`echo $$i | sed 's|\.ps||'` ; \
-		echo -e "$$d.ps\n$$d.eps\n$$d.png\n$$d.jpg\n$$d.txt\n$$d.pdf" ; \
+		echo -e "$$d.eps\n$$d.png\n$$d.pdf" ; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-pss
@@ -408,7 +408,7 @@ maintainer-clean-figs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(FIG_FIGS)" ; for i in $$list ; do \
 		f=`echo "$(srcdir)/$$i" | sed 's|\.fig$$||'` ; \
-		echo -e "$$f.ps\n$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
+		echo -e "$$f.eps\n$$f.png\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 DISTCLEAN_LOCAL	+= distclean-texi
@@ -419,7 +419,7 @@ maintainer-clean-tbls:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(TBL_TBLS)" ; for i in $$list ; do \
 		f=`echo "$(srcdir)/$$i" | sed 's|\.tbl$$||'` ; \
-		echo -e "$$f.ps\n$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
+		echo -e "$$f.txt\n$$f.ps\n$$f.eps\n$$f.png\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-tbls
@@ -428,7 +428,7 @@ maintainer-clean-pngs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PNG_PNGS)" ; for i in $$list ; do \
 		f=`echo "$(srcdir)$$i" | sed 's|\.png$$||'` ; \
-		echo -e "$$f.ps\n$$f.eps\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
+		echo -e "$$f.eps\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= distclean-pngs
@@ -437,7 +437,7 @@ maintainer-clean-pss:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(PS_PSS)" ; for i in $$list ; do \
 		f=`echo "$(srcdir)/$$i" | sed 's|\.ps$$||'` ; \
-		echo -e "$$f.eps\n$$f.png\n$$f.jpg\n$$f.txt\n$$f.pdf"; \
+		echo -e "$$f.eps\n$$f.png\n$$f.pdf"; \
 	done | $(am__base_remove)
 
 MAINTAINER_CLEAN_LOCAL	+= distclean-pss
