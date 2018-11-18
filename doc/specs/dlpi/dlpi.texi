@@ -403,7 +403,6 @@ herein.
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
-@page
 
 @c Define an index of primitives
 @defcodeindex pr
@@ -465,15 +464,8 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Index::
 @end menu
 
-@iftex
-@c insert list of figures and tables for printed manuals
 @shortcontents
 @contents
-@heading List of Figures
-@listoffloats Figure
-@heading List of Tables
-@listoffloats Table
-@end iftex
 
 @node Introduction
 @chapter Introduction
@@ -1351,7 +1343,7 @@ that a previously sent data unit either produced an error or could not be
 delivered.  This service does not, however, guarantee that an error indication
 will be issued for every undeliverable data unit.
 
-@figuresized{dlpi_fi29b,29b,-,4in}
+@figuresized{dlpi_fi29b,29b,Message Flow: Error Reporting Service,4in}
 
 @node XID and TEST Service
 @subsection XID and TEST Service
@@ -5802,7 +5794,7 @@ so, the table further indicates whether the @acronym{QoS} values are negotiated
 end-to-end among both DLS users and the DLS provider, or locally for each DLS
 user independently with the DLS provider.
 
-@tabfig{dlpi_tab4,1x,-}
+@tabfig{dlpi_tab4,1x,QOS Parameters}
 
 Parameter Service Mode Negotiation throughput connection end-to-end transit
 delay both end-to-end priority both local protection both local residual error
@@ -7808,5 +7800,14 @@ Interconnection for CCITT Applications," 1984.
 @c @printindex mp
 @c @end iftex
 @end ifnotplaintext
+
+@iftex
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @bye

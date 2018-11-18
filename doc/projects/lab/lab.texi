@@ -266,9 +266,6 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/versions.texi
 @include texi/prims.texi
 
-@shortcontents
-@contents
-
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -292,19 +289,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * List of Tables::
 * Index::
 @end menu
-
-@iftex
-@c insert list of figures and tables for printed manuals
-@page
-@heading List of Figures
-@listoffloats Figure
-@page
-@heading List of Tables
-@listoffloats Table
-@c @page
-@c @heading List of Listings
-@c @listoffloats Table
-@end iftex
 
 @node Executive Overview
 @unnumbered Executive Overview
@@ -378,6 +362,9 @@ or deployment applications.
 @email{bidulock@@openss7.org, Brian Bidulock}
 The OpenSS7 Project
 @end flushright
+
+@shortcontents
+@contents
 
 @node Preface
 @unnumbered Preface
@@ -2747,6 +2734,19 @@ not included.
 @node Index
 @unnumbered Index
 @printindex cp
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@c @page
+@c @heading List of Listings
+@c @listoffloats Table
+@end iftex
 
 @bye
 

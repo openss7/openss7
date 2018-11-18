@@ -265,9 +265,6 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/versions.texi
 @include texi/prims.texi
 
-@shortcontents
-@contents
-
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -309,17 +306,11 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Index::
 @end menu
 
-@iftex
-@c insert list of figures and tables for printed manuals
-@page
-@heading List of Figures
-@listoffloats Figure
-@page
-@heading List of Listings
-@listoffloats Table
-@end iftex
-
 @c --------------------------------------------------------------------------
+
+@shortcontents
+@contents
+
 @c --------------------------------------------------------------------------
 
 @node Preface
@@ -7297,6 +7288,16 @@ and output side.
 @c @node File Index
 @c @unnumberedsec Program and File Index
 @c @printindex pg
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Listings
+@listoffloats Table
+@end iftex
 
 @bye
 

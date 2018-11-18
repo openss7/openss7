@@ -265,9 +265,6 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/versions.texi
 @include texi/prims.texi
 
-@shortcontents
-@contents
-
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -324,19 +321,10 @@ Copying
 @c * Variable Index::		Variable Index
 @c * File Index::			File Index
 
-@iftex
-@c insert list of figures and tables for printed manuals
-@page
-@heading List of Figures
-@listoffloats Figure
-@c @page
-@c @heading List of Tables
-@c @listoffloats Table
-@c @page
-@c @heading List of Listings
-@c @listoffloats Table
-@end iftex
+@c --------------------------------------------------------------------------
 
+@shortcontents
+@contents
 
 @c --------------------------------------------------------------------------
 
@@ -1693,6 +1681,19 @@ and output side.
 @c @node File Index
 @c @unnumberedsec Program and File Index
 @c @printindex pg
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@c @page
+@c @heading List of Tables
+@c @listoffloats Table
+@c @page
+@c @heading List of Listings
+@c @listoffloats Table
+@end iftex
 
 @bye
 

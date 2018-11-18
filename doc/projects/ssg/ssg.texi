@@ -265,9 +265,6 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/versions.texi
 @include texi/prims.texi
 
-@shortcontents
-@contents
-
 @ifnottex
 @node Top
 @top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -300,15 +297,6 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Platform Sizing::
 * Index::
 @end menu
-
-@iftex
-@page
-@heading List of Figures
-@listoffloats Figure
-@page
-@heading List of Tables
-@listoffloats Table
-@end iftex
 
 @node Executive Overview
 @unnumbered Executive Overview
@@ -407,6 +395,9 @@ The OpenSS7 Project
 @subsubheading Development Effort
 
 @subsubheading Schedule
+
+@shortcontents
+@contents
 
 @node Preface
 @unnumbered Preface
@@ -3391,6 +3382,15 @@ A 100baseT Layer 2 switch is provided to ensure that M3UA/SCTP traffic is not hu
 @node Index
 @unnumbered Index
 @printindex cp
+
+@iftex
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @bye
 

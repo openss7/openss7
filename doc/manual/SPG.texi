@@ -316,17 +316,10 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @c * Variable Index::		Variable Index
 @c * File Index::			File Index
 
-@iftex
-@c insert list of figures and tables for printed manuals
+@c --------------------------------------------------------------------------
+
 @shortcontents
 @contents
-@heading List of Figures
-@listoffloats Figure
-@c @page
-@c @heading List of Tables
-@c @listoffloats Table
-@end iftex
-
 
 @c --------------------------------------------------------------------------
 
@@ -18939,6 +18932,16 @@ and output side.
 @c @node File Index
 @c @unnumberedsec Program and File Index
 @c @printindex pg
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@c @page
+@c @heading List of Tables
+@c @listoffloats Table
+@end iftex
 
 @bye
 
