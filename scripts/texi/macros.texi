@@ -88,7 +88,7 @@
 
 @macro tabfig{image,number,caption}
 @c @cartouche
-@float Table,Table \number\
+@float Table,tab:\number\
 @center @image{\image\}
 @caption{@emph{\caption\}}
 @end float
@@ -98,7 +98,7 @@
 
 @macro tabfigsized{image,number,caption,size}
 @c @cartouche
-@float Table,Table \number\
+@float Table,tab:\number\
 @center @image{\image\,\size\}
 @caption{@emph{\caption\}}
 @end float
@@ -108,7 +108,7 @@
 
 @macro figure{image,number,caption}
 @cartouche
-@float Figure,Figure \number\
+@float Figure,fig:\number\
 @center @image{\image\,,,\caption\}
 @caption{@emph{\caption\}}
 @end float
@@ -118,7 +118,7 @@
 
 @macro figuresized{image,number,caption,size}
 @cartouche
-@float Figure,Figure \number\
+@float Figure,fig:\number\
 @center @image{\image\,\size\,,\caption\}
 @caption{@emph{\caption\}}
 @end float
@@ -128,7 +128,7 @@
 
 @macro figureimage{image,number,caption,width,height,alttext,extension}
 @cartouche
-@float Figure,Figure \number\
+@float Figure,fig:\number\
 @center @image{\image\,\width\,\height\,\alttext\,\extension\}
 @caption{@emph{\caption\}}
 @end float
