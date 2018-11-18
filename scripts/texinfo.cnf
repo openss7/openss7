@@ -85,8 +85,8 @@
 @c @pagesizes 11in,8.5in
 @fonttextsize 10
 @paragraphindent 0
-@setcontentsaftertitlepage
-@setshortcontentsaftertitlepage
+@c @setcontentsaftertitlepage
+@c @setshortcontentsaftertitlepage
 @setchapternewpage odd
 @footnotestyle separate
 @set xref-automatic-section-title
