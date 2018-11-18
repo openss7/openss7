@@ -204,6 +204,8 @@
 %global HAVE_urpmirepo      %(if (rpm -q --whatprovides urpmi   >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper  >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 
+%global HAVE_systemd        %(if (rpm -q --whatprovides systemd >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+
 # when _reposubdir is not defined we cannot build a repo package
 %{!?_reposubdir:            %{expand: %%global HAVE_yumrepo   0}}
 %{!?_reposubdir:            %{expand: %%global HAVE_aptrepo   0}}
@@ -659,6 +661,7 @@
 %global BUILD_debug     %{WITH_debug}
 
 # define new autoconf 2.60, 2.61 stuff
+%{!?_usrlib:            %{expand: %%global _usrlib          %%{_prefix}/lib}}
 %{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
 %{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
 %{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
@@ -708,11 +711,21 @@
 %{!?_sslcertdir:        %{expand: %%global _sslcertdir      %%{_ssldir}/certs}}
 %{!?_cacertdir:         %{expand: %%global _cacertdir       %%{_datarootdir}/ca-certificates}}
 %{!?_lcacertdir:        %{expand: %%global _lcacertdir      %%{_prefix}/local/share/ca-certificates}}
+
+%if %{HAVE_systemd}
+%{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_usrlib}/modprobe.d}}
+%{!?_sysctlddir:        %{expand: %%global _sysctlddir      %%{_usrlib}/sysctl.d}}
+%{!?_modloadddir:       %{expand: %%global _modloadddir     %%{_usrlib}/modules-load.d}}
+%{!?_unitdir:           %{expand: %%global _unitdir         %%{_usrlib}/systemd/system}}
+%else
 %{!?_modprobeddir:      %{expand: %%global _modprobeddir    %%{_sysconfdir}/modprobe.d}}
+%{!?_sysctlddir:        %{expand: %%global _sysctlddir      %%{_sysconfdir}/sysctl.d}}
+%endif
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
 %{!?_reposerv:          %{expand: %%global _reposerv        @reposerv@}}
+
 
 # ---------------------------------------------------------------------------
 # Calculate which files were not built (and are not included)
@@ -3916,8 +3929,13 @@ fi
 #{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path}
 #{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path.d/#{sock2path}}
 #{?files_oldmods:#config(noreplace) #{_modutildir}/*}
+%if %{HAVE_systemd}
+%{?files_initscripts:%config(noreplace) %{_confgidir}/*}
+%{?files_initscripts:%{_unitdir}/*}
+%else
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_initrddir}/*}
+%endif
 %{?files_devscripts:%{_sbindir}/@STRCONF_DEVICES@}
 %{?files_mibfiles:%{_snmpmibdir}/*}
 %{?files_testscripts:%{_pkglibexecdir}/atlocal}
@@ -3937,7 +3955,12 @@ fi
 %{?files_wmscripts:%{_sbindir}/%{name}-update}
 %{?files_wmscripts:%{_sbindir}/%{name}-patch}
 %{?files_wmscripts:%{_sbindir}/%{name}-modprobe}
+%if %{HAVE_systemd}
+%{?files_wmscripts:%{_modloadddir}/specfs.conf}
 %{?files_wmscripts:%{_modprobeddir}/specfs.conf}
+%else
+%{?files_wmscripts:%{_modprobeddir}/specfs.conf}
+%endif
 %endif
 
 # ===========================================================================
@@ -5352,7 +5375,6 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 	    if [ -L $l ]; then start=yes; break; fi
 	done
 	[ $start = yes ] || continue
-        [ -x "`which systemctl   2>/dev/null`" ] && { systemctl     start $i && continue || break; }
 	[ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
 	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
 	[ -x %{_initrddir}/$i                  ] && { %{_initrddir}/$i start && continue || break; }
@@ -5400,7 +5422,6 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
                 if [ -L $l ]; then start=yes; break; fi
             done
             [ $start = yes ] || continue
-            [ -x "`which systemctl   2>/dev/null`" ] && { systemctl     start $i && continue || break; }
             [ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
             [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
             [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break; }
