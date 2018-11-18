@@ -24,18 +24,25 @@ for o in $(git tag --sort=-creatordate) ""; do
 		patchlv=$(echo "$date"|sed 's,-,,g')
 	else
 		version="$t"
-		if [ "$(echo $t|grep -q '\.20[01][0-9][0-9][0-9][0-9][0-9]$' 2>/dev/null)" != "" ] ; then
+		case "$t" in 
+		openss7-*.20[0-0][0-9][0-9][0-9][0-9][0-9])
 			date=$(echo "$version"|sed -r 's,^.*\.,,;s,(....)(..)(..),\1-\2-\3,')
 			patchlv=$(echo "$date"|sed 's,-,,g')
-		else
+			;;
+		openss7-*.*)
 			date=$(git show -s --format=%ci "$t^{commit}"|awk '{print$1}')
-			patchlv=""
-		fi
+			patchlv=$(echo "$version"|sed 's,^.*\.,,')
+			;;
+		*)
+			t="$o"
+			continue
+			;;
+		esac
 	fi
 	i=$((i+1))
 	version=$(echo "$version"|sed 's,^openss7-,,;s,\.2[0-9]*-,-,;s,[-_],.,g;s,\.g.*$,,;s,\.[^.]*$,,')
 	version="$version${patchlv:+.$patchlv}"
-	title="Release ${PACKAGE}${PACKAGE:+-}$version released $date"
+	title="Release ${PACKAGE}${PACKAGE:+ }$version released $date"
 	under=$(echo "$title"|sed 's,.,-,g')
 	/usr/bin/echo -e "\n$title\n$under\n"
 	cmd="git notes --ref=release show $t"
@@ -43,13 +50,14 @@ for o in $(git tag --sort=-creatordate) ""; do
 	lines=$(echo "$notes"|wc -l)
 	if [ $lines -gt 1 ] ; then
 		/usr/bin/echo -e "$cmd\n\n$notes\n"
-	fi
-	if [ :$t != :HEAD ] ; then
-		cmd="git tag -n100 -l ${t}"
-		notes=$(eval $cmd 2>/dev/null)
-		lines=$(echo "$notes"|wc -l)
-		if [ $lines -gt 1 ] ; then
-			/usr/bin/echo -e "$cmd\n\n$notes\n"
+	else
+		if [ :$t != :HEAD ] ; then
+			cmd="git tag -n100 -l ${t}"
+			notes=$(eval $cmd 2>/dev/null)
+			lines=$(echo "$notes"|wc -l)
+			if [ $lines -gt 1 ] ; then
+				/usr/bin/echo -e "$cmd\n\n$notes\n"
+			fi
 		fi
 	fi
 	cmd="git shortlog -e -n -w80,6,8 ${o}${o:+...}${t}"
