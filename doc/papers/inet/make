@@ -1,6 +1,7 @@
+#!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) doc/papers/sctp/Makefile
+# @(#) doc/papers/inet/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -72,6 +73,10 @@ PLOTS = \
 	$(PAPER_PREFIX)_smp_delay.plot \
 	$(PAPER_PREFIX)_smp_perf.plot \
 	$(PAPER_PREFIX)_smp_thrput.plot \
+	$(PAPER_PREFIX)_cos5_comp.plot \
+	$(PAPER_PREFIX)_cos5_delay.plot \
+	$(PAPER_PREFIX)_cos5_perf.plot \
+	$(PAPER_PREFIX)_cos5_thrput.plot \
 	$(PAPER_PREFIX)_suse_comp.plot \
 	$(PAPER_PREFIX)_suse_delay.plot \
 	$(PAPER_PREFIX)_suse_perf.plot \
@@ -79,49 +84,44 @@ PLOTS = \
 	$(PAPER_PREFIX)_u704_comp.plot \
 	$(PAPER_PREFIX)_u704_delay.plot \
 	$(PAPER_PREFIX)_u704_perf.plot \
-	$(PAPER_PREFIX)_u704_thrput.plot
-
-#	$(PAPER_PREFIX)_cos5_comp.plot \
-#	$(PAPER_PREFIX)_cos5_delay.plot \
-#	$(PAPER_PREFIX)_cos5_perf.plot \
-#	$(PAPER_PREFIX)_cos5_thrput.plot \
-#	$(PAPER_PREFIX)_ubuntu_comp.plot \
-#	$(PAPER_PREFIX)_ubuntu_delay.plot \
-#	$(PAPER_PREFIX)_ubuntu_perf.plot \
-#	$(PAPER_PREFIX)_ubuntu_thrput.plot
+	$(PAPER_PREFIX)_u704_thrput.plot \
+	$(PAPER_PREFIX)_ubuntu_comp.plot \
+	$(PAPER_PREFIX)_ubuntu_delay.plot \
+	$(PAPER_PREFIX)_ubuntu_perf.plot \
+	$(PAPER_PREFIX)_ubuntu_thrput.plot
 
 EPSFIGS = \
 	sockets.eps \
 	xtios.eps \
-	sctp.eps
+	udp.eps
 
 PDFFIGS = \
 	sockets.pdf \
 	xtios.pdf \
-	sctp.pdf
+	udp.pdf
 
 GIFFIGS = \
 	sockets.gif \
 	xtios.gif \
-	sctp.gif
+	udp.gif
 
 PNGFIGS = \
 	sockets.png \
 	xtios.png \
-	sctp.png
+	udp.png
 
 FIGFIGS = \
 	sockets.fig \
 	xtios.fig \
-	sctp.fig
+	udp.fig
 
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
-NAME = sctpresults
+NAME = testresults
 
 MY_PHONY += all all-dat
 
-all: $(NAME).bbl $(NAME).dvi $(NAME).ps $(NAME).pdf $(NAME).html
+all: $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
 
 $(PLOTFIGS): %.fig: %.plot
 	@make all-dat
@@ -166,10 +166,10 @@ $(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_p
 $(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf.fig $(PAPER_PREFIX)_nb_thrput.fig: $(PAPER_PREFIX)_nb.dat
 $(PAPER_PREFIX)_rh7_comp.fig $(PAPER_PREFIX)_rh7_delay.fig $(PAPER_PREFIX)_rh7_perf.fig $(PAPER_PREFIX)_rh7_thrput.fig: $(PAPER_PREFIX)_rh7.dat
 $(PAPER_PREFIX)_smp_comp.fig $(PAPER_PREFIX)_smp_delay.fig $(PAPER_PREFIX)_smp_perf.fig $(PAPER_PREFIX)_smp_thrput.fig: $(PAPER_PREFIX)_smp.dat
-#$(PAPER_PREFIX)_cos5_comp.fig $(PAPER_PREFIX)_cos5_delay.fig $(PAPER_PREFIX)_cos5_perf.fig $(PAPER_PREFIX)_cos5_thrput.fig: $(PAPER_PREFIX)_cos5.dat
+$(PAPER_PREFIX)_cos5_comp.fig $(PAPER_PREFIX)_cos5_delay.fig $(PAPER_PREFIX)_cos5_perf.fig $(PAPER_PREFIX)_cos5_thrput.fig: $(PAPER_PREFIX)_cos5.dat
 $(PAPER_PREFIX)_suse_comp.fig $(PAPER_PREFIX)_suse_delay.fig $(PAPER_PREFIX)_suse_perf.fig $(PAPER_PREFIX)_suse_thrput.fig: $(PAPER_PREFIX)_suse.dat
 $(PAPER_PREFIX)_u704_comp.fig $(PAPER_PREFIX)_u704_delay.fig $(PAPER_PREFIX)_u704_perf.fig $(PAPER_PREFIX)_u704_thrput.fig: $(PAPER_PREFIX)_u704.dat
-#$(PAPER_PREFIX)_ubuntu_comp.fig $(PAPER_PREFIX)_ubuntu_delay.fig $(PAPER_PREFIX)_ubuntu_perf.fig $(PAPER_PREFIX)_ubuntu_thrput.fig: $(PAPER_PREFIX)_ubuntu.dat
+$(PAPER_PREFIX)_ubuntu_comp.fig $(PAPER_PREFIX)_ubuntu_delay.fig $(PAPER_PREFIX)_ubuntu_perf.fig $(PAPER_PREFIX)_ubuntu_thrput.fig: $(PAPER_PREFIX)_ubuntu.dat
 
 PLOT_DATS = \
 	$(PAPER_PREFIX)_centos.dat \
@@ -273,4 +273,4 @@ MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 .PHONY: $(MY_PHONY)
 
 # =============================================================================
-# vim: ft=make
+# vim: ft=make sw=4

@@ -1,6 +1,7 @@
+#!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) doc/papers/sigtran/Makefile
+# @(#) doc/papers/sctp/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,39 +52,40 @@ MY_PHONY =
 
 PAPER_PREFIX = netperf
 
-#PLOTS = \
-#	$(PAPER_PREFIX)_centos_comp.plot \
-#	$(PAPER_PREFIX)_centos_delay.plot \
-#	$(PAPER_PREFIX)_centos_perf.plot \
-#	$(PAPER_PREFIX)_centos_thrput.plot \
-#	$(PAPER_PREFIX)_fc6_comp.plot \
-#	$(PAPER_PREFIX)_fc6_delay.plot \
-#	$(PAPER_PREFIX)_fc6_perf.plot \
-#	$(PAPER_PREFIX)_fc6_thrput.plot \
-#	$(PAPER_PREFIX)_nb_comp.plot \
-#	$(PAPER_PREFIX)_nb_delay.plot \
-#	$(PAPER_PREFIX)_nb_perf.plot \
-#	$(PAPER_PREFIX)_nb_thrput.plot \
-#	$(PAPER_PREFIX)_rh7_comp.plot \
-#	$(PAPER_PREFIX)_rh7_delay.plot \
-#	$(PAPER_PREFIX)_rh7_perf.plot \
-#	$(PAPER_PREFIX)_rh7_thrput.plot \
-#	$(PAPER_PREFIX)_smp_comp.plot \
-#	$(PAPER_PREFIX)_smp_delay.plot \
-#	$(PAPER_PREFIX)_smp_perf.plot \
-#	$(PAPER_PREFIX)_smp_thrput.plot \
+PLOTS = \
+	$(PAPER_PREFIX)_centos_comp.plot \
+	$(PAPER_PREFIX)_centos_delay.plot \
+	$(PAPER_PREFIX)_centos_perf.plot \
+	$(PAPER_PREFIX)_centos_thrput.plot \
+	$(PAPER_PREFIX)_fc6_comp.plot \
+	$(PAPER_PREFIX)_fc6_delay.plot \
+	$(PAPER_PREFIX)_fc6_perf.plot \
+	$(PAPER_PREFIX)_fc6_thrput.plot \
+	$(PAPER_PREFIX)_nb_comp.plot \
+	$(PAPER_PREFIX)_nb_delay.plot \
+	$(PAPER_PREFIX)_nb_perf.plot \
+	$(PAPER_PREFIX)_nb_thrput.plot \
+	$(PAPER_PREFIX)_rh7_comp.plot \
+	$(PAPER_PREFIX)_rh7_delay.plot \
+	$(PAPER_PREFIX)_rh7_perf.plot \
+	$(PAPER_PREFIX)_rh7_thrput.plot \
+	$(PAPER_PREFIX)_smp_comp.plot \
+	$(PAPER_PREFIX)_smp_delay.plot \
+	$(PAPER_PREFIX)_smp_perf.plot \
+	$(PAPER_PREFIX)_smp_thrput.plot \
+	$(PAPER_PREFIX)_suse_comp.plot \
+	$(PAPER_PREFIX)_suse_delay.plot \
+	$(PAPER_PREFIX)_suse_perf.plot \
+	$(PAPER_PREFIX)_suse_thrput.plot \
+	$(PAPER_PREFIX)_u704_comp.plot \
+	$(PAPER_PREFIX)_u704_delay.plot \
+	$(PAPER_PREFIX)_u704_perf.plot \
+	$(PAPER_PREFIX)_u704_thrput.plot
+
 #	$(PAPER_PREFIX)_cos5_comp.plot \
 #	$(PAPER_PREFIX)_cos5_delay.plot \
 #	$(PAPER_PREFIX)_cos5_perf.plot \
 #	$(PAPER_PREFIX)_cos5_thrput.plot \
-#	$(PAPER_PREFIX)_suse_comp.plot \
-#	$(PAPER_PREFIX)_suse_delay.plot \
-#	$(PAPER_PREFIX)_suse_perf.plot \
-#	$(PAPER_PREFIX)_suse_thrput.plot \
-#	$(PAPER_PREFIX)_u704_comp.plot \
-#	$(PAPER_PREFIX)_u704_delay.plot \
-#	$(PAPER_PREFIX)_u704_perf.plot \
-#	$(PAPER_PREFIX)_u704_thrput.plot \
 #	$(PAPER_PREFIX)_ubuntu_comp.plot \
 #	$(PAPER_PREFIX)_ubuntu_delay.plot \
 #	$(PAPER_PREFIX)_ubuntu_perf.plot \
@@ -116,11 +118,11 @@ FIGFIGS = \
 
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
-NAME = sigtranimp
+NAME = sctpresults
 
 MY_PHONY += all all-dat
 
-all: $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
+all: $(NAME).bbl $(NAME).dvi $(NAME).ps $(NAME).pdf $(NAME).html
 
 $(PLOTFIGS): %.fig: %.plot
 	@make all-dat
@@ -160,26 +162,26 @@ png: $(PNGFIGS) $(PLOTS:.plot=.png)
 eps: $(EPSFIGS) $(PLOTS:.plot=.eps)
 pdf: $(PDFFIGS) $(PLOTS:.plot=.pdf)
 
-#$(PAPER_PREFIX)_centos_comp.fig $(PAPER_PREFIX)_centos_delay.fig $(PAPER_PREFIX)_centos_perf.fig $(PAPER_PREFIX)_centos_thrput.fig: $(PAPER_PREFIX)_centos.dat
-#$(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_perf.fig $(PAPER_PREFIX)_fc6_thrput.fig: $(PAPER_PREFIX)_fc6.dat
-#$(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf.fig $(PAPER_PREFIX)_nb_thrput.fig: $(PAPER_PREFIX)_nb.dat
-#$(PAPER_PREFIX)_rh7_comp.fig $(PAPER_PREFIX)_rh7_delay.fig $(PAPER_PREFIX)_rh7_perf.fig $(PAPER_PREFIX)_rh7_thrput.fig: $(PAPER_PREFIX)_rh7.dat
-#$(PAPER_PREFIX)_smp_comp.fig $(PAPER_PREFIX)_smp_delay.fig $(PAPER_PREFIX)_smp_perf.fig $(PAPER_PREFIX)_smp_thrput.fig: $(PAPER_PREFIX)_smp.dat
+$(PAPER_PREFIX)_centos_comp.fig $(PAPER_PREFIX)_centos_delay.fig $(PAPER_PREFIX)_centos_perf.fig $(PAPER_PREFIX)_centos_thrput.fig: $(PAPER_PREFIX)_centos.dat
+$(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_perf.fig $(PAPER_PREFIX)_fc6_thrput.fig: $(PAPER_PREFIX)_fc6.dat
+$(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf.fig $(PAPER_PREFIX)_nb_thrput.fig: $(PAPER_PREFIX)_nb.dat
+$(PAPER_PREFIX)_rh7_comp.fig $(PAPER_PREFIX)_rh7_delay.fig $(PAPER_PREFIX)_rh7_perf.fig $(PAPER_PREFIX)_rh7_thrput.fig: $(PAPER_PREFIX)_rh7.dat
+$(PAPER_PREFIX)_smp_comp.fig $(PAPER_PREFIX)_smp_delay.fig $(PAPER_PREFIX)_smp_perf.fig $(PAPER_PREFIX)_smp_thrput.fig: $(PAPER_PREFIX)_smp.dat
 #$(PAPER_PREFIX)_cos5_comp.fig $(PAPER_PREFIX)_cos5_delay.fig $(PAPER_PREFIX)_cos5_perf.fig $(PAPER_PREFIX)_cos5_thrput.fig: $(PAPER_PREFIX)_cos5.dat
-#$(PAPER_PREFIX)_suse_comp.fig $(PAPER_PREFIX)_suse_delay.fig $(PAPER_PREFIX)_suse_perf.fig $(PAPER_PREFIX)_suse_thrput.fig: $(PAPER_PREFIX)_suse.dat
-#$(PAPER_PREFIX)_u704_comp.fig $(PAPER_PREFIX)_u704_delay.fig $(PAPER_PREFIX)_u704_perf.fig $(PAPER_PREFIX)_u704_thrput.fig: $(PAPER_PREFIX)_u704.dat
+$(PAPER_PREFIX)_suse_comp.fig $(PAPER_PREFIX)_suse_delay.fig $(PAPER_PREFIX)_suse_perf.fig $(PAPER_PREFIX)_suse_thrput.fig: $(PAPER_PREFIX)_suse.dat
+$(PAPER_PREFIX)_u704_comp.fig $(PAPER_PREFIX)_u704_delay.fig $(PAPER_PREFIX)_u704_perf.fig $(PAPER_PREFIX)_u704_thrput.fig: $(PAPER_PREFIX)_u704.dat
 #$(PAPER_PREFIX)_ubuntu_comp.fig $(PAPER_PREFIX)_ubuntu_delay.fig $(PAPER_PREFIX)_ubuntu_perf.fig $(PAPER_PREFIX)_ubuntu_thrput.fig: $(PAPER_PREFIX)_ubuntu.dat
 
-#PLOT_DATS = \
-#	$(PAPER_PREFIX)_centos.dat \
-#	$(PAPER_PREFIX)_fc6.dat \
-#	$(PAPER_PREFIX)_nb.dat \
-#	$(PAPER_PREFIX)_rh7.dat \
-#	$(PAPER_PREFIX)_smp.dat \
-#	$(PAPER_PREFIX)_cos5.dat \
-#	$(PAPER_PREFIX)_suse.dat \
-#	$(PAPER_PREFIX)_u704.dat \
-#	$(PAPER_PREFIX)_ubuntu.dat
+PLOT_DATS = \
+	$(PAPER_PREFIX)_centos.dat \
+	$(PAPER_PREFIX)_fc6.dat \
+	$(PAPER_PREFIX)_nb.dat \
+	$(PAPER_PREFIX)_rh7.dat \
+	$(PAPER_PREFIX)_smp.dat \
+	$(PAPER_PREFIX)_cos5.dat \
+	$(PAPER_PREFIX)_suse.dat \
+	$(PAPER_PREFIX)_u704.dat \
+	$(PAPER_PREFIX)_ubuntu.dat
 
 PAPER_BIBS = \
 	$(NAME).bib

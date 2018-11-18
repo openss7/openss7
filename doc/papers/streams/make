@@ -1,6 +1,7 @@
+#!/usr/bin/make -f
 # =============================================================================
 # 
-# @(#) doc/papers/inet/Makefile
+# @(#) doc/papers/streams/Makefile
 #
 # -----------------------------------------------------------------------------
 #
@@ -18,9 +19,10 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+# 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +51,7 @@ srcdir = .
 ECHO = echo
 MY_PHONY =
 
-PAPER_PREFIX = netperf
+PAPER_PREFIX = perftest
 
 PLOTS = \
 	$(PAPER_PREFIX)_centos_comp.plot \
@@ -90,33 +92,33 @@ PLOTS = \
 	$(PAPER_PREFIX)_ubuntu_thrput.plot
 
 EPSFIGS = \
-	sockets.eps \
-	xtios.eps \
-	udp.eps
+	legacypipe.eps \
+	streamspipe.eps \
+	socketpipe.eps
 
 PDFFIGS = \
-	sockets.pdf \
-	xtios.pdf \
-	udp.pdf
+	legacypipe.pdf \
+	streamspipe.pdf \
+	socketpipe.pdf
 
 GIFFIGS = \
-	sockets.gif \
-	xtios.gif \
-	udp.gif
+	legacypipe.gif \
+	streamspipe.gif \
+	socketpipe.gif
 
 PNGFIGS = \
-	sockets.png \
-	xtios.png \
-	udp.png
+	legacypipe.png \
+	streamspipe.png \
+	socketpipe.png
 
 FIGFIGS = \
-	sockets.fig \
-	xtios.fig \
-	udp.fig
+	legacypipe.fig \
+	streamspipe.fig \
+	socketpipe.fig
 
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
-NAME = testresults
+NAME = piperesults
 
 MY_PHONY += all all-dat
 
@@ -271,5 +273,3 @@ MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 .PHONY: $(MY_PHONY)
 
-# =============================================================================
-# vim: ft=make sw=4
