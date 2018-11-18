@@ -232,7 +232,6 @@ this document or the performance or implementation of the contents thereof.}
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
-@page
 
 @include texi/macros.texi
 @include texi/versions.texi
@@ -240,6 +239,9 @@ this document or the performance or implementation of the contents thereof.}
 @defcodeindex op
 @defcodeindex mk
 @defcodeindex mp
+
+@shortcontents
+@contents
 
 @ifnottex
 @node Top
@@ -2217,10 +2219,6 @@ restrictions.  Similar information is available in the manual pages that accompa
 
 @c ----------------------------------------------------------------------------
 
-@page
-@shortcontents
-@page
-@contents
 @bye
 
 @c ============================================================================

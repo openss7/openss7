@@ -302,10 +302,10 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 
 @iftex
 @c insert list of figures and tables for printed manuals
-@page
+@shortcontents
+@contents
 @heading List of Figures
 @listoffloats Figure
-@page
 @heading List of Tables
 @listoffloats Table
 @end iftex
@@ -30009,8 +30009,4 @@ Corporation}.
 @c @end iftex
 @end ifnotplaintext
 
-@page
-@shortcontents
-@page
-@contents
 @bye

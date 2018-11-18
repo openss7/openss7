@@ -231,7 +231,6 @@ this document or the performance or implementation of the contents thereof.}
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
-@page
 
 @c Define an index of primitives
 @defcodeindex pr
@@ -265,6 +264,9 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
+
+@shortcontents
+@contents
 
 @ifnottex
 @node Top
@@ -1464,8 +1466,4 @@ or @cite{OpenSS7 Corporation}.
 @unnumberedsec Index of Manual Pages Referenced
 @printindex mp
 
-@page
-@shortcontents
-@page
-@contents
 @bye

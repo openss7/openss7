@@ -231,7 +231,6 @@ this document or the performance or implementation of the contents thereof.}
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
-@page
 
 @c Define an index of primitives
 @defcodeindex pr
@@ -265,6 +264,9 @@ this document or the performance or implementation of the contents thereof.}
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
+
+@shortcontents
+@contents
 
 @ifnottex
 @node Top
@@ -608,10 +610,6 @@ and should match the type of Cat5 cable (solid core or stranded).
 
 @c ----------------------------------------------------------------------------
 
-@page
-@shortcontents
-@page
-@contents
 @bye
 
 @c ============================================================================

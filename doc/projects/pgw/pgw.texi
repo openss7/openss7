@@ -237,7 +237,6 @@ any use of this document or the performance or implementation of the contents th
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
-@page
 
 @c Define an index of primitives
 @defcodeindex pr
@@ -271,6 +270,9 @@ any use of this document or the performance or implementation of the contents th
 @include texi/macros.texi
 @include texi/versions.texi
 @include texi/prims.texi
+
+@shortcontents
+@contents
 
 @ifnottex
 @node Top
@@ -8233,8 +8235,4 @@ Ltd}.
 @printindex cp
 @end ifnotplaintext
 
-@page
-@shortcontents
-@page
-@contents
 @bye

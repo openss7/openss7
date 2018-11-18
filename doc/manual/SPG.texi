@@ -318,7 +318,8 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 
 @iftex
 @c insert list of figures and tables for printed manuals
-@page
+@shortcontents
+@contents
 @heading List of Figures
 @listoffloats Figure
 @c @page
@@ -18939,9 +18940,5 @@ and output side.
 @c @unnumberedsec Program and File Index
 @c @printindex pg
 
-@page
-@shortcontents
-@page
-@contents
 @bye
 
