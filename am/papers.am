@@ -90,9 +90,13 @@ AM_V_null = `$(ECHO_Q) ' >/dev/null'`
 	$(AM_V_at)eval "$(LATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(LATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
+	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
+	$(AM_V_at)eval "$(LATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 
 .tex.ps:
 	$(AM_V_GEN)eval "$(PSLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null) || :"
+	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
+	$(AM_V_at)eval "$(PSLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(PSLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
@@ -101,6 +105,8 @@ AM_V_null = `$(ECHO_Q) ' >/dev/null'`
 
 .tex.pdf:
 	$(AM_V_GEN)eval "$(PDFLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null) || :"
+	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
+	$(AM_V_at)eval "$(PDFLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(PDFLATEX) `echo $< | sed 's,.*/,,'` $(AM_V_null)"
 	$(AM_V_at)eval "$(BIBTEX) `echo $< | sed 's,.*/,,;s,\.tex,,'` $(AM_V_null)"
