@@ -1607,7 +1607,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 	[], [with_kabi_whitelist=search])
     _BLD_FIND_FILE([kernel kABI whitelist], [linux_cv_kabi_whitelist], [
 	    ${rootdir}/usr/lib/modules/kabi/kabi_whitelist_${karch}
+	    ${rootdir}/usr/lib/modules/kabi-current/kabi_whitelist_${karch}
 	    ${rootdir}/lib/modules/kabi/kabi_whitelist_${karch}
+	    ${rootdir}/lib/modules/kabi-current/kabi_whitelist_${karch}
     ], [], [dnl
 	if test ${with_kabi_whitelist:-search} != no ; then
 	    case "$target_vendor:$target_edition" in
@@ -1620,7 +1622,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 *** Configure cannot find the kABI whitelist:
 ***
 ***	/usr/lib/modules/kabi/kabi_whitelist_${karch}
+***	/usr/lib/modules/kabi-current/kabi_whitelist_${karch}
 ***	/lib/modules/kabi/kabi_whitelist_${karch}
+***	/lib/modules/kabi-current/kabi_whitelist_${karch}
 ***
 *** Perhaps you need to load the kABI whitelist package (e.g.,
 *** kabi-whitelist).  Kernel symbols cannot be checked against the
@@ -1628,11 +1632,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 *** If this is not what you want, load the kABI whitelist package
 *** and rerun configure.  Try:
 *** ], [
-*** RHEL 6.x:   'yum install kabi-whitelist'
-*** CentOS 6.x: 'yum install kabi-whitelist'
-*** SL 6.x:     'yum install kabi-whitelist'
-*** OLS 6.x:	'yum install kabi-whitelist'
-*** PUIAS 6.x:  (copy from RHEL or other clone)], [
+*** RHEL [[67]].x:   'yum install kabi-whitelist'
+*** CentOS [[67]].x: 'yum install kabi-whitelist'
+*** SL [[67]].x:     'yum install kabi-whitelist'
+*** OLS [[67]].x:    'yum install kabi-whitelist'
+*** PUIAS [[67]].x:  (copy from RHEL or other clone)], [
 ***
 *** Repeat after loading the correct package, specifying the correct
 *** file using configure argument --with-kabi-whitelist=WHITELIST,
