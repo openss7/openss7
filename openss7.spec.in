@@ -672,6 +672,7 @@
 %{!?_configdir:         %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:        %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:        %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
+%{!?_kbuilddir:         %{expand: %%global _kbuilddir       %%{_kmoduledir}/build}}
 %{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
 %{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
 %{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
@@ -3929,13 +3930,11 @@ fi
 #{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path}
 #{?files_sock2path:#config(noreplace) #{_sysconfdir}/sock2path.d/#{sock2path}}
 #{?files_oldmods:#config(noreplace) #{_modutildir}/*}
+%{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %if %{HAVE_systemd}
-%{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_unitdir}/*}
-%else
-%{?files_initscripts:%config(noreplace) %{_configdir}/*}
-%{?files_initscripts:%{_initrddir}/*}
 %endif
+%{?files_initscripts:%{_initrddir}/*}
 %{?files_devscripts:%{_sbindir}/@STRCONF_DEVICES@}
 %{?files_mibfiles:%{_snmpmibdir}/*}
 %{?files_testscripts:%{_pkglibexecdir}/atlocal}
@@ -3956,8 +3955,12 @@ fi
 %{?files_wmscripts:%{_sbindir}/%{name}-patch}
 %{?files_wmscripts:%{_sbindir}/%{name}-modprobe}
 %if %{HAVE_systemd}
-%{?files_wmscripts:%{_modloadddir}/specfs.conf}
+%{?files_wmscripts:%{_modloadddir}/streams.conf}
 %{?files_wmscripts:%{_modprobeddir}/specfs.conf}
+%{?files_wmscripts:%{_sysctlddir}/streams.conf}
+%{?files_wmscripts:%{_usrlib}/systemd/openss7}
+%{?files_wmscripts:%{_usrlib}/systemd/specfs}
+%{?files_wmscripts:%{_usrlib}/systemd/streams}
 %else
 %{?files_wmscripts:%{_modprobeddir}/specfs.conf}
 %endif
@@ -5730,17 +5733,24 @@ fi
 %{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
 #{?files_modules:#{_kmoduledir}/#{base}/Module*}
+%{?files_kinfo:%dir %{_kbuilddir}/include/sys/%{name}}
+%{?files_kinfo:%{_kbuilddir}/include/sys/%{name}/config.h}
+%{?files_kinfo:%{_kbuilddir}/include/sys/%{name}/version.h}
+%{?files_kinfo:%dir %{_kbuilddir}/%{name}}
+%{?files_mkvars:%{_kbuilddir}/%{name}/Module.mkvars}
+%{?files_symvers:%{_kbuilddir}/%{name}/System.symvers}
+%{?files_symvers:%{_kbuilddir}/%{name}/Module.symvers}
 %{?files_kinfo:%dir %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.mkvars}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{csite_file}}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}}
-#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/System.symvers}
-#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/Module.symvers}
-#{?files_symvers:#{_usrsrc}/#{name}-#{baseversion}-#{specrelease}/#{_kversion}/#{kernel_symvers}}
-#{?files_symvers:/boot/#{kernel_symsets}}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{mpost_file}}
+#{?files_symvers:/boot/#{kernel_symsets}}
 %endif
 
 # =============================================================================
