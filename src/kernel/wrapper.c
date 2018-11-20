@@ -151,7 +151,11 @@ EXPORT_SYMBOL_GPL(is_current_pgrp_orphaned);	/* used by src/modules/sth.c */
 #endif				/* HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR */
 
 #ifdef HAVE_TASKLIST_LOCK_ADDR
-extern rwlock_t tasklist_lock;
+/* RHEL7 uses special qrwlock_t */
+#ifndef HAVE_KTYPE_QRWLOCK_T
+#define qrwlock_t rwlock_t
+#endif
+extern qrwlock_t tasklist_lock;
 
 __asm__(".equiv  " __stringify(tasklist_lock) "," __stringify(HAVE_TASKLIST_LOCK_ADDR));
 __asm__(".type   " __stringify(tasklist_lock) ",@object");
