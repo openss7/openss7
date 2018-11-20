@@ -1704,6 +1704,14 @@ MODULE_INFO(supported, \"yes\");\n\
 \n\
 MODULE_INFO(intree, \"Y\");\n\
 \n\
+#ifdef RETPOLINE\n\
+MODULE_INFO(retpoline, \"Y\");\n\
+#endif\n\
+\n\
+#ifdef PACKAGE_RHELVERSION\n\
+MODULE_INFO(rhelversion, PACKAGE_RHELVERSION);\n\
+#endif\n\
+\n\
 #undef unix\n\
 \n\
 #ifndef __attribute_used__\n\
