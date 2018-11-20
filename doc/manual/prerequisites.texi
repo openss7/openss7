@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2018  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -105,7 +105,9 @@ Linux 2.4 kernel (2.4.10 - 2.4.27),
 @item @tab @minus{}
 Linux 2.6 kernel (2.6.3 - 2.6.39), or
 @item @tab @minus{}
-Linux 3.x kernel (3.0 - 3.14);
+Linux 3.x kernel (3.0 - 3.16);
+@item @tab @minus{}
+Linux 4.x kernel (4.0 - 4.10);
 @item @tab @minus{}
 glibc2 or better.
 @item @tab @minus{}
@@ -118,7 +120,7 @@ GNU texinfo (for info files).
 GNU bison and flex (for config programs).
 @item @tab @minus{}
 net-snmp (for SNMP agents).@footnote{A wide range of net-snmp releases are supported, from UCD-SNMP
-4.2.5 through net-snmp 5.7.2.}
+4.2.5 through net-snmp 5.8.}
 @item @tab @minus{}
 GNU gcj and classpath (for Java modules).
 @item @tab @minus{}
@@ -149,6 +151,20 @@ The following will meet most additional prerequisites for a CentOS/RHEL 6.0 buil
 	libgcj-devel lsof module-init-tools net-snmp-devel \
 	perl-devel rpm rpm-build tcl-devel texlive texlive-dvips \
 	texlive-latex texlive-utils transfig xz zip
+@end example
+
+@noindent
+The following will meet most additional prerequisites for a CentOS/RHEL 7.5 build host:
+
+@example
+#> yum install \
+	autoconf texlive-bibtex-bin bzip2 chkconfig ImageMagick \
+	createrepo doxygen texlive-dvips-bin ghostscript \
+	texlive-epstopdf perl-devel transfig gnuplot groff-base \
+	gzip initscripts kernel-abi-whitelists kernel-devel \
+	latex2html glibc lsof man-db coreutils openssl rpm \
+	rpm-build swig kernel systemd tcl-devel net-snmp-devel \
+	xz ca-certificates filesystem kmod
 @end example
 
 @noindent
