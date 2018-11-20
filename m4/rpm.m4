@@ -156,55 +156,63 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	case :${with_rpm_extra:-auto} in
 	    (:no)
 		rpm_cv_dist_extra=
+		rpm_cv_rhel_version=
 		;;
 	    (:auto)
 		rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (oracle)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".uek${rpm_tmp}"		    ;;
-			    (*)		rpm_cv_dist_extra=".uek${dist_cv_host_release}"   ;;
+			    (*)		rpm_cv_dist_extra=".uek${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (springdale)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
-			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"   ;;
+			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (puias)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".puias${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".puias${dist_cv_host_release}"   ;;
 			esac
 			;;
 		    (centos)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".centos${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".centos${dist_cv_host_release}"  ;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".lel${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".lel${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".WB${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".WB${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (scientific)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?|5|5.?|6|6.?)
+			    (3|3.?|4|4.?|5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".sl${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".sl${dist_cv_host_release}"	    ;;
 			esac
@@ -228,9 +236,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra=".EL"				    ;;
 			    (3|3.?)	rpm_cv_dist_extra=".E3"				    ;;
 			    (4|4.?)	rpm_cv_dist_extra=".EL4"			    ;;
-			    (5|5.?|6|6.?)
+			    (5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
-			    (*)		rpm_cv_dist_extra2=".el${dist_cv_host_release}"	    ;;
+			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (rhel)
@@ -238,7 +247,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (2|2.?)	rpm_cv_dist_extra=".EL"				    ;;
 			    (3|3.?)	rpm_cv_dist_extra=".E3"				    ;;
 			    (4|4.?)	rpm_cv_dist_extra=".EL4"			    ;;
-			    (5|5.?|6|6.?)
+			    (5|5.?|6|6.?|7|7.?)
+					rpm_cv_rhel_version="$dist_cv_host_release"
 					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
 			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
 			esac
@@ -290,6 +300,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		;;
 	    (*)
 		rpm_cv_dist_extra="$with_rpm_extra"
+		rpm_cv_rhel_version=
 		;;
 	esac
     ])
@@ -297,82 +308,92 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	case :${with_rpm_extra:-auto} in
 	    (:no)
 		rpm_cv_dist_extra2=
+		rpm_cv_rhel_version=
 		;;
 	    (:auto)
 		rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (oracle)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".UEK${dist_cv_host_release}"  ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".UEK${dist_cv_host_release}"    ;;
 			esac
 			;;
 		    (springdale)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
 		    (puias)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".PUIAS${dist_cv_host_release}"  ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".PUIAS${dist_cv_host_release}"  ;;
 			esac
 			;;
 		    (centos)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".COS${dist_cv_host_release}"  ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".COS${dist_cv_host_release}"    ;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".LEL${dist_cv_host_release}"  ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".LEL${dist_cv_host_release}"    ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".WB${dist_cv_host_release}"   ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".WB${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (scientific)
 			case $dist_cv_host_release in
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".SL${dist_cv_host_release}"  ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".SL${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (fedora)
 			case $dist_cv_host_release in
-			    ([1-6])	rpm_cv_dist_extra2=".FC${dist_cv_host_release}"	    ;;
-			    (*)		rpm_cv_dist_extra2=".fc${dist_cv_host_release}"	    ;;
+			    ([1-6])		rpm_cv_dist_extra2=".FC${dist_cv_host_release}"	    ;;
+			    (*)			rpm_cv_dist_extra2=".fc${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (redhat)
 			case $dist_cv_host_release in
-			    (7.[[0-3]])	  rpm_cv_dist_extra2=".7.x"			    ;;
-			    (8.0)	  rpm_cv_dist_extra2=".8"			    ;;
-			    (9)		  rpm_cv_dist_extra2=".9"			    ;;
-			    (2|2.?)	  rpm_cv_dist_extra2=".EL"			    ;;
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (7.[[0-3]])		rpm_cv_dist_extra2=".7.x"			    ;;
+			    (8.0)		rpm_cv_dist_extra2=".8"				    ;;
+			    (9)			rpm_cv_dist_extra2=".9"				    ;;
+			    (2|2.?)		rpm_cv_dist_extra2=".EL"			    ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
 		    (rhel)
 			case $dist_cv_host_release in
-			    (2|2.?)	  rpm_cv_dist_extra2=".EL"			    ;;
-			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
-			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
-			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (2|2.?)		rpm_cv_dist_extra2=".EL"			    ;;
+			    (3|3.?|4|4.?)	rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?|7|7.?)	rpm_cv_rhel_version="${dist_cv_host_release}"
+						rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)			rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
 		    (mandrake)
@@ -425,6 +446,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		;;
 	esac
     ])
+    if test :${rpm_cv_rhel_version:-no} != :no ; then
+	AC_DEFINE_UNQUOTED([PACKAGE_RHELVERSION], ["${rpm_cv_rhel_version}"], [Define to
+	    the RHEL version to place in kernel modules.])
+    fi
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
 	case "$dist_cv_host_distro" in
 	    (oracle|springdale|puias|centos|lineox|whitebox|scientific|fedora|redhat|rhel)
