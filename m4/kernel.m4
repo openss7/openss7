@@ -210,7 +210,7 @@ dnl     [], [enable_k_install=yes])
     AM_CONDITIONAL([WITH_K_WEAK_MODULES], [test x"${enable_k_weak_modules:-yes}" = xyes])
     AC_CACHE_CHECK([for kernel weak symbols], [linux_cv_k_weak_symbols], [dnl
     AC_ARG_ENABLE([k-weak-symbols],
-	[AS_HELP_STRING([--disable-weak-symbols],
+	[AS_HELP_STRING([--disable-k-weak-symbols],
 	    [disable the use of weak symbols in the kernel @<:@default=enabled@:>@])],
 	[], [enable_k_weak_symbols=yes])
     if test :"${enable_k_weak_symbols:-yes}" = :yes ; then
