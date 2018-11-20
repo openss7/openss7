@@ -6,7 +6,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2018  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -5055,7 +5055,7 @@ two or more CPUs concurrently executing the operating system
 
 @end table
 
-The @b{Linux} 2.6 and 3.x kernel is multi-threaded to make effective use of symmetric shared-memory
+The @b{Linux} 2.6, 3.x and 4.x kernel is multi-threaded to make effective use of symmetric shared-memory
 multiprocessor computers.  All parts of the kernel, including @acronym{STREAMS} modules and drivers,
 must ensure data integrity in a multiprocessing environment.  For the most part, developers must
 ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
@@ -5510,8 +5510,8 @@ with the exception of references to the free routine provided to @manref{esballo
 @acronym{STREAMS} loadable kernel modules that pass free routines to @manref{esballoc(9)} are
 responsible for incrementing their own module counts upon the call to @manref{esballoc(9)} and
 decrementing them when the @member{free_rtn} function exits.@footnote{It is only true for Linux 2.4
-kernels that it is necessary for the module to keep track of these things.  Under recent Linux 2.6
-and 3.x kernels, it is possible for the @acronym{STREAMS} executive to determine the module owner of
+kernels that it is necessary for the module to keep track of these things.  Under recent Linux 2.6,
+3.x and 4.x kernels, it is possible for the @acronym{STREAMS} executive to determine the module owner of
 the callback function and @cite{Linux Fast-STREAMS} performs the necessary module reference
 counting.}
 
@@ -5937,7 +5937,7 @@ At this priority level, software and hardware interrupts are enabled and the ker
 with preemption enabled.  This means that the currently executing kernel thread could preempt and
 sleep in favour of another thread of kernel execution.
 
-This priority level only exists on preemptive (mostly 2.6 or 3.x) kernels.
+This priority level only exists on preemptive (mostly 2.6, 3.x or 4.x) kernels.
 
 @item Non-Preemptive
 
@@ -6767,7 +6767,7 @@ device number mapping.@footnote{@cite{The Magic Garden Explained}}
 
 Versions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit
 major device number and an 8 bit minor device number grouped into a 16-bit combined device number.
-Linux 2.6 and 3.x kernels (and some patched 2.4 kernels) now have larger device numbers.  These
+Linux 2.6, 3.x and 4.x kernels (and some patched 2.4 kernels) now have larger device numbers.  These
 extended device numbers are 12 bits for major device number and 20 bits for minor device number,
 with 32 bits for the combined device number.
 
@@ -6784,7 +6784,7 @@ In earlier versions of @dfn{@value{PACKAGE_TITLE}}, the internal device numberin
 device number and 16-bits for minor device number.  This will soon be changed to 12-bits for major
 device number and 20-bits for minor device number to accommodate the newer @b{Linux} scheme.
 
-On 2.6 and 3.x @b{Linux} kernels that support the newer extended device numbers, external device
+On 2.6, 3.x and 4.x @b{Linux} kernels that support the newer extended device numbers, external device
 numbers and internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older
 16-bit device numbers, external device number and internal device numbers will differ.  In some
 situations, an internal device number can exists with no corresponding external device number
