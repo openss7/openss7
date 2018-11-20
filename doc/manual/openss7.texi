@@ -240,8 +240,10 @@ this document or the performance or implementation of the contents thereof.}
 @defcodeindex mk
 @defcodeindex mp
 
+@iftex
 @shortcontents
 @contents
+@end iftex
 
 @ifnottex
 @node Top
