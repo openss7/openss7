@@ -55,6 +55,8 @@ $srcdir/configure \
 	--sbindir=/usr/bin \
 	--libexecdir=/usr/lib \
 	--docdir=/usr/share/doc/openss7 \
+	--enable-maintainer-mode \
+	--enable-dependency-tracking \
 	--disable-static \
 	--disable-sysvinit \
 	--disable-k-abi-support \
