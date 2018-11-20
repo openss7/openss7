@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2018  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -108,6 +108,12 @@ release.}
 @item CentOS Enterprise Linux 6.2 (centos61)
 @item CentOS Enterprise Linux 6.3 (centos61)
 @item CentOS Enterprise Linux 6.4 (centos61)
+@item CentOS Enterprise Linux 7 (centos7)
+@item CentOS Enterprise Linux 7.1 (centos7)
+@item CentOS Enterprise Linux 7.2 (centos7)
+@item CentOS Enterprise Linux 7.3 (centos7)
+@item CentOS Enterprise Linux 7.4 (centos7)
+@item CentOS Enterprise Linux 7.5 (centos7)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
 @item Debian 4.0r1 Etch (deb4.0)
@@ -152,6 +158,12 @@ release.}
 @item Oracle Linux Server 6.2 (OLS6)
 @item Oracle Linux Server 6.3 (OLS6)
 @item Oracle Linux Server 6.4 (OLS6)
+@item Oracle Linux Server 7 (OLS7)
+@item Oracle Linux Server 7.1 (OLS7)
+@item Oracle Linux Server 7.2 (OLS7)
+@item Oracle Linux Server 7.3 (OLS7)
+@item Oracle Linux Server 7.4 (OLS7)
+@item Oracle Linux Server 7.5 (OLS7)
 @item PUIAS Linux 5.4 (PUIAS5)
 @item PUIAS Linux 5.5 (PUIAS5)
 @item PUIAS Linux 5.6 (PUIAS5)
@@ -161,6 +173,12 @@ release.}
 @item PUIAS Linux 6.2 (PUIAS6)
 @item PUIAS Linux 6.3 (PUIAS6)
 @item PUIAS Linux 6.4 (PUIAS6)
+@item PUIAS Linux 7 (PUIAS7)
+@item PUIAS Linux 7.1 (PUIAS7)
+@item PUIAS Linux 7.2 (PUIAS7)
+@item PUIAS Linux 7.3 (PUIAS7)
+@item PUIAS Linux 7.4 (PUIAS7)
+@item PUIAS Linux 7.5 (PUIAS7)
 @item RedHat Enterprise Linux 3.0 (EL3) TBD
 @item RedHat Enterprise Linux 4 (EL4) TBD
 @item RedHat Enterprise Linux 5 (EL5)
@@ -171,11 +189,17 @@ release.}
 @item RedHat Enterprise Linux 5.5 (EL5)
 @item RedHat Enterprise Linux 5.6 (EL5)
 @item RedHat Enterprise Linux 5.7 (EL5)
-@item RedHat Enterprise Linux 6 (EL6)
-@item RedHat Enterprise Linux 6.1 (EL6)
-@item RedHat Enterprise Linux 6.2 (EL6)
-@item RedHat Enterprise Linux 6.3 (EL6)
-@item RedHat Enterprise Linux 6.4 (EL6)
+@item RedHat Enterprise Linux 6 (el6)
+@item RedHat Enterprise Linux 6.1 (el6)
+@item RedHat Enterprise Linux 6.2 (el6)
+@item RedHat Enterprise Linux 6.3 (el6)
+@item RedHat Enterprise Linux 6.4 (el6)
+@item RedHat Enterprise Linux 7 (el7)
+@item RedHat Enterprise Linux 7.1 (el7)
+@item RedHat Enterprise Linux 7.2 (el7)
+@item RedHat Enterprise Linux 7.3 (el7)
+@item RedHat Enterprise Linux 7.4 (el7)
+@item RedHat Enterprise Linux 7.4 (el7)
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
 @item RedHat Linux 8.0 (RH8) TBD
@@ -193,6 +217,12 @@ release.}
 @item Scientific Linux 6.2 (SL6)
 @item Scientific Linux 6.3 (SL6)
 @item Scientific Linux 6.4 (SL6)
+@item Scientific Linux 7 (SL7)
+@item Scientific Linux 7.1 (SL7)
+@item Scientific Linux 7.2 (SL7)
+@item Scientific Linux 7.3 (SL7)
+@item Scientific Linux 7.4 (SL7)
+@item Scientific Linux 7.5 (SL7)
 @item SuSE 8.0 Professional (SuSE8.0) TBD
 @item SuSE 9.1 Personal (SuSE9.1) TBD
 @item SuSE 9.2 Professional (SuSE9.2) TBD
@@ -259,7 +289,7 @@ official @url{http://www.kernel.org/, kernel.org} sources.
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
 been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.38
 (with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  It has been tested from
-3.0 up to and including 3.14.  Please note that your mileage may vary if you use a kernel more
+3.0 up to and including 3.16.  Please note that your mileage may vary if you use a kernel more
 recent than 3.2: it is difficult to anticipate changes that kernel developers will make in the
 future.  Many kernels in the 2.6 and 3.x series now vary widely by release version and if you
 encounter problems, try a kernel within the supported series.
@@ -287,7 +317,7 @@ modules for each and every installed kernel were required.  This is no longer th
 modules installed by the @cite{@value{PACKAGE_TITLE}} package now support weak updates across a wide
 range of kernels in the series.  This means that it is normally only necessary to build and install
 the @cite{@value{PACKAGE_TITLE}} kernel modules for one kernel in a series.  This is true for all
-supported 2.6 and 3.x kernel distributions (and likely for others as well).
+supported 2.6, 3.x and 4.x kernel distributions (and likely for others as well).
 
 @node Linux Architectures
 @subsection Architectures
