@@ -263,7 +263,8 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	[AS_FUNCTION_DESCRIBE([dist_get_release], [STRING], [Checks the string for linux
 	 distribution release.])], [dnl
 dnl AC_MSG_WARN([checking for release in $[1]])
-    echo "$[1]" | head -1 | sed 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||'])
+dnl note that centos is adding a extra decimal to the release
+    echo "$[1]" | head -1 | sed -r 's|^[[^0-9.]]*||;s|[[^0-9.]].*$||;s|([[0-9][0-9]]*\.[[0-9][0-9]]*)\..*|\1|'])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    case :`echo "$dist_cv_build_rel_file" | sed 's|.*/||'` in
