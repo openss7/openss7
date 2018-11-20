@@ -434,9 +434,17 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		file->f_op = (struct file_operations *) f_op;
 	}
 #ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
-#ifdef HAVE_KFUNC_I_READCOUNT_INC
+#ifdef CONFIG_IMA
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_READCOUNT
+#ifdef HAVE_KFUNC_I_READCOUNT_DEC
 	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+#if 0
 		i_readcount_dec(file->f_dentry->d_inode);
+#else
+		atomic_dec(&file->f_dentry->d_inode->i_readcount);
+#endif
+#endif
+#endif
 #endif
 	if (file->f_dentry != NULL)
 		dput(file->f_dentry);
@@ -445,9 +453,17 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
 #else
-#ifdef HAVE_KFUNC_I_READCOUNT_INC
+#ifdef CONFIG_IMA
+#ifdef HAVE_KMEMB_STRUCT_INODE_I_READCOUNT
+#ifdef HAVE_KFUNC_I_READCOUNT_DEC
 	if ((file->f_mode & (FMODE_READ | FMODE_WRITE)) == FMODE_READ)
+#if 0
 		i_readcount_dec(file->f_path.dentry->d_inode);
+#else
+		atomic_dec(&file->f_dentry->d_inode->i_readcount);
+#endif
+#endif
+#endif
 #endif
 	path_put(&file->f_path);
 	file->f_path.dentry = dentry;
