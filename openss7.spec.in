@@ -512,7 +512,6 @@
 # defaults can be changed by passing --with-zzz or --without-zzz
 # to the rpmbuild command.  The default is to build almost
 # everything.
-%global WITH_weakmods       1
 %global WITH_wrapper        0
 %global WITH_modules        1
 %global WITH_devel          1
@@ -542,8 +541,6 @@
 # each architecture and kernel vesion, we accept --with[out]-zzz
 # options "modules" and "tools".  There are number of other
 # options as well.
-%{?_without_k_weak_modules:  %{expand: %%global WITH_weakmods       0}}
-%{?_with_k_weak_modules:     %{expand: %%global WITH_weakmods       1}}
 %{?_without_wrapper_module:  %{expand: %%global WITH_wrapper        0}}
 %{?_with_wrapper_module:     %{expand: %%global WITH_wrapper        1}}
 %{?_without_modules:         %{expand: %%global WITH_modules        0}}
@@ -3906,7 +3903,6 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     rm -f -- /.openss7_haveit-*
 fi
 
-%if %{WITH_weakmods}
 %if %{HAVE_weakmods}
 %triggerpostun -p /bin/bash base -- %{target_kernel}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3928,7 +3924,6 @@ if [ -x %{_sbindir}/%{name}-modules ]; then
             --remove-kernel $kernels || :
     fi
 fi
-%endif
 %endif
 
 %if %{PACKAGE_base}
@@ -5410,7 +5405,6 @@ fi
 %triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other present
-%if %{WITH_weakmods}
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
@@ -5424,7 +5418,6 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
                 --add-modules %{_kversion} || :
         fi
     fi
-%endif
 %endif
 %if %{FILES_oldmods}
 %if %{HAVE_initscripts}
@@ -5458,7 +5451,6 @@ else
     delete_modules=
 fi
 if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
-%if %{WITH_weakmods}
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
@@ -5474,7 +5466,6 @@ if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
                 --remove-modules %{_kversion} || :
         fi
     fi
-%endif
 %endif
 %if %{FILES_oldmods}
     if [ "%{_kversion}" = "`uname -r`" ]; then
