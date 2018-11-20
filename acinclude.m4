@@ -1237,6 +1237,7 @@ dnl----------------------------------------------------------------------------
 	struct inode.i_private,
 	struct inode.i_uid.val,
 	struct inode.i_gid.val,
+	struct inode.i_readcount,
 	struct kobject.kref,
 	struct kstatfs.f_type,
 	struct module.next,
