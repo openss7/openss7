@@ -35,8 +35,9 @@ _kvx="$(echo $_kvr|sed -e 's,\.[0-9][0-9]*-.*,,')"
 # use native tools for arch
 $srcdir/configure \
 	GCC="gcc" \
+	CXX="g++-6" \
 	KCC="gcc-5" \
-	WFLAGS='-Wno-unused-const-variable -Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+	WFLAGS='-Wno-unused-const-variable -Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels -Wno-missing-braces' \
 	CPPFLAGS="$CPPFLAGS" \
 	CFLAGS="-Wall -Werror $WFLAGS $CFLAGS" \
 	CXXFLAGS="-Wall -Werror $WFLAGS $CXXFLAGS" \
@@ -57,6 +58,7 @@ $srcdir/configure \
 	--docdir=/usr/share/doc/openss7 \
 	--enable-maintainer-mode \
 	--enable-dependency-tracking \
+	--enable-distribute-docs \
 	--disable-static \
 	--disable-sysvinit \
 	--disable-k-abi-support \
