@@ -158,7 +158,9 @@ if test :${enable_tools:-yes} = :yes ; then
 	AM_CONDITIONAL([WITH_JAVA],        [/bin/false])
     fi
 else
-    AM_CONDITIONAL([am__fastdepCXX],[/bin/false])
+    AM_CONDITIONAL([am__fastdepCXX],   [/bin/false])
+    AM_CONDITIONAL([am__fastdepGCJ],   [/bin/false])
+    AM_CONDITIONAL([am__fastdepJAVAC], [/bin/false])
 fi
 
 dnl
