@@ -3208,7 +3208,7 @@ AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
 		    test -r $linux_img || xz -dc $_kvmlinux >$linux_img ;;
 	    (*)	    linux_img="$_kvmlinux" ;;
 	esac
-	linux_kernel_symbol_addr_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
+	linux_kernel_symbol_addr_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>$$' | sed -e 's| .*||;s|^0[[xX]]||') 2>/dev/null`"
     fi
     linux_kernel_symbol_addr_tmp="${linux_kernel_symbol_addr_tmp:+0x}$linux_kernel_symbol_addr_tmp"
     AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_kernel_symbol_addr_tmp:-no}"]) ])
