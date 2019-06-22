@@ -161,6 +161,9 @@ else
     AM_CONDITIONAL([am__fastdepCXX],   [/bin/false])
     AM_CONDITIONAL([am__fastdepGCJ],   [/bin/false])
     AM_CONDITIONAL([am__fastdepJAVAC], [/bin/false])
+    AM_CONDITIONAL([WITH_GCJDBTOOL],   [/bin/false])
+    AM_CONDITIONAL([WITH_LIBGCJ],      [/bin/false])
+    AM_CONDITIONAL([WITH_JAVA],        [/bin/false])
 fi
 
 dnl
