@@ -402,39 +402,6 @@ fi
 AS_VAR_POPDEF([CacheVar])dnl
 ])
 
-## ---------------------- ##
-## Dependencies for JAVAC ##
-## ---------------------- ##
-
-# _AM_DEPDENDENCIES(JAVAC)
-# ------------------------
-m4_define([_AM_DEPENDENCIES(JAVAC)],
-[AC_REQUIRE([AM_SET_DEPDIR])dnl
-AC_REQUIRE([AM_OUTPUT_DEPENDENCY_COMMANDS])dnl
-AC_REQUIRE([AM_MAKE_INCLUDE])dnl
-AC_REQUIRE([AM_DEP_TRACK])dnl
-AC_CACHE_CHECK([dependency style of $GCJ],
-	       [am_cv_javac_dependencies_compiler_type],
-[if test -z "$AMDEP_TRUE" && test -f "$am_depcomp"; then
-    mkdir conftest.dir
-    cp "$am_depcomp" conftest.dir
-    cd conftest.dir
-    mkdir sub
-    am_cv_javac_dependencies_compiler_type=none
-    # FIXME put tests here
-    cd ..
-    rm -rf conftest.dir
-else
-    am_cv_javac_dependencies_compiler_type=none
-fi
-])
-AC_SUBST([JAVACDEPMODE], [depmode=$am_cv_javac_dependencies_compiler_type])
-AM_CONDITIONAL([am__fastdepJAVAC], [
-    test "x$enable_dependency_trackint" != xno \
-    && test "$am_cv_javac_dependencies_compiler_type" = gcc3])
-])
-
-
 # =============================================================================
 # _GCJ_CONFIG
 # -----------------------------------------------------------------------------
