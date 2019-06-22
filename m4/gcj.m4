@@ -198,6 +198,7 @@ m4_expand_once([_AC_COMPILER_EXEEXT])[]dnl
 m4_expand_once([_AC_COMPILER_OBJEXT])[]dnl
 _AC_LANG_COMPILER_GNU
 _AC_PROG_GCJ_G
+_AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES(GCJ)])
 AC_LANG_POP(Java)dnl
 ])
 
