@@ -1109,11 +1109,13 @@ bzero(void *data, size_t len)
 	memset(data, 0, len);
 }
 
+#ifndef HAVE_KFUNC_BCMP
 static __inline__ int
 bcmp(const void *s1, const void *s2, size_t len)
 {
 	return memcmp(s1, s2, len);
 }
+#endif				/* HAVE_KFUNC_BCMP */
 
 /* Message functions. */
 

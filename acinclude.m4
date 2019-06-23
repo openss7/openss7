@@ -827,6 +827,7 @@ dnl----------------------------------------------------------------------------
 	__symbol_put \
 	access_ok \
 	atomic_add_return \
+	bcmp \
 	check_region \
 	class_create \
 	__class_create \
