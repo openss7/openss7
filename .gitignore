@@ -999,8 +999,7 @@ nsap
 nuimap
 *.o
 *.old
-openss7-1.1.8.20150415.lsm
-openss7-1.1.8.8.20150415.lsm
+openss7-*.lsm
 OpenSS7.dox
 openss7.lsm
 openss7_mknod
