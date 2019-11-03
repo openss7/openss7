@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "src/kernel/wrapper.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define WRAPPER_DESCRIP		"SVR 4.2 Symbol Definition Wrappers for Linux Fast-STREAMS"
 #define WRAPPER_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define WRAPPER_REVISION	"OpenSS7 src/kernel/wrapper.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
