@@ -1051,19 +1051,24 @@ static char *
 specfs_dname(struct dentry *dentry, char *buffer, int buflen)
 {
 	struct cdevsw *cdev;
+	char *retn;
 
 	if ((cdev = cdrv_get(getmajor(dentry->d_inode->i_ino)))) {
 		struct devnode *cmin;
 
 		if ((cmin = cmin_get(cdev, getminor(dentry->d_inode->i_ino)))) {
-			return dynamic_dname(dentry, buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
+			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
 		} else {
-			return dynamic_dname(dentry, buffer, buflen, "STR %s/%lu", cdev->d_name,
-					     getminor(dentry->d_inode->i_ino));
+			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%lu", cdev->d_name,
+					     (unsigned long) getminor(dentry->d_inode->i_ino));
 		}
+		cdrv_put(cdev);
 	} else {
-		return dynamic_dname(dentry, buffer, buflen, "STR ???/???");
+		retn = dynamic_dname(dentry, buffer, buflen, "STR %lu/%lu",
+				     (unsigned long) getmajor(dentry->d_inode->i_ino),
+				     (unsigned long) getminor(dentry->d_inode->i_ino));
 	}
+	return (retn);
 }
 #endif				/* CONFIG_KMEMB_STRUCT_DENTRY_OPERATIONS_D_DNAME */
 
