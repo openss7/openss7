@@ -381,12 +381,16 @@ itoemajor(major_t imajor, int prevemaj)
 		list_for_each(pos, &cdev->d_majors) {
 			struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
 
-			if (found_previous)
+			if (found_previous) {
+				cdrv_put(cdev);
 				return (cmaj->n_major);
+			}
 			if (prevemaj == cmaj->n_major)
 				found_previous = 1;
 		}
 	}
+	if (cdev)
+		cdrv_put(cdev);
 	return (NODEV);
 }
 
