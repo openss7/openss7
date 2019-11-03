@@ -200,7 +200,7 @@ autopush_next(dev_t dev)
 		ap_get(api);
 	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	_ctrace(sdev_put(cdev));
+	_ctrace(cdrv_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
@@ -224,7 +224,7 @@ autopush_find(dev_t dev)
 		ap_get(api);
 	streams_spin_unlock(&apush_lock, flags);
 	_printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
-	_ctrace(sdev_put(cdev));
+	_ctrace(cdrv_put(cdev));
       notfound:
 	return ((struct strapush *) api);
 }
