@@ -64,6 +64,7 @@ bld_cv_pkg_cmd_VMLINUX=${bld_cv_pkg_cmd_VMLINUX='pacman --sync linux-lts316'}
 bld_cv_pkg_cmd_XZ_CMD=${bld_cv_pkg_cmd_XZ_CMD='pacman --sync xz'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='pacman --sync zip'}
 bld_cv_pkg_cmd__CONFIG=${bld_cv_pkg_cmd__CONFIG='pacman --sync linux-lts316-headers'}
+bld_cv_pkg_cmd__ETC_INIT_D=${bld_cv_pkg_cmd__ETC_INIT_D='pacman --sync booth'}
 bld_cv_pkg_cmd__ETC_PACMAN_D=${bld_cv_pkg_cmd__ETC_PACMAN_D='pacman --sync pacman-mirrorlist'}
 bld_cv_pkg_cmd__ETC_RC_D=${bld_cv_pkg_cmd__ETC_RC_D='pacman --sync snort'}
 bld_cv_pkg_cmd__ETC_RC_D_INIT_D=${bld_cv_pkg_cmd__ETC_RC_D_INIT_D='pacman --sync yum'}
@@ -150,6 +151,7 @@ bld_cv_pkg_name_VMLINUX=${bld_cv_pkg_name_VMLINUX=linux-lts316}
 bld_cv_pkg_name_XZ_CMD=${bld_cv_pkg_name_XZ_CMD=xz}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_name__CONFIG=${bld_cv_pkg_name__CONFIG=linux-lts316-headers}
+bld_cv_pkg_name__ETC_INIT_D=${bld_cv_pkg_name__ETC_INIT_D=booth}
 bld_cv_pkg_name__ETC_PACMAN_D=${bld_cv_pkg_name__ETC_PACMAN_D=pacman-mirrorlist}
 bld_cv_pkg_name__ETC_RC_D=${bld_cv_pkg_name__ETC_RC_D=snort}
 bld_cv_pkg_name__ETC_RC_D_INIT_D=${bld_cv_pkg_name__ETC_RC_D_INIT_D=yum}
@@ -178,6 +180,7 @@ bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_path_VMLINUX=${bld_cv_pkg_path_VMLINUX=/usr/lib/modules/3.16.60-1-lts316/build/vmlinux}
 bld_cv_pkg_path__CONFIG=${bld_cv_pkg_path__CONFIG=/usr/lib/modules/3.16.60-1-lts316/build/.config}
+bld_cv_pkg_path__ETC_INIT_D=${bld_cv_pkg_path__ETC_INIT_D=/etc/init.d}
 bld_cv_pkg_path__ETC_PACMAN_D=${bld_cv_pkg_path__ETC_PACMAN_D=/etc/pacman.d}
 bld_cv_pkg_path__ETC_RC_D=${bld_cv_pkg_path__ETC_RC_D=/etc/rc.d}
 bld_cv_pkg_path__ETC_RC_D_INIT_D=${bld_cv_pkg_path__ETC_RC_D_INIT_D=/etc/rc.d/init.d}
@@ -263,7 +266,7 @@ bld_cv_pkg_ver_C_REHASH=${bld_cv_pkg_ver_C_REHASH=1.1.1-1}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=25-1}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.8.14-1}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=2018.47465-5}
-bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=9.25-4}
+bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=9.26-1}
 bld_cv_pkg_ver_EPSTOPDF=${bld_cv_pkg_ver_EPSTOPDF=2018.48566-1}
 bld_cv_pkg_ver_EXTERN_H=${bld_cv_pkg_ver_EXTERN_H=5.28.0-1}
 bld_cv_pkg_ver_FIG2DEV=${bld_cv_pkg_ver_FIG2DEV=3.2.7-1}
@@ -301,8 +304,8 @@ bld_cv_pkg_ver_PACMAN_CONF=${bld_cv_pkg_ver_PACMAN_CONF=5.1.1-1}
 bld_cv_pkg_ver_PDFLATEX=${bld_cv_pkg_ver_PDFLATEX=2018.47465-5}
 bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=2018.47465-5}
 bld_cv_pkg_ver_PIC=${bld_cv_pkg_ver_PIC=1.22.3-8}
-bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.25-4}
-bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=9.25-4}
+bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.26-1}
+bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=9.26-1}
 bld_cv_pkg_ver_PSLATEX=${bld_cv_pkg_ver_PSLATEX=2018.48566-1}
 bld_cv_pkg_ver_REFER=${bld_cv_pkg_ver_REFER=1.22.3-8}
 bld_cv_pkg_ver_REPO_ADD=${bld_cv_pkg_ver_REPO_ADD=5.1.1-1}
@@ -315,13 +318,14 @@ bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.22.3-8}
 bld_cv_pkg_ver_SWIG=${bld_cv_pkg_ver_SWIG=3.0.12-2}
 bld_cv_pkg_ver_SYSTEMCTL=${bld_cv_pkg_ver_SYSTEMCTL=239.300-2}
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.22.3-8}
-bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6.9-1}
+bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6.9-2}
 bld_cv_pkg_ver_TEX=${bld_cv_pkg_ver_TEX=2018.47465-5}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.8-1}
 bld_cv_pkg_ver_VMLINUX=${bld_cv_pkg_ver_VMLINUX=3.16.60-1}
 bld_cv_pkg_ver_XZ_CMD=${bld_cv_pkg_ver_XZ_CMD=5.2.4-1}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0-8}
 bld_cv_pkg_ver__CONFIG=${bld_cv_pkg_ver__CONFIG=3.16.60-1}
+bld_cv_pkg_ver__ETC_INIT_D=${bld_cv_pkg_ver__ETC_INIT_D=1.0-1}
 bld_cv_pkg_ver__ETC_PACMAN_D=${bld_cv_pkg_ver__ETC_PACMAN_D=20180912-1}
 bld_cv_pkg_ver__ETC_RC_D=${bld_cv_pkg_ver__ETC_RC_D=2.9.12-2}
 bld_cv_pkg_ver__ETC_RC_D_INIT_D=${bld_cv_pkg_ver__ETC_RC_D_INIT_D=3.4.3-7}

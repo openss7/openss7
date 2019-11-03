@@ -1,4 +1,4 @@
-OpenSS7 -- read me first file.  2018-11-19
+OpenSS7 -- read me first file.  2018-11-24
 $Id: README,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
 Copyright (c) 2008-2018  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.8.20181119 was released under AGPLv3 2018-11-19.
+Package openss7-1.1.8.20181120 was released under AGPLv3 2018-11-24.
 
 This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -43,19 +43,19 @@ Package:(1)
      * Network Performance (the OpenSS7 netperf fork)
      * Dialogic Open System Release 6.1
 
-This distribution is applicable to 'Linux' 2.4, 2.6 and 3.x kernels as
-was targeted at 'ix86', 'x86_64', 'ppc' and 'ppc64' architectures, but
-should build and install for other architectures as well.
+This distribution is applicable to 'Linux' 2.4, 2.6, 3.x and 4.x kernels
+and was targeted at 'ix86', 'x86_64', 'ppc' and 'ppc64' architectures,
+but should build and install for other architectures as well.
 
 Release
 -------
 
-This is the 'openss7-1.1.8.20181119' package, released 2018-11-19.  This
-'1.1.8.20181119' release, and the latest version, can be obtained from
+This is the 'openss7-1.1.8.20181120' package, released 2018-11-24.  This
+'1.1.8.20181120' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181119.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181120.tar.xz
 
 The release is available as an 'autoconf(1)' tarball, 'src.rpm' or
 'dsc', as a set of binary 'rpm's or 'deb's, or as a 'yum(8)',
@@ -213,7 +213,8 @@ Prerequisites for building OpenSS7 package are as follows:
           - A fairly LSB compliant GNU/Linux distribution.(3)
           - Linux 2.4 kernel (2.4.10 - 2.4.27),
           - Linux 2.6 kernel (2.6.3 - 2.6.39), or
-          - Linux 3.x kernel (3.0 - 3.14);
+          - Linux 3.x kernel (3.0 - 3.16);
+          - Linux 4.x kernel (4.0 - 4.10);
           - glibc2 or better.
           - GNU groff (for man pages).(4)
           - GNU texinfo (for info files).
@@ -242,6 +243,18 @@ The following will meet most additional prerequisites for a CentOS/RHEL
      	libgcj-devel lsof module-init-tools net-snmp-devel \
      	perl-devel rpm rpm-build tcl-devel texlive texlive-dvips \
      	texlive-latex texlive-utils transfig xz zip
+
+The following will meet most additional prerequisites for a CentOS/RHEL
+7.5 build host:
+
+     #> yum install \
+     	autoconf texlive-bibtex-bin bzip2 chkconfig ImageMagick \
+     	createrepo doxygen texlive-dvips-bin ghostscript \
+     	texlive-epstopdf perl-devel transfig gnuplot groff-base \
+     	gzip initscripts kernel-abi-whitelists kernel-devel \
+     	latex2html glibc lsof man-db coreutils openssl rpm \
+     	rpm-build swig kernel systemd tcl-devel net-snmp-devel \
+     	xz ca-certificates filesystem kmod
 
 The following will meet most additional prerequisites for a SuSE Linux
 Enterprise 11 build host:
@@ -276,7 +289,7 @@ You also need the same version of 'gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add 'CC=kgcc' on the line
 after './configure', for example:
 
-     $> ../openss7-1.1.8.20181119/configure CC='gcc-3.4'
+     $> ../openss7-1.1.8.20181120/configure CC='gcc-3.4'
 
 The package builds and installs SNMP agents.  When configuring and
 building the package, it is necessary to have the net-snmp development
@@ -308,11 +321,11 @@ Installation
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181119.tar.xz
-     $> tar -xJvf openss7-1.1.8.20181119.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181120.tar.xz
+     $> tar -xJvf openss7-1.1.8.20181120.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.8.20181119/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.8.20181120/configure --enable-autotest --enable-silent-rules
      $> make V=0
      $> make check
      $> sudo make install
@@ -320,8 +333,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.8.20181119
-     $> rm -f openss7-1.1.8.20181119.tar.xz
+     $> rm -rf openss7-1.1.8.20181120
+     $> rm -f openss7-1.1.8.20181120.tar.xz
 
 If you have problems, try building with the logging targets instead.  If
 the make of a logging target fails, an automatic problem report will be
@@ -329,11 +342,11 @@ generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(6)  Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181119.tar.xz
-     $> tar -xJvf openss7-1.1.8.20181119.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181120.tar.xz
+     $> tar -xJvf openss7-1.1.8.20181120.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.8.20181119/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.8.20181120/configure --enable-autotest --enable-silent-rules
      $> make V=1 compile.log
      $> make check.log
      $> sudo make install.log
@@ -341,8 +354,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.8.20181119
-     $> rm -f openss7-1.1.8.20181119.tar.xz
+     $> rm -rf openss7-1.1.8.20181120
+     $> rm -f openss7-1.1.8.20181120.tar.xz
 
 See 'README-make' for additional specialized make targets.
 
@@ -357,14 +370,14 @@ The OpenSS7 package is available from the downloads area of The OpenSS7
 Project website (http://www.openss7.org/download.html) using a command
 such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181119.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20181120.tar.xz
 
 Unpack the tarball using a command such as:
 
-     $> tar -xJvf openss7-1.1.8.20181119.tar.xz
+     $> tar -xJvf openss7-1.1.8.20181120.tar.xz
 
 The tarball will unpack into the relative subdirectory named after the
-package name: openss7-1.1.8.20181119.
+package name: openss7-1.1.8.20181120.
 
 The package builds using the GNU 'autoconf' utilities and the
 'configure' script.  To build the package, we recommend using a separate
@@ -372,19 +385,19 @@ The package builds using the GNU 'autoconf' utilities and the
 
      $> mkdir build
      $> cd build
-     $> ../openss7-1.1.8.20181119/configure
+     $> ../openss7-1.1.8.20181120/configure
 
 In general, the package configures and builds without adding any special
 options to the 'configure' script.  For general options to the
 'configure' script, see the GNU 'INSTALL' file in the distribution:
 
-     $> less ../openss7-1.1.8.20181119/INSTALL
+     $> less ../openss7-1.1.8.20181120/INSTALL
 
 For specific options to the 'configure' script, see the
 'INSTALL-openss7' file in the distribution, or simply execute the
 configure script with the '--help' option like so:
 
-     $> ../openss7-1.1.8.20181119/configure --help
+     $> ../openss7-1.1.8.20181120/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the 'make' command:
@@ -431,8 +444,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf openss7-1.1.8.20181119
-     $> rm -f openss7-1.1.8.20181119.tar.xz
+     $> rm -rf openss7-1.1.8.20181120
+     $> rm -f openss7-1.1.8.20181120.tar.xz
 
 Detailed Installation Instructions
 ----------------------------------
@@ -441,7 +454,7 @@ More detailed installation instructions can be found in the *note
 Installation::, contained in the distribution in 'text', 'info', 'html'
 and 'pdf' formats:
 
-     $> cd ../openss7-1.1.8.20181119
+     $> cd ../openss7-1.1.8.20181120
      $> less doc/manual/openss7.txt
      $> lynx doc/manual/openss7.html
      $> info doc/manual/openss7.info
@@ -472,7 +485,7 @@ the groff extension package ('groff_ext'), as it contains the 'refer' or
 pages.
 
    (5) A wide range of net-snmp releases are supported, from UCD-SNMP
-4.2.5 through net-snmp 5.7.2.
+4.2.5 through net-snmp 5.8.
 
    (6) Please see *note Problem Reports::, or the file 'PROBLEMS' in the
 release directory for more information on filing a proper "Problem
