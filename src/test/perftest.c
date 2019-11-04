@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -290,7 +290,9 @@ test_sync(int fds[])
 		if (tbyttot >= rbyttot + rmsize) {
 			int ret = 0;
 
+#ifndef NATIVE_PIPES
 			if (readwrite) {
+#endif
 				while (!timer_timeout && (ret = read(fds[0], my_msg, rmsize)) > 0) {
 					rbytcnt += ret;
 					rbyttot += ret;
@@ -304,6 +306,7 @@ test_sync(int fds[])
 					if (blocking)
 						break;
 				}
+#ifndef NATIVE_PIPES
 			} else {
 				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
@@ -324,6 +327,7 @@ test_sync(int fds[])
 						break;
 				}
 			}
+#endif
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
@@ -339,7 +343,9 @@ test_sync(int fds[])
 		if (tbyttot < rbyttot + rmsize) {
 			int ret = 0;
 
+#ifndef NATIVE_PIPES
 			if (readwrite) {
+#endif
 				while (!timer_timeout && (ret = write(fds[1], my_msg, tmsize)) > 0) {
 					tbytcnt += ret;
 					tbyttot += ret;
@@ -353,6 +359,7 @@ test_sync(int fds[])
 					if (blocking)
 						break;
 				}
+#ifndef NATIVE_PIPES
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
@@ -371,6 +378,7 @@ test_sync(int fds[])
 						break;
 				}
 			}
+#endif
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
@@ -480,7 +488,9 @@ read_child(int fd)
 		if (pfd.revents & (POLLIN | POLLRDNORM)) {
 			int ret = 0;
 
+#ifndef NATIVE_PIPES
 			if (readwrite) {
+#endif
 				while (!timer_timeout && (ret = read(fd, my_msg, rmsize)) > 0) {
 					rbytcnt += ret;
 					if (rbytcnt < 0)
@@ -491,6 +501,7 @@ read_child(int fd)
 					if (ret > rbytmax)
 						rbytmax = ret;
 				}
+#ifndef NATIVE_PIPES
 			} else {
 				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
@@ -508,6 +519,7 @@ read_child(int fd)
 						rbytmax = ret;
 				}
 			}
+#endif
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
@@ -625,7 +637,9 @@ write_child(int fd)
 		if (pfd.revents & (POLLOUT | POLLWRNORM)) {
 			int ret = 0;
 
+#ifndef NATIVE_PIPES
 			if (readwrite) {
+#endif
 				while (!timer_timeout && (ret = write(fd, my_msg, tmsize)) > 0) {
 					tbytcnt += ret;
 					if (tbytcnt < 0)
@@ -636,6 +650,7 @@ write_child(int fd)
 					if (ret > tbytmax)
 						tbytmax = ret;
 				}
+#ifndef NATIVE_PIPES
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
@@ -650,6 +665,7 @@ write_child(int fd)
 						tbytmax = ret;
 				}
 			}
+#endif
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
@@ -1001,7 +1017,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -1059,7 +1075,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2019  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
