@@ -3372,12 +3372,12 @@ main(int argc, char *argv[])
 		case 'f':
 			if (optarg == NULL)
 				goto missing_arg;
-			strncpy(filename, optarg, sizeof(filename));
+			strncpy(filename, optarg, sizeof(filename) - 1);
 			break;
 		case 'o':
 			if (optarg == NULL)
 				goto missing_arg;
-			strncpy(outpfile, optarg, sizeof(outpfile));
+			strncpy(outpfile, optarg, sizeof(outpfile) - 1);
 			break;
 		case 'D':
 			yydebug = 1;

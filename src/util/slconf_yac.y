@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -1563,7 +1563,7 @@ add_pipe_remainder:
 clei:
     TOK_STRING
     {
-	strncpy(cur.clei, $<str>1, sizeof(cur.clei));
+	strncpy(cur.clei, $<str>1, sizeof(cur.clei) - 1);
 	$<str>$ = $<str>1;
     }
     ;
@@ -1581,7 +1581,7 @@ device:
 	    yyerror("device is not a character device");
 	    YYERROR;
 	}
-	strncpy(cur.device, device, sizeof(cur.device));
+	strncpy(cur.device, device, sizeof(cur.device) - 1);
 	$<str>$ = $<str>1;
     }
     ;
@@ -1769,7 +1769,7 @@ module:
 	int n = cur.modules.sl_nmods;
 	char *name = cur.module_list[n].l_name;
 	if (n < 8) {
-	    strncpy(name, $<str>1, FMNAMESZ);
+	    strncpy(name, $<str>1, FMNAMESZ - 1);
 	    $<val>$ = 1;
 	    cur.modules.sl_nmods++;
 	} else {
@@ -2127,7 +2127,7 @@ link_command:
 	if (sel[handle].fd == -1) {
 	    if (yydebug)
 		fprintf(stderr, "result is %.64s\n", $<str>3);
-	    strncpy(&sel[handle].device[0],$<str>3,MAX_BUF_SIZE);
+	    strncpy(&sel[handle].device[0],$<str>3,MAX_BUF_SIZE - 1);
 	    if (sel[handle].level < 1) sel[handle].level = 1;
 	    if ((sel[handle].fd = open(sel[handle].device, O_RDWR)) != -1) {
 		sel[handle].state = LMI_UNATTACHED;
@@ -2274,7 +2274,7 @@ link_selection:
     }
     | TOK_CLEI TOK_STRING
     {
-	strncpy(sel[handle].clei,$<str>2,MAX_BUF_SIZE);
+	strncpy(sel[handle].clei,$<str>2,MAX_BUF_SIZE - 1);
     }
     ;
 
