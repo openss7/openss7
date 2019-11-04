@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -669,7 +669,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -716,7 +716,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -1164,29 +1164,29 @@ main(int argc, char *argv[])
 		case 'a':	/* -a, --admin MAILID */
 			if (debug)
 				fprintf(stderr, "%s: setting mail id to %s\n", argv[0], optarg);
-			strncpy(mailuid, optarg, 127);
+			strncpy(mailuid, optarg, sizeof(mailuid) - 1);
 			break;
 		case 'd':	/* -d, --directory DIRECTORY */
-			strncpy(outpdir, optarg, 127);
+			strncpy(outpdir, optarg, sizeof(outpdir) - 1);
 			break;
 		case 'b':	/* -b, --basename BASNAME */
-			strncpy(basname, optarg, 64);
+			strncpy(basname, optarg, sizeof(basname) - 1);
 			break;
 		case 'o':	/* -o, --outfile OUTFILE */
-			strncpy(outfile, optarg, 127);
+			strncpy(outfile, optarg, sizeof(outfile) - 1);
 			break;
 		case 'e':	/* -e, --errfile ERRFILE */
-			strncpy(errfile, optarg, 127);
+			strncpy(errfile, optarg, sizeof(errfile) - 1);
 			break;
 		case 'p':	/* -p, --pidfile PIDFILE */
 			if (debug)
 				fprintf(stderr, "%s: setting pid file to %s\n", argv[0], optarg);
-			strncpy(pidfile, optarg, 127);
+			strncpy(pidfile, optarg, sizeof(pidfile) - 1);
 			break;
 		case 'l':	/* -l, --logdev DEVNAME */
 			if (debug)
 				fprintf(stderr, "%s: setting device name to %s\n", argv[0], optarg);
-			strncpy(devname, optarg, 127);
+			strncpy(devname, optarg, sizeof(devname) - 1);
 			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)

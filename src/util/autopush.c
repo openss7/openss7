@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -100,7 +100,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -147,7 +147,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -358,12 +358,12 @@ autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, i
 	for (i = 0; i < nmods; i++) {
 		if (debug)
 			fprintf(stderr, "%s: copying module name %s\n", __FUNCTION__, modlist[i]);
-		strncpy(sap.sap_list[i], modlist[i], FMNAMESZ);
+		strncpy(sap.sap_list[i], modlist[i], FMNAMESZ - 1);
 		if (debug)
 			fprintf(stderr, "%s: copied module name %s\n", __FUNCTION__,
 				sap.sap_list[i]);
 	}
-	strncpy(sap.sap_module, devname, FMNAMESZ);
+	memcpy(sap.sap_module, devname, FMNAMESZ);
 	if (debug)
 		fprintf(stderr, "%s: performing SAD_SAP\n", __FUNCTION__);
 	if (ioctl(fd, SAD_SAP, &sap) < 0) {
@@ -408,7 +408,7 @@ autopush_ver(char *argv[], int nmods, char **modlist)
 	sml.list.sl_nmods = nmods;
 	sml.list.sl_modlist = &sml.mlist[0];
 	for (i = 0; i < nmods; i++)
-		strncpy(sml.mlist[i].l_name, modlist[i], FMNAMESZ);
+		strncpy(sml.mlist[i].l_name, modlist[i], FMNAMESZ - 1);
 	if (ioctl(fd, SAD_VML, &sml.list) < 0) {
 		if (output || debug)
 			perror(argv[0]);
@@ -444,7 +444,7 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 		sap.sap_minor = minor;
 		sap.sap_lastminor = 0;
 		sap.sap_npush = MAXAPUSH;
-		strncpy(sap.sap_module, devname, FMNAMESZ);
+		memcpy(sap.sap_module, devname, FMNAMESZ);
 		if (debug)
 			fprintf(stderr, "%s: performing SAD_GAP\n", __FUNCTION__);
 		if (ioctl(fd, SAD_GAP, &sap) < 0) {
@@ -488,7 +488,7 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			sap.sap_minor = minor;
 			sap.sap_lastminor = 0;
 			sap.sap_npush = MAXAPUSH;
-			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
+			strncpy(sap.sap_module, mlist->name, FMNAMESZ - 1);
 			if (debug)
 				fprintf(stderr,
 					"%s: performing SAD_GAP major = %d, minor = %d, name = %s\n",
@@ -568,7 +568,7 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 		sap.sap_minor = minor;
 		sap.sap_lastminor = 0;
 		sap.sap_npush = MAXAPUSH;
-		strncpy(sap.sap_module, devname, FMNAMESZ);
+		memcpy(sap.sap_module, devname, FMNAMESZ);
 		if (debug)
 			fprintf(stderr, "%s: performing SAD_SAP\n", __FUNCTION__);
 		if (ioctl(fd, SAD_SAP, &sap) < 0) {
@@ -612,7 +612,7 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			sap.sap_minor = 0;
 			sap.sap_lastminor = 0;
 			sap.sap_npush = MAXAPUSH;
-			strncpy(sap.sap_module, mlist->name, FMNAMESZ);
+			strncpy(sap.sap_module, mlist->name, FMNAMESZ - 1);
 			if (debug)
 				fprintf(stderr, "%s: performing SAD_SAP major = %d, name = %s\n",
 					__FUNCTION__, (int) major, sap.sap_module);
@@ -690,7 +690,7 @@ autopush_fil(char *argv[], char *filename)
 				if ('0' <= token[0] || token[0] <= '9') {
 					major = strtol(token, &end, 0);
 				} else {
-					strncpy(devname, optarg, FMNAMESZ);
+					strncpy(devname, optarg, FMNAMESZ - 1);
 				}
 				if (end[0] != '\0')
 					break;
@@ -720,7 +720,7 @@ autopush_fil(char *argv[], char *filename)
 			default:	/* module name (tokenind - 3) */
 				if (token[0] == '#')
 					break;
-				strncpy(sap.sap_list[sap.sap_npush++], token, FMNAMESZ);
+				strncpy(sap.sap_list[sap.sap_npush++], token, FMNAMESZ - 1);
 				continue;
 			}
 			break;
@@ -728,7 +728,7 @@ autopush_fil(char *argv[], char *filename)
 		if (tokenind < 3)
 			goto error;
 		sap.sap_major = major;
-		strncpy(sap.sap_module, devname, FMNAMESZ);
+		strncpy(sap.sap_module, devname, FMNAMESZ - 1);
 		if (minor == -1) {
 			sap.sap_cmd = SAP_ALL;
 			sap.sap_minor = 0;
@@ -864,7 +864,7 @@ main(int argc, char *argv[])
 					goto bad_option;
 			} else {
 				/* -M, --major name */
-				strncpy(devname, optarg, FMNAMESZ);
+				strncpy(devname, optarg, FMNAMESZ - 1);
 			}
 			break;
 		case 'm':	/* -m, --minor minor */
@@ -879,7 +879,7 @@ main(int argc, char *argv[])
 			if (option == OPTION_NONE || option == OPTION_FILE
 			    || option == OPTION_VERIFY || major != -1)
 				goto bad_option;
-			strncpy(devname, optarg, FMNAMESZ);
+			strncpy(devname, optarg, FMNAMESZ - 1);
 			break;
 		case 'l':	/* -l, --lastminor lastminor */
 			if (option != OPTION_SET || minor == -1)

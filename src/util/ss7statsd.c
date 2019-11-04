@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -200,7 +200,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -256,7 +256,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -1486,105 +1486,105 @@ main(int argc, char *argv[])
 				option_error(argc, argv, optind - 1, strerror(errno), 2);
 			if (!S_ISDIR(st.st_mode))
 				option_error(argc, argv, optind - 1, "not a directory", 2);
-			strncpy(outpdir, optarg, sizeof(outpdir));
+			strncpy(outpdir, optarg, sizeof(outpdir) - 1);
 			break;
 		case 'o':	/* -o, --outfile OUTFILE */
 			if (optarg == NULL)
 				option_error(argc, argv, optind - 1, "required argument", 2);
 			if (optarg[0] != '/') {
-				strncpy(outfile, optarg, sizeof(outfile));
+				strncpy(outfile, optarg, sizeof(outfile) - 1);
 				break;
 			}
-			strncpy(outpath, optarg, sizeof(outpath));
+			strncpy(outpath, optarg, sizeof(outpath) - 1);
 			break;
 		case 'l':	/* -l, --logfile LOGFILE */
 			if (optarg == NULL)
 				option_error(argc, argv, optind - 1, "required argument", 2);
 			if (optarg[0] != '/') {
-				strncpy(errfile, optarg, sizeof(errfile));
+				strncpy(errfile, optarg, sizeof(errfile) - 1);
 				break;
 			}
-			strncpy(errpath, optarg, sizeof(errpath));
+			strncpy(errpath, optarg, sizeof(errpath) - 1);
 			break;
 		case 'f':	/* -f, --cfgfile [CFGFILE] */
 			if (optarg != NULL)
-				strncpy(cfgfile, optarg, sizeof(cfgfile));
+				strncpy(cfgfile, optarg, sizeof(cfgfile) - 1);
 			useconfig = 1;
 			break;
 		case 'L':	/* -L, --slmx [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
-				strncpy(devslmx, optarg, sizeof(devslmx));
+				strncpy(devslmx, optarg, sizeof(devslmx) - 1);
 				if ((optstr = strsep(&optarg, ",")) != NULL)
-					strncpy(evtslmx, optarg, sizeof(evtslmx));
+					strncpy(evtslmx, optarg, sizeof(evtslmx) - 1);
 				else
 					strncpy(evtslmx, SS7STATSD_DEFAULT_EVTSLMX,
-						sizeof(evtslmx));
+						sizeof(evtslmx) - 1);
 			} else {
-				strncpy(devslmx, SS7STATSD_DEFAULT_DEVSLMX, sizeof(devslmx));
-				strncpy(evtslmx, SS7STATSD_DEFAULT_EVTSLMX, sizeof(evtslmx));
+				strncpy(devslmx, SS7STATSD_DEFAULT_DEVSLMX, sizeof(devslmx) - 1);
+				strncpy(evtslmx, SS7STATSD_DEFAULT_EVTSLMX, sizeof(evtslmx) - 1);
 			}
 			if (evtslmx[0] == '\0')
-				strncpy(evtslmx, devslmx, sizeof(evtslmx));
+				memcpy(evtslmx, devslmx, sizeof(evtslmx));
 			break;
 		case 'M':	/* -M, --mtpx [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
-				strncpy(devmtpx, optarg, sizeof(devmtpx));
+				strncpy(devmtpx, optarg, sizeof(devmtpx) - 1);
 				if ((optstr = strsep(&optarg, ",")) != NULL)
-					strncpy(evtmtpx, optarg, sizeof(evtmtpx));
+					strncpy(evtmtpx, optarg, sizeof(evtmtpx) - 1);
 				else
 					strncpy(evtmtpx, SS7STATSD_DEFAULT_EVTMTPX,
-						sizeof(evtmtpx));
+						sizeof(evtmtpx) - 1);
 			} else {
-				strncpy(devmtpx, SS7STATSD_DEFAULT_DEVMTPX, sizeof(devmtpx));
-				strncpy(evtmtpx, SS7STATSD_DEFAULT_EVTMTPX, sizeof(evtmtpx));
+				strncpy(devmtpx, SS7STATSD_DEFAULT_DEVMTPX, sizeof(devmtpx) - 1);
+				strncpy(evtmtpx, SS7STATSD_DEFAULT_EVTMTPX, sizeof(evtmtpx) - 1);
 			}
 			if (evtmtpx[0] == '\0')
-				strncpy(evtmtpx, devmtpx, sizeof(evtmtpx));
+				memcpy(evtmtpx, devmtpx, sizeof(evtmtpx));
 			break;
 		case 'S':	/* -S, --sccp [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
-				strncpy(devsccp, optarg, sizeof(devsccp));
+				strncpy(devsccp, optarg, sizeof(devsccp) - 1);
 				if ((optstr = strsep(&optarg, ",")) != NULL)
-					strncpy(evtsccp, optarg, sizeof(evtsccp));
+					strncpy(evtsccp, optarg, sizeof(evtsccp) - 1);
 				else
 					strncpy(evtsccp, SS7STATSD_DEFAULT_EVTSCCP,
-						sizeof(evtsccp));
+						sizeof(evtsccp) - 1);
 			} else {
-				strncpy(devsccp, SS7STATSD_DEFAULT_DEVSCCP, sizeof(devsccp));
-				strncpy(evtsccp, SS7STATSD_DEFAULT_EVTSCCP, sizeof(evtsccp));
+				strncpy(devsccp, SS7STATSD_DEFAULT_DEVSCCP, sizeof(devsccp) - 1);
+				strncpy(evtsccp, SS7STATSD_DEFAULT_EVTSCCP, sizeof(evtsccp) - 1);
 			}
 			if (evtsccp[0] == '\0')
-				strncpy(evtsccp, devsccp, sizeof(evtsccp));
+				memcpy(evtsccp, devsccp, sizeof(evtsccp));
 			break;
 		case 'T':	/* -T, --tcap [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
-				strncpy(devtcap, optarg, sizeof(devtcap));
+				strncpy(devtcap, optarg, sizeof(devtcap) - 1);
 				if ((optstr = strsep(&optarg, ",")) != NULL)
-					strncpy(evttcap, optarg, sizeof(evttcap));
+					strncpy(evttcap, optarg, sizeof(evttcap) - 1);
 				else
 					strncpy(evttcap, SS7STATSD_DEFAULT_EVTTCAP,
-						sizeof(evttcap));
+						sizeof(evttcap) - 1);
 			} else {
-				strncpy(devtcap, SS7STATSD_DEFAULT_DEVTCAP, sizeof(devtcap));
-				strncpy(evttcap, SS7STATSD_DEFAULT_EVTTCAP, sizeof(evttcap));
+				strncpy(devtcap, SS7STATSD_DEFAULT_DEVTCAP, sizeof(devtcap) - 1);
+				strncpy(evttcap, SS7STATSD_DEFAULT_EVTTCAP, sizeof(evttcap) - 1);
 			}
 			if (evttcap[0] == '\0')
-				strncpy(evttcap, devtcap, sizeof(evttcap));
+				memcpy(evttcap, devtcap, sizeof(evttcap));
 			break;
 		case 'I':	/* -I, --isup [DEVNAME[,DEVNAME]] */
 			if ((optstr = strsep(&optarg, ",")) != NULL) {
-				strncpy(devisup, optarg, sizeof(devisup));
+				strncpy(devisup, optarg, sizeof(devisup) - 1);
 				if ((optstr = strsep(&optarg, ",")) != NULL)
-					strncpy(evtisup, optarg, sizeof(evtisup));
+					strncpy(evtisup, optarg, sizeof(evtisup) - 1);
 				else
 					strncpy(evtisup, SS7STATSD_DEFAULT_EVTISUP,
-						sizeof(evtisup));
+						sizeof(evtisup) - 1);
 			} else {
-				strncpy(devisup, SS7STATSD_DEFAULT_DEVISUP, sizeof(devisup));
-				strncpy(evtisup, SS7STATSD_DEFAULT_EVTISUP, sizeof(evtisup));
+				strncpy(devisup, SS7STATSD_DEFAULT_DEVISUP, sizeof(devisup) - 1);
+				strncpy(evtisup, SS7STATSD_DEFAULT_EVTISUP, sizeof(evtisup) - 1);
 			}
 			if (evtisup[0] == '\0')
-				strncpy(evtisup, devisup, sizeof(evtisup));
+				memcpy(evtisup, devisup, sizeof(evtisup));
 			break;
 		case 'q':	/* -q, --quiet */
 			verbose -= verbose > 1 ? 1 : verbose;
@@ -1630,20 +1630,20 @@ main(int argc, char *argv[])
 	/* organize path names */
 	if (outpath[0] == '\0') {
 		if (outpdir[0] == '\0')
-			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir));
+			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir) - 1);
 		if (outfile[0] == '\0')
-			strncpy(outfile, SS7STATSD_DEFAULT_OUTFILE, sizeof(outfile));
+			strncpy(outfile, SS7STATSD_DEFAULT_OUTFILE, sizeof(outfile) - 1);
 		snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
 	}
 	if (errpath[0] == '\0') {
 		if (outpdir[0] == '\0')
-			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir));
+			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir) - 1);
 		if (errfile[0] == '\0')
-			strncpy(errfile, SS7STATSD_DEFAULT_ERRFILE, sizeof(errfile));
+			strncpy(errfile, SS7STATSD_DEFAULT_ERRFILE, sizeof(errfile) - 1);
 		snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
 	}
 	if (cfgfile[0] == '\0') {
-		strncpy(cfgfile, SS7STATSD_DEFAULT_CFGFILE, sizeof(cfgfile));
+		strncpy(cfgfile, SS7STATSD_DEFAULT_CFGFILE, sizeof(cfgfile) - 1);
 	}
 	exit(0);
 }

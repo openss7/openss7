@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -88,7 +88,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -135,7 +135,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2016, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -269,7 +269,7 @@ main(int argc, char *argv[])
 			command = CMN_PUSH;
 			mlen = strnlen(optarg, OPTS_MAX);
 			memset(mbuf, 0, OPTS_MAX);
-			strncpy(mbuf, optarg, OPTS_MAX);
+			strncpy(mbuf, optarg, OPTS_MAX - 1);
 			if (debug)
 				fprintf(stderr, "%s: module list: %s\n", __FUNCTION__, mbuf);
 			/* count number of modules in list */
@@ -289,7 +289,7 @@ main(int argc, char *argv[])
 			if (command != CMN_POP)
 				goto bad_option;
 			mlen = strnlen(optarg, OPTS_MAX);
-			strncpy(mbuf, optarg, OPTS_MAX);
+			strncpy(mbuf, optarg, OPTS_MAX - 1);
 			command = CMN_POPUPTO;
 			break;
 		case 'a':	/* -a, --all */
@@ -301,7 +301,7 @@ main(int argc, char *argv[])
 			if (command != CMN_NONE)
 				goto bad_option;
 			command = CMN_FILE;
-			strncpy(fbuf, optarg, PATH_MAX);
+			strncpy(fbuf, optarg, PATH_MAX - 1);
 			break;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)
