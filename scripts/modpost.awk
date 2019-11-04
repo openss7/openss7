@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1996,7 +1996,7 @@ function write_mymodules(modules,    i, base, file, mod)
     print_vinfo(1,"w: mymodules, " files " files written")
 }
 BEGIN {
-    LINT = "yes"
+    LINT = 0
     me = "modpost.awk"
     count_errs = 0; count_warn = 0; errors = ""
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"

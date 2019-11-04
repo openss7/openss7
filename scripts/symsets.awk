@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1206,7 +1206,7 @@ function write_symsets(file,		progress,count_sets,count_syms,directory,tarball,d
     print_vinfo(1,"w: pkgsymset, sets " count_sets ", syms " count_syms)
 }
 BEGIN {
-    LINT = "yes"
+    LINT = 0
     me = "symsets.awk"
     count_errs = 0; count_warn = 0; errors = ""
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
