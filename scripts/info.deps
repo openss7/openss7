@@ -30,7 +30,7 @@ function scanincludes(file)
 }
 
 BEGIN {
-    LINT = "yes"
+    LINT = 0
     if ("srcdir" in ENVIRON)
 	srcdir = EINVRON["srcdir"]
     if ("top_srcdir" in ENVIRON)

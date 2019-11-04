@@ -303,7 +303,7 @@ function check_section(base, sect,  command) {
     return check_manual(command)
 }
 BEGIN {
-#   LINT = "yes"
+    LINT = 0
     if ("LANG" in ENVIRON)
 	ENVIRON["LANG"] = ""
     success = 0
