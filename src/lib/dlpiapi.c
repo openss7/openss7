@@ -2579,7 +2579,8 @@ _dlpi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 {
 	char tmp[BUFSIZ];
 	int i, rows, cols, remaining;
-	char *p = (char *) buf, *q = tmp;
+	unsigned char *p = buf;
+	char *q = tmp;
 
 	if (indent > 5)
 		indent = 5;
@@ -2587,8 +2588,23 @@ _dlpi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 		cols = (remaining >= 16) ? 16 : remaining;
 		for (q = tmp, i = 0; i < indent; i++, q++)
 			*q = '\t';
-		for (i = 0; i < cols; i++, q += 3, p++)
+		for (i = 0; i < cols; i++, q += 3, p++) {
+#if 0
+			/* this generates an internal compiler error on gcc 9.2 */
 			sprintf(q, "%02X ", *p);
+#else
+			unsigned v;
+			char c;
+
+			v = (((unsigned) *p)>>4) & 0x0f;
+			c = (v <= 9) ? '0' + v : 'A' + (v - 10);
+			q[0] = c;
+			v = (((unsigned) *p)>>0) & 0x0f;
+			c = (v <= 9) ? '0' + v : 'A' + (v - 10);
+			q[1] = c;
+			q[2] = ' ';
+#endif
+		}
 		syslog(LOG_INFO, "%s", tmp);
 	}
 	return (0);		/* XXX */
