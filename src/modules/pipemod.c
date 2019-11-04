@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@ static char const ident[] = "src/modules/pipemod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define PIPEMOD_DESCRIP		"SVR 4.2 Pipe Module (PIPEMOD) STREAMS Module"
 #define PIPEMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPEMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PIPEMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PIPEMOD_REVISION	"OpenSS7 src/modules/pipemod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -242,9 +242,10 @@ static struct fmodsw pipemod_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 pipemodinit(void)
 {
 	int err;
@@ -263,9 +264,10 @@ pipemodinit(void)
 };
 
 #ifdef CONFIG_STREAMS_PIPEMOD_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 pipemodexit(void)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define PFMOD_DESCRIP		"SVR 4.2 Packet Filter Module (PFMOD) STREAMS Module"
 #define PFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PFMOD_COPYRIGHT		"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PFMOD_COPYRIGHT		"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PFMOD_REVISION		"OpenSS7 src/modules/pfmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PFMOD_DEVICE		"SVR 4.2 Packet Filter Module (PFMOD) for STREAMS"
 #define PFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1496,9 +1496,10 @@ pfmod_ioctl32_register(void)
 #endif				/* __LP64__ */
 
 #ifdef CONFIG_STREAMS_PFMOD_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 pfmodinit(void)
 {
 	int err;
@@ -1530,9 +1531,10 @@ pfmodinit(void)
 }
 
 #ifdef CONFIG_STREAMS_PFMOD_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 pfmodexit(void)
 {
 	int err;

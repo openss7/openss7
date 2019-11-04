@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/modules/dlaix.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define DLAIX_DESCRIP	"LAPB over HDLC Module for Linux Fast-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define DLAIX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define DLAIX_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define DLAIX_REVISION	"OpenSS7 src/modules/dlaix.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DLAIX_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define DLAIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2590,7 +2590,7 @@ static struct fmodsw dl_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static __init int
+static int
 dlaix_modinit(void)
 {
 	int err;
@@ -2605,7 +2605,7 @@ dlaix_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 dlaix_modexit(void)
 {
 	int err;

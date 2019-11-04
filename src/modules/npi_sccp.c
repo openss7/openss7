@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/npi_sccp.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define NPI_SCCP_DESCRIP	"SCCPI to NPI Conversion Module for Linux Fast-STREAMS"
 #define NPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define NPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NPI_SCCP_REVISION	"OpenSS7 src/modules/npi_sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define NPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4070,7 +4070,7 @@ static struct fmodsw np_fmod = {
 /**
  * npi_sccp_modinit: - initialize kernel module
  */
-static int __init
+static int
 npi_sccp_modinit(void)
 {
 	int err;
@@ -4087,7 +4087,7 @@ npi_sccp_modinit(void)
 /**
  * npi_sccp_modexit: - deinitialize kernel module
  */
-static void __exit
+static void
 npi_sccp_modexit(void)
 {
 	int err;

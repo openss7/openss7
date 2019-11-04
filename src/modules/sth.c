@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -156,7 +156,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"SVR 4.2 Stream Head (STH) STREAMS Module"
 #define STH_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STH_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define STH_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define STH_REVISION	"OpenSS7 src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -11901,9 +11901,10 @@ struct fmodsw sth_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_STH_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 sthinit(void)
 {
 	int result;
@@ -11928,9 +11929,10 @@ sthinit(void)
 }
 
 #ifdef CONFIG_STREAMS_STH_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 sthexit(void)
 {
 #if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL

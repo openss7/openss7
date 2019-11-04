@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/modules/sdl_pmod.c (" PACKAGE_ENVR ") " PACKAGE
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS Pipe Module"
 #define SDL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDL_REVISION	"OpenSS7 src/modules/sdl_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDL_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_LICENSE	"GPL"
@@ -3903,7 +3903,7 @@ static struct fmodsw sdl_fmod = {
 /**
  * sdl_pmodinit: - initialize SDL-PMOD
  */
-static __init int
+static int
 sdl_pmodinit(void)
 {
 	int err;
@@ -3921,7 +3921,7 @@ sdl_pmodinit(void)
 /**
  * sdl_pmodexit: - terminate SDL-PMOD
  */
-static __exit void
+static void
 sdl_pmodexit(void)
 {
 	int err;

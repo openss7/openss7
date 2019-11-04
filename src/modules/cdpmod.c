@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,7 +63,7 @@ static char const ident[] = "src/modules/cdpmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define CDPMOD_DESCRIP	"HDLC Pipe Module for Linux Fast-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define CDPMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CDPMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CDPMOD_REVISION	"OpenSS7 src/modules/cdpmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CDPMOD_DEVICE	"SVR 4.2MP CD PIPE Module (CDPMOD) for HDLC"
 #define CDPMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1514,7 +1514,7 @@ struct fmodsw cd_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static __init int
+static int
 cdpmod_modinit(void)
 {
 	int err;
@@ -1533,7 +1533,7 @@ cdpmod_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 cdpmod_modexit(void)
 {
 	int err;

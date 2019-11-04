@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@ static char const ident[] = "src/modules/testmod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define TESTMOD_DESCRIP		"SVR 4.2 Test Module for Linux Fast-STREAMS"
 #define TESTMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TESTMOD_REVISION	"OpenSS7 src/modules/testmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -556,9 +556,10 @@ tm_register_ioctl32(void)
 }
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 testmodinit(void)
 {
 	int err;
@@ -581,9 +582,10 @@ testmodinit(void)
 };
 
 #ifdef CONFIG_STREAMS_TESTMOD_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 testmodexit(void)
 {
 	unregister_strmod(&testmod_fmod);

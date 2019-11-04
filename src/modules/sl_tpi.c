@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -77,7 +77,7 @@ static char const ident[] = "src/modules/sl_tpi.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define SL_TPI_DESCRIP		"SS7/IP Signalling Link (SL) STREAMS Module"
 #define SL_TPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux-Fast STREAMS"
 #define SL_TPI_REVISION	"OpenSS7 src/modules/sl_tpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SL_TPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SL_TPI_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SL_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_TPI_LICENSE		"GPL"
@@ -8908,7 +8908,7 @@ sl_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sl_tpiinit(void)
 {
 	int err;
@@ -8934,7 +8934,7 @@ sl_tpiinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sl_tpiterminate(void)
 {
 	int err;

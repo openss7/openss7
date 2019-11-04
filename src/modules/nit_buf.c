@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -80,7 +80,7 @@ static char const ident[] = "src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define NBUF_DESCRIP	"SVR 4.1 SNI Buffer Module (NBUF) STREAMS Module"
 #define NBUF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NBUF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NBUF_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NBUF_REVISION	"OpenSS7 src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NBUF_DEVICE	"SVR 4.1 SNIT Buffer Module (NBUF) for STREAMS."
 #define NBUF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1169,9 +1169,10 @@ STATIC struct fmodsw nbuf_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_NBUF_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 nbufinit(void)
 {
 	int err;
@@ -1203,9 +1204,10 @@ nbufinit(void)
 }
 
 #ifdef CONFIG_STREAMS_NBUF_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 nbufexit(void)
 {
 	int err;

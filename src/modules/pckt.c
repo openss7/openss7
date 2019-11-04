@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -212,7 +212,7 @@ static char const ident[] = "src/modules/pckt.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define PCKT_DESCRIP		"Packet Mode Module (PCKT) STREAMS Module"
 #define PCKT_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PCKT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PCKT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PCKT_REVISION	"OpenSS7 src/modules/pckt.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PCKT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -575,9 +575,10 @@ static struct fmodsw pckt_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_PCKT_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 pckt_init(void)
 {
 	int err;
@@ -596,9 +597,10 @@ pckt_init(void)
 };
 
 #ifdef CONFIG_STREAMS_PCKT_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 pckt_exit(void)
 {
 	unregister_strmod(&pckt_fmod);

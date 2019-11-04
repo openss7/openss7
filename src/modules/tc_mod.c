@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -111,7 +111,7 @@ static char const ident[] = "src/modules/tc_mod.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS Module"
 #define TC_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TC_REVISION	"OpenSS7 src/modules/tc_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define TC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TC_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TC_LICENSE	"GPL"
@@ -5355,7 +5355,7 @@ static struct fmodsw tc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static __init int
+static int
 tc_modinit(void)
 {
 	int err;
@@ -5370,7 +5370,7 @@ tc_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 tc_modexit(void)
 {
 	int err;

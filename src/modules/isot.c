@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -82,7 +82,7 @@ static char const ident[] = "src/modules/isot.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define ISOT_DESCRIP	"SVR 4.2 ISO Transport over TCP for Linux Fast-STREAMS"
 #define ISOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define ISOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ISOT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ISOT_REVISION	"OpenSS7 src/modules/isot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ISOT_DEVICE	"SVR 4.2 MP STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3356,7 +3356,7 @@ module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for ISOT. (0 for allocation.)");
 
-static __init int
+static int
 isotinit(void)
 {
 #if NEVER
@@ -3376,7 +3376,7 @@ isotinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 isotexit(void)
 {
 #if NEVER

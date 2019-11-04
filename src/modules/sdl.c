@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/sdl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS Module"
 #define SDL_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDL_REVISION	"OpenSS7 src/modules/sdl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDL_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_LICENSE	"GPL"
@@ -2278,7 +2278,7 @@ sdl_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sdlinit(void)
 {
 	int err;
@@ -2298,7 +2298,7 @@ sdlinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sdlterminate(void)
 {
 	int err;

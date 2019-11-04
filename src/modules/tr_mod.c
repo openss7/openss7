@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -94,7 +94,7 @@ static char const ident[] = "src/modules/tr_mod.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS Module"
 #define TR_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TR_REVISION	"OpenSS7 src/modules/tr_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define TR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TR_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TR_LICENSE	"GPL"
@@ -4611,7 +4611,7 @@ static struct fmodsw tr_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static __init int
+static int
 tr_modinit(void)
 {
 	int err;
@@ -4670,7 +4670,7 @@ tr_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 tr_modexit(void)
 {
 	int err;

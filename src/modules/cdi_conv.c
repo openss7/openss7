@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,7 @@ static char const ident[] = "src/modules/cdi_conv.c (" PACKAGE_ENVR ") " PACKAGE
 #include <sys/cdi.h>
 
 #define CDI_CONV_DESCRIP	"CDI Endian Conversion (CDI-CONV) for Linux Fast-STREAMS"
-#define CDI_CONV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CDI_CONV_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CDI_CONV_REVISION	"OpenSS7 src/modules/cdi_conv.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CDI_CONV_DEVICE		"SVR 4.2 CDI Endian Conversion (CDI-CONV) for STREAMS"
 #define CDI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -331,7 +331,7 @@ static struct fmodsw cdi_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-int __init
+int
 cdi_convinit(void)
 {
 	int err;
@@ -349,7 +349,7 @@ cdi_convinit(void)
 	return (0);
 }
 
-void __exit
+void
 cdi_convexit(void)
 {
 	unregister_strmod(&cdi_fmod);

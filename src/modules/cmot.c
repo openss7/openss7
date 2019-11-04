@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,7 +63,7 @@ static char const ident[] = "src/modules/cmot.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define CMOT_DESCRIP	"CMOT STREAMS Module"
 #define CMOT_EXTRA      "Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define CMOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CMOT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CMOT_REVISION	"OpenSS7 src/modules/cmot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CMOT_DEVICE	"SVR 4.2MP CMISE over TCP (CMOT)"
 #define CMOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -145,7 +145,7 @@ MODULE_PARM_DESC(modid, "Module ID for CMOT module.  (0 for allocation.)");
 
 /** cmotinit - initialize CMOT
   */
-static __init int
+static int
 cmotinit(void)
 {
 	cmn_err(CE_NOTE, MOD_BANNER);
@@ -154,7 +154,7 @@ cmotinit(void)
 
 /** cmotexit - terminate CMOT
   */
-static __exit void
+static void
 cmotexit(void)
 {
 	return;

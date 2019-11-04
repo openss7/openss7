@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/modules/nullmod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define NULLMOD_DESCRIP		"Null Module (NULLMOD) STREAMS Module"
 #define NULLMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULLMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NULLMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NULLMOD_REVISION	"OpenSS7 src/modules/nullmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -443,9 +443,10 @@ nullmod_register_ioctl32(void)
 }
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 nullmodinit(void)
 {
 	int err;
@@ -468,9 +469,10 @@ nullmodinit(void)
 }
 
 #ifdef CONFIG_STREAMS_NULLMOD_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 nullmodexit(void)
 {
 	unregister_strmod(&nullmod_fmod);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "src/modules/sccp_mod.c (" PACKAGE_ENVR ") " PACKAGE
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS Module"
 #define SC_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SC_REVISION	"OpenSS7 src/modules/sccp_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SC_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -4597,7 +4597,7 @@ static struct fmodsw sc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static __init int
+static int
 sccp_modinit(void)
 {
 	int err;
@@ -4612,7 +4612,7 @@ sccp_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 sccp_modexit(void)
 {
 	int err;

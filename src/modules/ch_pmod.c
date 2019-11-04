@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -71,7 +71,7 @@ static char const ident[] = "src/modules/ch_pmod.c (" PACKAGE_ENVR ") " PACKAGE_
 #define CH_DESCRIP	"CH (Channel) STREAMS Pipe Module"
 #define CH_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define CH_REVISION	"OpenSS7 src/modules/ch_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define CH_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CH_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
@@ -2910,7 +2910,7 @@ static struct fmodsw ch_fmod = {
 /**
  * ch_pmodinit: - initialize CH-PMOD
  */
-static __init int
+static int
 ch_pmodinit(void)
 {
 	int err;
@@ -2929,7 +2929,7 @@ ch_pmodinit(void)
 /**
  * ch_pmodexit: - terminate CH-PMOD
  */
-static __exit void
+static void
 ch_pmodexit(void)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -82,7 +82,7 @@ static char const ident[] = "src/modules/bufmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define BUFMOD_DESCRIP		"SVR 4.2 Buffer Module (BUFMOD) STREAMS Module"
 #define BUFMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define BUFMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define BUFMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define BUFMOD_REVISION	"OpenSS7 src/modules/bufmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1501,9 +1501,10 @@ bufmod_ioctl32_register(void)
 #endif				/* __LP64__ */
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 bufmodinit(void)
 {
 	int err;
@@ -1535,9 +1536,10 @@ bufmodinit(void)
 }
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 bufmodexit(void)
 {
 	int err;

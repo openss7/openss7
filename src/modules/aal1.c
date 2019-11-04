@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/modules/aal1.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define AAL1_DESCRIP	"MTP3B-AAL1 STREAMS Module"
 #define AAL1_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define AAL1_REVISION	"OpenSS7 src/modules/aal1.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define AAL1_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define AAL1_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define AAL1_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL1 module."
 #define AAL1_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define AAL1_LICENSE	"GPL"
@@ -2759,7 +2759,7 @@ static struct fmodsw a1_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static int __init
+static int
 aal1init(void)
 {
 	int err;
@@ -2789,7 +2789,7 @@ aal1terminate(void)
 	return (0);
 }
 
-static void __exit
+static void
 aal1exit(void)
 {
 	aal1terminate();

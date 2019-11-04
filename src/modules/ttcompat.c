@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -475,7 +475,7 @@ struct ltchars {
 
 #define TTCOMPAT_DESCRIP	"Packet Mode (TTCOMPAT) STREAMS Module"
 #define TTCOMPAT_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TTCOMPAT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TTCOMPAT_REVISION	"OpenSS7 src/modules/ttcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TTCOMPAT_DEVICE		"SVR 4.2 MP STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1179,9 +1179,10 @@ static struct fmodsw ttcompat_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_TTCOMPAT_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 ttcompat_init(void)
 {
 	int err;
@@ -1200,9 +1201,10 @@ ttcompat_init(void)
 }
 
 #ifdef CONFIG_STREAMS_TTCOMPAT_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 ttcompat_exit(void)
 {
 	unregister_strmod(&ttcompat_fmod);

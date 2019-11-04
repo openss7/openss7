@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -64,7 +64,7 @@ static char const ident[] = "src/modules/mstr.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define MSTR_DESCRIP	"Multi-Stream (MSTR) STREAMS Module"
 #define MSTR_EXTRA	"Part of Linux Fast-STREAMS"
-#define MSTR_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MSTR_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define MSTR_REVISION	"OpenSS7 src/modules/mstr.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -239,7 +239,7 @@ static struct fmodsw mstr_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 mstrinit(void)
 {
 	int err;
@@ -254,7 +254,7 @@ mstrinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 mstrexit(void)
 {
 	int err;

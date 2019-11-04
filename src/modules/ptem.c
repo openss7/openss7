@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -103,7 +103,7 @@ References
 
 #define PTEM_DESCRIP		"Pseudo-Terminal Emulation Module (PTEM) STREAMS Module"
 #define PTEM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTEM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PTEM_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PTEM_REVISION	"OpenSS7 src/modules/ptem.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PTEM_DEVICE		"SVR 4.2 MP STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1008,9 +1008,10 @@ static struct fmodsw ptem_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_PTEM_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 ptem_init(void)
 {
 	int err;
@@ -1029,9 +1030,10 @@ ptem_init(void)
 };
 
 #ifdef CONFIG_STREAMS_PTEM_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 ptem_exit(void)
 {
 	unregister_strmod(&ptem_fmod);

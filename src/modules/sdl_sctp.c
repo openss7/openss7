@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,7 +67,7 @@ static char const ident[] = "src/modules/sdl_sctp.c (" PACKAGE_ENVR ") " PACKAGE
 #define SDL_SCTP_DESCRIP	"SS7/SCTP Signalling Data Link (SDL) STREAMS Module"
 #define SDL_SCTP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDL_SCTP_REVISION	"OpenSS7 src/modules/sdl_sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDL_SCTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDL_SCTP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_SCTP_LICENSE	"GPL"
@@ -2266,7 +2266,7 @@ sdl_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sdl_sctpinit(void)
 {
 	int err;
@@ -2285,7 +2285,7 @@ sdl_sctpinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sdl_sctpterminate(void)
 {
 	int err;

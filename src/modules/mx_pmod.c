@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -72,7 +72,7 @@ static char const ident[] = "src/modules/mx_pmod.c (" PACKAGE_ENVR ") " PACKAGE_
 #define MX_DESCRIP	"MX (Multiplex) STREAMS Pipe Module"
 #define MX_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define MX_REVISION	"OpenSS7 src/modules/mx_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MX_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_LICENSE	"GPL"
@@ -2911,7 +2911,7 @@ static struct fmodsw mx_fmod = {
 /**
  * mx_pmodinit: - initialize MX-PMOD
  */
-static __init int
+static int
 mx_pmodinit(void)
 {
 	int err;
@@ -2930,7 +2930,7 @@ mx_pmodinit(void)
 /**
  * mx_pmodexit: - terminate MX-PMOD
  */
-static __exit void
+static void
 mx_pmodexit(void)
 {
 	int err;

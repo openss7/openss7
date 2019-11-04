@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/tpiperf.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define TPIPERF_DESCRIP		"TPI Performance (TPIPERF) STREAMS Module"
 #define TPIPERF_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TPIPERF_REVISION	"OpenSS7 src/modules/tpiperf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TPIPERF_DEVICE		"SVR 4.2 MP STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -760,7 +760,7 @@ tpiperf_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 tpiperfinit(void)
 {
 	int err;
@@ -780,7 +780,7 @@ tpiperfinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 tpiperfterminate(void)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,7 +70,7 @@ static char const ident[] = "src/modules/connld.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define CONNLD_DESCRIP		"SVR 4.2 Connection Line Discipline (CONNLD) STREAMS Module"
 #define CONNLD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CONNLD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CONNLD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CONNLD_REVISION	"OpenSS7 src/modules/connld.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -196,9 +196,10 @@ static struct fmodsw connld_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_CONNLD_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 connldinit(void)
 {
 	int err;
@@ -217,9 +218,10 @@ connldinit(void)
 };
 
 #ifdef CONFIG_STREAMS_CONNLD_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 connldexit(void)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/sscop.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define SSCOP_DESCRIP	"MTP3B-SSCOP STREAMS Module"
 #define SSCOP_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOP_REVISION	"OpenSS7 src/modules/sscop.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SSCOP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SSCOP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-SSCOP module."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOP_LICENSE	"GPL"
@@ -2924,7 +2924,7 @@ static struct fmodsw sc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static int __init
+static int
 sscopinit(void)
 {
 	int err;
@@ -2954,7 +2954,7 @@ sscopterminate(void)
 	return (0);
 }
 
-static void __exit
+static void
 sscopexit(void)
 {
 	sscopterminate();

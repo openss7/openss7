@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -86,7 +86,7 @@ static char const ident[] = "src/modules/xot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define XOT_DESCRIP	"X.25 over TCP Module for Linux Fast-STREAMS"
 #define XOT_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define XOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define XOT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define XOT_REVISION	"OpenSS7 src/modules/xot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4076,7 +4076,7 @@ MODULE_PARM_DESC(modid, "Module ID for XOT.  (0 for allocation.)");
 
 /** cmotinit - initialize CMOT
   */
-static __init int
+static int
 xotmodinit(void)
 {
 #if 0
@@ -4099,7 +4099,7 @@ xotmodinit(void)
 
 /** cmotexit - terminate CMOT
   */
-static __exit void
+static void
 xotmodexit(void)
 {
 #if 0

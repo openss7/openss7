@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/modules/sscopmce.c (" PACKAGE_ENVR ") " PACKAGE
 #define SSCOPMCE_DESCRIP	"MTP3B-SSCOPMCE STREAMS Module"
 #define SSCOPMCE_EXTRA		"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define SSCOPMCE_REVISION	"OpenSS7 src/modules/sscopmce.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SSCOPMCE_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SSCOPMCE_DEVICE		"Provides OpenSS7 MTP3B-I.432.3-SSCOPMCE module."
 #define SSCOPMCE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SSCOPMCE_LICENSE	"GPL"
@@ -2078,7 +2078,7 @@ static struct fmodsw sc_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static int __init
+static int
 sscopmceinit(void)
 {
 	int err;
@@ -2108,7 +2108,7 @@ sscopmceterminate(void)
 	return (0);
 }
 
-static void __exit
+static void
 sscopmceexit(void)
 {
 	sscopmceterminate();

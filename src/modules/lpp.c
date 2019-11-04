@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,7 @@ static char const ident[] = "src/modules/lpp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LPP_DESCRIP	"LPP STREAMS Module"
 #define LPP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define LPP_REVISION	"OpenSS7 src/modules/lpp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define LPP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LPP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LPP_DEVICE	"Provides OpenSS7 Lightweight Presentation Protocol (LPP)"
 #define LPP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LPP_LICENSE	"GPL"
@@ -131,7 +131,7 @@ MODULE_PARM_DESC(modid, "Module ID for LPP module.  (0 for allocation.)");
 
 /** lppinit - initialize LPP
   */
-static __init int
+static int
 lppinit(void)
 {
 	cmn_err(CE_NOTE, MOD_BANNER);
@@ -140,7 +140,7 @@ lppinit(void)
 
 /** lppexit - terminate LPP
   */
-static __exit void
+static void
 lppexit(void)
 {
 	return;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -84,7 +84,7 @@ static char const ident[] = "src/modules/phys.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS Module"
 #define PHYS_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define PHYS_REVISION	"OpenSS7 src/modules/phys.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define PHYS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PHYS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PHYS_LICENSE	"GPL"
@@ -2774,7 +2774,7 @@ static struct fmodsw ph_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-static int __init
+static int
 physinit(void)
 {
 	int err;
@@ -2804,7 +2804,7 @@ physterminate(void)
 	return (0);
 }
 
-static void __exit
+static void
 physexit(void)
 {
 	physterminate();

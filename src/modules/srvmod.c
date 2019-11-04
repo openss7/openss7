@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,7 +78,7 @@ static char const ident[] = "src/modules/srvmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define SRVMOD_DESCRIP		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
 #define SRVMOD_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SRVMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SRVMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SRVMOD_REVISION	"OpenSS7 src/modules/srvmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SRVMOD_DEVICE		"SVR 4.2 Buffer Module (SRVMOD) for STREAMS"
 #define SRVMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -298,9 +298,10 @@ STATIC struct fmodsw srvmod_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_SRVMOD_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 srvmodinit(void)
 {
 	int err;
@@ -319,9 +320,10 @@ srvmodinit(void)
 }
 
 #ifdef CONFIG_STREAMS_SRVMOD_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 srvmodexit(void)
 {
 	int err;

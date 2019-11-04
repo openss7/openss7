@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -58,7 +58,7 @@ static char const ident[] = "src/modules/sm_mod.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP"
 #define SM_MOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SM_MOD_REVISION	"OpenSS7 src/modules/sm_mod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SM_MOD_LICENSE		"GPL"
@@ -330,7 +330,7 @@ sm_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sm_modinit(void)
 {
 	int err;
@@ -349,7 +349,7 @@ sm_modinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sm_modterminate(void)
 {
 	int err;

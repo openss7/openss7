@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,7 +63,7 @@ static char const ident[] = "src/modules/dlpi_conv.c (" PACKAGE_ENVR ") " PACKAG
 
 #define DLPI_CONV_DESCRIP	"DLPI Endian Conversion (DLPI-CONV) for Linux Fast-STREAMS"
 #define DLPI_CONV_EXTRA		"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
-#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define DLPI_CONV_REVISION	"OpenSS7 src/modules/dlpi_conv.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -288,7 +288,7 @@ static struct fmodsw dlpi_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-int __init
+int
 dlpi_convinit(void)
 {
 	int err;
@@ -306,7 +306,7 @@ dlpi_convinit(void)
 	return (0);
 }
 
-void __exit
+void
 dlpi_convexit(void)
 {
 	unregister_strmod(&dlpi_fmod);

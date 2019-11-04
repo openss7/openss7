@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -83,7 +83,7 @@ static char const ident[] = "src/modules/sdt_pmod.c (" PACKAGE_ENVR ") " PACKAGE
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS Pipe Module"
 #define SDT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_REVISION	"OpenSS7 src/modules/sdt_pmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_LICENSE	"GPL"
@@ -4415,7 +4415,7 @@ static struct fmodsw sdt_fmod = {
 /**
  * sdt_pmodinit: - initialize SDT-PMOD
  */
-static __init int
+static int
 sdt_pmodinit(void)
 {
 	int err;
@@ -4433,7 +4433,7 @@ sdt_pmodinit(void)
 /**
  * sdt_pmodexit: - terminate SDT-PMOD
  */
-static __exit void
+static void
 sdt_pmodexit(void)
 {
 	int err;

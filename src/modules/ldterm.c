@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -143,7 +143,7 @@ static char const ident[] = "src/modules/ldterm.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define LDTERM_DESCRIP		"Line Discipline for Terminals (LDTERM) STREAMS Module"
 #define LDTERM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LDTERM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LDTERM_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LDTERM_REVISION	"OpenSS7 src/modules/ldterm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LDTERM_DEVICE		"SVR 4.2 MP STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -669,9 +669,10 @@ static struct fmodsw ldterm_fmod = {
 };
 
 #ifdef CONFIG_STREAMS_LDTERM_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 ldterm_init(void)
 {
 	int err;
@@ -690,9 +691,10 @@ ldterm_init(void)
 };
 
 #ifdef CONFIG_STREAMS_LDTERM_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 ldterm_exit(void)
 {
 	unregister_strmod(&ldterm_fmod);

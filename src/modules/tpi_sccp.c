@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -86,7 +86,7 @@ static char const ident[] = "src/modules/tpi_sccp.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define TPI_SCCP_DESCRIP	"SCCPI to TPI Conversion Module for Linux Fast-STREAMS"
 #define TPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TPI_SCCP_REVISION	"OpenSS7 src/modules/tpi_sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define TPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5325,7 +5325,7 @@ static struct fmodsw tp_fmod = {
 /**
  * tpi_sccp_modinit: - initialize kernel module
  */
-static int __init
+static int
 tpi_sccp_modinit(void)
 {
 	int err;
@@ -5342,7 +5342,7 @@ tpi_sccp_modinit(void)
 /**
  * tpi_sccp_modexit: - deinitialize kernel module
  */
-static void __exit
+static void
 tpi_sccp_modexit(void)
 {
 	int err;

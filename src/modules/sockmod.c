@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -124,7 +124,7 @@ static char const ident[] = "src/modules/sockmod.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define SMOD_DESCRIP	"Socket Module for TPI Devices (SOCKMOD) STREAMS Module"
 #define SMOD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SMOD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SMOD_REVISION	"OpenSS7 src/modules/sockmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -961,7 +961,7 @@ smod_ioctl32_register(void)
 
 #endif				/* defined __LP64__ */
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sockmodinit(void)
 {
 	int err;
@@ -991,7 +991,7 @@ sockmodinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sockmodterminate(void)
 {
 	int err;

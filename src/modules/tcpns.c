@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -81,7 +81,7 @@ static char const ident[] = "src/modules/tcpns.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define TCPNS_DESCRIP	"RFC 1006/2126 ISOT/ITOT NS (TCPNS) STREAMS Module"
 #define TCPNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define TCPNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TCPNS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TCPNS_REVISION	"OpenSS7 src/modules/tcpns.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCPNS_DEVICE	"SVR 4.2 MP STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -466,7 +466,7 @@ tcpns_unregister_strmod(void)
 	return (0);
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 tcpnsinit(void)
 {
 	int err;
@@ -486,7 +486,7 @@ tcpnsinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 tcpnsterminate(void)
 {
 	int err;

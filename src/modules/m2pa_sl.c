@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -80,7 +80,7 @@ static char const ident[] = "src/modules/m2pa_sl.c (" PACKAGE_ENVR ") " PACKAGE_
 #define M2PA_SL_DESCRIP		"M2PA/SCTP Signalling Link (SL) STREAMS Module"
 #define M2PA_SL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2PA_SL_REVISION	"OpenSS7 src/modules/m2pa_sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define M2PA_SL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define M2PA_SL_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2PA_SL_LICENSE		"GPL"
@@ -8359,7 +8359,7 @@ STATIC struct fmodsw sl_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 m2pa_slinit(void)
 {
 	int err;
@@ -8379,7 +8379,7 @@ m2pa_slinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 m2pa_slterminate(void)
 {
 	int err;

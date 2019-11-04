@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,7 +78,7 @@ static char const ident[] = "src/modules/mtp_npi.c (" PACKAGE_ENVR ") " PACKAGE_
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS Module"
 #define MTP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MTP_NPI_REVISION	"OpenSS7 src/modules/mtp_npi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MTP_NPI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MTP_NPI_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_NPI_LICENSE		"GPL"
@@ -3344,7 +3344,7 @@ static struct fmodsw mtp_fmod = {
 	.f_kmod = THIS_MODULE,
 };
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 mtp_npiinit(void)
 {
 	int err;
@@ -3359,7 +3359,7 @@ mtp_npiinit(void)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 mtp_npiterminate(void)
 {
 	int err;
