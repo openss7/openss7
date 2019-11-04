@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -112,7 +112,7 @@ static char const ident[] = "src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define NP_DESCRIP	"User Datagram Protocol (UDP) Network Provider (NP_UDP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6625,7 +6625,7 @@ np_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 npterminate(void)
 {
 	int err, mindex;
@@ -6645,7 +6645,7 @@ npterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 npinit(void)
 {
 	int err, mindex = 0;

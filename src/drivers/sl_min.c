@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,7 +57,7 @@ static char const ident[] = "src/drivers/sl_min.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define SL_MIN_DESCRIP		"SS7/IP Signalling Link (SL) STREAMS Multiplexing Driver"
 #define SL_MIN_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_MIN_REVISION	"OpenSS7 src/drivers/sl_min.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SL_MIN_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SL_MIN_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MIN_LICENSE		"GPL"
@@ -1050,7 +1050,7 @@ slm_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sl_minterminate(void)
 {
 	int err, mindex;
@@ -1068,7 +1068,7 @@ sl_minterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sl_mininit(void)
 {
 	int err, mindex = 0;

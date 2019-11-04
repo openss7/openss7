@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -144,7 +144,7 @@ static char const ident[] = "src/drivers/ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS Multiplexing Driver"
 #define UA_AS_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define UA_AS_REVISION	"OpenSS7 src/drivers/ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define UA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define UA_AS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UA_AS_LICENSE	"GPL"
@@ -18273,7 +18273,7 @@ module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for UA-AS driver.  (0 for allocation.)");
 
-static __init int
+static int
 ua_asinit(void)
 {
 	int err;
@@ -18288,7 +18288,7 @@ ua_asinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 ua_asexit(void)
 {
 	int err;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -86,7 +86,7 @@ static char const ident[] = "src/drivers/sad.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define SAD_DESCRIP	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SAD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SAD_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SAD_REVISION	"OpenSS7 src/drivers/sad.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SAD_DEVICE	"SVR 4.2 MP STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -696,9 +696,10 @@ sad_register_ioctl32(void)
 }
 
 #ifdef CONFIG_STREAMS_SAD_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 sadinit(void)
 {
 	int err;
@@ -724,9 +725,10 @@ sadinit(void)
 };
 
 #ifdef CONFIG_STREAMS_SAD_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 sadexit(void)
 {
 	unregister_strnod(&sad_cdev, 1);

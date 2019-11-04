@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/nit_if.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define NIT_DESCRIP	"SVR 4.1 SNIT (NIT_IF) STREAMS Driver"
 #define NIT_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NIT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NIT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NIT_REVISION	"OpenSS7 src/drivers/nit_if.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NIT_DEVICE	"SVR 4.2 MP STREAMS NIT Driver"
 #define NIT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -389,9 +389,10 @@ STATIC struct file_operations nit_f_ops ____cacheline_aligned = {
  */
 
 #ifdef CONFIG_STREAMS_NIT_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 nitinit(void)
 {
 	int err;
@@ -410,9 +411,10 @@ nitinit(void)
 };
 
 #ifdef CONFIG_STREAMS_NIT_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 nitexit(void)
 {
 	if (unregister_cmajor(&nit_cdev, major) != 0)

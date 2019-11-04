@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,7 +57,7 @@ static char const ident[] = "src/drivers/x25-llc2.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define LLC2_DESCRIP	"SVR 4.2 DLPI X25-LLC2 Driver for Linux Fast-STREAMS"
 #define LLC2_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC2_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LLC2_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LLC2_REVISION	"OpenSS7 src/drivers/x25-llc2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LLC2_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for IEEE 802.2 LLC"
 #define LLC2_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -152,7 +152,7 @@ MODULE_PARM_DESC(modid, "Module ID for LLC2.  (0 for allocation.)");
 
 /** llc2init - initialize LLC2
   */
-static __init int
+static int
 llc2init(void)
 {
 	cmn_err(CE_NOTE, DRV_BANNER);
@@ -161,7 +161,7 @@ llc2init(void)
 
 /** llc2exit - terminate LLC2
   */
-static __exit void
+static void
 llc2exit(void)
 {
 	return;

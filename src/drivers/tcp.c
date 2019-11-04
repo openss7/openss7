@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -125,7 +125,7 @@ static char const ident[] = "src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define TCP_DESCRIP	"Transport Control Protocol (TCP) STREAMS Driver"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TCP_REVISION	"OpenSS7 src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -7041,7 +7041,7 @@ tpi_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 tpiterminate(void)
 {
 	int err, mindex;
@@ -7061,7 +7061,7 @@ tpiterminate(void)
 	tpi_term_hashes();
 	return;
 }
-MODULE_STATIC int __init
+MODULE_STATIC int
 tpiinit(void)
 {
 	int err, mindex = 0;

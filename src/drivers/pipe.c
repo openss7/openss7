@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,7 +70,7 @@ static char const ident[] = "src/drivers/pipe.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define PIPE_DESCRIP	"SVR 4.2 STREAMS-based Pipe (PIPE) STREAMS Driver"
 #define PIPE_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PIPE_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PIPE_REVISION	"OpenSS7 src/drivers/pipe.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PIPE_DEVICE	"SVR 4.2 MP STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -214,9 +214,10 @@ static struct cdevsw pipe_cdev = {
 };
 
 #ifdef CONFIG_STREAMS_PIPE_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 pipeinit(void)
 {
 	int err;
@@ -235,9 +236,10 @@ pipeinit(void)
 };
 
 #ifdef CONFIG_STREAMS_PIPE_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 pipeexit(void)
 {
 	unregister_strdev(&pipe_cdev, major);

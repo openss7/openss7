@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/loop.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define LOOP_DESCRIP	"SVR 4.2 STREAMS Null Stream (LOOP) Driver"
 #define LOOP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOOP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LOOP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LOOP_REVISION	"OpenSS7 src/drivers/loop.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -539,9 +539,10 @@ STATIC struct cdevsw loop_cdev = {
 };
 
 #ifdef CONFIG_STREAMS_LOOP_MODULE
-STATIC
-#endif
+STATIC int
+#else
 int __init
+#endif
 loopinit(void)
 {
 	int err;
@@ -560,9 +561,10 @@ loopinit(void)
 };
 
 #ifdef CONFIG_STREAMS_LOOP_MODULE
-STATIC
-#endif
+STATIC void
+#else
 void __exit
+#endif
 loopexit(void)
 {
 	unregister_strdev(&loop_cdev, major);

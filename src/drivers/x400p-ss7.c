@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -94,7 +94,7 @@ static char const ident[] = "src/drivers/x400p-ss7.c (" PACKAGE_ENVR ") " PACKAG
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define X400P_REVISION	"OpenSS7 src/drivers/x400p-ss7.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define X400P_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards"
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define X400P_LICENSE		"GPL"
@@ -4894,7 +4894,7 @@ xp_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 x400pterminate(void)
 {
 	int err, mindex;
@@ -4916,7 +4916,7 @@ x400pterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 x400pinit(void)
 {
 	int err, mindex = 0;

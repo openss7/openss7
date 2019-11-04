@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -122,7 +122,7 @@ static char const ident[] = "src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SL_X400P_REVISION	"OpenSS7 src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
@@ -32650,7 +32650,7 @@ sl_x400pterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sl_x400pinit(void)
 {
 	int err, mindex = 0;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -66,7 +66,7 @@ static char const ident[] = "src/drivers/nuls.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define NULS_DESCRIP	"SVR 4.2 Null Stream (NULS) STREAMS Driver"
 #define NULS_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NULS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NULS_REVISION	"OpenSS7 src/drivers/nuls.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NULS_DEVICE	"SVR 4.2 MP STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -361,9 +361,10 @@ static struct cdevsw nuls_cdev = {
 };
 
 #ifdef CONFIG_STREAMS_NULS_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 nulsinit(void)
 {
 	int err;
@@ -382,9 +383,10 @@ nulsinit(void)
 };
 
 #ifdef CONFIG_STREAMS_NULS_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 nulsexit(void)
 {
 	unregister_strdev(&nuls_cdev, major);

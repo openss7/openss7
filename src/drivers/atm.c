@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@ static char const ident[] = "src/drivers/atm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ATM_DESCRIP	"ATM STREAMS Multiplexing Driver"
 #define ATM_EXTRA	"Part of the OpenSS7 ATM Stack for Linux Fast-STREAMS"
 #define ATM_REVISION	"OpenSS7 src/drivers/atm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ATM_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ATM_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ATM_DEVICE	"Provides OpenSS7 ATM I.432.X Pseudo-Device Driver."
 #define ATM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ATM_LICENSE	"GPL"
@@ -2618,7 +2618,7 @@ static struct cdevsw atm_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-static int __init
+static int
 atminit(void)
 {
 	int err;
@@ -2649,7 +2649,7 @@ atmterminate(void)
 	return (0);
 }
 
-static void __exit
+static void
 atmexit(void)
 {
 	atmterminate();

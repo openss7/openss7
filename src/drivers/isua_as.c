@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -113,7 +113,7 @@ static char const ident[] = "src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 #define ISUA_AS_DESCRIP		"ISUA/SCTP AS MTP STREAMS Multiplexing Driver"
 #define ISUA_AS_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define ISUA_AS_REVISION	"OpenSS7 src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ISUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define ISUA_AS_LICENSE		"GPL"
@@ -18237,7 +18237,7 @@ module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for ISUA-AS driver.  (0 for allocation.)");
 
-static __init int
+static int
 isua_asinit(void)
 {
 	int err;
@@ -18252,7 +18252,7 @@ isua_asinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 isua_asexit(void)
 {
 	int err;

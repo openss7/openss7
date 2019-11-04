@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -81,7 +81,7 @@ static char const ident[] = "src/drivers/x25-plp.c (" PACKAGE_ENVR ") " PACKAGE_
 
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP Driver for Linux Fast-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PLP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PLP_REVISION	"OpenSS7 src/drivers/x25-plp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5020,7 +5020,7 @@ plp_unregister_strdev(major_t major)
 }
 #endif
 
-static __init int
+static int
 plp_modinit(void)
 {
 #if NEVER
@@ -5037,7 +5037,7 @@ plp_modinit(void)
 	return (0);
 }
 
-static __exit void
+static void
 plp_modexit(void)
 {
 #if NEVER

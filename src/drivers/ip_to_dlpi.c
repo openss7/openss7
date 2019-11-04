@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/drivers/ip_to_dlpi.c (" PACKAGE_ENVR ") " PACKA
 
 #define IP2XINET_DESCRIP	"INET Data Link Provider (IP_TO_DLPI) STREAMS Driver"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define IP2XINET_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define IP2XINET_REVISION	"OpenSS7 src/drivers/ip_to_dlpi.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define IP2XINET_DEVICE		"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1506,7 +1506,7 @@ STATIC struct cdevsw ip2xinet_cdev = {
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
-int __init
+int
 ip2xinet_init(void)
 {
 	int err;
@@ -1523,7 +1523,7 @@ ip2xinet_init(void)
 	return (0);
 }
 
-void __exit
+void
 ip2xinet_exit(void)
 {
 	return (void) unregister_strdev(&ip2xinet_cdev, major);

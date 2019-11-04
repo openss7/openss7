@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/drivers/sccp.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define SCCP_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) STREAMS Multiplexing Driver"
 #define SCCP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_REVISION	"OpenSS7 src/drivers/sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SCCP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SCCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"
@@ -21507,7 +21507,7 @@ static struct cdevsw sccp_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 sccpterminate(void)
 {
 	int err;
@@ -21521,7 +21521,7 @@ sccpterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 sccpinit(void)
 {
 	int err;

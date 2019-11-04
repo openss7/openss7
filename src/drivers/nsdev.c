@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,7 +70,7 @@ static char const ident[] = "src/drivers/nsdev.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define NSDEV_DESCRIP	"STREAMS Named Stream Device (NSDEV) STREAMS Driver"
 #define NSDEV_EXTRA	"Part of Linux Fast-STREAMS"
-#define NSDEV_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NSDEV_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define NSDEV_REVISION	"OpenSS7 src/drivers/nsdev.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NSDEV_DEVICE	"SVR 4.2 MP STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -332,9 +332,10 @@ STATIC struct file_operations nsdev_f_ops ____cacheline_aligned = {
  */
 
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 nsdevinit(void)
 {
 	int err;
@@ -353,9 +354,10 @@ nsdevinit(void)
 };
 
 #ifdef CONFIG_STREAMS_NSDEV_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 nsdevexit(void)
 {
 	unregister_cmajor(&nsdev_cdev, major);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,7 +67,7 @@ static char const ident[] = "src/drivers/echo.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define ECHO_DESCRIP	"SVR 4.2 Echo (ECHO) STREAMS Driver"
 #define ECHO_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ECHO_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ECHO_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ECHO_REVISION	"OpenSS7 src/drivers/echo.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ECHO_DEVICE	"SVR 4.2 MP STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -404,9 +404,10 @@ static struct cdevsw echo_cdev = {
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 echoinit(void)
 {
 	int err;
@@ -425,9 +426,10 @@ echoinit(void)
 };
 
 #ifdef CONFIG_STREAMS_ECHO_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 echoexit(void)
 {
 	unregister_strdev(&echo_cdev, major);

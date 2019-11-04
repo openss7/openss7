@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/ldl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define LDL_DESCRIP	"INET Data Link Provider (DLPI) NET4 STREAMS Driver"
 #define LDL_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
-#define LDL_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LDL_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LDL_REVISION	"OpenSS7 src/drivers/ldl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5068,7 +5068,7 @@ ldl_register_ioctl32(void)
 	return (0);
 }
 
-int __init
+int
 ldl_init(void)
 {
 	int err;
@@ -5087,7 +5087,7 @@ ldl_init(void)
 	return (0);
 }
 
-void __exit
+void
 ldl_exit(void)
 {
 	unregister_strdev(&ldl_cdev, major);

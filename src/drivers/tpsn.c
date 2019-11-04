@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -152,7 +152,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define	TP_DESCRIP	"OSI Transport Provider for Subnetworks (TPSN) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Ltd.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Ltd.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport for Subnetworks Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14106,7 +14106,7 @@ tp_unregister_strdev(major_t major)
 /**
  * tp_init: - initialize the INET kernel module under Linux
  */
-static __init int
+static int
 tp_init(void)
 {
 	int err;
@@ -14186,7 +14186,7 @@ tp_init(void)
 /**
  * tp_exit: - remove the INET kernel module under Linux
  */
-static __exit void
+static void
 tp_exit(void)
 {
 	int err;

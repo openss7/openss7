@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -90,7 +90,7 @@ static char const ident[] = "src/drivers/sl_mux.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS Multiplexing Driver"
 #define SL_MUX_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SL_MUX_REVISION	"OpenSS7 src/drivers/sl_mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MUX_LICENSE		"GPL"
@@ -4878,7 +4878,7 @@ static struct devnode sl_m_node = {
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-static __init int
+static int
 sl_muxinit(void)
 {
 	int err;
@@ -4940,7 +4940,7 @@ sl_muxinit(void)
 	return (err);
 }
 
-static __exit void
+static void
 sl_muxexit(void)
 {
 	int err;

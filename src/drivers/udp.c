@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -127,7 +127,7 @@ static char const ident[] = "src/drivers/udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define TP_DESCRIP	"User Datagram Protocol (UDP) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 src/drivers/udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9549,7 +9549,7 @@ tp_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 tp_udpterminate(void)
 {
 	int err, mindex;
@@ -9569,7 +9569,7 @@ tp_udpterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 tp_udpinit(void)
 {
 	int err, mindex = 0;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SCTP_REVISION	"OpenSS7 src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -30465,7 +30465,7 @@ sctp_term_proto(void)
 /**
  * sctp_init: - initialize the SCTP kernel module under Linux
  */
-static __init int
+static int
 sctp_init(void)
 {
 	int err;
@@ -30496,7 +30496,7 @@ sctp_init(void)
 /**
  * sctp_exit: - remove the SCTP kernel module under Linux
  */
-static __exit void
+static void
 sctp_exit(void)
 {
 	int err;

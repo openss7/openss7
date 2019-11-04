@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/isup.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ISUP_DESCRIP	"ISUP STREAMS Multiplexing Driver"
 #define ISUP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define ISUP_REVISION	"OpenSS7 src/drivers/isup.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ISUP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ISUP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"
@@ -27510,7 +27510,7 @@ isup_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 isupterminate(void)
 {
 	int err, mindex;
@@ -27529,7 +27529,7 @@ isupterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 isupinit(void)
 {
 	int err, mindex = 0;

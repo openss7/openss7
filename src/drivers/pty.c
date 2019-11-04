@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,7 @@ static char const ident[] = "src/drivers/pty.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define PTY_DESCRIP	"SVR 4.2 Pseudo-Terminal (PTY) STREAMS Driver"
 #define PTY_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTY_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define PTY_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define PTY_REVISION	"OpenSS7 src/drivers/pty.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PTY_DEVICE	"SVR 4.2 MP STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1246,7 +1246,7 @@ pts_unregister_strdev(major_t major)
 	return (0);
 }
 
-MODULE_STATIC void __exit
+MODULE_STATIC void
 ptyterminate(void)
 {
 	int err, mindex;
@@ -1276,7 +1276,7 @@ ptyterminate(void)
 	return;
 }
 
-MODULE_STATIC int __init
+MODULE_STATIC int
 ptyinit(void)
 {
 	int err, mindex = 0;

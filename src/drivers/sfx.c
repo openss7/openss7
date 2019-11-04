@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/sfx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define SFX_DESCRIP	"SVR 4.2 STREAMS-based FIFOs Driver"
 #define SFX_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SFX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SFX_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SFX_REVISION	"OpenSS7 src/drivers/sfx.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SFX_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -205,9 +205,10 @@ static struct cdevsw sfx_cdev = {
 };
 
 #ifdef CONFIG_STREAMS_SFX_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 sfxinit(void)
 {
 	int err;
@@ -226,9 +227,10 @@ sfxinit(void)
 };
 
 #ifdef CONFIG_STREAMS_SFX_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 sfxexit(void)
 {
 	unregister_strdev(&sfx_cdev, major);

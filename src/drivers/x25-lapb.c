@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/x25-lapb.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define LAPB_DESCRIP	"SVR 4.2 DLPI X25-LAPB Driver for Linux Fast-STREAMS"
 #define LAPB_EXTRA      "Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LAPB_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define LAPB_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define LAPB_REVISION	"OpenSS7 src/drivers/x25-lapb.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LAPB_DEVICE	"SVR 4.2MP DLPI Driver (DLPI) for X.25 Link Access Protocol B-Channel (X25-LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -157,7 +157,7 @@ MODULE_PARM_DESC(modid, "Module ID for LAPB.  (0 for allocation.)");
 
 /** lapbinit - initialize LAPB
   */
-static __init int
+static int
 lapbinit(void)
 {
 	cmn_err(CE_NOTE, DRV_BANNER);
@@ -166,7 +166,7 @@ lapbinit(void)
 
 /** lapbexit - terminate LAPB
   */
-static __exit void
+static void
 lapbexit(void)
 {
 	return;

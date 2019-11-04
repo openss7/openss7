@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -97,7 +97,7 @@ static char const ident[] = "src/drivers/tcap.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define TCAP_DESCRIP	"SS7 Transaction Capabilities Application Part (TCAP) STREAMS Multiplexing Driver"
 #define TCAP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define TCAP_REVISION	"OpenSS7 src/drivers/tcap.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define TCAP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TCAP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"
@@ -13783,7 +13783,7 @@ tcap_unregister_strdev(major_t major)
 	return (0);
 }
 
-static void __exit
+static void
 tcapterminate(void)
 {
 	int err, mindex;
@@ -13804,7 +13804,7 @@ tcapterminate(void)
 	return;
 }
 
-static int __init
+static int
 tcapinit(void)
 {
 	int err, mindex = 0;

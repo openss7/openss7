@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -137,7 +137,7 @@ static char const ident[] = "src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define CLNS_DESCRIP	"OSI CLNS Network Provider STREAMS Driver"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define CLNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CLNS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define CLNS_REVISION	"OpenSS7 src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1635,7 +1635,7 @@ STATIC struct cdevsw np_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-int __init
+int
 np_init(void)
 {
 	int err;
@@ -1654,7 +1654,7 @@ np_init(void)
 	return (0);
 }
 
-void __exit
+void
 np_exit(void)
 {
 	unregister_strdev(&np_cdev, major);
