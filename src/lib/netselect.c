@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -761,7 +761,7 @@ __nsl_nc_sperror(void)
 		case NC_NOERROR:
 		case NC_NOMEM:
 		case NC_NOSET:
-			(void) strncpy(errbuf, gettext(__nsl_nc_errlist[idx]), NCERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nc_errlist[idx]), NCERR_BUFSZ - 1);
 			break;
 		case NC_OPENFAIL:
 		case NC_NOTFOUND:

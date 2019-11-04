@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -565,7 +565,7 @@ __sockpath_sp_sperror(void)
 		case SP_NOERROR:
 		case SP_NOMEM:
 		case SP_NOSET:
-			(void) strncpy(errbuf, __sockpath_sp_errlist[idx], SPERR_BUFSZ);
+			(void) strncpy(errbuf, __sockpath_sp_errlist[idx], SPERR_BUFSZ - 1);
 			break;
 		case SP_OPENFAIL:
 		case SP_NOTFOUND:
