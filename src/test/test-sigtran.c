@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -6024,7 +6024,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -6082,7 +6082,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -6279,12 +6279,12 @@ main(int argc, char *argv[])
 			if (strtoul(optarg, NULL, 0) != 0)
 				iids[0].num = strtoul(optarg, NULL, 0);
 			else
-				strncpy(iids[0].text, optarg, sizeof(iids[0].text));
+				strncpy(iids[0].text, optarg, sizeof(iids[0].text) - 1);
 			if (token) {
 				if (strtoul(token, NULL, 0) != 0)
 					iids[1].num = strtoul(token, NULL, 0);
 				else
-					strncpy(iids[1].text, token, sizeof(iids[1].text));
+					strncpy(iids[1].text, token, sizeof(iids[1].text) - 1);
 				token--;
 				token[0] = ',';
 			}
@@ -6433,12 +6433,12 @@ main(int argc, char *argv[])
 			break;
 		case 'i':	/* -i, --client-host [HOSTNAME[,HOSTNAME]*] */
 			client_host_specified = 1;
-			strncpy(hostbufc, optarg, HOST_BUF_LEN);
+			strncpy(hostbufc, optarg, HOST_BUF_LEN - 1);
 			hostc = hostbufc;
 			break;
 		case 'I':	/* -I, --server-host [HOSTNAME[,HOSTNAME]*] */
 			server_host_specified = 1;
-			strncpy(hostbufs, optarg, HOST_BUF_LEN);
+			strncpy(hostbufs, optarg, HOST_BUF_LEN - 1);
 			hosts = hostbufs;
 			break;
 #endif

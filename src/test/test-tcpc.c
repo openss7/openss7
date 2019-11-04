@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -284,7 +284,7 @@ splash(int argc, char *argv[])
 %1$s: TCP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -341,7 +341,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -451,12 +451,12 @@ main(int argc, char **argv)
 			break;
 		switch (c) {
 		case 'l':
-			strncpy(hostbufl, optarg, HOST_BUF_LEN);
+			strncpy(hostbufl, optarg, HOST_BUF_LEN - 1);
 			hostl = hostbufl;
 			hostlp = &hostl;
 			break;
 		case 'r':
-			strncpy(hostbufr, optarg, HOST_BUF_LEN);
+			strncpy(hostbufr, optarg, HOST_BUF_LEN - 1);
 			hostr = hostbufr;
 			hostrp = &hostr;
 			break;

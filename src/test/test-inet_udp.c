@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -43113,7 +43113,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -43170,7 +43170,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved.\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
@@ -43352,12 +43352,12 @@ main(int argc, char *argv[])
 			break;
 		case 'i':	/* --client-host *//* client host */
 			client_host_specified = 1;
-			strncpy(hostbufc, optarg, HOST_BUF_LEN);
+			strncpy(hostbufc, optarg, HOST_BUF_LEN - 1);
 			hostc = hostbufc;
 			break;
 		case 'I':	/* --server-host *//* server host */
 			server_host_specified = 1;
-			strncpy(hostbufs, optarg, HOST_BUF_LEN);
+			strncpy(hostbufs, optarg, HOST_BUF_LEN - 1);
 			hosts = hostbufs;
 			break;
 		case 'r':	/* --repeat */
