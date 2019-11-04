@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -72,7 +72,7 @@ static char const ident[] = "src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define MPSCOMP_DESCRIP		"Mentat Portable STREAMS Compatibility for Linux Fast-STREAMS"
 #define MPSCOMP_EXTRA		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define MPSCOMP_REVISION	"OpenSS7 src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3221,9 +3221,10 @@ mps_intr_enable(pl_t pl)
 EXPORT_SYMBOL(mps_intr_enable);
 
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 mpscomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
@@ -3235,9 +3236,10 @@ mpscomp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 mpscomp_exit(void)
 {
 	return;

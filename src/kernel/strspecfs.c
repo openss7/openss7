@@ -1801,9 +1801,10 @@ specfs_init_cache(void)
  *  strspecfs_init: - initialize the shadow special filesystem
  */
 #ifdef CONFIG_STREAMS_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 specfs_init(void)
 {
 	int result;
@@ -1836,9 +1837,10 @@ specfs_init(void)
  *  strspecfs_exit: - deinitialize the shadow special filesystem
  */
 #ifdef CONFIG_STREAMS_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 specfs_exit(void)
 {
 	strlookup_exit();

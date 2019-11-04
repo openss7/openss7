@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/hpuxcompat.c (" PACKAGE_ENVR ") " PACKAG
 
 #define HPUXCOMP_DESCRIP	"HP-UX 11i v2 Compatibility for Linux Fast-STREAMS"
 #define HPUXCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define HPUXCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define HPUXCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define HPUXCOMP_REVISION	"OpenSS7 src/kernel/hpuxcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -323,9 +323,10 @@ str_uninstall(struct stream_inst *inst)
 EXPORT_SYMBOL(str_uninstall);
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 hpuxcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
@@ -337,9 +338,10 @@ hpuxcomp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 hpuxcomp_exit(void)
 {
 	return;

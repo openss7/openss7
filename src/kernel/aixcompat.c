@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/aixcompat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define AIXCOMP_DESCRIP		"AIX 5L Version 5.1 Compatibility for Linx Fast-STREAMS"
 #define AIXCOMP_EXTRA		"Part of hUNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define AIXCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define AIXCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define AIXCOMP_REVISION	"OpenSS7 src/kernel/aixcompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -307,9 +307,10 @@ str_install_AIX(int cmd, strconf_t * sc)
 EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 aixcomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
@@ -321,9 +322,10 @@ aixcomp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 aixcomp_exit(void)
 {
 	return;

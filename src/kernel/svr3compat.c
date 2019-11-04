@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/svr3compat.c (" PACKAGE_ENVR ") " PACKAG
 
 #define SVR3COMP_DESCRIP	"UNIX(R) SVR 3.2 Compatibility for Linux Fast-STREAMS"
 #define SVR3COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SVR3COMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SVR3COMP_REVISION	"OpenSS7 src/kernel/svr3compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -108,9 +108,10 @@ __SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t bsize, int type, u
 EXPORT_SYMBOL(alloc_proto);	/* svr3/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 svr3comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
@@ -122,9 +123,10 @@ svr3comp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 svr3comp_exit(void)
 {
 	return;

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,7 @@ static char const ident[] = "src/kernel/strmain.c (" PACKAGE_ENVR ") " PACKAGE_D
 #include "sys/config.h"
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STREAMS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define STREAMS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define STREAMS_REVISION	"OpenSS7 src/kernel/strmain.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define STREAMS_DEVICE		"SVR 4.2 MP STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -158,9 +158,10 @@ modules_exit(void)
 }
 
 #ifdef CONFIG_STREAMS_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 streams_init(void)
 {
 	int result = -EINVAL;
@@ -194,9 +195,10 @@ streams_init(void)
 }
 
 #ifdef CONFIG_STREAMS_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 streams_exit(void)
 {
 	modules_exit();

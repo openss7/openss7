@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/maccompat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define MACCOMP_DESCRIP		"Mac OpenTransport Version 1.5r2 Compatibility for Linux Fast-STREAMS"
 #define MACCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MACCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MACCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define MACCOMP_REVISION	"OpenSS7 src/kernel/maccompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -329,9 +329,10 @@ mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg)
 EXPORT_SYMBOL(mpnotify);
 
 #ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 maccomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
@@ -343,9 +344,10 @@ maccomp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 maccomp_exit(void)
 {
 	return;

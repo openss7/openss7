@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAG
 
 #define SVR4COMP_DESCRIP	"UNIX(R) SVR 4.2 MP Compatibility module for Linux Fast-STREAMS"
 #define SVR4COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SVR4COMP_REVISION	"OpenSS7 src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -646,9 +646,10 @@ wakeup(caddr_t event)
 EXPORT_SYMBOL(wakeup);		/* svr4/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 svr4comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
@@ -660,9 +661,10 @@ svr4comp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 svr4comp_exit(void)
 {
 	return;

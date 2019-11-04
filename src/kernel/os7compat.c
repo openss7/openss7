@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/os7compat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define OS7COMP_DESCRIP		"OpenSS7 STREAMS Compatibility module for Linux Fast-STREAMS"
 #define OS7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OS7COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define OS7COMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define OS7COMP_REVISION	"OpenSS7 src/kernel/os7compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -894,9 +894,10 @@ __OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer,
 EXPORT_SYMBOL_GPL(ss7_start_timer);
 
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 os7comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
@@ -908,9 +909,10 @@ os7comp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 os7comp_exit(void)
 {
 	return;

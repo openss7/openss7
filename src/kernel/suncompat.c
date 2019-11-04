@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/suncompat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SUNCOMP_DESCRIP		"Solaris(R) 8 Compatibility for Linux Fast-STREAMS"
 #define SUNCOMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SUNCOMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SUNCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define SUNCOMP_REVISION	"OpenSS7 src/kernel/suncompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -732,9 +732,10 @@ mod_info(struct modlinkage *ml, struct modinfo *mi)
 EXPORT_SYMBOL(mod_info);	/* strconf.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 suncomp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
@@ -746,9 +747,10 @@ suncomp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 suncomp_exit(void)
 {
 	return;

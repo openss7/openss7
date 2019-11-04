@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/uw7compat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define UW7COMP_DESCRIP		"UnixWare(R) 7.1.3 Compatibility for Linux Fast-STREAMS"
 #define UW7COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define UW7COMP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define UW7COMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define UW7COMP_REVISION	"OpenSS7 src/kernel/uw7compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -203,9 +203,10 @@ __UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
 EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
-static
-#endif
+static int
+#else
 int __init
+#endif
 uw7comp_init(void)
 {
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
@@ -217,9 +218,10 @@ uw7comp_init(void)
 }
 
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
-static
-#endif
+static void
+#else
 void __exit
+#endif
 uw7comp_exit(void)
 {
 	return;
