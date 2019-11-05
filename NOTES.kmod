@@ -1,6 +1,5 @@
-OpenSS7 -- kernel module notes.  2013-01-03
-$Id: NOTES.kmod,v 1.1.2.6 2011-09-02 08:46:26 brian Exp $
-Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+OpenSS7 -- kernel module notes.  2019-11-05
+Copyright (c) 2008-2019  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -821,11 +820,33 @@ Archlinux:
     Which is the same as the old names; however, getting the 3.M no
     longer consists of splitting `uname -r` at '-'.
 
+    UPDATE:
+
+    With the 5.3 kernel, archlinux no longer places kernel items in
+    /lib/modules/5.M.REL-REV-FLAV but in /lib/modules/5.M.REL-REV.
+    Also, no extramodules directory of any sort is created.  Supported
+    DKMS packages are installing kernel-specific  modules in
+    /lib/modules/5.M.REL-REV/extramodules.
+
+    The 4.19 lts kernel still places its kernel items in the
+    /lib/modules/4.M.REL-REV-FLAV directory, but no longer creates
+    a symbolic link from /lib/modules/4.M.REL-REV-FLAV/extramodules to
+    /lib/modules/extramodules/4.M-FLAV and does not place a version file
+    there.  The kernel does not create an extramodules directory at all.
+    However, some supported DKMS packages do place modules in
+    /lib/modules/extramodules-4.M-FLAV although no "version" file exists
+    there.  Other supported DKMS packages place modules in
+    /lib/modules/4.M.REL-REV-FLAV/extramodules like the 5.3 scheme.
+
+    Under the current scheme it makes sense to always place modules in
+    /lib/modules/$(uname -r)/extramodules/openss7/ and the weak modules
+    mechanism will again be supported.
+
 -----
 
 =========================================================================
 
- Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited  <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
 
