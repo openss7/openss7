@@ -787,6 +787,8 @@ dnl----------------------------------------------------------------------------
 	asm/system.h \
 	linux/seq_file.h \
 	linux/smpboot.h \
+	uapi/linux/sched/types.h \
+	linux/sched/signal.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -871,6 +873,7 @@ dnl----------------------------------------------------------------------------
 	kill_litter_super \
 	kill_proc \
 	ksize \
+	ktime_get_real_ts \
 	module_put \
 	nf_reset \
 	num_online_cpus \
@@ -1062,6 +1065,7 @@ dnl----------------------------------------------------------------------------
 	__GFP_WAIT \
 	__GFP_RECLAIM \
 	NET_XMIT_POLICED \
+	set_task_state \
     ], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -1745,6 +1749,7 @@ dnl----------------------------------------------------------------------------
 	sched_setscheduler,
 	secure_dccp_sequence_number,
 	secure_tcp_sequence_number,
+	secure_tcp_seq,
 	send_group_sig_info,
 	send_sig,
 	send_sig_info,
