@@ -4737,6 +4737,14 @@ sctp_lookup(struct sctphdr *sh, uint32_t daddr, uint32_t saddr)
  *  =========================================================================
  */
 
+#if   defined HAVE_SECURE_TCP_SEQ_SYMBOL
+#if   defined HAVE_SECURE_TCP_SEQ_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern uint32_t secure_tcp_seq(uint32_t, uint32_t, uint16_t, uint16_t);
+#else
+extern uint32_t secure_tcp_seq(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((__weak__));
+#endif
+#endif
+
 #if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SYMBOL
 #if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
@@ -4772,6 +4780,17 @@ secure_sctp_sequence_number(uint32_t daddr, uint32_t saddr, uint16_t dport, uint
 #else
 	if (secure_tcp_sequence_number != 0) {
 		return secure_tcp_sequence_number(daddr, saddr, dport, sport);
+	}
+#endif
+#endif
+#if   defined HAVE_SECURE_TCP_SEQ_SYMBOL
+#if   defined HAVE_SECURE_TCP_SEQ_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+	{
+		return secure_tcp_seq(daddr, saddr, dport, sport);
+	}
+#else
+	if (secure_tcp_seq != 0) {
+		return secure_tcp_seq(daddr, saddr, dport, sport);
 	}
 #endif
 #endif
@@ -4811,11 +4830,11 @@ secure_sctp_sequence_number(uint32_t daddr, uint32_t saddr, uint16_t dport, uint
 		hash[3] = jiffies;
 		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
 	}
-#endif
-#endif
 	{
 		return (daddr ^ saddr ^ ((sport << 16) | dport) ^ jiffies);
 	}
+#endif
+#endif
 }
 
 

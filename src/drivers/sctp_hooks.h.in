@@ -231,8 +231,16 @@ extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, _
 #else
 extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
 #endif
+#endif
+
+#undef HAVE_SECURE_TCP_SEQ_SYMBOL
+#ifdef HAVE_SECURE_TCP_SEQ_SYMBOL
+#undef HAVE_SECURE_TCP_SEQ_SUPPORT
+#if defined HAVE_SECURE_TCP_SEQ_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern u32 secure_tcp_seq(__be32 saddr, __be32 daddr, __be16 sport, __be16 dport);
 #else
-#error Need a way to get a secure tcp sequence number.
+extern u32 secure_tcp_seq(__be32 saddr, __be32 daddr, __be16 sport, __be16 dport);
+#endif
 #endif
 
 #undef UNUSED
