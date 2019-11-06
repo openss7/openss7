@@ -79,6 +79,9 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
+#ifdef HAVE_KINC_LINUX_SCHED_SIGNAL_H
+#include <linux/sched/signal.h>
+#endif
 #ifdef HAVE_KINC_ASM_SYSTEM_H
 #include <asm/system.h>
 #endif
