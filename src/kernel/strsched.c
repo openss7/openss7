@@ -93,6 +93,9 @@ static char const ident[] = "src/kernel/strsched.c (" PACKAGE_ENVR ") " PACKAGE_
 #if defined HAVE_KINC_LINUX_SMPBOOT_H
 #include <linux/smpboot.h>
 #endif
+#if defined HAVE_KINC_UAPI_LINUX_SCHED_TYPES_H
+#include <uapi/linux/sched/types.h> /* struct sched_param */
+#endif
 
 #ifndef __STRSCHD_EXTERN_INLINE
 #define __STRSCHD_EXTERN_INLINE inline streams_fastcall __unlikely
