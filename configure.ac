@@ -122,7 +122,7 @@ LT_PATH_LD
 dnl LT_LANG([C++])
 dnl LT_LANG([Java])
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.19.8])
+AM_GNU_GETTEXT_VERSION([0.20])
 AM_GNU_GETTEXT([external])
 
 m4_include([m4/swig.m4])
