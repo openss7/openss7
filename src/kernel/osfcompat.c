@@ -149,7 +149,7 @@ streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sfl
 		if (WR(q)->q_next && SAMESTR(q))
 			return (EIO);
 	}
-	if ((sp = kmem_alloc(sizeof(*sp) + size, KM_NOSLEEP)))	/* we could probably sleep */
+	if (!(sp = kmem_alloc(sizeof(*sp) + size, KM_NOSLEEP)))	/* we could probably sleep */
 		return (ENOMEM);
 	bzero(sp, sizeof(*sp) + size);
 	spin_lock(&str_list_lock);
