@@ -31,17 +31,18 @@ case "`uname -m`" in
 	;;
 esac
 
-#_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
-#_kvr="$(pacman -Qi linux-lts41|awk '/^Version/{print$3}')-lts41"
-#KCC="gcc"
+_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
+KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts44|awk '/^Version/{print$3}')-lts44"
+#KCC="gcc"
+#_kvr="$(pacman -Qi linux-lts49|awk '/^Version/{print$3}')-lts49"
+#KCC="gcc"
+#_kvr="$(pacman -Qi linux-lts414|awk '/^Version/{print$3}')-lts414"
 #KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
 #KCC="gcc"
 #_kvr="$(pacman -Qi linux|awk '/^Version/{print$3}')-ARCH"
 #KCC="gcc"
-_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
-KCC="gcc"
 
 ./configure \
 	KCC="$KCC" \
