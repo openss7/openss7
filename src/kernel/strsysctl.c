@@ -112,445 +112,585 @@ STATIC struct ctl_table streams_table[] = {
 	/* stream head default maximum packet size */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAXPSZ,
+	 .ctl_name = STREAMS_MAXPSZ,
 #endif
-	 "maxpsz", &sysctl_str_maxpsz, sizeof(ulong), 0644, NULL,
+	 .procname = "maxpsz",
+	 .data = &sysctl_str_maxpsz,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 &sysctl_str_minpsz, NULL},
+	 .extra1 = &sysctl_str_minpsz,
+	 .extra2 = NULL
+	},
 	/* stream head default minimum packet size */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MINPSZ,
+	 .ctl_name = STREAMS_MINPSZ,
 #endif
-	 "minpsz", &sysctl_str_minpsz, sizeof(ulong), 0644, NULL,
+	 .procname = "minpsz",
+	 .data = &sysctl_str_minpsz,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, &sysctl_str_maxpsz},
+	 .extra1 = NULL,
+	 .extra2 = &sysctl_str_maxpsz
+	},
 	/* stream head default high water mark */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_HIWAT,
+	 .ctl_name = STREAMS_HIWAT,
 #endif
-	 "hiwat", &sysctl_str_hiwat, sizeof(ulong), 0644, NULL,
+	 .procname = "hiwat",
+	 .data = &sysctl_str_hiwat,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 &sysctl_str_lowat, NULL},
+	 .extra1 = &sysctl_str_lowat,
+	 .extra2 = NULL
+	},
 	/* stream head default low water mark */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_LOWAT,
+	 .ctl_name = STREAMS_LOWAT,
 #endif
-	 "lowat", &sysctl_str_lowat, sizeof(ulong), 0644, NULL,
+	 .procname = "lowat",
+	 .data = &sysctl_str_lowat,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, &sysctl_str_hiwat},
+	 .extra1 = NULL,
+	 .extra2 = &sysctl_str_hiwat},
 	/* default close time */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_CLTIME,
+	 .ctl_name = STREAMS_CLTIME,
 #endif
-	 "cltime", &sysctl_str_cltime, sizeof(ulong), 0644, NULL,
+	 .procname = "cltime",
+	 .data = &sysctl_str_cltime,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
 #ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
-	 &proc_dointvec_ms_jiffies,
+	 .proc_handler = &proc_dointvec_ms_jiffies,
 #else
-	 &proc_doulongvec_ms_jiffies_minmax,
+	 .proc_handler = &proc_doulongvec_ms_jiffies_minmax,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* default hold time maximum */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_RTIME,
+	 .ctl_name = STREAMS_RTIME,
 #endif
-	 "rtime", &sysctl_str_rtime, sizeof(ulong), 0644, NULL,
+	 .procname = "rtime",
+	 .data = &sysctl_str_rtime,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
 #ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
-	 &proc_dointvec_ms_jiffies,
+	 .proc_handler = &proc_dointvec_ms_jiffies,
 #else
-	 &proc_doulongvec_ms_jiffies_minmax,
+	 .proc_handler = &proc_doulongvec_ms_jiffies_minmax,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* default ioctl() acknowledgement time */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_IOCTIME,
+	 .ctl_name = STREAMS_IOCTIME,
 #endif
-	 "ioctime", &sysctl_str_ioctime, sizeof(ulong), 0644, NULL,
+	 .procname = "ioctime",
+	 .data = &sysctl_str_ioctime,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
 #ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
-	 &proc_dointvec_ms_jiffies,
+	 .proc_handler = &proc_dointvec_ms_jiffies,
 #else
-	 &proc_doulongvec_ms_jiffies_minmax,
+	 .proc_handler = &proc_doulongvec_ms_jiffies_minmax,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum number of pushed modules - system wide */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_NSTRPUSH,
+	 .ctl_name = STREAMS_NSTRPUSH,
 #endif
-	 "nstrpush", &sysctl_str_nstrpush, sizeof(ulong), 0644, NULL,
+	 .procname = "nstrpush",
+	 .data = &sysctl_str_nstrpush,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum memory threshold */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_STRTHRESH,
+	 .ctl_name = STREAMS_STRTHRESH,
 #endif
-	 "strthresh", &sysctl_str_strthresh, sizeof(ulong), 0644, NULL,
+	 .procname = "strthresh",
+	 .data = &sysctl_str_strthresh,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* hold time for STRHOLD feature in milliseconds, zero disables */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_STRHOLD,
+	 .ctl_name = STREAMS_STRHOLD,
 #endif
-	 "strhold", &sysctl_str_strhold, sizeof(ulong), 0644, NULL,
+	 .procname = "strhold",
+	 .data = &sysctl_str_strhold,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
 #ifdef HAVE_PROC_DOINTVEC_MS_JIFFIES_USABLE
-	 &proc_dointvec_ms_jiffies,
+	 .proc_handler = &proc_dointvec_ms_jiffies,
 #else
-	 &proc_doulongvec_ms_jiffies_minmax,
+	 .proc_handler = &proc_doulongvec_ms_jiffies_minmax,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum ctrl part size */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_STRCTLSZ,
+	 .ctl_name = STREAMS_STRCTLSZ,
 #endif
-	 "strctlsz", &sysctl_str_strctlsz, sizeof(ulong), 0644, NULL,
+	 .procname = "strctlsz",
+	 .data = &sysctl_str_strctlsz,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum data part size */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_STRMSGSZ,
+	 .ctl_name = STREAMS_STRMSGSZ,
 #endif
-	 "strmsgsz", &sysctl_str_strmsgsz, sizeof(ulong), 0644, NULL,
+	 .procname = "strmsgsz",
+	 .data = &sysctl_str_strmsgsz,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_NSTRMSGS,
+	 .ctl_name = STREAMS_NSTRMSGS,
 #endif
-	 "nstrmsgs", &sysctl_str_nstrmsgs, sizeof(ulong), 0644, NULL,
+	 .procname = "nstrmsgs",
+	 .data = &sysctl_str_nstrmsgs,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* number of queue bands, 256 is too many already */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_NBAND,
+	 .ctl_name = STREAMS_NBAND,
 #endif
-	 "nband", &sysctl_str_nband, sizeof(ulong), 0644, NULL,
+	 .procname = "nband",
+	 .data = &sysctl_str_nband,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategry = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_REUSE_FMODSW,
+	 .ctl_name = STREAMS_REUSE_FMODSW,
 #endif
-	 "reuse_fmodsw", &sysctl_str_reuse_fmodsw, sizeof(int), 0644, NULL,
+	 .procname = "reuse_fmodsw",
+	 .data = &sysctl_str_reuse_fmodsw,
+	 .mode = sizeof(int),
+	 .maxlen = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_dointvec,
+	 .proc_handler = &proc_dointvec,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum number of autopushed modules - per device */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAX_APUSH,
+	 .ctl_name = STREAMS_MAX_APUSH,
 #endif
-	 "max_apush", &sysctl_str_max_apush, sizeof(ulong), 0644, NULL,
+	 .procname = "max_apush",
+	 .data = &sysctl_str_max_apush,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAX_STRAMOD,
+	 .ctl_name = STREAMS_MAX_STRAMOD,
 #endif
-	 "max_stramod", &sysctl_str_max_stramod, sizeof(ulong), 0644, NULL,
+	 .procname = "max_stramod",
+	 .data = &sysctl_str_max_stramod,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum number of STREAMS cdevsw[] entries */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAX_STRDEV,
+	 .ctl_name = STREAMS_MAX_STRDEV,
 #endif
-	 "max_strdev", &sysctl_str_max_strdev, sizeof(ulong), 0444, NULL,
+	 .procname = "max_strdev",
+	 .data = &sysctl_str_max_strdev,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0444,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum number of STREAMS fmodsw[] entries */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAX_STRMOD,
+	 .ctl_name = STREAMS_MAX_STRMOD,
 #endif
-	 "max_strmod", &sysctl_str_max_strmod, sizeof(ulong), 0444, NULL,
+	 .procname = "max_strmod",
+	 .data = &sysctl_str_max_strmod,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0444,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	/* maximum number of allocated mdbblocks */
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MAX_MBLK,
+	 .ctl_name = STREAMS_MAX_MBLK,
 #endif
-	 "max_mblk", &sysctl_str_max_mblk, sizeof(ulong), 0644, NULL,
+	 .procname = "max_mblk",
+	 .data = &sysctl_str_max_mblk,
+	 .maxlen = sizeof(ulong),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_doulongvec_minmax,
+	 .proc_handler = &proc_doulongvec_minmax,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 STREAMS_MSG_PRIORITY,
+	 .ctl_name = STREAMS_MSG_PRIORITY,
 #endif
-	 "msg_priority", &sysctl_str_msg_priority, sizeof(int), 0644, NULL,
+	 .procname = "msg_priority",
+	 .data = &sysctl_str_msg_priority,
+	 .maxlen = sizeof(int),
+	 .mode = 0644,
+	 .child = NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
-	 NULL,
+	 .parent = NULL,
 #endif
-	 &proc_dointvec,
+	 .proc_handler = &proc_dointvec,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
-	 NULL,
+	 .poll = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 NULL,
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
-	 NULL,
+	 .de = NULL,
 #endif
-	 NULL, NULL},
-	{0}
+	 .extra1 = NULL,
+	 .extra2 = NULL
+	},
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 .ctl_name = 0,
+#endif
+	 .procname = NULL,
+	}
 };
 
 STATIC struct ctl_table streams_root_table[] = {
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
-	 CTL_STREAMS,
+	 .ctl_name = CTL_STREAMS,
 #endif
-	 "streams", NULL, 0, 0555, streams_table,},
-	{0}
+	 .procname = "streams",
+	 .data = NULL,
+	 .maxlen = 0,
+	 .mode = 0555,
+	 .child = streams_table,
+	},
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 .ctl_name = 0,
+#endif
+	 .procname = NULL,
+	}
 };
 
 BIG_STATIC int
