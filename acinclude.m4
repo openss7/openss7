@@ -874,6 +874,7 @@ dnl----------------------------------------------------------------------------
 	kill_proc \
 	ksize \
 	ktime_get_real_ts \
+	ktime_get_real_ts64 \
 	module_put \
 	nf_reset \
 	num_online_cpus \
@@ -1298,7 +1299,8 @@ dnl----------------------------------------------------------------------------
 	struct task_struct.namespace,
 	struct task_struct.uid,
 	struct nameidata.dentry,
-	struct nameidata.mnt], [:], [:], [
+	struct nameidata.mnt,
+	struct timer_list.data], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -1959,9 +1961,63 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW], [1], [Define if
 		function kmem_cache_create takes 5 arguments in the new style.])
 	fi
+	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args newer],
+		       [linux_cv_kmem_cache_create_5_newer], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[struct kmem_cache *(*my_autoconf_function_pointer)
+			(const char*, unsigned int, unsigned int, slab_flags_t,
+			 void (*)(void *)) =
+			 &kmem_cache_create;]]) ],
+		[linux_cv_kmem_cache_create_5_newer='yes'],
+		[linux_cv_kmem_cache_create_5_newer='no'])
+	    ])
+	if test :$linux_cv_kmem_cache_create_5_newer = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER], [1], [Define if
+		function kmem_cache_create takes 5 arguments in the newer style.])
+	fi
 	AH_VERBATIM([kmem_create_cache],
 [/* stupid kernel developers keep changing this freaking thing */
-#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
 #else
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
