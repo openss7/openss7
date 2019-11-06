@@ -1853,6 +1853,63 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_RCU_NOTE_CONTEXT_SWITCH_NO_ARGS], [1], [Define if
 		function rcu_note_context_switch takes no arguments (void).])
 	fi
+	AC_CACHE_CHECK([for kernel kill_pid_info_as_cred with 3 args],
+		       [linux_cv_kill_pid_info_as_cred_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */
+#ifdef HAVE_KINC_LINUX_SCHED_SIGNAL_H
+#include <linux/sched/signal.h>
+#endif]],
+		    [[int (*my_autoconf_function_pointer)
+			(int, struct siginfo *, struct pid *,
+			 const struct cred *) =
+			 &kill_pid_info_as_cred;]]) ],
+		[linux_cv_kill_pid_info_as_cred_3_args='yes'],
+		[linux_cv_kill_pid_info_as_cred_3_args='no'])
+	    ])
+	if test :$linux_cv_kill_pid_info_as_cred_3_args = :yes; then
+	    AC_DEFINE([HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS], [1], [Define if
+		function kill_pid_info_as_cred takes 3 arguments.])
+	fi
 	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args],
 		       [linux_cv_kmem_cache_create_5_args], [dnl
 	    AC_COMPILE_IFELSE([

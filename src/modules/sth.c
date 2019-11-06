@@ -1234,8 +1234,13 @@ kill_proc_(pid_t sess, int sig, int priv)
 /* 3.4 kernel approach: */
 #if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined HAVE_KMEMB_STRUCT_CRED_EUID_VAL
 #if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred);
+#else
 extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
 				 const struct cred *cred, u32 secid);
+#endif
 int
 kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, kuid_t uid, kuid_t euid, u32 secid,
 	       struct user_namespace *user_ns)
@@ -1245,14 +1250,24 @@ kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, kuid_t uid, kuid_
 		.euid = euid,
 		.user_ns = user_ns,
 	};
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+	return kill_pid_info_as_cred(sig, info, pid, &cr);
+#else
 	return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+#endif
 }
 
 #define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
 #else
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred)
+    __attribute__ ((__weak__));
+#else
 extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
 				 const struct cred *cred, u32 secid)
     __attribute__ ((__weak__));
+#endif
 int
 kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
 	       struct user_namespace *user_ns)
@@ -1263,7 +1278,11 @@ kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t 
 			.euid = euid,
 			.user_ns = user_ns,
 		};
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+		return kill_pid_info_as_cred(sig, info, pid, &cr);
+#else
 		return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+#endif
 	}
 	return kill_pid(pid, sig, 1);
 }
@@ -1273,8 +1292,13 @@ kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t 
 #else				/* defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined
 				   HAVE_KMEMB_STRUCT_CRED_EUID_VAL */
 #if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred);
+#else
 extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
 				 const struct cred *cred, u32 secid);
+#endif
 int
 kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
 	       struct user_namespace *user_ns)
@@ -1292,14 +1316,24 @@ kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t 
 #endif
 		.user_ns = user_ns,
 	};
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+	return kill_pid_info_as_cred(sig, info, pid, &cr);
+#else
 	return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+#endif
 }
 
 #define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c,d,e,f,g)
 #else
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
+				 const struct cred *cred)
+    __attribute__ ((__weak__));
+#else
 extern int kill_pid_info_as_cred(int sig, struct siginfo *info, struct pid *pid,
 				 const struct cred *cred, u32 secid)
     __attribute__ ((__weak__));
+#endif
 int
 kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid,
 	       struct user_namespace *user_ns)
@@ -1310,7 +1344,11 @@ kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t 
 			.euid = {euid},
 			.user_ns = user_ns,
 		};
+#if     defined HAVE_KFUNC_KILL_PID_INFO_AS_CRED_3_ARGS
+		return kill_pid_info_as_cred(sig, info, pid, &cr);
+#else
 		return kill_pid_info_as_cred(sig, info, pid, &cr, secid);
+#endif
 	}
 	return kill_pid(pid, sig, 1);
 }
