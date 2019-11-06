@@ -1310,12 +1310,14 @@ spec_read_inode(struct inode *inode)
 		inode->i_nlink = 2;
 #endif
 	}
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+	ktime_get_real_ts64(&inode->i_mtime);
+#elif defined HAVE_KFUNC_KTIME_GET_REAL_TS
 	ktime_get_real_ts(&inode->i_mtime);
-	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #else
-	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+	inode->i_mtime = CURRENT_TIME;
 #endif
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 	inode->i_private = NULL;	/* done with it */
 	return;
       bad_inode:
@@ -1558,12 +1560,14 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	if (!(inode = new_inode(sb)))
 		goto free_error;
 	inode->i_ino = -1UL;	/* unused (non-zero) inode number */
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+	ktime_get_real_ts64(&inode->i_mtime);
+#elif defined HAVE_KFUNC_KTIME_GET_REAL_TS
 	ktime_get_real_ts(&inode->i_mtime);
-	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #else
-	inode->i_mtime = inode->i_atime = inode->i_ctime = CURRENT_TIME;
+	inode->i_mtime = CURRENT_TIME;
 #endif
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 	inode->i_blocks = 0;
 #ifdef HAVE_KMEMB_STRUCT_INODE_I_BLKSIZE
 	inode->i_blksize = 1024;
@@ -1772,14 +1776,13 @@ specfs_term_cache(void)
 }
 
 static void
-#if !defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS) && \
-    !defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
-snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
+#if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 snode_init_once(kmem_cachep_t cachep, void *data)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 snode_init_once(void *data)
-#endif
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 	struct inode *inode = (struct inode *) data;
 
