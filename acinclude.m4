@@ -1203,6 +1203,7 @@ dnl----------------------------------------------------------------------------
 	struct ctl_table.strategy,
 	struct dentry_operations.d_dname,
 	struct dst_entry.path,
+	struct dst_ops.update_pmtu,
 	struct file.f_cred,
 	struct file.f_gid,
 	struct file.f_uid,
@@ -3405,6 +3406,31 @@ dnl----------------------------------------------------------------------------
 	if test :$linux_cv_first_net_device_1_arg = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG], [1], [Define if
 		function first_net_device() takes 1 argument.])
+	fi
+	AC_CACHE_CHECK([for kernel member proto_ops.getname takes 3 args],
+	    [linux_cv_kmem_struct_proto_ops_getname_3_args], [
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+[[struct proto_ops temp;
+(*temp.getname)((struct socket *)0, (struct sockaddr *)0, (int)0);]]) ],
+		[linux_cv_kmem_struct_proto_ops_getname_3_args='yes'],
+		[linux_cv_kmem_struct_proto_ops_getname_3_args='no'])
+	])
+	if test :$linux_cv_kmem_struct_proto_ops_getname_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KMEMB_STRUCT_PROTO_OPS_GETNAME_3_ARGS], [1], [Define to 1
+		if the getname member of the proto_ops structure passes
+		three arguments instead of four.])
 	fi
 	AC_CACHE_CHECK([for kernel inet_addr_type with 2 args],
 		       [linux_cv_inet_addr_type_2_args], [dnl

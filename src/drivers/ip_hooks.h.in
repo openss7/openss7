@@ -363,7 +363,8 @@ extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
 
 /* Define to 1 if 'path' is member of 'struct dst_entry'. */
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
-#ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
+#undef HAVE_KMEMB_STRUCT_DST_OPS_UPDATE_PMTU
+#if defined HAVE_KMEMB_STRUCT_DST_ENTRY_PATH || defined HAVE_KMEMB_STRUCT_DST_OPS_UPDATE_PMTU
 /* dst_pmtu should be already defined */
 /* Define if function ip_rt_update_pmtu takes 4 arguments. */
 #undef HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS

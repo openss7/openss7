@@ -12707,7 +12707,12 @@ sock_getsockname(struct socket *sock, struct sockaddr *add, int *len)
 	ensure(sock, return (-EPROTO));
 	ensure(sock->ops, return (-EFAULT));
 	ensure(sock->ops->getname, return (-EFAULT));
+#if defined HAVE_KMEMB_STRUCT_PROTO_OPS_GETNAME_3_ARGS
+	*len = sock->ops->getname(sock, add, 0);
+	return (0);
+#else
 	return sock->ops->getname(sock, add, len, 0);
+#endif
 }
 
 static int
@@ -12717,7 +12722,12 @@ sock_getpeername(struct socket *sock, struct sockaddr *add, int *len)
 	ensure(sock->ops, return (-EFAULT));
 	ensure(sock->ops->getname, return (-EFAULT));
 	ensure(sock->sk, return (-EFAULT));
+#if defined HAVE_KMEMB_STRUCT_PROTO_OPS_GETNAME_3_ARGS
+	*len = sock->ops->getname(sock, add, 1);
+	return (0);
+#else
 	return sock->ops->getname(sock, add, len, 1);
+#endif
 }
 
 #if 0
