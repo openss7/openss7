@@ -142,6 +142,9 @@ struct strevent {
 			int pl;
 			int cpu;
 			struct timer_list timer;
+#if !defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
+			struct strevent *se;
+#endif
 		} t;			/* timeout event */
 		struct {
 			queue_t *queue;

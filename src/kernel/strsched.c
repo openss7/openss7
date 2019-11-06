@@ -218,7 +218,7 @@ strblocking(void)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 qbinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 qbinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -349,7 +349,7 @@ bput(qband_t **bp)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 apinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 apinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -443,7 +443,7 @@ ap_put(struct apinfo *api)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 devinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 devinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 devinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -552,7 +552,7 @@ EXPORT_SYMBOL_GPL(di_put);	/* include/sys/openss7/strsubr.h */
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 mdlinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 mdlinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 mdlinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -668,7 +668,7 @@ queinfo_init(struct queinfo *qu)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 queinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 queinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -848,7 +848,7 @@ qput(queue_t **qp)
 STATIC __hot_out void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 mdbblock_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 mdbblock_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -1383,7 +1383,7 @@ term_freemblks(void)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 linkinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 linkinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -1477,7 +1477,7 @@ EXPORT_SYMBOL_GPL(freelk);	/* include/sys/openss7/strsubr.h */
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 syncq_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 syncq_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -1748,7 +1748,7 @@ event_export(struct strevent *se)
 STATIC void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 seinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 seinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -2021,9 +2021,17 @@ static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
  *  the timeout fails to enter the synchronization queues, if any.
  */
 STATIC void
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
 timeout_function(unsigned long arg)
+#else
+timeout_function(struct timer_list *arg)
+#endif
 {
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
 	struct strevent *se = (struct strevent *) arg;
+#else
+	struct strevent *se = *(struct strevent **)(arg + 1);
+#endif
 
 #if !defined CONFIG_STREAMS_KTHREADS || defined HAVE_KFUNC_CPU_RAISE_SOFTIRQ
 	struct strthread *t = &strthreads[se->x.t.cpu];
@@ -2062,8 +2070,12 @@ strsched_timeout(struct strevent *se)
 	long id;
 
 	id = event_export(se);
-	se->x.t.timer.data = (long) se;
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
+	se->x.t.timer.data = (unsigned long) se;
 	se->x.t.timer.function = timeout_function;
+#else
+	se->x.t.se = se;
+#endif
 	add_timer(&se->x.t.timer);
 	return (id);
 }
@@ -2113,7 +2125,11 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 		se->x.t.arg = arg;
 		se->x.t.pl = pl;
 		se->x.t.cpu = cpu;
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
 		init_timer(&se->x.t.timer);
+#else
+		timer_setup(&se->x.t.timer, timeout_function, 0);
+#endif
 		se->x.t.timer.expires = jiffies + ticks;
 		id = strsched_timeout(se);
 	}
@@ -4840,7 +4856,11 @@ timeouts(struct strthread *t)
 }
 
 STATIC __unlikely void
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
 scan_timeout_function(unsigned long arg)
+#else
+scan_timeout_function(struct timer_list *arg)
+#endif
 {
 	struct strthread *t = this_thread;
 
@@ -5439,7 +5459,7 @@ clear_shinfo(struct shinfo *sh)
 STATIC __unlikely void
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 shinfo_ctor(kmem_cachep_t cachep, void *obj)
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 shinfo_ctor(void *obj)
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -5652,7 +5672,7 @@ STATIC struct cacheinfo {
 #if defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS)
 	void (*ctor) (kmem_cachep_t, void *);
 	void (*dtor) (kmem_cachep_t, void *);
-#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW)
+#elif defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEW) || defined(HAVE_KFUNC_KMEM_CACHE_CREATE_5_NEWER)
 	void (*ctor) (void *);
 	void (*dtor) (void *);
 #else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
@@ -6534,9 +6554,13 @@ strsched_init(void)
 #endif				/* !defined CONFIG_STREAMS_NORECYCLE */
 		t->freeevnt_tail = &t->freeevnt_head;
 	}
+#if defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA
 	init_timer(&scan_timer);
 	scan_timer.data = 0;
 	scan_timer.function = scan_timeout_function;
+#else				/* defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA */
+	timer_setup(&scan_timer, scan_timeout_function, 0);
+#endif				/* defined HAVE_KMEMB_STRUCT_TIMER_LIST_DATA */
 	init_strsched();
 	return (0);
 }
