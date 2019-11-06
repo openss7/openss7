@@ -242,12 +242,12 @@ spx_wput(queue_t *q, mblk_t *mp)
 		   messages that are not for us.  This is because we want the stream to support
 		   passing of M_PROTO and M_PCPROTO messages as well, regardless of whether it is
 		   just a loop-back device or whether it is an unnamed pipe. */
-		if (p->init == 0 && mp->b_wptr >= mp->b_rptr + sizeof(long)) {
+		if (p->init == 0 && mp->b_wptr >= mp->b_rptr + sizeof(queue_t *)) {
 			queue_t *oq = NULL;
 			struct spx *x;
 
 			/* not necessarily aligned */
-			bcopy(mp->b_rptr, oq, sizeof(*oq));
+			bcopy(mp->b_rptr, &oq, sizeof(oq));
 			/* validate against list */
 			spin_lock(&spx_lock);
 			for (x = spx_list; x && x->q != oq; x = x->next) ;
