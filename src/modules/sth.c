@@ -511,6 +511,19 @@ strdetached(struct stdata *sd)
  *  or hard interrupt attempts to schedule.
  */
 
+#if !defined HAVE_KMACRO_SET_TASK_STATE
+#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+#define set_task_state(tsk, state_value)			\
+	do {							\
+		(tsk)->task_state_change = _THIS_IP_;		\
+		smp_store_mb((tsk)->state, (state_value));		\
+	} while (0)
+#else
+#define set_task_state(tsk, state_value)		\
+	smp_store_mb((tsk)->state, (state_value))
+#endif
+#endif
+
 /**
  * strsyscall - exit a system call
  *
