@@ -47,14 +47,18 @@
 #
 # =============================================================================
 
+MYDEFAULT ?= cflag-check
 KERNEL_TOPDIR ?= /usr/src/linux
-KERNEL_CONFIG = /usr/src/linux/.config
-KCONFIG_CONFIG = $(KERNEL_CONFIG)
-KERNELRELEASE = $(shell uname -r)
+
+.EXPORT_ALL_VARIABLES:
 
 .SILENT:
 
-.DEFAULT: cflag-check
+.DEFAULT: mydefault
+
+.PHONY: mydefault
+mydefault: $(MYDEFAULT)
+
 
 .PHONY: cflag-check
 cflag-check:
@@ -120,6 +124,7 @@ flag-check:
 	-echo "OBJDUMP='$(OBJDUMP)'"
 	-:
 	-echo "HOSTCC='$(HOSTCC)'"
+	-echo "HOSTCXX='$(HOSTCXX)'"
 	-echo "HOSTCFLAGS='$(HOSTCFLAGS)'"
 	-echo "GENKSYMS='$(GENKSYMS)'"
 	-echo "DEPMOD='$(DEPMOD)'"
@@ -134,15 +139,25 @@ flag-check:
 	-echo "CPPFLAGS='$(CPPFLAGS)'"
 	-echo "AFLAGS='$(AFLAGS)'"
 	-:
+	-echo "KBUILD_AFLAGS='$(KBUILD_AFLAGS)'"
 	-echo "KBUILD_CFLAGS='$(KBUILD_CFLAGS)'"
 	-echo "KBUILD_CPPFLAGS='$(KBUILD_CPPFLAGS)'"
-	-echo "KBUILD_AFLAGS='$(KBUILD_AFLAGS)'"
+	-echo "KBUILD_AFLAGS_KERNEL='$(KBUILD_AFLAGS_KERNEL)'"
+	-echo "KBUILD_CFLAGS_KERNEL='$(KBUILD_CFLAGS_KERNEL)'"
+	-echo "KBUILD_AFLAGS_MODULE='$(KBUILD_AFLAGS_MODULE)'"
+	-echo "KBUILD_CFLAGS_MODULE='$(KBUILD_CFLAGS_MODULE)'"
+	-echo "KBUILD_LDFLAGS='$(KBUILD_LDCFLAGS)'"
+	-echo "KBUILD_LDFLAGS_MODULE='$(KBUILD_LDCFLAGS_MODULE)'"
+	-:
+	-echo "KBUILD_HOSTCFLAGS='$(KBUILD_HOSTCFLAGS)'"
+	-echo "KBUILD_HOSTCXXFLAGS='$(KBUILD_HOSTCXXFLAGS)'"
+	-echo "KBUILD_HOSTLDFLAGS='$(KBUILD_HOSTLDFLAGS)'"
+	-echo "KBUILD_HOSTLDLIBS='$(KBUILD_HOSTLDLIBS)'"
 
 .PHONY: env
 env:
 	@env
 
-#include $(KERNEL_CONFIG)
 include $(KERNEL_TOPDIR)/Makefile
 -include $(KERNEL_TOPDIR)/scripts/Makefile.lib
 
