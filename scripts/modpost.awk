@@ -801,7 +801,7 @@ function read_modobject(command, dir, own, src,
 		val = "" $1; sec = $(NF-2); offset = $(NF-1); sym = $NF
 		flags = substr($0, length(val)+2, 7)
 		if (substr(flags,1,1) == "l") {
-		    if (substr(flags,7,1) == "O") {
+		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
 			if (sec == ".modinfo") {
 			    if (sym ~ /^_?__mod_version[0-9]*$/)
 				mod_vers[mod] = 1
@@ -820,7 +820,7 @@ function read_modobject(command, dir, own, src,
 		    continue
 		}
 		if (substr(flags,1,1) == "g") {
-		    if (substr(flags,7,1) == "O") {
+		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
 			if (sub(/^_?_?__ksymtab/,"",sec)) {
 			    sub(/\+.*/,"",sec)
 			    if (sub(/^_?__ksymtab_/,"",sym)) {
