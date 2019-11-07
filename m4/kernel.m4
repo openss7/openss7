@@ -2288,7 +2288,7 @@ dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_cflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" ${linux_setup_kernel_cflags_tmp:+$linux_setup_kernel_cflags_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cflag-check' | tr '\n' ' ')
+	linux_cv_k_cflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" ${linux_setup_kernel_cflags_tmp:+$linux_setup_kernel_cflags_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cflag-check' | tail -1)
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -2475,7 +2475,7 @@ dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_cppflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cppflag-check' | tr '\n' ' ')
+	linux_cv_k_cppflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cppflag-check' | tail -1)
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
 	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
@@ -2550,7 +2550,7 @@ dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_modflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='modflag-check' | tr '\n' ' ')
+	linux_cv_k_modflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='modflag-check' | tail -1)
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
@@ -2587,7 +2587,7 @@ dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_bldflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='bldflag-check' | tr '\n' ' ')
+	linux_cv_k_bldflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='bldflag-check' | tail -1)
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line and is no longer
@@ -2609,7 +2609,7 @@ dnl
 dnl	As of 4.9.13 kernel, KBUILD_STR() no longer appears in the makefile, but must still
 dnl	stringify KBUILD_BASENAME anyway.
 dnl	
-	if test ${linux_cv_k_major:-0} -ge 4 -a ${linux_cv_k_minor} -ge 9 ; then
+	if test ${linux_cv_k_major:-0} -ge 5 -o \( ${linux_cv_k_major:-0} -ge 4 -a ${linux_cv_k_minor} -ge 9 \) ; then
 		linux_cv_k_bldflags="'-DKBUILD_STR(s)=\#s'"
 	fi
 	# the escapes and quotes here are delicate: don't change them!
@@ -2626,7 +2626,7 @@ dnl	from the makefile.
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_mnflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='mnflag-check' | tr '\n' ' ')
+	linux_cv_k_mnflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='mnflag-check' | tail -1)
 	linux_cv_k_mnflags_orig="$linux_cv_k_mnflags"])
 	case "$linux_cv_k_mnflags" in
 	    (*KBUILD_MODNAME*)
@@ -2656,7 +2656,7 @@ dnl	copyright on the hash.c program, RedHat is responsible for this commerical i
 dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
-	linux_cv_k_dhflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='dhflag-check' | tr '\n' ' ')
+	linux_cv_k_dhflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" modname=phony srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='dhflag-check' | tail -1)
 	linux_cv_k_dhflags_orig="$linux_cv_k_dhflags"])
 	case "$linux_cv_k_dhflags" in
 	    (*DEBUG_HASH*)
