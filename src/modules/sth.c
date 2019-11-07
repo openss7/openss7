@@ -2066,7 +2066,7 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 #if !defined CONFIG_KERNEL_WEAK_MODULES
 		/* we only reference thread group leaders because they cannot unhash in our faces,
 		   but will just zombie if they exit before the others in the thread group. */
-		procp = str_find_thread_group_leader(c);
+		procp = str_find_thread_group_leader(current);
 #else
 		procp = current;
 #endif

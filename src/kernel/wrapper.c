@@ -194,6 +194,7 @@ EXPORT_SYMBOL_GPL(kill_sl_func);	/* ??? UNUSED ??? */
 #endif				/* HAVE_KILL_SL_ADDR */
 #endif
 
+#if 0 /* not used anymore */
 #if !defined HAVE_SEND_GROUP_SIG_INFO_EXPORT && !defined HAVE_GROUP_SEND_SIG_INFO_EXPORT
 /* All this because some idiot changed the name. */
 
@@ -219,6 +220,7 @@ EXPORT_SYMBOL_GPL(group_send_sig_info);	/* used by src/modules/sth.c */
 
 #endif				/* !defined HAVE_SEND_GROUP_SIG_INFO_EXPORT && !defined
 				   HAVE_GROUP_SEND_SIG_INFO_EXPORT */
+#endif
 
 #ifdef HAVE___WAKE_UP_SYNC_ADDR
 __asm__(".equiv  " __stringify(__wake_up_sync) "," __stringify(HAVE___WAKE_UP_SYNC_ADDR));
