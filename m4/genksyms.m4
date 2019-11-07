@@ -105,7 +105,7 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     done
     _BLD_PATH_PROG([KGENKSYMS], [genksyms], [\${kbuilddir}/scripts/genksyms/genksyms],
 		 [$ksyms_path], [dnl
-	if test :"$linux_cv_k_ko_modules" = :yes ; then
+	if test :"$linux_cv_k_ko_modules" = :yes -a :"$linux_cv_k_versions" = :yes; then
 	    AC_MSG_WARN([Could not find executable kernel genksyms program in $ksyms_path.])
 	fi])
 dnl AC_ARG_VAR([MODPOST],
