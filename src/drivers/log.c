@@ -343,7 +343,6 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 	else
 		pri = LOG_INFO;
 	if ((mp = allocb(sizeof(*lp), BPRI_MED))) {
-		struct timeval tv;
 
 		mp->b_datap->db_type = (flags & SL_NOPUTBUF) ? M_PCPROTO : M_PROTO;
 		lp = (typeof(lp)) mp->b_rptr;
@@ -354,8 +353,13 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 		lp->level = level;
 		lp->flags = flags;
 		lp->ttime = jiffies;
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+		lp->ltime = ktime_get_real_seconds();
+#else
+		struct timeval tv;
 		do_gettimeofday(&tv);
 		lp->ltime = tv.tv_sec;
+#endif
 		lp->seq_no = seq_no;
 		lp->pri = source | pri;
 	}
@@ -485,13 +489,11 @@ log_wput(queue_t *q, mblk_t *mp)
 	case M_PCPROTO:
 	{
 		struct log_ctl *lp;
-		struct timeval tv;
 
 		if (!log_conq && !log_errq && !log_trcq)
 			break;
 		if (mp->b_wptr < mp->b_rptr + sizeof(*lp))
 			break;
-		do_gettimeofday(&tv);
 		lp = (typeof(lp)) mp->b_rptr;
 		if (lp->flags & (SL_CONSOLE | SL_ERROR | SL_TRACE)) {
 			if (lp->flags & SL_CONSOLE)
@@ -567,6 +569,7 @@ log_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case CLONEOPEN:
 		if (cminor < 1)
 			cminor = 2;
+		__attribute__((fallthrough));
 	case DRVOPEN:
 	{
 		major_t dmajor = 0;
