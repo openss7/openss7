@@ -193,6 +193,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				break;
 			case SQLVL_DEFAULT:
 				cdev->d_sqlvl = SQLVL_MODULE;
+				__attribute__((fallthrough));
 			case SQLVL_MODULE:
 				cdev->d_flag |= D_MTPERMOD;
 				break;
@@ -274,6 +275,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				break;
 			case SQLVL_DEFAULT:
 				fmod->f_sqlvl = SQLVL_MODULE;
+				__attribute__((fallthrough));
 			case SQLVL_MODULE:
 				fmod->f_flag |= D_MTPERMOD;
 				break;
