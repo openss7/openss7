@@ -223,6 +223,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		} else
 			length = sizeof(n.prim);
 		(void) length;
+		__attribute__((fallthrough));
 	}
 	case T_CONN_CON:
 	{
@@ -232,6 +233,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 		(void) n;
 		(void) t;
+		__attribute__((fallthrough));
 	}
 	case T_DISCON_IND:
 	{
@@ -241,6 +243,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 		(void) n;
 		(void) t;
+		__attribute__((fallthrough));
 	}
 	case T_DATA_IND:
 	{
@@ -248,6 +251,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_data_ind_t n = { N_DATA_IND, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_EXDATA_IND:
 	{
@@ -255,6 +259,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_exdata_ind_t n = { N_EXDATA_IND, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_INFO_ACK:
 	{
@@ -262,6 +267,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_info_ack_t n = { N_INFO_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_BIND_ACK:
 	{
@@ -269,6 +275,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_bind_ack_t n = { N_BIND_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_ERROR_ACK:
 	{
@@ -276,6 +283,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_error_ack_t n = { N_ERROR_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_OK_ACK:
 	{
@@ -283,6 +291,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_ok_ack_t n = { N_OK_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_UNITDATA_IND:
 	{
@@ -290,6 +299,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_unitdata_ind_t n = { N_UNITDATA_IND, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_UDERROR_IND:
 	{
@@ -297,6 +307,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_uderror_ind_t n = { N_UDERROR_IND, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_OPTMGMT_ACK:
 	{
@@ -304,6 +315,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_ok_ack_t n = { N_OK_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_ORDREL_IND:
 	{
@@ -311,6 +323,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_discon_ind_t n = { N_DISCON_IND, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 	case T_OPTDATA_IND:
 	{
@@ -331,6 +344,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 			(void) n;
 		}
+		__attribute__((fallthrough));
 #endif
 
 	}
@@ -345,6 +359,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_info_ack_t n = { N_INFO_ACK, };
 
 		(void) n;
+		__attribute__((fallthrough));
 	}
 
 /*
@@ -366,6 +381,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	case T_ADDR_REQ:
 	case T_CAPABILITY_REQ:
 		__swerr();
+		__attribute__((fallthrough));
 	default:
 		freemsg(mp);
 		return (0);
