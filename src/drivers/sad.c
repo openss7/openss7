@@ -585,6 +585,7 @@ sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		minor = 1;
 		if (sads[minor].assigned != 0)
 			break;
+		__attribute__((fallthrough));
 	case DRVOPEN:
 		if (minor != 0 && minor != 1)
 			break;
