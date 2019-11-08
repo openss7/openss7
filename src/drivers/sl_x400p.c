@@ -1242,9 +1242,18 @@ xp_xray_data(struct ch *ch, mblk_t *mp, uint flags, size_t hlen)
 	size_t mlen = 0;
 
 	prefetch(sp);
-	if (unlikely(flags & NI_TIMESTAMP))
+	if (unlikely(flags & NI_TIMESTAMP)) {
 		/* some xray stream wants a timestamp */
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+		struct timespec ts = { 0, 0 };
+
+		getnstimeofday(&ts);
+		tv.tv_sec = ts.tv_sec;
+		tv.tv_usec = ts.tv_nsec / NSEC_PER_USEC;
+#else
 		do_gettimeofday(&tv);
+#endif
+	}
 	if (unlikely(flags & NI_LEN))
 		/* some xray stream wants message length */
 		mlen = msgsize(mp);
@@ -3785,6 +3794,7 @@ xp_t1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifclock) {
 	default:
 		sp->config.ifclock = SDL_CLOCK_LOOP;
+		__attribute__((fallthrough));
 	case SDL_CLOCK_LOOP:
 		/* Use the signal present at RCLK as the transmit clock.  The TCLK pin is ignored. */
 		ccr3 |= (1 << 6);	/* CCR3.6: TCLKSRC: Transmit Clock Source Select. 0 = TCR1.7; 1 =
@@ -4178,6 +4188,7 @@ xp_e1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifclock) {
 	default:
 		sp->config.ifclock = SDL_CLOCK_LOOP;
+		__attribute__((fallthrough));
 	case SDL_CLOCK_LOOP:
 		/* Use the signal present at RCLK as the transmit clock.  The TCLK pin is ignored. */
 		ccr6 |= (1 << 2);	/* CCR6.2: 1 = Force transmitter to internally switch to RCLK as
@@ -4214,6 +4225,7 @@ xp_e1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifframing) {
 	default:
 		sp->config.ifframing = SDL_FRAMING_CCS;
+		__attribute__((fallthrough));
 	case SDL_FRAMING_CCS:
 		ccr1 |= (1 << 3);	/* CCR1.3: 1 = Rx CCS signaling mode */
 		tcr1 &= ~(1 << 5);	/* TCR1.5: 0 = sample time slot 16 at TSER pin */
@@ -4226,6 +4238,7 @@ xp_e1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifcoding) {
 	default:
 		sp->config.ifcoding = SDL_CODING_HDB3;
+		__attribute__((fallthrough));
 	case SDL_CODING_HDB3:
 		ccr1 |= (1 << 6);	/* CCR1.6: 1 = Tx HDB3 enabled */
 		ccr1 |= (1 << 2);	/* CCR1.2: 1 = Rx HDB3 enabled */
@@ -4240,6 +4253,7 @@ xp_e1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifgcrc) {
 	default:
 		sp->config.ifgcrc = SDL_GCRC_CRC4;
+		__attribute__((fallthrough));
 	case SDL_GCRC_CRC4:
 		ccr1 |= (1 << 4);	/* CRC1.4: 1 = Tx CRC4 enabled */
 		ccr1 |= (1 << 0);	/* CRC1.0: 1 = Rx CRC4 enalled */
@@ -4624,6 +4638,7 @@ xp_x1_span_config(struct sp *sp, bool timeouts)
 	default:
 	case SDL_GTYPE_NONE:
 		sp->config.ifgtype = SDL_GTYPE_E1;
+		__attribute__((fallthrough));
 	case SDL_GTYPE_E1:
 		/* MSTRREG.1=1: E1 Operating Mode. */
 		xlb[0x00] = (1 << 1);
@@ -4704,6 +4719,7 @@ xp_x1_span_config(struct sp *sp, bool timeouts)
 	switch (sp->config.ifclock) {
 	default:
 		sp->config.ifclock = SDL_CLOCK_LOOP;
+		__attribute__((fallthrough));
 	case SDL_CLOCK_LOOP:
 		/* Use the signal present at RCLK as the transmit clock.  The TCLK pin is ignored. */
 		/* CCR1.1-2 = '11'B Use the signal present at RCLK as the transmit clock. The TCLK pin is
@@ -6320,6 +6336,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 				ctlreg |= E1DIV;
 			break;
 		}
+		__attribute__((fallthrough));
 	default:
 	case SYNCSELF:
 		ctlreg |= cd->clkreg;
@@ -6380,6 +6397,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 				case SDL_TYPE_DS0A:
 					sp->config.iftype = sdl_default_e1_chan.iftype;
 					sp->config.ifrate = sdl_default_e1_chan.ifrate;
+					__attribute__((fallthrough));
 				case SDL_TYPE_DS0:
 					sp->config.ifblksize = sdl_default_e1_chan.ifblksize;
 					break;
@@ -6408,6 +6426,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 					case SDL_TYPE_DS0A:
 						ch->sdl.config.iftype = sdl_default_e1_chan.iftype;
 						ch->sdl.config.ifrate = sdl_default_e1_chan.ifrate;
+						__attribute__((fallthrough));
 					case SDL_TYPE_DS0:
 						ch->sdl.config.ifblksize = sdl_default_e1_chan.ifblksize;
 						break;
@@ -6468,6 +6487,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 				case SDL_TYPE_DS0:
 					sp->config.iftype = sdl_default_j1_chan.iftype;
 					sp->config.ifrate = sdl_default_j1_chan.ifrate;
+					__attribute__((fallthrough));
 				case SDL_TYPE_DS0A:
 					sp->config.ifblksize = sdl_default_j1_chan.ifblksize;
 					break;
@@ -6496,6 +6516,7 @@ xp_card_reconfig(struct cd *cd, int restart)
 					case SDL_TYPE_DS0:
 						ch->sdl.config.iftype = sdl_default_j1_chan.iftype;
 						ch->sdl.config.ifrate = sdl_default_j1_chan.ifrate;
+						__attribute__((fallthrough));
 					case SDL_TYPE_DS0A:
 						ch->sdl.config.ifblksize = sdl_default_j1_chan.ifblksize;
 						break;
@@ -7988,6 +8009,7 @@ sl_lsc_sios(struct ch *ch)
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
 		xp_timer_stop(ch, t1);	/* ok to stop if not running */
+		__attribute__((fallthrough));
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
 		ch->sl.statem.failure_reason = SL_FAIL_RECEIVED_SIOS;
@@ -14723,6 +14745,7 @@ mx_iocgoption_span(struct sp *sp, mx_option_t * arg)
 		break;
 	case SDL_GMODE_BOTH_LB:
 		val->mxSpanMode = (1 << MXSPANMODE_LOCAL) | (1 << MXSPANMODE_REMOTE);
+		break;
 	default:
 	case SDL_GMODE_NONE:
 		val->mxSpanMode = 0;
@@ -27985,6 +28008,7 @@ dsx_copyin(queue_t *q, mblk_t *mp, struct xp *xp, struct copyresp *cp, mblk_t *d
 		break;
 	case _IOC_NR(DSX_IOCGSTATUS):	/* dsx_status_t */
 		err = dsx_iocgstatus(q, mp, dp);
+		break;
 	case _IOC_NR(DSX_IOCSSTATUS):	/* dsx_status_t */
 	case _IOC_NR(DSX_IOCCSTATUS):	/* dsx_status_t */
 		err = dsx_status_size((dsx_status_t *) dp->b_rptr);
@@ -29073,6 +29097,7 @@ bpf_ioctl(queue_t *q, mblk_t *mp, struct xp *xp, struct iocblk *ioc)
 		default:
 			goto eopnotsupp;
 		}
+		break;
 	case _IOC_NR(BIOCGSTATS):	/* bpf_stat or bpf_stat_old */
 		switch (ioc->ioc_cmd) {
 		case BIOCGSTATS:
@@ -30139,6 +30164,7 @@ xp_w_proto_return(mblk_t *mp, int rtn)
 		return (rtn);
 	default:
 		freemsg(mp);
+		__attribute__((fallthrough));
 	case 0:
 		return (0);
 	}
