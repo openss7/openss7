@@ -3723,9 +3723,7 @@ EXTRA_DIST			+= cache/arch-os-i686-config.cache \
 				   configs/configure.ubuntu-lucid \
 				   configs/sh.arch
 
-MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
-				   $(top_srcdir)/config.h.in \
-				   $(top_srcdir)/configure \
+MAINTAINERCLEANFILES		+= $(top_srcdir)/configure \
 				   $(top_srcdir)/COPYING \
 				   $(top_srcdir)/INSTALL \
 				   $(top_srcdir)/scripts/compile \
