@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -4405,10 +4405,14 @@ drv_getparm(const unsigned int parm, void *value_p)
 		return (0);
 	case TIME:
 	{
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+		*(time_t *) value_p = (time_t) ktime_get_real_seconds();
+#else
 		struct timeval tv;
 
 		do_gettimeofday(&tv);
 		*(time_t *) value_p = tv.tv_sec;
+#endif
 		return (0);
 	}
 	case UCRED:
