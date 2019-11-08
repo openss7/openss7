@@ -652,14 +652,12 @@ __sdl_timer_stop(struct sdl *s, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t9:
 		sdl_stop_timer_t9(s);
 		if (single)
 			break;
-		/* 
-		   fall through */
 		break;
 	default:
 		swerr();
