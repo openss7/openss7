@@ -6373,6 +6373,8 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			/* fall through */
+			__attribute__((fallthrough));
 		case _IOC_NR(I_LINK):
 			if ((sl = sl_alloc_priv(lb->l_qbot, &sl_list, lb->l_index, iocp->ioc_cr)))
 				break;
@@ -6390,6 +6392,8 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			/* fall through */
+			__attribute__((fallthrough));
 		case _IOC_NR(I_UNLINK):
 			for (sl = sl_list; sl; sl = sl->next)
 				if (sl->index == lb->l_index)
