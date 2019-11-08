@@ -8828,6 +8828,7 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	switch (gp_get_state(gp)) {
 	case ASP_WACK_ASPDN:	/* Solicited */
 		mi_timer_stop(gp->gp.wack_aspdn);
+		__attribute__((fallthrough));	/* XXX */
 	case ASP_UP:		/* Unsolicited */
 		for (rp = gp->rp.list; rp; rp = rp->gp.next)
 			if ((err = rp_set_state(rp, q, AS_DOWN)))
@@ -16574,6 +16575,7 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 		switch ((state = gp_get_state(gp))) {
 		case ASP_WACK_ASPDN:
 			mi_timer_stop(gp->gp.wack_aspdn);
+			__attribute__((fallthrough));	/* XXX */
 		case ASP_UP:
 			for (rp = gp->rp.list; rp; rp = rp->gp.next)
 				if ((err = rp_set_state(rp, q, AS_DOWN)))
@@ -17107,6 +17109,7 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 		switch ((state = gp_get_state(gp))) {
 		case ASP_WACK_ASPDN:
 			mi_timer_stop(gp->gp.wack_aspdn);
+			__attribute__((fallthrough));	/* XXX */
 		case ASP_UP:
 			for (rp = gp->rp.list; rp; rp = rp->gp.next)
 				if ((err = rp_set_state(rp, q, AS_DOWN)))
