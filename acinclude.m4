@@ -947,6 +947,7 @@ dnl----------------------------------------------------------------------------
 	task_tgid_vnr \
 	tcp_set_skb_tso_segs_sock \
 	to_kdev_t \
+	totalram_pages \
 	try_module_get \
 	unregister_cpu_notifier \
 	unregister_ioctl32_conversion \
@@ -1139,7 +1140,8 @@ dnl----------------------------------------------------------------------------
 	struct inet_protocol,
 	struct net_protocol,
 	struct net_device_ops,
-	qrwlock_t], [:], [:], [
+	qrwlock_t,
+	struct kernel_siginfo], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
@@ -1561,6 +1563,7 @@ dnl----------------------------------------------------------------------------
 	__xfrm_policy_check,
 	__xfrm_sk_clone_policy,
 	_def_fifo_ops,
+	_totalram_pages,
 	afinet_get_info,
 	cd_forget,
 	cdev_put,
@@ -2670,6 +2673,37 @@ dnl----------------------------------------------------------------------------
 		AC_DEFINE([HAVE_INET_PROTOS_IS_CONST], [1], [Define if the array
 			   inet_protos contains const pointers.])
 	    fi
+	fi
+	if test :$linux_cv_type_struct_net_protocol = :yes ; then
+	    AC_CACHE_CHECK([for net_protocol.err_handler returns int],
+			   [linux_cv_net_protocol_err_handler_returns_int], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>]],
+		    [[int (*my_autoconf_function_pointer)(struct sk_buff *, u32) = NULL;
+		      struct net_protocol my_autoconf_proto = { .err_handler = my_autoconf_function_pointer, };]]) ],
+		    [linux_cv_net_protocol_err_handler_returns_int=yes],
+		    [linux_cv_net_protocol_err_handler_returns_int=no])
+		])
+		if test :$linux_cv_net_protocol_err_handler_returns_int = :yes ; then
+		    AC_DEFINE([HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT], [1], [Define if struct
+			net_protocol.err_handler returns int.])
+		fi
 	fi
 	if test :$linux_cv_xfrm_policy_delete_symbol = :yes ; then
 	    AC_CACHE_CHECK([for kernel xfrm_policy_delete_symbol returns int],
