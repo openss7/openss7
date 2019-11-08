@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -71,7 +71,7 @@ static char const ident[] = "src/modules/itot.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define ITOT_DESCRIP	"RFC 2161 ISO Transport over TCP (ITOT) STREAMS Module"
 #define ITOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define ITOT_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ITOT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
 #define ITOT_REVISION	"OpenSS7 src/modules/itot.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ITOT_DEVICE	"SVR 4.2 MP STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
