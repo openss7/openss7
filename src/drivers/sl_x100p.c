@@ -2719,6 +2719,7 @@ sl_lsc_sios(queue_t *q, struct xp *xp)
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
 		xp_timer_stop(xp, t1);	/* ok to stop if not running */
+		__attribute__((fallthrough));
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
 		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIOS);
@@ -3439,6 +3440,8 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 			xp->sl.statem.local_processor_outage = 0;	/* ??? */
 			return (QR_DONE);
 		}
+		/* unreachable */
+		break;
 	case SL_STATE_INITIAL_ALIGNMENT:
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
@@ -3450,6 +3453,8 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 			xp->sl.statem.local_processor_outage = 0;
 			return (QR_DONE);
 		}
+		/* unreachable */
+		break;
 	case SL_STATE_ALIGNED_NOT_READY:
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
@@ -3463,6 +3468,8 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 			xp->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
 			return (QR_DONE);
 		}
+		/* unreachable */
+		break;
 	case SL_STATE_PROCESSOR_OUTAGE:
 		switch (xp->option.pvar) {
 		case SS7_PVAR_ITUT_93:
