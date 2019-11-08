@@ -9,4 +9,5 @@ rm -f cscope.*
 #make V=0 cscope
 #cscope -b
 #make V=0 clean all README
+#make MODPOST_DEBUG=5 MODPOST_VERBOSE=5 V=0
 make V=0
