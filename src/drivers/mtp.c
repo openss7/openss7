@@ -6735,7 +6735,7 @@ mtp_tfr_reroute(queue_t *q, struct rl *rl)
 		struct lk *lk = rt->lk.lk;
 		struct rs *adj = lk->sp.adj;
 
-		if (!(rs->flags * RSF_CLUSTER)) {
+		if (!(rs->flags & RSF_CLUSTER)) {
 			if (adj->dest == rs->dest)
 				continue;
 			mtp_send_tfr(q, sp, lk->ni, adj->dest, sp->pc, sls, rs->dest);
@@ -9678,6 +9678,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
 		/* fall through */
+		__attribute__((fallthrough));
 	}
 	case SLS_PROC_OUTG:
 	case SLS_IS:
@@ -9698,6 +9699,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 			sl->flags &= ~SLF_TRAFFIC;
 			return (0);
 		}
+		__attribute__((fallthrough));	/* XXX */
 	case SLS_WACK_SLTM:
 		if ((err = sl_stop_req(q, sl)))
 			goto error;
@@ -15116,6 +15118,7 @@ m_conn_req(queue_t *q, mblk_t *mp)
 		}
 		mtp_set_state(mtp, MTPS_WACK_CREQ);
 		/* fall through */
+		__attribute__((fallthrough));
 	case MTPS_WACK_CREQ:
 		/* There is another thing to do once the connection has been established: that is
 		   to deliver MTP restart begins indication or to deliver MTP resume or MTP pause
