@@ -296,6 +296,7 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			break;
 		case SQLVL_DEFAULT:
 			cdev->d_sqlvl = SQLVL_MODULE;
+			__attribute__((fallthrough));
 		case SQLVL_MODULE:
 			cdev->d_flag |= D_MTPERMOD;
 			break;
@@ -345,6 +346,7 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			break;
 		case SQLVL_DEFAULT:
 			fmod->f_sqlvl = SQLVL_MODULE;
+			__attribute__((fallthrough));
 		case SQLVL_MODULE:
 			fmod->f_flag |= D_MTPERMOD;
 			break;
