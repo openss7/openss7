@@ -2316,6 +2316,7 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_long prim, np_ulong seq, np_
 			if (seq)
 				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
 										   instead */
+			__attribute__((fallthrough)); /* XXX */
 		case NS_WACK_DREQ6:
 		case NS_WACK_DREQ9:
 		case NS_WACK_DREQ10:
@@ -3396,6 +3397,7 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong prim, np_ulong seq, np
 			if (seq)
 				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
 										   instead */
+			__attribute__((fallthrough)); /* XXX */
 		case TS_WACK_DREQ6:
 		case TS_WACK_DREQ9:
 		case TS_WACK_DREQ10:
@@ -4366,6 +4368,7 @@ unpack_cpa(np_ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
 			}
 			break;
 		}
+		__attribute__((fallthrough));
 	default:
 		if (pci) {
 			if (p + 2 > e)
@@ -18938,6 +18941,7 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			__attribute__((fallthrough));
 		case _IOC_NR(I_LINK):
 			if ((mt =
 			     sccp_alloc_link(lb->l_qbot, &master.mt.list, lb->l_index,
@@ -18957,6 +18961,7 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			__attribute__((fallthrough));
 		case _IOC_NR(I_UNLINK):
 			for (mt = master.mt.list; mt; mt = mt->next)
 				if (mt->u.mux.index == lb->l_index)
