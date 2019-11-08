@@ -1557,6 +1557,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -1567,22 +1568,27 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndlowat);
 				if (ih->name != T_ALLOPT)
@@ -1590,6 +1596,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -1601,26 +1608,32 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += T_SPACE(0);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TOS:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.tos);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.ttl);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.reuseaddr);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.dontroute);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.broadcast);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				olen += _T_SPACE_SIZEOF(t_defaults.ip.addr);
 				if (ih->name != T_ALLOPT)
@@ -1672,6 +1685,7 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -1682,22 +1696,27 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				olen += _T_SPACE_SIZEOF(t->options.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndlowat);
 				if (ih->name != T_ALLOPT)
@@ -1705,6 +1724,7 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -1716,26 +1736,32 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += T_SPACE(0);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TOS:
 				olen += _T_SPACE_SIZEOF(t->options.ip.tos);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				olen += _T_SPACE_SIZEOF(t->options.ip.ttl);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				olen += _T_SPACE_SIZEOF(t->options.ip.reuseaddr);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				olen += _T_SPACE_SIZEOF(t->options.ip.dontroute);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				olen += _T_SPACE_SIZEOF(t->options.ip.broadcast);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				olen += _T_SPACE_SIZEOF(t->options.ip.addr);
 				if (ih->name != T_ALLOPT)
@@ -1786,6 +1812,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -1801,30 +1828,35 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				if (optlen && optlen != sizeof(t->options.xti.linger))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				if (optlen && optlen != sizeof(t->options.xti.rcvbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				if (optlen && optlen != sizeof(t->options.xti.rcvlowat))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				if (optlen && optlen != sizeof(t->options.xti.sndbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				if (optlen && optlen != sizeof(t->options.xti.sndlowat))
 					goto einval;
@@ -1834,6 +1866,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -1846,36 +1879,42 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TOS:
 				if (optlen && optlen != sizeof(t->options.ip.tos))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				if (optlen && optlen != sizeof(t->options.ip.ttl))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				if (optlen && optlen != sizeof(t->options.ip.reuseaddr))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				if (optlen && optlen != sizeof(t->options.ip.dontroute))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				if (optlen && optlen != sizeof(t->options.ip.broadcast))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				if (optlen && optlen != sizeof(t->options.ip.addr))
 					goto einval;
@@ -1928,6 +1967,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -1942,18 +1982,21 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t->options.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.linger))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.rcvbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.xti.rcvlowat))
@@ -1961,12 +2004,14 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.sndbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.xti.sndlowat))
@@ -1977,6 +2022,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -1990,18 +2036,21 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TOS:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.tos))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.ip.tos);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.ttl))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.ip.ttl);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.ip.reuseaddr))
@@ -2009,6 +2058,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t->options.ip.reuseaddr);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.ip.dontroute))
@@ -2016,6 +2066,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t->options.ip.dontroute);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.ip.broadcast))
@@ -2023,6 +2074,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
 				olen += _T_SPACE_SIZEOF(t->options.ip.broadcast);
 				if (ih->name != T_ALLOPT)
 					continue;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.ip.addr))
 					goto einval;
@@ -2122,6 +2174,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -2142,6 +2195,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.linger);
 				oh->level = XTI_GENERIC;
@@ -2152,6 +2206,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvbuf);
 				oh->level = XTI_GENERIC;
@@ -2162,6 +2217,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvlowat);
 				oh->level = XTI_GENERIC;
@@ -2172,6 +2228,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndbuf);
 				oh->level = XTI_GENERIC;
@@ -2182,6 +2239,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndlowat);
 				oh->level = XTI_GENERIC;
@@ -2195,6 +2253,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				continue;
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -2215,6 +2274,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_TOS:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.tos);
@@ -2226,6 +2286,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ttl);
 				oh->level = T_INET_IP;
@@ -2236,6 +2297,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.reuseaddr);
 				oh->level = T_INET_IP;
@@ -2246,6 +2308,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.dontroute);
 				oh->level = T_INET_IP;
@@ -2256,6 +2319,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.broadcast);
 				oh->level = T_INET_IP;
@@ -2266,6 +2330,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.addr);
 				oh->level = T_INET_IP;
@@ -2335,6 +2400,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -2355,6 +2421,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.linger);
 				oh->level = XTI_GENERIC;
@@ -2366,6 +2433,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvbuf);
 				oh->level = XTI_GENERIC;
@@ -2377,6 +2445,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvlowat);
 				oh->level = XTI_GENERIC;
@@ -2388,6 +2457,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndbuf);
 				oh->level = XTI_GENERIC;
@@ -2399,6 +2469,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndlowat);
 				oh->level = XTI_GENERIC;
@@ -2413,6 +2484,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				continue;
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -2433,6 +2505,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_TOS:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.tos);
@@ -2445,6 +2518,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.ttl);
 				oh->level = T_INET_IP;
@@ -2456,6 +2530,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.reuseaddr);
 				oh->level = T_INET_IP;
@@ -2467,6 +2542,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.dontroute);
 				oh->level = T_INET_IP;
@@ -2478,6 +2554,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.broadcast);
 				oh->level = T_INET_IP;
@@ -2489,6 +2566,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				oh->len = _T_LENGTH_SIZEOF(t->options.ip.addr);
 				oh->level = T_INET_IP;
@@ -2563,6 +2641,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -2594,6 +2673,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_LINGER:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -2629,6 +2709,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVBUF:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -2654,6 +2735,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_RCVLOWAT:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -2679,6 +2761,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDBUF:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -2705,6 +2788,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case XTI_SNDLOWAT:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -2734,6 +2818,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 				continue;
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -2757,6 +2842,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_TOS:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2781,6 +2867,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_TTL:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2814,6 +2901,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_REUSEADDR:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2832,6 +2920,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_DONTROUTE:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2850,6 +2939,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_BROADCAST:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2868,6 +2958,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			case T_IP_ADDR:
 				oh->len = ih->len;
 				oh->level = T_INET_IP;
@@ -2937,6 +3028,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
+			__attribute__((fallthrough));
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -2973,6 +3065,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case XTI_LINGER:
 			{
@@ -3012,6 +3105,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case XTI_RCVBUF:
 			{
@@ -3041,6 +3135,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case XTI_RCVLOWAT:
 			{
@@ -3070,6 +3165,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case XTI_SNDBUF:
 			{
@@ -3099,6 +3195,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case XTI_SNDLOWAT:
 			{
@@ -3132,6 +3229,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				continue;
 			if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 				goto efault;
+			__attribute__((fallthrough));
 		case T_INET_IP:
 			switch (ih->name) {
 			default:
@@ -3154,6 +3252,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_TOS:
 			{
@@ -3190,6 +3289,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_TTL:
 			{
@@ -3220,6 +3320,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_REUSEADDR:
 			{
@@ -3242,6 +3343,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_DONTROUTE:
 			{
@@ -3264,6 +3366,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_BROADCAST:
 			{
@@ -3286,6 +3389,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
+				__attribute__((fallthrough));
 			}
 			case T_IP_ADDR:
 			{
@@ -3360,7 +3464,11 @@ t_build_options(struct tp *t, const unsigned char *ip, const size_t ilen, unsign
  */
 
 STATIC int tp_v4_rcv(struct sk_buff *skb);
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+STATIC int tp_v4_err(struct sk_buff *skb, u32 info);
+#else
 STATIC void tp_v4_err(struct sk_buff *skb, u32 info);
+#endif
 
 /*
  *  IP subsystem management
@@ -8633,7 +8741,12 @@ tp_v4_rcv(struct sk_buff *skb)
  * tp->qlock protects the state of private structure.  tp->refs protects the private structure
  * from being deallocated before locking.
  */
-STATIC __unlikely void
+STATIC __unlikely
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+int
+#else
+void
+#endif
 tp_v4_err(struct sk_buff *skb, u32 info)
 {
 	struct tp *tp;
@@ -8680,7 +8793,11 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 	/* release reference from lookup */
 	tp_put(tp);
 	tp_v4_err_next(skb, info);	/* anyway */
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+	return(0);
+#else
 	return;
+#endif
       no_buffers:
 	ptrace(("ERROR: could not allocate buffer\n"));
 	goto discard_put;
@@ -8707,7 +8824,11 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+	return(0);
+#else
 	return;
+#endif
 }
 
 /*
