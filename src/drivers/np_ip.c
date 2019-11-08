@@ -806,7 +806,11 @@ np_get_statef(const struct np *np)
  */
 
 STATIC int np_v4_rcv(struct sk_buff *skb);
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+STATIC int np_v4_err(struct sk_buff *skb, u32 info);
+#else
 STATIC void np_v4_err(struct sk_buff *skb, u32 info);
+#endif
 
 /*
  *  IP subsystem management
@@ -5387,6 +5391,7 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_cont)
 			if (unlikely(putq(q, mp->b_cont) == 0))
 				freemsg(mp->b_cont);
+		__attribute__((fallthrough));
 	case QR_TRIMMED:
 		freeb(mp);
 		break;
@@ -5395,12 +5400,14 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			break;
 		}
+		__attribute__((fallthrough));
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			break;
 		}
 		rtn = -EOPNOTSUPP;
+		__attribute__((fallthrough));
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
 		freemsg(mp);
@@ -5414,6 +5421,7 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			break;
 		}
+		__attribute__((fallthrough));
 	case -ENOBUFS:
 	case -EBUSY:
 	case -ENOMEM:
@@ -5432,12 +5440,14 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 	switch (rtn) {
 	case QR_DONE:
 		freemsg(mp);
+		__attribute__((fallthrough));
 	case QR_ABSORBED:
 		return (1);
 	case QR_STRIP:
 		if (mp->b_cont)
 			if (!putbq(q, mp->b_cont))
 				freemsg(mp->b_cont);
+		__attribute__((fallthrough));
 	case QR_TRIMMED:
 		freeb(mp);
 		return (1);
@@ -5446,12 +5456,14 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			return (1);
 		}
+		__attribute__((fallthrough));
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			return (1);
 		}
 		rtn = -EOPNOTSUPP;
+		__attribute__((fallthrough));
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
 		freemsg(mp);
@@ -5468,6 +5480,7 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			return (1);
 		}
+		__attribute__((fallthrough));
 	case -ENOBUFS:		/* proc must have scheduled bufcall */
 	case -EBUSY:		/* proc must have failed canput */
 	case -ENOMEM:		/* proc must have scheduled bufcall */
@@ -5977,7 +5990,12 @@ np_v4_rcv(struct sk_buff *skb)
  * np->qlock protects the state of private structure.  np->refs protects the private structure
  * from being deallocated before locking.
  */
-STATIC __unlikely void
+STATIC __unlikely
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+int
+#else
+void
+#endif
 np_v4_err(struct sk_buff *skb, u32 info)
 {
 	struct np *np;
@@ -6018,7 +6036,11 @@ np_v4_err(struct sk_buff *skb, u32 info)
 	/* release reference from lookup */
 	np_put(np);
 	np_v4_err_next(skb, info);	/* anyway */
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+	return(0);  /* XXX */
+#else
 	return;
+#endif
       no_buffers:
 	ptrace(("ERROR: could not allocate buffer\n"));
 	goto discard_put;
@@ -6041,7 +6063,11 @@ np_v4_err(struct sk_buff *skb, u32 info)
 #else
 	ICMP_INC_STATS_BH(IcmpInErrors);
 #endif
+#if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
+	return(0);  /* XXX */
+#else
 	return;
+#endif
 }
 
 /*
