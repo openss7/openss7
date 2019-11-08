@@ -390,7 +390,7 @@ RELEASECLEANFILES	+= $(mpkgtopdir)/*.log* \
 ##
 distclean-pkg: release-clean-pkgs
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	test -d '$(mpkgbuilddir)' && rm -rf -- $(mpkgbuilddir)
+	test -d '$(mpkgbuilddir)' && rm -rf -- $(mpkgbuilddir) || :
 
 
 DISTCLEAN_LOCAL		+= distclean-pkg
