@@ -262,6 +262,7 @@ spx_wput(queue_t *q, mblk_t *mp)
 			}
 			spin_unlock(&spx_lock);
 		}
+		__attribute__((fallthrough));
 	default:
 		if (q->q_next)
 			putnext(q, mp);
@@ -313,6 +314,7 @@ spx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case CLONEOPEN:
 		if (cminor < 1)
 			cminor = 1;
+		__attribute__((fallthrough));
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
