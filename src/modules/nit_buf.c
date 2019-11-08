@@ -437,6 +437,7 @@ nbuf_iocdata(queue_t *q, mblk_t *mp)
 			putnext(q, mp);
 			break;
 		}
+		break;
 	default:
 		putnext(q, mp);
 		break;
