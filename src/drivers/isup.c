@@ -10063,8 +10063,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t1:
 		if ((to = xchg(&ct->timers.t1, 0))) {
 			untimeout(to);
@@ -10073,8 +10073,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t2:
 		if ((to = xchg(&ct->timers.t2, 0))) {
 			untimeout(to);
@@ -10083,8 +10083,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t3:
 		if ((to = xchg(&ct->timers.t3, 0))) {
 			untimeout(to);
@@ -10093,8 +10093,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t5:
 		if ((to = xchg(&ct->timers.t5, 0))) {
 			untimeout(to);
@@ -10103,8 +10103,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t6:
 		if ((to = xchg(&ct->timers.t6, 0))) {
 			untimeout(to);
@@ -10113,8 +10113,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t7:
 		if ((to = xchg(&ct->timers.t7, 0))) {
 			untimeout(to);
@@ -10123,8 +10123,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t8:
 		if ((to = xchg(&ct->timers.t8, 0))) {
 			untimeout(to);
@@ -10133,8 +10133,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t9:
 		if ((to = xchg(&ct->timers.t9, 0))) {
 			untimeout(to);
@@ -10143,8 +10143,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t10:
 		if ((to = xchg(&ct->timers.t10, 0))) {
 			untimeout(to);
@@ -10153,8 +10153,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t11:
 		if ((to = xchg(&ct->timers.t11, 0))) {
 			untimeout(to);
@@ -10163,8 +10163,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t24:
 		if ((to = xchg(&ct->timers.t24, 0))) {
 			untimeout(to);
@@ -10173,8 +10173,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t31:
 		if ((to = xchg(&ct->timers.t31, 0))) {
 			untimeout(to);
@@ -10183,8 +10183,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t32:
 		if ((to = xchg(&ct->timers.t32, 0))) {
 			untimeout(to);
@@ -10193,8 +10193,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t33:
 		if ((to = xchg(&ct->timers.t33, 0))) {
 			untimeout(to);
@@ -10203,8 +10203,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t34:
 		if ((to = xchg(&ct->timers.t34, 0))) {
 			untimeout(to);
@@ -10213,8 +10213,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t35:
 		if ((to = xchg(&ct->timers.t35, 0))) {
 			untimeout(to);
@@ -10223,8 +10223,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t38:
 		if ((to = xchg(&ct->timers.t38, 0))) {
 			untimeout(to);
@@ -10233,8 +10233,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tacc_r:
 		if ((to = xchg(&ct->timers.tacc_r, 0))) {
 			untimeout(to);
@@ -10243,8 +10243,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tcra:
 		if ((to = xchg(&ct->timers.tcra, 0))) {
 			untimeout(to);
@@ -10253,8 +10253,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tcrm:
 		if ((to = xchg(&ct->timers.tcrm, 0))) {
 			untimeout(to);
@@ -10263,8 +10263,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case texm_d:
 		if ((to = xchg(&ct->timers.texm_d, 0))) {
 			untimeout(to);
@@ -10273,8 +10273,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t12:
 		if ((to = xchg(&ct->timers.t12, 0))) {
 			untimeout(to);
@@ -10283,8 +10283,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t13:
 		if ((to = xchg(&ct->timers.t13, 0))) {
 			untimeout(to);
@@ -10293,8 +10293,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t14:
 		if ((to = xchg(&ct->timers.t14, 0))) {
 			untimeout(to);
@@ -10303,8 +10303,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t15:
 		if ((to = xchg(&ct->timers.t15, 0))) {
 			untimeout(to);
@@ -10313,8 +10313,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t16:
 		if ((to = xchg(&ct->timers.t16, 0))) {
 			untimeout(to);
@@ -10323,8 +10323,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t17:
 		if ((to = xchg(&ct->timers.t17, 0))) {
 			untimeout(to);
@@ -10333,8 +10333,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t25:
 		if ((to = xchg(&ct->timers.t25, 0))) {
 			untimeout(to);
@@ -10343,8 +10343,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t26:
 		if ((to = xchg(&ct->timers.t26, 0))) {
 			untimeout(to);
@@ -10353,8 +10353,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t27:
 		if ((to = xchg(&ct->timers.t27, 0))) {
 			untimeout(to);
@@ -10363,8 +10363,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t36:
 		if ((to = xchg(&ct->timers.t36, 0))) {
 			untimeout(to);
@@ -10373,8 +10373,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t37:
 		if ((to = xchg(&ct->timers.t37, 0))) {
 			untimeout(to);
@@ -10383,8 +10383,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tccr:
 		if ((to = xchg(&ct->timers.tccr, 0))) {
 			untimeout(to);
@@ -10393,8 +10393,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tccr_r:
 		if ((to = xchg(&ct->timers.tccr_r, 0))) {
 			untimeout(to);
@@ -10403,8 +10403,8 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tcvt:
 		if ((to = xchg(&ct->timers.tcvt, 0))) {
 			untimeout(to);
@@ -10413,8 +10413,7 @@ __ct_timer_stop(struct ct *ct, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	}
 }
 
@@ -10794,8 +10793,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t18:
 		if ((to = xchg(&cg->timers.t18, 0))) {
 			untimeout(to);
@@ -10804,8 +10803,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t19:
 		if ((to = xchg(&cg->timers.t19, 0))) {
 			untimeout(to);
@@ -10814,8 +10813,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t20:
 		if ((to = xchg(&cg->timers.t20, 0))) {
 			untimeout(to);
@@ -10824,8 +10823,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t21:
 		if ((to = xchg(&cg->timers.t21, 0))) {
 			untimeout(to);
@@ -10834,8 +10833,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t22:
 		if ((to = xchg(&cg->timers.t22, 0))) {
 			untimeout(to);
@@ -10844,8 +10843,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t23:
 		if ((to = xchg(&cg->timers.t23, 0))) {
 			untimeout(to);
@@ -10854,8 +10853,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t28:
 		if ((to = xchg(&cg->timers.t28, 0))) {
 			untimeout(to);
@@ -10864,8 +10863,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tcgb:
 		if ((to = xchg(&cg->timers.tcgb, 0))) {
 			untimeout(to);
@@ -10874,8 +10873,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tgrs:
 		if ((to = xchg(&cg->timers.tgrs, 0))) {
 			untimeout(to);
@@ -10884,8 +10883,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case thga:
 		if ((to = xchg(&cg->timers.thga, 0))) {
 			untimeout(to);
@@ -10894,8 +10893,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tscga:
 		if ((to = xchg(&cg->timers.tscga, 0))) {
 			untimeout(to);
@@ -10904,8 +10903,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case tscga_d:
 		if ((to = xchg(&cg->timers.tscga_d, 0))) {
 			untimeout(to);
@@ -10914,8 +10913,8 @@ __cg_timer_stop(struct cg *cg, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	}
 }
 
@@ -11091,8 +11090,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t4:
 		if ((to = xchg(&sr->timers.t4, 0))) {
 			untimeout(to);
@@ -11101,8 +11100,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t29:
 		if ((to = xchg(&sr->timers.t29, 0))) {
 			untimeout(to);
@@ -11111,8 +11110,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t30:
 		if ((to = xchg(&sr->timers.t30, 0))) {
 			untimeout(to);
@@ -11121,8 +11120,7 @@ __sr_timer_stop(struct sr *sr, const uint t)
 		}
 		if (single)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
 	}
 }
 
@@ -11194,6 +11192,7 @@ ct_block(queue_t *q, struct ct *ct)
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
+		__attribute__((fallthrough)); /* XXX */
 	case CTS_ICC_WAIT_ACM:
 		if (ct_tst(ct, CCTF_COR_PENDING))
 			ct_timer_stop(ct, t8);
@@ -11251,6 +11250,7 @@ ct_reset(queue_t *q, struct ct *ct)
 		break;
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
+		__attribute__((fallthrough));
 	case CTS_ICC_WAIT_ACM:
 		if (ct_tst(ct, CCTF_COR_PENDING))
 			ct_timer_stop(ct, t8);
@@ -11345,6 +11345,7 @@ cg_m_block(queue_t *q, struct cg *cg)
 			switch (ct_get_c_state(ct)) {
 			case CTS_ICC_WAIT_SAM:
 				ct_timer_stop(ct, t35);
+				__attribute__((fallthrough));
 			case CTS_ICC_WAIT_ACM:
 				if (ct_tst(ct, CCTF_COR_PENDING))
 					ct_timer_stop(ct, t8);
@@ -11406,6 +11407,7 @@ cg_h_block(queue_t *q, struct cg *cg)
 			switch (ct_get_c_state(ct)) {
 			case CTS_OGC_WAIT_SAM:
 				ct_timer_stop(ct, t35);
+				__attribute__((fallthrough)); /* XXX */
 			case CTS_OGC_WAIT_ACM:
 				ct_timer_stop(ct, t7);
 				break;
@@ -11414,6 +11416,7 @@ cg_h_block(queue_t *q, struct cg *cg)
 				break;
 			case CTS_ICC_WAIT_SAM:
 				ct_timer_stop(ct, t35);
+				__attribute__((fallthrough)); /* XXX */
 			case CTS_ICC_WAIT_ACM:
 				if (ct_tst(ct, CCTF_COR_PENDING))
 					ct_timer_stop(ct, t8);
@@ -11709,8 +11712,8 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CTS_OGC_WAIT_SAM:
 	case CTS_OGC_WAIT_ACM:
 		ct_set_c_state(ct, CTS_IDLE);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CTS_IDLE:
 		if (m->msg.iam.cpc != ((ISUP_CPC_TEST_CALL >> 24) & 0xff)) {
 			/* 
@@ -11869,11 +11872,10 @@ isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	switch (ct_get_i_state(ct)) {
 	case CCS_WREQ_MORE:
-		/* 
-		   skip optional CC_MORE_INFO_REQ */
+		/* skip optional CC_MORE_INFO_REQ */
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_INFO);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_INFO:
 		if ((err = cc_information_ind(q, ct, m)))
 			return (err);
@@ -11996,6 +11998,7 @@ isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 			ct_timer_stop(ct, t35);
+			__attribute__((fallthrough));
 		case CTS_ICC_WAIT_ACM:
 			ct_timer_stop(ct, t8);
 			if (ct_get_i_state(ct) != CCS_IDLE) {
@@ -12006,8 +12009,8 @@ isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 					return (err);
 				ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			}
-			/* 
-			   fall through */
+			/* fall through */
+			__attribute__((fallthrough));
 		case CTS_ICC_WAIT_CCR:
 			ct_timer_stop(ct, t36);
 			if (ct_get_t_state(ct) == CKS_WIND_CCREP) {
@@ -12095,8 +12098,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROCEED);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_PROCEED:
 		if (!(m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE)) {
 			if ((err = cc_proceeding_ind(q, ct, m)))
@@ -12104,8 +12107,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_ALERTING);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_ALERTING:
 		if (m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE) {
 			if ((err = cc_alerting_ind(q, ct, m)))
@@ -12113,8 +12116,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_PROGRESS:
 		if (!(m->msg.acm.bci & ISUP_BCI_SUBSCRIBER_FREE)) {
 			if ((err = cc_progress_ind(q, ct, m)))
@@ -12122,8 +12125,8 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_IBI:
 		if (m->oparm.obci.ptr
 		    && ((m->oparm.obci.val << 16) & ISUP_OBCI_INBAND_INFORMATION_AVAILABLE)) {
@@ -12132,8 +12135,7 @@ isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_CONNECT);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
@@ -12182,14 +12184,13 @@ isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_CONNECT);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_PROCEED:
 	case CCS_WIND_ALERTING:
 	case CCS_WIND_PROGRESS:
 	case CCS_WIND_CONNECT:
-		/* 
-		   responsiblity of CC to start charging after receiving CC_CONNECT_IND */
+		/* responsiblity of CC to start charging after receiving CC_CONNECT_IND */
 		if ((err = cc_connect_ind(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_CONNECTED);
@@ -12197,8 +12198,7 @@ isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
-		/* 
-		   release iam information */
+		/* release iam information */
 		ct_set_c_state(ct, CTS_OGC_ANSWERED);
 		return (QR_DONE);
 	}
@@ -12326,6 +12326,7 @@ isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 		break;
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
+		__attribute__((fallthrough));
 	case CTS_ICC_WAIT_ACM:
 		if (ct_tst(ct, CCTF_COR_PENDING))
 			ct_timer_stop(ct, t8);
@@ -12538,8 +12539,8 @@ isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((tg->config.flags & ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE)
 		    && !(tg->config.flags & ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED))
 			ct_timer_start(ct, t38);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	}
 	case CTS_OGC_SUSPENDED:
 		ct_set(ct, CCTF_TERM_SUSPENDED);
@@ -13506,6 +13507,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 			switch (ct_get_c_state(ct)) {
 			case CTS_ICC_WAIT_SAM:
 				ct_timer_stop(ct, t35);
+				__attribute__((fallthrough));
 			case CTS_ICC_WAIT_ACM:
 				if (ct_tst(ct, CCTF_COR_PENDING))
 					ct_timer_stop(ct, t8);
@@ -13515,6 +13517,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 				break;
 			case CTS_OGC_WAIT_SAM:
 				ct_timer_stop(ct, t35);
+				__attribute__((fallthrough));
 			case CTS_OGC_WAIT_ACM:
 				ct_timer_stop(ct, t7);
 				break;
@@ -14518,8 +14521,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 		if ((err = cc_setup_con(q, ct, m)))
 			return (err);
 		ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROCEED);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_PROCEED:
 		/* 
 		   need ACM (not CPG) in these states */
@@ -14529,8 +14532,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_ALERTING);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_ALERTING:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_ALERTING) {
 			if ((err = cc_alerting_ind(q, ct, m)))
@@ -14538,8 +14541,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_PROGRESS:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_PROGRESS) {
 			if ((err = cc_progress_ind(q, ct, m)))
@@ -14547,8 +14550,8 @@ isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 			ct_set_i_state(ct, ct->cpc.cc, CCS_WIND_PROGRESS);
 			break;
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WIND_IBI:
 		if ((m->msg.cpg.evnt & ISUP_EVNT_MASK) == ISUP_EVNT_IBI) {
 			if ((err = cc_ibi_ind(q, ct, m)))
@@ -15326,8 +15329,8 @@ isup_dec_grs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1 && v->ptr[0] == 0)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	case SS7_PVAR_ITUT:
 		if (v->len != 1 || v->ptr[0] < 1 || v->ptr[0] > 31)
@@ -15366,8 +15369,8 @@ isup_dec_cgb(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 				break;
 			return (-EINVAL);
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15416,8 +15419,8 @@ isup_dec_cgu(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 				break;
 			return (-EINVAL);
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	{
 		int i, j, set;
@@ -15465,8 +15468,8 @@ isup_dec_cgba(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 				break;
 			return (-EINVAL);
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15515,8 +15518,8 @@ isup_dec_cgua(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 				break;
 			return (-EINVAL);
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	case SS7_PVAR_ITUT:
 	{
@@ -15797,8 +15800,8 @@ isup_dec_cqm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 		   ANSI allows range value of zero for pre-arranged circuit groups */
 		if (v->len == 1 && v->ptr[0] == 0)
 			break;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	default:
 	case SS7_PVAR_ITUT:
 		if (v->len != 1 || v->ptr[0] < 1 || v->ptr[0] > 31)
@@ -16601,6 +16604,7 @@ ct_t8_timeout(struct ct *ct)
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
+		__attribute__((fallthrough));
 	case CTS_ICC_WAIT_ACM:
 		/* 
 		   responsibility of CC to remove COT */
@@ -17327,8 +17331,8 @@ ct_t27_timeout(struct ct *ct)
 			ct_set(ct, CCTF_LOC_RESET_PENDING);
 			ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
 		}
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CTS_ICC_WAIT_RLC:
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T27_TIMEOUT)))
 			return (err);
@@ -17476,8 +17480,8 @@ ct_t34_timeout(struct ct *ct)
 		switch ((err = mtp_read(NULL, ct->sgm, ct->sr.sr))) {
 		case QR_DONE:
 			freemsg(ct->sgm);
-			/* 
-			   fall through */
+			/* fall through */
+			__attribute__((fallthrough));
 		case QR_ABSORBED:
 			ct->sgm = NULL;
 			return (QR_DONE);
@@ -17568,8 +17572,8 @@ ct_t36_timeout(struct ct *ct)
 			ct_set(ct, CCTF_LOC_RESET_PENDING);
 		}
 		ct_set_c_state(ct, CTS_ICC_WAIT_RLC);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CTS_ICC_WAIT_RLC:
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T36_TIMEOUT)))
 			return (err);
@@ -20181,8 +20185,8 @@ cc_information_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_INFO);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_INFO:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20643,8 +20647,8 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_PROCEED);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_PROCEED:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20729,8 +20733,8 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_ALERTING);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_ALERTING:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20817,8 +20821,8 @@ cc_progress_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_PROGRESS);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_PROGRESS:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -20933,8 +20937,8 @@ cc_ibi_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_IBI);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_IBI:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -21177,8 +21181,8 @@ cc_forwxfer_req(queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		ct_set_i_state(ct, cc, CCS_WACK_FORWXFER);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CCS_WACK_FORWXFER:
 		if ((err = cc_ok_ack(q, cc, ct, p->cc_primitive)))
 			return (err);
@@ -21312,8 +21316,8 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 		if ((tg->config.flags & ISUP_TGF_INCOMING_INTERNATIONAL_EXCHANGE)
 		    && !(tg->config.flags & ISUP_TGF_SUSPEND_NATIONALLY_PERFORMED))
 			ct_timer_start(ct, t38);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	}
 	case CTS_OGC_SUSPENDED:
 	{
@@ -21603,11 +21607,10 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	case CTS_OGC_SUSPENDED:
 		ct_timer_stop(ct, t6);
 		ct_timer_stop(ct, t38);
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case CTS_OGC_ANSWERED:
-		/* 
-		   stop charging */
+		/* stop charging */
 		goto release_ogc;
 	case CTS_ICC_SEND_RLC:
 	case CTS_OGC_SEND_RLC:
@@ -21616,9 +21619,9 @@ cc_release_req(queue_t *q, mblk_t *mp)
 		if ((err = isup_send_rlc(q, ct, opt_ptr, opt_len)))
 			return (err);
 		ct_set_c_state(ct, CTS_IDLE);
+		__attribute__((fallthrough));
 	case CTS_IDLE:
-		/* 
-		   ignore it */
+		/* ignore it */
 		return (QR_DONE);
 	default:
 		swerr();
@@ -25247,6 +25250,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			__attribute__((fallthrough));
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: I_LINK\n", DRV_NAME, cc));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
@@ -25280,6 +25284,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
+			__attribute__((fallthrough));
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, cc));
 			spin_lock_irqsave(&master.lock, flags);
