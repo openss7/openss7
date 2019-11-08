@@ -985,14 +985,12 @@ __sdt_timer_stop(struct sdt *s, const uint t)
 	switch (t) {
 	case tall:
 		single = 0;
-		/* 
-		   fall through */
+		/* fall through */
+		__attribute__((fallthrough));
 	case t8:
 		sdt_stop_timer_t8(s);
 		if (single)
 			break;
-		/* 
-		   fall through */
 		break;
 	default:
 		swerr();
