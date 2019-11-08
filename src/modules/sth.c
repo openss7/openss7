@@ -1230,7 +1230,39 @@ kill_proc_(pid_t sess, int sig, int priv)
 #endif
 
 /* How to send a signal with information to a process: just use kill_proc_info(7) in the code */
-#if   defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
+#if defined HAVE_KILL_PID_INFO_SYMBOL
+/* 4.9 kernel approach: */
+#if   defined HAVE_KILL_PID_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+extern int kill_pid_info(int sig, struct kernel_siginfo *info, struct pid *pid);
+#else
+extern int kill_pid_info(int sig, struct siginfo *info, struct pid *pid);
+#endif
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info(a,b,c)
+#else
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+extern int kill_pid_info(int sig, struct kernel_siginfo *info, struct pid *pid)
+    __attribute__ ((__weak__));
+#else
+extern int kill_pid_info(int sig, struct siginfo *info, struct pid *pid)
+    __attribute__ ((__weak__));
+#endif
+int
+kill_pid_info_(int sig,
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+	       struct kernel_siginfo *info,
+#else
+	       struct siginfo *info,
+#endif
+	       struct pid *pid)
+{
+	if (kill_pid_info)
+		return kill_pid_info(sig, info, pid);
+	return kill_pid(pid, sig, 1);
+}
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info_(a,b,c)
+#endif
+#elif   defined HAVE_KILL_PID_INFO_AS_CRED_SYMBOL
 /* 3.4 kernel approach: */
 #if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL && defined HAVE_KMEMB_STRUCT_CRED_EUID_VAL
 #if   defined HAVE_KILL_PID_INFO_AS_CRED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
@@ -1468,12 +1500,27 @@ int send_sig_(int sig, struct task_struct *p, int priv)
 /* How to send a signal with information to a specific task (thread). */
 #if   defined HAVE_SEND_SIG_INFO_SYMBOL
 #if   defined HAVE_SEND_SIG_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+extern int send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p);
+#else
 extern int send_sig_info(int sig, struct siginfo *info, struct task_struct *p);
+#endif
 #define send_sig_info(a,b,c) send_sig_info(a,b,c)
+#else
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+extern int send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
+	__attribute__((__weak__));
 #else
 extern int send_sig_info(int sig, struct siginfo *info, struct task_struct *p)
 	__attribute__((__weak__));
-int send_sig_info_(int sig, struct siginfo *info, struct task_struct *p)
+#endif
+int send_sig_info_(int sig,
+#if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+		   struct kernel_siginfo *info,
+#else
+		   struct siginfo *info,
+#endif
+		   struct task_struct *p)
 {
 	if (send_sig_info)
 		return send_sig_info(sig, info, p);
@@ -1635,7 +1682,11 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 				if (sd->sd_eropt & WERRNONPERSIST)
 					clear_bit(STWRERR_BIT, &sd->sd_flag);
 				if (sd->sd_wropt & SNDPIPE)
+#if defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+					send_sig_info(SIGPIPE, (struct kernel_siginfo *) 1, current);
+#else
 					send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
+#endif
 				return (-sd->sd_werror);
 			} else if ((access & FREAD) == 0)
 				return (-EIO);
@@ -2126,7 +2177,11 @@ STATIC __unlikely void
 strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 {
 	struct strevent *se;
+#if defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+	struct kernel_siginfo si;
+#else
 	struct siginfo si;
+#endif
 	int bits, sig;
 
 	for (se = sd->sd_siglist; se; se = se->se_next) {
@@ -9744,6 +9799,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
 			access |= FEXCL;
 			/* FIXME: These gets need to have an ic_len of zero.  */
+			__attribute__((fallthrough));
 		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
 			length = sizeof(struct termios);
@@ -9753,6 +9809,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
 			access |= FEXCL;
 			/* FIXME: These gets need to have an ic_len of zero.  */
+			__attribute__((fallthrough));
 		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
 			length = sizeof(struct termio);
 			break;
@@ -9853,6 +9910,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 #endif
 		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
 			length = sizeof(struct winsize);
 			break;
@@ -9869,6 +9927,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 #if 0
 			/* conflicts with TCSETSW on ppc */
 		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
@@ -10239,6 +10298,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETSF):	/* const struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
 			length = sizeof(struct termios);
@@ -10247,6 +10307,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETAW):	/* const struct termio * *//* SVID *//* XXX */
 		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
 			length = sizeof(struct termio);
 			break;
@@ -10347,6 +10408,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 #endif
 		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
 			length = sizeof(struct winsize);
 			break;
@@ -10363,6 +10425,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
 			access |= FEXCL;
+			__attribute__((fallthrough));
 #if 0
 			/* conflicts with TCSETSW on ppc */
 		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
@@ -11041,6 +11104,7 @@ strwput(queue_t *q, mblk_t *mp)
 			putq(q, mp);
 			return (0);
 		}
+		__attribute__((fallthrough));
 	case M_PROTO:
 		if (likely((b = getq(q)) != NULL)) {
 			/* delayed one has to go - can't delay the other */
