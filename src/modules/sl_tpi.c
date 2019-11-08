@@ -3326,6 +3326,7 @@ sl_lsc_sios(queue_t *q)
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
 		sl_timer_stop(q, t1);	/* ok to stop if not running */
+		__attribute__((fallthrough));
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
 		sl_out_of_service_ind(q, SL_FAIL_RECEIVED_SIOS);
@@ -4110,6 +4111,7 @@ sl_lsc_clear_buffers(queue_t *q)
 			sl->sl.statem.local_processor_outage = 0;	/* ??? */
 			return (QR_DONE);
 		}
+		__attribute__((fallthrough));
 	case SL_STATE_INITIAL_ALIGNMENT:
 		switch (sl->option.pvar) {
 		case SS7_PVAR_ITUT_93:
@@ -4121,6 +4123,7 @@ sl_lsc_clear_buffers(queue_t *q)
 			sl->sl.statem.local_processor_outage = 0;
 			return (QR_DONE);
 		}
+		__attribute__((fallthrough));
 	case SL_STATE_ALIGNED_NOT_READY:
 		switch (sl->option.pvar) {
 		case SS7_PVAR_ITUT_93:
@@ -4134,6 +4137,7 @@ sl_lsc_clear_buffers(queue_t *q)
 			sl->sl.statem.lsc_state = SL_STATE_ALIGNED_READY;
 			return (QR_DONE);
 		}
+		__attribute__((fallthrough));
 	case SL_STATE_PROCESSOR_OUTAGE:
 		switch (sl->option.pvar) {
 		case SS7_PVAR_ITUT_93:
@@ -4228,6 +4232,7 @@ sl_lsc_local_processor_recovered(queue_t *q)
 			sl_rc_retrieve_fsnx(q);
 			sl_txc_send_fisu(q);	/* note 3: in fisu BSN <= FSNX-1 */
 			sl->sl.statem.lsc_state = SL_STATE_IN_SERVICE;
+			__attribute__((fallthrough));
 		case SS7_PVAR_ANSI_92:
 			sl->sl.statem.local_processor_outage = 0;
 			sl_rc_accept_msu_fisu(q);
@@ -4952,8 +4957,8 @@ sl_rx_wakeup(queue_t *q)
 				   we can't deliver */
 				return (0);
 			}
-			/* 
-			   fall thru */
+			/* fall thru */
+			__attribute__((fallthrough));
 		case SL_STATE_IN_SERVICE:
 			/* 
 			   when in service we deliver as many buffers as we can */
@@ -8458,6 +8463,7 @@ sl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup)
 			case QR_STRIP:
 				if (mp->b_cont)
 					putq(q, mp->b_cont);
+				__attribute__((fallthrough));
 			case QR_TRIMMED:
 				ctrace(freeb(mp));
 				break;
@@ -8466,12 +8472,14 @@ sl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup)
 					qreply(q, mp);
 					break;
 				}
+				__attribute__((fallthrough));
 			case QR_PASSALONG:
 				if (q->q_next) {
 					putnext(q, mp);
 					break;
 				}
 				rtn = -EOPNOTSUPP;
+				__attribute__((fallthrough));
 			default:
 				ctrace(freemsg(mp));
 				break;
@@ -8484,6 +8492,7 @@ sl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup)
 					putnext(q, mp);
 					break;
 				}
+				__attribute__((fallthrough));
 			case -ENOBUFS:
 			case -EBUSY:
 			case -ENOMEM:
@@ -8529,6 +8538,7 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 			case QR_STRIP:
 				if (mp->b_cont)
 					putbq(q, mp->b_cont);
+				__attribute__((fallthrough));
 			case QR_TRIMMED:
 				ctrace(freeb(mp));
 				continue;
@@ -8537,12 +8547,14 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 					qreply(q, mp);
 					continue;
 				}
+				__attribute__((fallthrough));
 			case QR_PASSALONG:
 				if (q->q_next) {
 					putnext(q, mp);
 					continue;
 				}
 				rtn = -EOPNOTSUPP;
+				__attribute__((fallthrough));
 			default:
 				ptrace(("%s: ERROR: (q dropping) %d\n", SL_TPI_MOD_NAME, rtn));
 				ctrace(freemsg(mp));
@@ -8558,6 +8570,7 @@ sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *)
 					putnext(q, mp);
 					continue;
 				}
+				__attribute__((fallthrough));
 			case -ENOBUFS:	/* proc must have scheduled bufcall */
 			case -EBUSY:	/* proc must have failed canput */
 			case -ENOMEM:	/* proc must have scheduled bufcall */
