@@ -527,6 +527,7 @@ bufmod_ioctl(queue_t *q, mblk_t *mp)
 			putnext(q, mp);
 			break;
 		}
+		break;
 	default:
 		putnext(q, mp);
 		break;
@@ -689,6 +690,7 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 			putnext(q, mp);
 			break;
 		}
+		break;
 	default:
 		putnext(q, mp);
 		break;
@@ -714,11 +716,19 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 STATIC noinline fastcall __hot_get void
 bufmod_gettimeval(const struct sb *sb, struct sb_hdr *sbh)
 {
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+	struct timespec ts;
+
+	getnstimeofday(&ts);
+	sbh->sbh_timestamp.tv_sec = ts.tv_sec;
+	sbh->sbh_timestamp.tv_usec = ts.tv_nsec / NSEC_PER_USEC;
+#else
 	struct timeval tv;
 
 	do_gettimeofday(&tv);
 	sbh->sbh_timestamp.tv_sec = tv.tv_sec;
 	sbh->sbh_timestamp.tv_usec = tv.tv_usec;
+#endif
 }
 
 /** bufmod_adjsize: -adjust a message to the snapshot length.
