@@ -369,6 +369,7 @@ tcpns_rput(queue_t *q, mblk_t *mp)
 		{
 		}
 		}
+		__attribute__((fallthrough));
 	}
 	case M_DATA:
 	{
