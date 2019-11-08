@@ -692,6 +692,7 @@ mux_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case CLONEOPEN:
 		if (cminor < 1)
 			cminor = 2;
+		__attribute__((fallthrough));
 	case DRVOPEN:
 	{
 		major_t dmajor = 0;
