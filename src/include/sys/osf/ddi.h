@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -81,10 +81,14 @@ lbolt(void)
 __OSF_EXTERN_INLINE time_t
 time(void)
 {
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+	return (time_t) ktime_get_real_seconds();
+#else
 	struct timeval tv;
 
 	do_gettimeofday(&tv);
 	return tv.tv_sec;
+#endif
 }
 
 __OSF_EXTERN int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));

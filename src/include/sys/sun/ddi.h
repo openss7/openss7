@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2017  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -98,10 +98,14 @@ ddi_get_pid(void)
 __SUN_EXTERN_INLINE time_t
 ddi_get_time(void)
 {
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+	return (time_t) ktime_get_real_seconds();
+#else
 	struct timeval tv;
 
 	do_gettimeofday(&tv);
 	return (tv.tv_sec);
+#endif
 }
 __SUN_EXTERN_INLINE unsigned short
 ddi_getiminor(dev_t dev)
