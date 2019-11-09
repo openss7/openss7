@@ -617,7 +617,7 @@ pthread_setspecific(pthread_key_t key, const void *pointer)
 	if (__pthread_setspecific)
 		return __pthread_setspecific(key, pointer);
 	/** Otherwise, set the value in the statically allocated array.  */
-	if (key < 0 || key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists)
+	if (key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists)
 		return (EINVAL);
 	___pthread_keys[key].value = (void *) pointer;
 	return (0);
@@ -640,7 +640,7 @@ pthread_getspecific(pthread_key_t key)
 	if (__pthread_getspecific)
 		return __pthread_getspecific(key);
 	/** Otherwise, get the value from the statically allocated array.  */
-	if (key < 0 || key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists) {
+	if (key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists) {
 		errno = EINVAL;
 		return (NULL);
 	}
@@ -662,7 +662,7 @@ pthread_key_delete(pthread_key_t key)
 	if (__pthread_key_delete)
 		return __pthread_key_delete(key);
 	/* Otherwise, mark the key available in the statically allocated array. */
-	if (key < 0 || key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists)
+	if (key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists)
 		return (EINVAL);
 	___pthread_keys[key].exists = 0;
 	___pthread_keys[key].value = NULL;
