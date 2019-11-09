@@ -915,9 +915,9 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
 			oh = NULL;
 			break;
 		}
-		if (oh->level != level)
+		if (oh->level != (t_uscalar_t) level)
 			continue;
-		if (oh->name != name)
+		if (oh->name != (t_uscalar_t) name)
 			continue;
 		break;
 	}
@@ -1963,7 +1963,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1989,7 +1989,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -4112,6 +4112,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -4981,6 +4982,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
@@ -4994,7 +4996,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -5416,7 +5418,7 @@ expect(int child, int wait, int want)
  *  -------------------------------------------------------------------------
  */
 static int
-preamble_0(int child)
+preamble_0()
 {
 	return (__RESULT_SUCCESS);
 }
@@ -6228,6 +6230,7 @@ test_case_1_1_resp(int child)
 int
 test_case_1_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6315,6 +6318,7 @@ test_case_1_2_resp(int child)
 int
 test_case_1_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6411,6 +6415,7 @@ test_case_1_3_resp(int child)
 int
 test_case_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6494,6 +6499,7 @@ test_case_2_0_resp(int child)
 int
 test_case_2_0_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6652,6 +6658,7 @@ test_case_2_1_resp(int child)
 int
 test_case_2_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6794,6 +6801,7 @@ test_case_2_2_resp(int child)
 int
 test_case_2_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6992,6 +7000,7 @@ test_case_2_3_resp(int child)
 int
 test_case_2_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -7313,6 +7322,7 @@ test_case_5_1_resp(int child)
 int
 test_case_5_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -7425,6 +7435,7 @@ test_case_5_2_resp(int child)
 int
 test_case_5_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -7551,6 +7562,7 @@ test_case_5_3_resp(int child)
 int
 test_case_5_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -7690,6 +7702,7 @@ test_case_5_4_resp(int child)
 int
 test_case_5_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8060,6 +8073,7 @@ test_case_6_1_resp(int child)
 int
 test_case_6_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8360,6 +8374,7 @@ test_case_6_3_resp(int child)
 int
 test_case_6_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8595,6 +8610,7 @@ test_case_7_2_resp(int child)
 int
 test_case_7_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8712,6 +8728,7 @@ test_case_8_1_resp(int child)
 int
 test_case_8_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8851,6 +8868,7 @@ test_case_8_2_resp(int child)
 int
 test_case_8_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -8967,6 +8985,7 @@ test_case_8_3_resp(int child)
 int
 test_case_8_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9063,6 +9082,7 @@ test_case_8_4_resp(int child)
 int
 test_case_8_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9306,6 +9326,7 @@ test_case_9_2_resp(int child)
 int
 test_case_9_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9468,6 +9489,7 @@ test_case_9_3_resp(int child)
 int
 test_case_9_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9669,6 +9691,7 @@ test_case_9_4_resp(int child)
 int
 test_case_9_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9779,6 +9802,7 @@ test_case_10_1_resp(int child)
 int
 test_case_10_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9812,7 +9836,7 @@ Delivery of ordered data with destination failure."
 int
 test_case_10_2_conn(int child)
 {
-	int i, j, n = 0;
+	unsigned i, j, n = 0;
 	struct result {
 		uint req_idx;
 		struct timeval req;
@@ -9886,6 +9910,7 @@ test_case_10_2_resp(int child)
 int
 test_case_10_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -10281,7 +10306,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -10534,7 +10559,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -10590,7 +10615,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10610,7 +10635,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10624,7 +10649,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10914,13 +10939,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -10936,7 +10961,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -10955,7 +10980,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
