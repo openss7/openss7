@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -3218,13 +3218,13 @@ gdmo_fprintwrap(FILE *output, const char *str, int len, int width)
 }
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	(void) fprintf(stdout, "\
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -3262,13 +3262,13 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 static void
-version(int argc, char *argv[])
+version()
 {
 	(void) fprintf(stdout, "\
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -3281,7 +3281,7 @@ See `%1$s --copying' for copying permissions.\n\
 ", NAME, PACKAGE, VERSION, PACKAGE_ENVR " " PACKAGE_DATE);
 }
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	(void) fprintf(stderr, "\
 Usage:\n\
@@ -3292,7 +3292,7 @@ Usage:\n\
 ", argv[0]);
 }
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	(void) fprintf(stdout, "\
 Usage:\n\
@@ -3357,17 +3357,17 @@ main(int argc, char *argv[])
 		case 'h':	/* -h, --help */
 			if (yydebug)
 				fprintf(stderr, "%s: printing help message", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit (0);
 		case 'V':	/* -V, --version */
 			if (yydebug)
 				fprintf(stderr, "%s: printing version message", argv[0]);
-			version(argc, argv);
+			version();
 			exit (0);
 		case 'C':	/* -C, --copying */
 			if (yydebug)
 				fprintf(stderr, "%s: printing copying message", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit (0);
 		case 'f':
 			if (optarg == NULL)
@@ -3386,14 +3386,14 @@ main(int argc, char *argv[])
 		      missing_arg:
 			optind--;
 			fprintf(stderr, "%s: missing argument -- %s\n", argv[0], argv[optind]);
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case '?':
 		default:
 		      syntax_error:
 			optind--;
 			fprintf(stderr, "%s: illegal syntax -- %s\n", argv[0], argv[optind]);
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
