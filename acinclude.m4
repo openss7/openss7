@@ -789,6 +789,7 @@ dnl----------------------------------------------------------------------------
 	linux/smpboot.h \
 	uapi/linux/sched/types.h \
 	linux/sched/signal.h \
+	linux/build-salt.h \
 	], [:], [:], [
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
