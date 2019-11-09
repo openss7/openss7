@@ -985,7 +985,7 @@ nerrno_string(ulong nerr, long uerr)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1534,7 +1534,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1560,7 +1560,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1599,7 +1599,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -2142,7 +2142,7 @@ print_proto(char *pro_ptr, size_t pro_len)
 	size_t pnum = pro_len / sizeof(p[0]);
 
 	if (pro_len) {
-		int i;
+		unsigned i;
 
 		if (!pnum)
 			printf("(PROTOID_length = %lu)", (ulong) pro_len);
@@ -2409,7 +2409,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -3003,7 +3003,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -3960,6 +3960,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 	qos_data.sid = 0;
 	qos_info.hmac = SCTP_HMAC_NONE;
 	qos_info.options = 0;
@@ -4497,6 +4498,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
@@ -4510,7 +4512,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union N_primitives *p = (union N_primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((PRIM_type = p->type)) {
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -4879,6 +4881,7 @@ expect(int child, int wait, int want)
 static int
 preamble_0(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -4943,7 +4946,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 
 	return (__RESULT_NOTAPPL);
@@ -5760,12 +5763,14 @@ test_case_2_1_conn(int child)
 int
 test_case_2_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_2_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6987,7 +6992,7 @@ test_case_7_1_list(int child)
 		case __EVENT_NO_MSG:
 			continue;
 		default:
-			failure_string = event_string(child, last_event);
+			failure_string = event_string(last_event);
 			goto failure;
 		}
 		state++;
@@ -7043,7 +7048,7 @@ test_case_7_2_conn(int child)
 			print_more(child);
 			test_sleep(child, 1);
 			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
-				failure_string = event_string(child, last_event);
+				failure_string = event_string(last_event);
 				goto failure;
 			}
 		}
@@ -7096,7 +7101,7 @@ test_case_7_2_list(int child)
 	state++;
 	while (r < 4) {
 		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
-			failure_string = event_string(child, last_event);
+			failure_string = event_string(last_event);
 			goto failure;
 		}
 		if (data.len > 10)
@@ -7108,7 +7113,7 @@ test_case_7_2_list(int child)
 	print_less(child);
 	while (rcv_bytes < 50000 + 10) {
 		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS) {
-			failure_string = event_string(child, last_event);
+			failure_string = event_string(last_event);
 			goto failure;
 		}
 		if (data.len > 10)
@@ -8126,7 +8131,7 @@ Delivery of ordered data with destination failure."
 int
 test_case_10_2_conn(int child)
 {
-	int i, j, n = 0;
+	unsigned i, j, n = 0;
 	struct result {
 		uint req_idx;
 		struct timeval req;
@@ -8602,7 +8607,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -8907,7 +8912,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
@@ -8964,7 +8969,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -8984,7 +8989,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -8998,7 +9003,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -9304,13 +9309,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -9326,7 +9331,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -9345,7 +9350,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
