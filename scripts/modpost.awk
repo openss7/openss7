@@ -586,6 +586,7 @@ function set_symmap(sym, type, addr, src, from)
 }
 function set_symbol(sym, mod, crc, expt, set, pos, own, src, use, from)
 {
+    if (sym ~ /^(gpl|strings)$/) { return }
     if (!(sym in syms)) {
 	syms[sym] = 1
 	cache_dirty = 1
@@ -771,7 +772,7 @@ function set_symset(set, hash, numb, ssym, scrc, own, src, from,	n,i,symbols)
 }
 function read_modobject(command, dir, own, src,
 			pfx,fmt,files,progress,SECTION,string,mod,count_syms,count_unds,
-			count_weak,count_vers,flags,val,sec,offset,sym,crc,char)
+			count_weak,count_vers,flags,val,sec,offset,sym,crc,char,unused)
 {
     pfx = "r: ko object, "
     fmt = "%3d syms, %3d unds, %3d weak, %3d vers"
@@ -809,9 +810,10 @@ function read_modobject(command, dir, own, src,
 			}
 			if (sub(/^_?_?__ksymtab/,"",sec)) {
 			    sub(/\+.*/,"",sec)
+			    if (sub(/^_unused/,"",sec)) { unused = "UNUSED_" } else { unused = "" }
 			    if (sub(/^_?__ksymtab_/,"",sym)) {
 				print_debug(3,pfx "symbol: " sym)
-				set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
+				set_symbol(sym, mod, "", "EXPORT_" unused "SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
 				count_syms++
 			    }
 			    continue
@@ -823,9 +825,10 @@ function read_modobject(command, dir, own, src,
 		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
 			if (sub(/^_?_?__ksymtab/,"",sec)) {
 			    sub(/\+.*/,"",sec)
+			    if (sub(/^_unused/,"",sec)) { unused = "UNUSED_" } else { unused = "" }
 			    if (sub(/^_?__ksymtab_/,"",sym)) {
 				print_debug(3,pfx "symbol: " sym)
-				set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
+				set_symbol(sym, mod, "", "EXPORT_" unused "SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
 				count_syms++
 			    }
 			    continue
@@ -1693,9 +1696,16 @@ function write_symsets(file,		progress,count_sets,count_syms,directory,tarball,d
 function write_header(file, mod, base)
 {
     print "\
+#ifdef HAVE_KINC_LINUX_BUILD_SALT_H\n\
+#include <linux/build-salt.h>\n\
+#endif\n\
 #include <linux/module.h>\n\
 #include <linux/vermagic.h>\n\
 #include <linux/compiler.h>\n\
+\n\
+#ifdef HAVE_KINC_LINUX_BUILD_SALT_H\n\
+BUILD_SALT;\n\
+#endif\n\
 \n\
 MODULE_INFO(vermagic, VERMAGIC_STRING);\n\
 #ifdef CONFIG_SUSE_KERNEL\n\
@@ -1722,6 +1732,7 @@ MODULE_INFO(rhelversion, PACKAGE_RHELVERSION);\n\
 #define KBUILD_MODNAME " base "\n\
 \n\
 #ifdef KBUILD_MODNAME\n\
+MODULE_INFO(name, KBUILD_MODNAME);\n\
 struct module __this_module\n\
 __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	.name = __stringify(KBUILD_MODNAME),\
