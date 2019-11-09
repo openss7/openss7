@@ -1010,7 +1010,7 @@ print_header(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -1067,7 +1067,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1086,7 +1086,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1100,7 +1100,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1303,13 +1303,13 @@ main(int argc, char *argv[])
 			verbose = val;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1325,7 +1325,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -1334,7 +1334,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
