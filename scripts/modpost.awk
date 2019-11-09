@@ -1732,7 +1732,7 @@ MODULE_INFO(rhelversion, PACKAGE_RHELVERSION);\n\
 #define KBUILD_MODNAME " base "\n\
 \n\
 #ifdef KBUILD_MODNAME\n\
-MODULE_INFO(name, KBUILD_MODNAME);\n\
+MODULE_INFO(name, __stringify(KBUILD_MODNAME));\n\
 struct module __this_module\n\
 __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	.name = __stringify(KBUILD_MODNAME),\
