@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -286,7 +286,7 @@ void
 print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
-	int i;
+	unsigned i;
 	size_t anum = (add_len - sizeof(a->port)) / sizeof(*a->addr);
 
 	printf("[%d]", ntohs(a->port));
@@ -301,6 +301,7 @@ print_qos(char *qos_ptr, size_t add_len)
 {
 	N_qos_sctp_t *qos = (N_qos_sctp_t *) qos_ptr;
 
+	(void) add_len;
 	switch (qos->n_qos_type) {
 	case N_QOS_SEL_CONN_SCTP:
 		printf("CONN:");
@@ -719,6 +720,7 @@ sctp_data(int fd, int fd2, const char *data)
 {
 	N_qos_sel_data_sctp_t qos;
 
+	(void) data;
 	qos.n_qos_type = N_QOS_SEL_DATA_SCTP;
 	qos.ppi = 3;
 	qos.sid = 0;
@@ -793,14 +795,14 @@ do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -850,7 +852,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -858,7 +860,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -870,7 +872,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -884,7 +886,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -951,13 +953,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -971,7 +973,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -980,7 +982,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
