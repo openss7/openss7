@@ -955,7 +955,7 @@ nerrno_string(ulong nerr, long uerr)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1492,7 +1492,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1518,7 +1518,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1557,7 +1557,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -2100,7 +2100,7 @@ print_proto(char *pro_ptr, size_t pro_len)
 	size_t pnum = pro_len / sizeof(p[0]);
 
 	if (pro_len) {
-		int i;
+		unsigned i;
 
 		if (!pnum)
 			printf("(PROTOID_length = %lu)", (ulong) pro_len);
@@ -2337,7 +2337,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -2931,7 +2931,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -3874,7 +3874,7 @@ begin_tests(int index)
 }
 
 static int
-end_tests(int index)
+end_tests(int index __attribute__((unused)))
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
@@ -4392,7 +4392,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	union N_primitives *p = (union N_primitives *) ctrl->buf;
 	char buf[64];
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((PRIM_type = p->type)) {
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -4720,6 +4720,7 @@ expect(int child, int wait, int want)
 static int
 preamble_0(int child)
 {
+	(void) child;
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -4791,7 +4792,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
@@ -4853,7 +4854,7 @@ preamble_1_idle_cons(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
 
@@ -4987,9 +4988,9 @@ preamble_1_wres_cind_conn(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + 2);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)}, 0},
+		{AF_INET, port, {htonl(0x7f000002)}, 0},
+		{AF_INET, port, {htonl(0x7f000003)}, 0}
 	};
 	char buf[] = "xxxxTest Data";
 
@@ -5080,9 +5081,9 @@ preamble_1_data_xfer_list(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + 0);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)}, 0},
+		{AF_INET, port, {htonl(0x7f000002)}, 0},
+		{AF_INET, port, {htonl(0x7f000003)}, 0}
 	};
 	char buf[] = "xxxxTest Data";
 	N_qos_sel_conn_ip_t qos = {
@@ -5814,6 +5815,7 @@ Checks that three streams can be opened and closed."
 int
 test_case_1_1(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6740,7 +6742,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_2(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6791,6 +6793,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_3(int child)
 {
+	(void) child;
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
@@ -6846,6 +6849,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_4(int child)
 {
+	(void) child;
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
@@ -6901,6 +6905,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_5(int child)
 {
+	(void) child;
 #if 0
 	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
@@ -6956,7 +6961,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_6(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -7007,7 +7012,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_7(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -7059,7 +7064,7 @@ set."
 int
 test_case_1_6_1_8(int child)
 {
-	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {0x0000007f} };
+	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {0x0000007f}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -7110,7 +7115,7 @@ issued in the NS_UNBND state.  Default destination with specified port."
 int
 test_case_1_6_1_9(int child)
 {
-	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -7245,7 +7250,7 @@ address in the NS_UNBND state."
 int
 test_case_1_6_2_2(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7330,7 +7335,7 @@ int
 test_case_1_6_2_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7419,7 +7424,7 @@ test_case_1_6_2_4(int child)
 	int proto = TEST_PROTOCOL;
 	int flag = (child == 0) ? DEFAULT_DEST : ((child == 2) ? DEFAULT_LISTENER : 0);
 	int serv = (flag == DEFAULT_LISTENER) ? N_CONS : N_CLNS;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 
 	ADDR_buffer = &sin;
@@ -7506,7 +7511,7 @@ int
 test_case_1_6_2_5(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7592,7 +7597,7 @@ int
 test_case_1_6_3_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7659,7 +7664,7 @@ test_case_2_1_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
 	int proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 
 	ADDR_buffer = &sin;
@@ -7711,7 +7716,7 @@ int
 test_case_2_1_2(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -7761,7 +7766,7 @@ int
 test_case_2_1_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 
 	TOKEN_value = 0;
 	ADDR_buffer = &sin;
@@ -8170,7 +8175,7 @@ int
 test_case_2_4_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -8220,7 +8225,7 @@ int
 test_case_2_4_2(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -8270,7 +8275,7 @@ int
 test_case_2_4_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -8320,7 +8325,7 @@ int
 test_case_2_4_4(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -8370,7 +8375,7 @@ int
 test_case_2_4_5(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000000)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -8420,7 +8425,7 @@ int
 test_case_2_5_1(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 	char buf[] = "xxxxTest Data";
 
 	ADDR_buffer = &sin;
@@ -8473,7 +8478,7 @@ int
 test_case_2_5_2(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + ((child + 1) % 3));
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 	char buf[] = "xxxxTest Data";
 
 	ADDR_buffer = &sin;
@@ -8530,7 +8535,7 @@ test_case_3_1_1(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
 
@@ -8583,7 +8588,7 @@ int
 test_case_3_1_2(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)}, 0 };
 
 	TOKEN_value = 0;
 	ADDR_buffer = &sin;
@@ -8726,7 +8731,7 @@ int
 test_case_3_2_1(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 	char buf[] = "xxxxTest Data";
 
 	ADDR_buffer = &sin;
@@ -8987,7 +8992,7 @@ int
 test_case_3_4_2(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -9043,7 +9048,7 @@ test_case_3_4_3(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin);
@@ -9150,7 +9155,7 @@ test_case_3_4_5(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin) - 1;
@@ -9205,7 +9210,7 @@ test_case_3_4_6(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000001)}, 0 };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin);
@@ -9260,7 +9265,7 @@ test_case_3_4_7(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+		struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin);
@@ -9315,7 +9320,7 @@ test_case_3_4_8(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		np_ulong type = N_QOS_SEL_UD_IP;
 
 		ADDR_buffer = &sin;
@@ -9371,7 +9376,7 @@ test_case_3_4_9(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		np_ulong type = N_QOS_SEL_CONN_IP;
 
 		ADDR_buffer = &sin;
@@ -9427,7 +9432,7 @@ test_case_3_4_10(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		N_qos_sel_conn_ip_t qos = {
 			.n_qos_type = N_QOS_SEL_CONN_IP,
 			.protocol = 2000,
@@ -9492,7 +9497,7 @@ test_case_3_4_11(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		char buf[] = "Test data";
 
 		ADDR_buffer = &sin;
@@ -9548,7 +9553,7 @@ test_case_3_4_12(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		char buf[70000] = "Test data";
 
 		ADDR_buffer = &sin;
@@ -9608,7 +9613,7 @@ int
 test_case_3_5_1(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -9632,6 +9637,7 @@ test_case_3_5_1(int child)
 int
 test_case_3_5_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9664,9 +9670,9 @@ test_case_3_5_2(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)}, 0},
+		{AF_INET, port, {htonl(0x7f000002)}, 0},
+		{AF_INET, port, {htonl(0x7f000003)}, 0}
 	};
 
 	ADDR_buffer = sin;
@@ -9691,6 +9697,7 @@ test_case_3_5_2(int child)
 int
 test_case_3_5_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9723,9 +9730,9 @@ test_case_3_5_3(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)}, 0},
+		{AF_INET, port, {htonl(0x7f000002)}, 0},
+		{AF_INET, port, {htonl(0x7f000003)}, 0}
 	};
 	char buf[] = "xxxxTest Data";
 
@@ -9758,6 +9765,7 @@ test_case_3_5_3(int child)
 int
 test_case_3_5_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -9907,9 +9915,9 @@ test_case_3_6_3(int child)
 	if (child == 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + 1);
 		struct sockaddr_in sin[3] = {
-			{AF_INET, port, {htonl(0x7f000001)}},
-			{AF_INET, port, {htonl(0x7f000002)}},
-			{AF_INET, port, {htonl(0x7f000003)}}
+			{AF_INET, port, {htonl(0x7f000001)}, 0},
+			{AF_INET, port, {htonl(0x7f000002)}, 0},
+			{AF_INET, port, {htonl(0x7f000003)}, 0}
 		};
 		char buf[] = "xxxxTest Data";
 
@@ -10303,7 +10311,7 @@ test_case_3_7_4(int child)
 {
 	if (child == 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + 1);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		char buf[] = "xxxxTest Data";
 
 		ADDR_buffer = &sin;
@@ -10419,9 +10427,9 @@ test_case_3_8_2(int child)
 	if (child == 2) {
 		int port = htons(TEST_PORT_NUMBER + 0);
 		struct sockaddr_in sin[3] = {
-			{AF_INET, port, {htonl(0x7f000001)}},
-			{AF_INET, port, {htonl(0x7f000002)}},
-			{AF_INET, port, {htonl(0x7f000003)}}
+			{AF_INET, port, {htonl(0x7f000001)}, 0},
+			{AF_INET, port, {htonl(0x7f000002)}, 0},
+			{AF_INET, port, {htonl(0x7f000003)}, 0}
 		};
 		char buf[] = "xxxxTest Data";
 		N_qos_sel_conn_ip_t qos = {
@@ -10503,9 +10511,9 @@ test_case_3_8_3(int child)
 	if (child == 2) {
 		int port = htons(TEST_PORT_NUMBER + 0);
 		struct sockaddr_in sin[3] = {
-			{AF_INET, port, {htonl(0x7f000001)}},
-			{AF_INET, port, {htonl(0x7f000002)}},
-			{AF_INET, port, {htonl(0x7f000003)}}
+			{AF_INET, port, {htonl(0x7f000001)},0},
+			{AF_INET, port, {htonl(0x7f000002)},0},
+			{AF_INET, port, {htonl(0x7f000003)},0}
 		};
 		char buf[] = "xxxxTest Data";
 		N_qos_sel_conn_ip_t qos = {
@@ -10702,9 +10710,9 @@ test_case_3_9_3(int child)
 	if (child != 1) {
 		unsigned short port = htons(TEST_PORT_NUMBER + 1);
 		struct sockaddr_in sin[3] = {
-			{AF_INET, port, {htonl(0x7f000001)}},
-			{AF_INET, port, {htonl(0x7f000002)}},
-			{AF_INET, port, {htonl(0x7f000003)}}
+			{AF_INET, port, {htonl(0x7f000001)},0},
+			{AF_INET, port, {htonl(0x7f000002)},0},
+			{AF_INET, port, {htonl(0x7f000003)},0}
 		};
 		char buf[] = "xxxxTest Data";
 
@@ -11032,7 +11040,7 @@ test_case_3_10_4(int child)
 {
 	if (child != 1) {
 		unsigned short port = htons(TEST_PORT_NUMBER + 1);
-		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)}, 0 };
 		char buf[] = "xxxxTest Data";
 
 		ADDR_buffer = &sin;
@@ -11643,7 +11651,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -11948,7 +11956,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -12004,7 +12012,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -12024,7 +12032,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12038,7 +12046,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12344,13 +12352,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -12366,7 +12374,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -12385,7 +12393,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
