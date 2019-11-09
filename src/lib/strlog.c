@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -862,8 +862,8 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				args += splen;
 			else
 				args = aend;
-			if (slen > (size_t) decimal)
-				slen = (size_t) decimal;
+			if (slen > decimal)
+				slen = decimal;
 			if (!(flags & FLAG_LEFT))
 				if (slen < width) {
 					while (slen < width--) {
@@ -913,6 +913,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				break;
 			case 'X':
 				flags |= FLAG_LARGE;
+				__attribute__((fallthrough));
 			case 'x':
 				base = 16;
 				break;
@@ -1026,7 +1027,7 @@ __streams_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
 	struct log_ctl lc;
 	int len;
 
-	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
+	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < (int) sizeof(lc)) {
 		errno = -EINVAL;
 		return (-1);
 	}
