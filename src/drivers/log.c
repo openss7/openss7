@@ -356,9 +356,12 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 #if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
 		lp->ltime = ktime_get_real_seconds();
 #else
-		struct timeval tv;
-		do_gettimeofday(&tv);
-		lp->ltime = tv.tv_sec;
+		{
+			struct timeval tv;
+
+			do_gettimeofday(&tv);
+			lp->ltime = tv.tv_sec;
+		}
 #endif
 		lp->seq_no = seq_no;
 		lp->pri = source | pri;
