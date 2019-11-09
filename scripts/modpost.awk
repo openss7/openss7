@@ -586,7 +586,6 @@ function set_symmap(sym, type, addr, src, from)
 }
 function set_symbol(sym, mod, crc, expt, set, pos, own, src, use, from)
 {
-    if (sym ~ /^(gpl|strings)$/) { return }
     if (!(sym in syms)) {
 	syms[sym] = 1
 	cache_dirty = 1
@@ -801,6 +800,9 @@ function read_modobject(command, dir, own, src,
 		    continue
 		val = "" $1; sec = $(NF-2); offset = $(NF-1); sym = $NF
 		flags = substr($0, length(val)+2, 7)
+		# skip debugging symbols
+		if (substr(flags,6,1) == "d")
+		    continue
 		if (substr(flags,1,1) == "l") {
 		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
 			if (sec == ".modinfo") {
