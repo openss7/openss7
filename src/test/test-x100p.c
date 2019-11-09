@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -704,6 +704,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -727,6 +728,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -740,6 +742,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -1059,6 +1062,7 @@ signal(int action)
 			printf("                                  :msu\n");
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
@@ -2092,6 +2096,7 @@ test_1_8a(void)
 				break;
 			case SIO:
 				send(SIO);
+				__attribute__((fallthrough));
 			case SIN:
 				send(SIN);
 				break;
@@ -5991,7 +5996,7 @@ test_6_3(void)
 		case 0:
 			count++;
 			send(FISU_CORRUPT);
-			for (; count < iutconf.sdt.T + 1; count++)
+			for (; count < (int) iutconf.sdt.T + 1; count++)
 				send(FISU_CORRUPT_S);
 			start_tt(2000);
 			state = 1;
@@ -6129,7 +6134,7 @@ test_7_1(void)
 			switch ((event = wait_event(0))) {
 			case NO_MSG:
 			case SIN:
-				if (count < iutconf.sdt.Tin - 1) {
+				if (count < (int) iutconf.sdt.Tin - 1) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
@@ -6225,7 +6230,7 @@ test_7_2(void)
 			switch ((event = wait_event(0))) {
 			case NO_MSG:
 			case SIN:
-				if (count < iutconf.sdt.Tin) {
+				if (count < (int) iutconf.sdt.Tin) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
@@ -6324,19 +6329,19 @@ test_7_3(void)
 				break;
 			case SIOS:
 				send(COUNT);
-				if (tries == iutconf.sl.M)
+				if (tries == (int) iutconf.sl.M)
 					return SUCCESS;
 				return FAILURE;
 			case NO_MSG:
 			case SIN:
-				if (count <= iutconf.sdt.Tin) {
+				if (count <= (int) iutconf.sdt.Tin) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
 					send(COUNT);
 					count = 0;
 					send(SIN);
-					if (tries < iutconf.sl.M) {
+					if (tries < (int) iutconf.sl.M) {
 						start_tt(iutconf.sl.t4n * 10 / 2);
 						state = 3;
 						tries++;
@@ -6421,7 +6426,7 @@ test_7_4(void)
 				break;
 			case TIMEOUT:
 				send(LSSU_CORRUPT);
-				for (count = 1; count < iutconf.sdt.Tie; count++)
+				for (count = 1; count < (int) iutconf.sdt.Tie; count++)
 					send(LSSU_CORRUPT_S);
 				send(COUNT);
 				send(SIE);
@@ -6540,6 +6545,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x80))
 					return FAILURE;
 				state = 2;
+				__attribute__((fallthrough));
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = pt_bib = 0x80;
@@ -6575,6 +6581,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x00))
 					return FAILURE;
 				state = 4;
+				__attribute__((fallthrough));
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
@@ -6643,6 +6650,7 @@ test_8_3(void)
 					break;
 				}
 				count++;
+				__attribute__((fallthrough));
 			case TIMEOUT:
 				signal(COUNT);
 				count = 0;
@@ -7301,6 +7309,7 @@ test_8_13(void)
 			switch ((event = wait_event(0))) {
 			case FISU:
 				send(FISU);
+				__attribute__((fallthrough));
 			case NO_MSG:
 				signal(STOP);
 				start_tt(1000);
@@ -7599,7 +7608,7 @@ test_9_4(void)
 	int n = iutconf.sl.N1 - 1;
 	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
-	if (msu_len > iutconf.sdt.m)
+	if (msu_len > (int) iutconf.sdt.m)
 		return INCONCLUSIVE;
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) iutconf.sl.N1, (long) iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
@@ -7686,7 +7695,7 @@ test_9_5(void)
 		n = iutconf.sl.N1 - 1;
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		if (msu_len > (int) iutconf.sdt.m)
 			return INCONCLUSIVE;
 	}
 	if (msu_len > 12)
@@ -7778,7 +7787,7 @@ test_9_6(void)
 		n = iutconf.sl.N1 - 1;
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		if (msu_len > (int) iutconf.sdt.m)
 			return INCONCLUSIVE;
 	}
 	if (msu_len > 12)
@@ -8241,6 +8250,7 @@ test_10_2(void)
 					break;
 				}
 				start_tt(iutconf.sl.t5 * 10);
+				__attribute__((fallthrough));
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -8319,6 +8329,7 @@ test_10_3(void)
 					return FAILURE;
 				}
 				start_tt(iutconf.sl.t5 * 10);
+				__attribute__((fallthrough));
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -8347,7 +8358,7 @@ typedef unsigned short ppa_t;
 void
 print_ppa(ppa_t * ppa, int len)
 {
-	if (len >= sizeof(*ppa)) {
+	if (len >= (int) sizeof(*ppa)) {
 		printf("PPA slot = %d\n", ((*ppa) >> 12) & 0xf);
 		printf("PPA span = %d\n", ((*ppa) >> 8) & 0xf);
 		printf("PPA chan = %d\n", ((*ppa) >> 0) & 0xff);
@@ -10193,8 +10204,8 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 int
 do_tests(void)
 {
-	int i, ret;
-	int failed = 0, passed = 0, inconc = 0, errored = 0;
+	unsigned i;
+	int ret, failed = 0, passed = 0, inconc = 0, errored = 0;
 
 	// char cbuf[BUFSIZE];
 	// char dbuf[BUFSIZE];
@@ -10266,14 +10277,14 @@ do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 ITU-T RECOMMENDATAION Q.781 - Conformance Test Suite\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -10321,7 +10332,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -10329,7 +10340,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -10341,7 +10352,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10355,7 +10366,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10418,13 +10429,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -10440,7 +10451,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -10449,7 +10460,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
