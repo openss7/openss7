@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -330,7 +330,7 @@ static int tries = 0;
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -5015,7 +5015,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -6889,6 +6889,8 @@ stream_start(int child, int index)
 		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 	}
+#else
+	(void) index;
 #endif				/* TEST_M2PA */
 	switch (child) {
 	case 1:
@@ -7063,6 +7065,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 #if TEST_M2PA
 	qos_data.sid = 0;
 	qos_info.hmac = SCTP_HMAC_NONE;
@@ -7285,6 +7288,7 @@ do_signal(int child, int action)
 	case __TEST_FISU:
 		if (!cntmsg)
 			print_tx_msg(child, "FISU");
+		__attribute__((fallthrough));
 	case __TEST_FISU_S:
 		dbuf[0] = bib[child] | bsn[child];
 		dbuf[1] = fib[child] | fsn[child];
@@ -7302,6 +7306,7 @@ do_signal(int child, int action)
 	case __TEST_LSSU_CORRUPT:
 		if (!cntmsg)
 			print_tx_msg(child, "LSSU(corrupt)");
+		__attribute__((fallthrough));
 	case __TEST_LSSU_CORRUPT_S:
 		dbuf[0] = bib[child] | bsn[child];
 		dbuf[1] = fib[child] | fsn[child];
@@ -7312,6 +7317,7 @@ do_signal(int child, int action)
 	case __TEST_FISU_CORRUPT:
 		if (!cntmsg)
 			print_tx_msg(child, "FISU(corrupt)");
+		__attribute__((fallthrough));
 	case __TEST_FISU_CORRUPT_S:
 		dbuf[0] = bib[child] | bsn[child];
 		dbuf[1] = fib[child] | fsn[child];
@@ -8488,6 +8494,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 	int other = (child + 1) % 2;
 #endif				/* TEST_X400 || TEST_M2PA */
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		switch (child) {
 		default:
@@ -8565,7 +8572,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 				break;
 			}
 			if (show_fisus || event != __TEST_FISU) {
-				if (event != oldret || oldisb != (((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]))) {
+				if (event != oldret || oldisb != (int)(((bib[other] | bsn[other]) << 8) | (fib[other] | fsn[other]))) {
 					// if (oldisb == (((bib[other] | bsn[other]) << 8) |
 					// (fib[other] |
 					// fsn[other])) &&
@@ -8932,7 +8939,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union primitives *p = (union primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->prim)) {
+	if (ctrl->len >= (int) sizeof(p->prim)) {
 		switch ((last_prim = p->prim)) {
 #if TEST_M2PA
 		case N_CONN_REQ:
@@ -9405,7 +9412,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -9434,6 +9441,8 @@ preamble_unbound(int child)
 		failure_string = FAILURE_STRING("bad CURRENT_state");
 		goto failure;
 	}
+#else
+	(void) child;
 #endif				/* TEST_M2PA */
 	return __RESULT_SUCCESS;
 #if TEST_M2PA
@@ -9445,6 +9454,7 @@ preamble_unbound(int child)
 static int
 postamble_unbound(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -9680,6 +9690,8 @@ preamble_push(int child)
 		if (do_signal(child, __TEST_PUSH))
 			goto failure;
 	}
+#else
+	(void) child;
 #endif				/* TEST_M2PA */
 	return __RESULT_SUCCESS;
 #if TEST_M2PA
@@ -9703,6 +9715,8 @@ postamble_pop(int child)
 		state = failed;
 		goto failure;
 	}
+#else
+	(void) child;
 #endif				/* TEST_M2PA */
 	return __RESULT_SUCCESS;
 #if TEST_M2PA
@@ -10397,12 +10411,14 @@ Checks that two Streams can be opened and closed."
 int
 test_0_2_1_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_1_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -10423,12 +10439,14 @@ Checks that two Streams can be opened, information obtained, and closed."
 int
 test_0_2_2_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_2_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -10450,12 +10468,14 @@ pushed, popped, and closed."
 int
 test_0_2_3_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_3_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -12103,6 +12123,7 @@ test_1_9b_ptu(int child, int proving)
 static int
 test_1_9b_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -12429,6 +12450,7 @@ test_1_11_ptu(int child, int proving)
 static int
 test_1_11_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12548,6 +12570,7 @@ test_1_12a_ptu(int child, int proving)
 static int
 test_1_12a_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12655,6 +12678,7 @@ test_1_12b_ptu(int child, int proving)
 static int
 test_1_12b_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -12774,6 +12798,7 @@ test_1_13_ptu(int child, int proving)
 static int
 test_1_13_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12947,6 +12972,7 @@ test_1_15_ptu(int child, int proving)
 static int
 test_1_15_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -13304,6 +13330,7 @@ test_1_19_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_SIO) {
@@ -13319,6 +13346,7 @@ test_1_19_ptu(int child)
 				goto failure;
 			beg_time = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIE)) {
 				switch (last_event) {
@@ -13338,6 +13366,7 @@ test_1_19_ptu(int child)
 				goto failure;
 			print_less(child);
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -13425,6 +13454,7 @@ test_1_20_ptu(int child)
 			if (do_signal(child, last_event))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -13616,6 +13646,7 @@ test_1_23_ptu(int child)
 			beg_time = 0;
 			start_tt(config->sl.t4n / 2);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -13711,6 +13742,7 @@ test_1_24_ptu(int child)
 				goto failure;
 			origin = state;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIO)) {
 				if (last_event == __TEST_SIOS) {
@@ -13726,6 +13758,7 @@ test_1_24_ptu(int child)
 				goto failure;
 			beg_time = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -13803,6 +13836,7 @@ test_1_25_ptu(int child)
 				goto failure;
 			origin = state;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIO) {
@@ -13874,6 +13908,7 @@ test_1_26_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				switch (last_event) {
@@ -13941,6 +13976,7 @@ test_1_27_ptu(int child, int proving)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO) {
@@ -14056,6 +14092,7 @@ test_1_28_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14122,6 +14159,7 @@ test_1_29a_ptu(int child)
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14240,6 +14278,7 @@ test_1_30a_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO) {
@@ -14316,6 +14355,7 @@ test_1_30b_ptu(int child)
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14385,6 +14425,7 @@ test_1_31a_ptu(int child)
 			if (do_signal(child, __TEST_SIPO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14462,6 +14503,7 @@ test_1_31b_ptu(int child)
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO) {
@@ -14532,6 +14574,7 @@ test_1_32a_ptu(int child)
 			if (start_tt(config->sl.t4n / 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				switch (last_event) {
@@ -14551,6 +14594,7 @@ test_1_32a_ptu(int child)
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				switch (last_event) {
@@ -14667,6 +14711,7 @@ test_1_33_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14733,6 +14778,7 @@ test_1_34_ptu(int child)
 			if (do_signal(child, __TEST_SIOS))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -14860,6 +14906,7 @@ test_2_1_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIO)) {
 				if (last_event == __TEST_SIOS) {
@@ -14872,6 +14919,7 @@ test_2_1_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -14968,6 +15016,7 @@ test_2_2_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -15064,6 +15113,7 @@ test_2_3_ptu(int child)
 			if (do_signal(child, __TEST_SIN))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -15153,6 +15203,7 @@ test_2_4_ptu(int child)
 			if (do_signal(child, __TEST_SIX))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				switch (last_event) {
@@ -15377,6 +15428,7 @@ test_2_7_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -15391,6 +15443,7 @@ test_2_7_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -15541,6 +15594,7 @@ test_3_1_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -15619,6 +15673,7 @@ test_3_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_FISU)
@@ -15627,6 +15682,7 @@ test_3_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -15703,6 +15759,7 @@ test_3_3_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO)
@@ -15783,6 +15840,7 @@ test_3_4_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_SIPO)
@@ -15792,6 +15850,7 @@ test_3_4_ptu(int child)
 				goto failure;
 			fib[child] ^= 0x80;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO) {
@@ -15862,6 +15921,7 @@ test_3_5_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU)
@@ -15938,6 +15998,7 @@ test_3_6_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_FISU)
@@ -15946,6 +16007,7 @@ test_3_6_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -16024,6 +16086,7 @@ test_3_7_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO)
@@ -16112,6 +16175,7 @@ test_3_8_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_SIPO)
@@ -16120,6 +16184,7 @@ test_3_8_ptu(int child)
 			if (do_signal(child, __TEST_FISU_BAD_FIB))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIPO) {
@@ -16205,6 +16270,7 @@ test_4_1a_ptu(int child)
 			   Outage" command at SP A, and send another MSU from SP A. */
 			test_msleep(child, LONG_WAIT);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			/* (4) Send another data message from SP B to SP A and acknowledge the
 			   first data message sent from SP A. */
@@ -16245,6 +16311,7 @@ test_4_1a_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			/* (6) Check that the second data message sent after "Set Local Processor
 			   Outage" was asserted is not acknowledged or indicated. */
@@ -16261,6 +16328,7 @@ test_4_1a_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			/* (8) Check that this last message is neither acknowledged by nor
 			   indicated at SP A. */
@@ -16283,6 +16351,7 @@ test_4_1a_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			/* (12) Check that the message sent before status "Ready" is neither
 			   acknowledged by nor indicated at SP A. */
@@ -16302,6 +16371,7 @@ test_4_1a_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 5:
 			/* (14) Check that SP A and SP B exchange this last set of data messages
 			   and akcnowledgements */
@@ -16857,6 +16927,7 @@ test_4_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_SIPO) {
@@ -16940,6 +17011,7 @@ test_4_3_ptu(int child)
 			if (do_signal(child, __TEST_SIPO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_SIPO) {
@@ -16958,6 +17030,7 @@ test_4_3_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_FISU)
@@ -17038,6 +17111,7 @@ test_5_1_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -17110,6 +17184,7 @@ test_5_2_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -17261,6 +17336,7 @@ test_5_4a_ptu(int child)
 			if (start_tt(config->sl.t7))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event != __TEST_FISU)
@@ -17328,6 +17404,7 @@ test_5_4b_ptu(int child)
 			if (start_tt(config->sl.t7))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event != __TEST_FISU)
@@ -17395,6 +17472,7 @@ test_5_5a_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event != __TEST_FISU)
@@ -17548,6 +17626,7 @@ test_6_1_ptu(int child)
 				goto failure;
 			count = 255;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU) {
@@ -17742,12 +17821,13 @@ test_6_3_ptu(int child)
 			count = 1;
 			if (do_signal(child, __TEST_FISU_CORRUPT))
 				goto failure;
-			for (; count < config->sdt.T + 1; count++)
+			for (; count < (int) config->sdt.T + 1; count++)
 				if (do_signal(child, __TEST_FISU_CORRUPT_S))
 					goto failure;
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -17830,6 +17910,7 @@ test_6_4_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT))
 				continue;
@@ -17838,6 +17919,7 @@ test_6_4_ptu(int child)
 			if (start_tt(4000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -17919,6 +18001,7 @@ test_7_1_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIN)) {
 				if (last_event == __TEST_SIO) {
@@ -17934,6 +18017,7 @@ test_7_1_ptu(int child)
 			if (start_tt(config->sl.t4n / 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_SIN) {
@@ -17944,12 +18028,13 @@ test_7_1_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_SIN)
 					goto failure;
 			}
-			if (count < config->sdt.Tin - 1) {
+			if (count < (int) config->sdt.Tin - 1) {
 				if (do_signal(child, __TEST_LSSU_CORRUPT))
 					goto failure;
 				count++;
@@ -17963,6 +18048,7 @@ test_7_1_ptu(int child)
 					goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_SIN) {
@@ -18047,6 +18133,7 @@ test_7_2_ptu(int child)
 			if (start_tt(config->sl.t4n * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIN)) {
 				if (last_event == __TEST_SIO) {
@@ -18061,6 +18148,7 @@ test_7_2_ptu(int child)
 			if (start_tt(config->sl.t4n / 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_SIN) {
@@ -18071,12 +18159,13 @@ test_7_2_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_SIN)
 					goto failure;
 			}
-			if (count < config->sdt.Tin) {
+			if (count < (int) config->sdt.Tin) {
 				if (do_signal(child, __TEST_LSSU_CORRUPT))
 					goto failure;
 				count++;
@@ -18091,6 +18180,7 @@ test_7_2_ptu(int child)
 					goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_SIN) {
@@ -18175,6 +18265,7 @@ test_7_3_ptu(int child)
 			if (start_tt(config->sl.t4n * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIN)) {
 				if (last_event == __TEST_SIO) {
@@ -18190,6 +18281,7 @@ test_7_3_ptu(int child)
 				goto failure;
 			tries = 1;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_SIN) {
@@ -18200,17 +18292,18 @@ test_7_3_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			switch ((event = wait_event(child, 0))) {
 			case __TEST_SIOS:
 				if (do_signal(child, __TEST_COUNT))
 					goto failure;
-				if (tries == config->sl.M)
+				if (tries == (int) config->sl.M)
 					break;
 				goto failure;
 			case __EVENT_NO_MSG:
 			case __TEST_SIN:
-				if (count <= config->sdt.Tin) {
+				if (count <= (int) config->sdt.Tin) {
 					if (do_signal(child, __TEST_LSSU_CORRUPT))
 						goto failure;
 					count++;
@@ -18221,7 +18314,7 @@ test_7_3_ptu(int child)
 					count = 0;
 					if (do_signal(child, __TEST_SIN))
 						goto failure;
-					if (tries < config->sl.M) {
+					if (tries < (int) config->sl.M) {
 						if (start_tt(config->sl.t4n / 2))
 							goto failure;
 						state--;
@@ -18237,6 +18330,7 @@ test_7_3_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 5:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_SIN) {
@@ -18317,6 +18411,7 @@ test_7_4_ptu(int child)
 			if (do_signal(child, __TEST_SIO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIN)) {
 				if (last_event == __TEST_SIO) {
@@ -18331,6 +18426,7 @@ test_7_4_ptu(int child)
 			if (start_tt(config->sl.t4e / 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_SIN) {
@@ -18342,7 +18438,7 @@ test_7_4_ptu(int child)
 			}
 			if (do_signal(child, __TEST_LSSU_CORRUPT))
 				goto failure;
-			for (count = 1; count < config->sdt.Tie; count++)
+			for (count = 1; count < (int) config->sdt.Tie; count++)
 				if (do_signal(child, __TEST_LSSU_CORRUPT_S))
 					goto failure;
 			if (do_signal(child, __TEST_COUNT))
@@ -18353,6 +18449,7 @@ test_7_4_ptu(int child)
 			if (start_tt(config->sl.t4e * 2 + 200))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_SIN) {
@@ -18434,6 +18531,7 @@ test_8_1_ptu(int child)
 			if (start_tt(5000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 #if TEST_X400
@@ -18456,6 +18554,7 @@ test_8_1_ptu(int child)
 				goto failure;
 #endif				/* TEST_X400 */
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -18492,6 +18591,7 @@ test_8_1_ptu(int child)
 				goto failure;
 #endif				/* TEST_M2PA */
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 #if TEST_X400
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
@@ -18574,6 +18674,7 @@ test_8_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -18593,6 +18694,7 @@ test_8_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -18613,6 +18715,7 @@ test_8_2_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -18698,6 +18801,7 @@ test_8_3_ptu(int child)
 			if (start_tt(config->sl.t7 / 2 - 200))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			switch (get_event(child)) {
 #if TEST_X400
@@ -18707,9 +18811,9 @@ test_8_3_ptu(int child)
 					goto failure;
 				continue;
 			case __TEST_MSU:
-				if (fsn[1] > 1 && fsn[1] < n - 3)
+				if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 					oldisb++;
-				if (fsn[1] != n - 1) {
+				if ((int) fsn[1] != n - 1) {
 					count++;
 					do_signal(child, __TEST_ETC);
 					do_signal(child, __TEST_COUNT);
@@ -18719,6 +18823,7 @@ test_8_3_ptu(int child)
 					continue;
 				}
 				count++;
+				__attribute__((fallthrough));
 			case __EVENT_TIMEOUT:
 				print_more(child);
 				do_signal(child, __TEST_ETC);
@@ -18777,6 +18882,7 @@ test_8_3_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			switch (get_event(child)) {
 #if TEST_X400
@@ -18786,9 +18892,9 @@ test_8_3_ptu(int child)
 					goto failure;
 				continue;
 			case __TEST_MSU:
-				if (fsn[1] > 1 && fsn[1] < n - 3)
+				if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 					oldisb++;
-				if (fsn[1] != n - 1) {
+				if ((int) fsn[1] != n - 1) {
 					count++;
 					do_signal(child, __TEST_ETC);
 					do_signal(child, __TEST_COUNT);
@@ -18911,6 +19017,7 @@ test_8_4_ptu(int child)
 			if (start_tt(10000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -18928,6 +19035,7 @@ test_8_4_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19020,6 +19128,7 @@ test_8_5_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19035,6 +19144,7 @@ test_8_5_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19109,6 +19219,7 @@ test_8_6_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19117,6 +19228,7 @@ test_8_6_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19124,6 +19236,7 @@ test_8_6_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19141,6 +19254,7 @@ test_8_6_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19211,6 +19325,7 @@ test_8_7_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19219,6 +19334,7 @@ test_8_7_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19227,6 +19343,7 @@ test_8_7_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19237,6 +19354,7 @@ test_8_7_ptu(int child)
 			if (start_tt(1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -19322,6 +19440,7 @@ test_8_8_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19332,6 +19451,7 @@ test_8_8_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -19399,6 +19519,7 @@ test_8_9a_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19406,6 +19527,7 @@ test_8_9a_ptu(int child)
 			if (do_signal(child, __TEST_SIPO))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19414,6 +19536,7 @@ test_8_9a_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19425,6 +19548,7 @@ test_8_9a_ptu(int child)
 			if (start_tt(1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19440,6 +19564,7 @@ test_8_9a_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 5:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19521,6 +19646,7 @@ test_8_9b_ptu(int child)
 			}
 			bsn[0] = fsn[1];
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIPO)) {
 				if (last_event == __TEST_FISU) {
@@ -19534,6 +19660,7 @@ test_8_9b_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				switch (last_event) {
@@ -19626,6 +19753,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				if (last_event != __TEST_FISU)
@@ -19635,6 +19763,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19645,6 +19774,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19660,6 +19790,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -19741,6 +19872,7 @@ test_8_11_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_FISU)
@@ -19758,6 +19890,7 @@ test_8_11_ptu(int child)
 			if (start_tt(1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -19832,6 +19965,7 @@ test_8_12a_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -19849,6 +19983,7 @@ test_8_12a_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -20112,6 +20247,7 @@ test_9_1_ptu(int child)
 			if (do_signal(child, __TEST_FISU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_MSU) {
@@ -20126,6 +20262,7 @@ test_9_1_ptu(int child)
 			if (do_signal(child, __TEST_MSU))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
 				goto failure;
@@ -20220,8 +20357,8 @@ test_9_2_ptu(int child)
 				}
 				goto failure;
 			}
-			if (fsn[1] < fsn_hi) {
-				if (fsn[1] != fsn_ex)
+			if ((int) fsn[1] < fsn_hi) {
+				if ((int) fsn[1] != fsn_ex)
 					goto failure;
 				if (++fsn_ex == fsn_hi) {
 					fsn_ex = fsn_lo;
@@ -20233,7 +20370,7 @@ test_9_2_ptu(int child)
 					goto failure;
 				continue;
 			}
-			if (fsn[1] != fsn_hi)
+			if ((int) fsn[1] != fsn_hi)
 				goto failure;
 			if (do_signal(CHILD_IUT, __TEST_ETC))
 				goto failure;
@@ -20250,11 +20387,12 @@ test_9_2_ptu(int child)
 #endif
 			fsn_hi++;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] < fsn_hi) {
-				if (fsn[1] != fsn_ex)
+			if ((int) fsn[1] < fsn_hi) {
+				if ((int) fsn[1] != fsn_ex)
 					goto failure;
 				if (++fsn_ex == fsn_hi) {
 					fsn_ex = fsn_lo;
@@ -20268,7 +20406,7 @@ test_9_2_ptu(int child)
 				continue;
 			}
 			print_more(child);
-			if (fsn[1] != fsn_hi)
+			if ((int) fsn[1] != fsn_hi)
 				goto failure;
 			if (do_signal(CHILD_IUT, __TEST_ETC))
 				goto failure;
@@ -20277,14 +20415,15 @@ test_9_2_ptu(int child)
 			tries = 0;
 			oldisb = (oldisb & 0xff80) + fsn_ex;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_FISU)) {
 				if (last_event == __TEST_MSU) {
 					bsn[0] = fsn_lo;
 					if (do_signal(child, __TEST_FISU))
 						goto failure;
-					if (fsn[1] != fsn_ex) {
-						if (fsn[1] == fsn_ex + 1) {
+					if ((int) fsn[1] != fsn_ex) {
+						if ((int) fsn[1] == fsn_ex + 1) {
 							if (fsn_lo < fsn_hi) {
 								fsn_lo++;
 								fsn_ex++;
@@ -20391,6 +20530,7 @@ test_9_3_ptu(int child)
 			if (start_tt(config->sl.t7 + 1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -20405,16 +20545,17 @@ test_9_3_ptu(int child)
 				goto failure;
 			count = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] == n)
+			if ((int) fsn[1] == n)
 				goto failure;
-			if (fsn[1] == n - 1)
+			if ((int) fsn[1] == n - 1)
 				count++;
-			if (fsn[1] > 1 && fsn[1] < n - 3)
+			if ((int) fsn[1] > 1 && (int) fsn[1] < n - 3)
 				oldisb++;
-			if (fsn[1] != 0 || !count) {
+			if ((int) fsn[1] != 0 || !count) {
 				bsn[0] = 0x7f;
 				if (do_signal(child, __TEST_FISU))
 					goto failure;
@@ -20428,11 +20569,12 @@ test_9_3_ptu(int child)
 				goto failure;
 			count = 1;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] != n) {
-				if (fsn[1] > 1 && fsn[1] < n - 3)
+			if ((int) fsn[1] != n) {
+				if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 					oldisb++;
 				bsn[0] = 0;
 				if (do_signal(child, __TEST_FISU))
@@ -20519,7 +20661,7 @@ test_9_4_ptu(int child)
 
 	msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 	n = config->sl.N2 / (msu_len + h) + 1;
-	if (msu_len > config->sdt.m)
+	if (msu_len > (int) config->sdt.m)
 		goto inconclusive;
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
@@ -20545,14 +20687,15 @@ test_9_4_ptu(int child)
 				goto failure;
 			count = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] == n)
+			if ((int) fsn[1] == n)
 				goto failure;
-			if (fsn[1] == n - 1)
+			if ((int) fsn[1] == n - 1)
 				count++;
-			if (fsn[1] > 1 && fsn[1] < n - 3)
+			if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 				oldisb++;
 			if (fsn[1] != 0 || !count) {
 				bsn[0] = 0x7f;
@@ -20568,11 +20711,12 @@ test_9_4_ptu(int child)
 				goto failure;
 			count = 1;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] != n) {
-				if (fsn[1] > 1 && fsn[1] < n - 3)
+			if ((int) fsn[1] != n) {
+				if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 					oldisb++;
 				bsn[0] = 0;
 				if (do_signal(child, __TEST_FISU))
@@ -20613,7 +20757,7 @@ test_9_4_iut(int child)
 
 	msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 	n = config->sl.N2 / (msu_len + h) + 1;
-	if (msu_len > config->sdt.m)
+	if (msu_len > (int) config->sdt.m)
 		goto inconclusive;
 	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
@@ -20663,7 +20807,7 @@ test_9_5_ptu(int child)
 		n = config->sl.N1 - 1;
 		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 		n = config->sl.N2 / (msu_len + h) + 1;
-		if (msu_len > config->sdt.m)
+		if (msu_len > (int) config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
@@ -20677,6 +20821,7 @@ test_9_5_ptu(int child)
 			if (start_tt(config->sl.t7 + 1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -20695,14 +20840,15 @@ test_9_5_ptu(int child)
 			fisu_sent = 1;
 			count = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] == n)
+			if ((int) fsn[1] == n)
 				goto failure;
-			if (fsn[1] == n - 1)
+			if ((int) fsn[1] == n - 1)
 				count++;
-			if (fsn[1] > 1 && fsn[1] < n - 3)
+			if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 				oldisb++;
 			if (fsn[1] != 3 || !count) {
 				if (!fisu_sent) {
@@ -20722,17 +20868,18 @@ test_9_5_ptu(int child)
 			fisu_sent = 1;
 			count = 3;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] == n - 3) {
+			if ((int) fsn[1] == n - 3) {
 				if (!count)
 					goto failure;
 				count--;
 				continue;
 			}
-			if (fsn[1] != n) {
-				if (fsn[1] > 1 && fsn[1] < n - 3)
+			if ((int) fsn[1] != n) {
+				if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 					oldisb++;
 				if (!fisu_sent) {
 					bsn[0] = n - 1;
@@ -20780,7 +20927,7 @@ test_9_5_iut(int child)
 		n = config->sl.N1 - 1;
 		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 		n = config->sl.N2 / (msu_len + h) + 1;
-		if (msu_len > config->sdt.m)
+		if (msu_len > (int) config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
@@ -20830,7 +20977,7 @@ test_9_6_ptu(int child)
 		n = config->sl.N1 - 1;
 		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 		n = config->sl.N2 / (msu_len + h) + 1;
-		if (msu_len > config->sdt.m)
+		if (msu_len > (int) config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
@@ -20859,14 +21006,15 @@ test_9_6_ptu(int child)
 				goto failure;
 			count = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU))
 				goto failure;
-			if (fsn[1] == n)
+			if ((int) fsn[1] == n)
 				goto failure;
-			if (fsn[1] == n - 1)
+			if ((int) fsn[1] == n - 1)
 				count++;
-			if (fsn[1] > 1 && fsn[1] < n - 3)
+			if (fsn[1] > 1 && (int) fsn[1] < n - 3)
 				oldisb++;
 			if (fsn[1] != 3 || count != 2) {
 				bsn[0] = 0x7f;
@@ -20913,7 +21061,7 @@ test_9_6_iut(int child)
 		n = config->sl.N1 - 1;
 		msu_len = config->sl.N2 / (config->sl.N1 - 1) - h + 1;
 		n = config->sl.N2 / (msu_len + h) + 1;
-		if (msu_len > config->sdt.m)
+		if (msu_len > (int) config->sdt.m)
 			goto inconclusive;
 	}
 	if (msu_len > 12)
@@ -20962,6 +21110,7 @@ test_9_7_ptu(int child)
 			if (start_tt(5000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_MSU)) {
 				if (last_event == __TEST_FISU) {
@@ -20979,6 +21128,7 @@ test_9_7_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				switch (last_event) {
@@ -21008,6 +21158,7 @@ test_9_7_ptu(int child)
 			if (start_tt(500))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -21194,6 +21345,7 @@ test_9_9_ptu(int child)
 			if (start_tt(1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_FISU) {
@@ -21365,6 +21517,7 @@ test_9_11_ptu(int child)
 			if (start_tt(config->sl.t7 * 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				if (last_event == __TEST_MSU) {
@@ -21597,6 +21750,7 @@ test_10_1_ptu(int child)
 				goto failure;
 			beg_time = milliseconds(child, t5);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIB)) {
 				if (last_event == __TEST_FISU) {
@@ -21614,6 +21768,7 @@ test_10_1_ptu(int child)
 				goto failure;
 			count = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				switch (last_event) {
@@ -21701,6 +21856,7 @@ test_10_2a_ptu(int child)
 				goto failure;
 			beg_time = milliseconds(child, t6);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -21727,6 +21883,7 @@ test_10_2a_ptu(int child)
 			if (start_tt(config->sl.t7 - 200))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -21743,6 +21900,7 @@ test_10_2a_ptu(int child)
 			if (start_tt(1000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __TEST_FISU) {
@@ -21930,6 +22088,7 @@ test_10_3_ptu(int child)
 				goto failure;
 			beg_time = milliseconds(child, t6);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_SIOS)) {
 				switch (last_event) {
@@ -21945,6 +22104,7 @@ test_10_3_ptu(int child)
 					}
 					if (start_tt(config->sl.t5 - 3))
 						goto failure;
+					__attribute__((fallthrough));
 				case __TEST_FISU:
 					bsn[0] = fsn[0] = 0x7f;
 					if (do_signal(child, __TEST_FISU_S))
@@ -22448,7 +22608,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -22753,14 +22913,14 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -22809,7 +22969,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -22817,7 +22977,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -22829,7 +22989,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -22843,7 +23003,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -23411,13 +23571,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help, -?, --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -23433,7 +23593,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -23452,7 +23612,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
