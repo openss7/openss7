@@ -194,7 +194,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -926,9 +926,9 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
 			oh = NULL;
 			break;
 		}
-		if (oh->level != level)
+		if (oh->level != (t_uscalar_t) level)
 			continue;
-		if (oh->name != name)
+		if (oh->name != (t_uscalar_t) name)
 			continue;
 		break;
 	}
@@ -1445,7 +1445,7 @@ etype_string(t_uscalar_t etype)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1976,7 +1976,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2002,7 +2002,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2281,7 +2281,7 @@ number_string(struct t_opthdr *oh)
 }
 
 char *
-value_string(int child, struct t_opthdr *oh)
+value_string(struct t_opthdr *oh)
 {
 	static char buf[64] = "(invalid)";
 
@@ -2723,7 +2723,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -3333,7 +3333,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -3483,7 +3483,7 @@ print_opt_length(int child, struct t_opthdr *oh)
 void
 print_opt_value(int child, struct t_opthdr *oh)
 {
-	char *value = value_string(child, oh);
+	char *value = value_string(oh);
 
 	if (value)
 		print_string(child, value);
@@ -4138,7 +4138,7 @@ test_pop(int child)
  */
 
 static int
-stream_start(int child, int index)
+stream_start(int child)
 {
 	int offset = 3 * 0;
 	int i;
@@ -4205,16 +4205,16 @@ stream_stop(int child)
  */
 
 static int
-begin_tests(int index)
+begin_tests()
 {
 	state = 0;
-	if (stream_start(0, index) != __RESULT_SUCCESS)
+	if (stream_start(0) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (stream_start(1, index) != __RESULT_SUCCESS)
+	if (stream_start(1) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (stream_start(2, index) != __RESULT_SUCCESS)
+	if (stream_start(2) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	show_acks = 1;
@@ -4224,7 +4224,7 @@ begin_tests(int index)
 }
 
 static int
-end_tests(int index)
+end_tests()
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
@@ -4245,7 +4245,7 @@ end_tests(int index)
 int
 begin_tests_p(int index)
 {
-	if (begin_tests(index) != __RESULT_SUCCESS)
+	if (begin_tests() != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (test_push(0, "tpiperf") != __RESULT_SUCCESS)
@@ -4274,7 +4274,7 @@ end_tests_p(int index)
 	if (test_pop(0) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (end_tests(index) != __RESULT_SUCCESS)
+	if (end_tests() != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -5090,6 +5090,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
@@ -5103,7 +5104,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -5610,7 +5611,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -5646,6 +5647,7 @@ test_msleep(int child, unsigned long m)
 static int
 preamble_0(int child)
 {
+	(void) child;
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -6403,6 +6405,7 @@ Checks that three streams can be opened and closed."
 int
 test_case_1_1(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -7322,7 +7325,7 @@ test_case_1_5(int child, ulong result)
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->optmgmt_ack.MGMT_flags != result)
+	if (p->optmgmt_ack.MGMT_flags != (t_scalar_t) result)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7347,6 +7350,8 @@ test_case_1_5_xfail(int child, int terror, int error)
 int
 test_case_1_5_xti(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -7360,6 +7365,8 @@ test_case_1_5_xti(int child, ulong result, int terror, int error)
 int
 test_case_1_5_ip(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -8210,8 +8217,8 @@ test_case_1_5_4_12(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
@@ -9187,10 +9194,8 @@ test_case_1_5_5_27(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -9224,10 +9229,8 @@ test_case_1_5_5_28(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -9261,10 +9264,8 @@ test_case_1_5_5_29(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -9617,7 +9618,7 @@ test_case_1_6(int child, ulong result)
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->optmgmt_ack.MGMT_flags != result)
+	if (p->optmgmt_ack.MGMT_flags != (t_scalar_t) result)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9642,6 +9643,8 @@ test_case_1_6_xfail(int child, int terror, int error)
 int
 test_case_1_6_xti(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -9655,6 +9658,8 @@ test_case_1_6_xti(int child, ulong result, int terror, int error)
 int
 test_case_1_6_ip(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -10513,8 +10518,8 @@ test_case_1_6_4_12(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
@@ -11490,10 +11495,8 @@ test_case_1_6_5_27(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -11527,10 +11530,8 @@ test_case_1_6_5_28(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS},
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -11564,10 +11565,8 @@ test_case_1_6_5_29(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -11920,7 +11919,7 @@ test_case_1_7(int child, ulong result)
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->optmgmt_ack.MGMT_flags != result)
+	if (p->optmgmt_ack.MGMT_flags != (t_scalar_t) result)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11945,6 +11944,8 @@ test_case_1_7_xfail(int child, int terror, int error)
 int
 test_case_1_7_xti(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -11958,6 +11959,8 @@ test_case_1_7_xti(int child, ulong result, int terror, int error)
 int
 test_case_1_7_ip(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -12816,8 +12819,8 @@ test_case_1_7_4_12(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
@@ -13793,10 +13796,8 @@ test_case_1_7_5_27(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -13830,10 +13831,8 @@ test_case_1_7_5_28(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -13867,10 +13866,8 @@ test_case_1_7_5_29(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -14223,7 +14220,7 @@ test_case_1_8(int child, ulong result)
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->optmgmt_ack.MGMT_flags != result)
+	if (p->optmgmt_ack.MGMT_flags != (t_scalar_t) result)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14248,6 +14245,8 @@ test_case_1_8_xfail(int child, int terror, int error)
 int
 test_case_1_8_xti(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -14261,6 +14260,8 @@ test_case_1_8_xti(int child, ulong result, int terror, int error)
 int
 test_case_1_8_ip(int child, ulong result, int terror, int error)
 {
+	(void) terror;
+	(void) error;
 	switch (test_level) {
 	case T_INET_IP:
 	case T_INET_UDP:
@@ -15119,8 +15120,8 @@ test_case_1_8_4_12(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
@@ -16096,10 +16097,8 @@ test_case_1_8_5_27(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -16133,10 +16132,8 @@ test_case_1_8_5_28(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -16170,10 +16167,8 @@ test_case_1_8_5_29(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -18447,7 +18442,7 @@ for UDP and TCP."
 int
 test_case_1_10_10(int child)
 {
-	struct sockaddr_in addr = { AF_INET, 0, {0} };
+	struct sockaddr_in addr = { AF_INET, 0, {0}, 0 };
 
 	test_addr = NULL;
 	test_alen = 0;
@@ -18529,7 +18524,7 @@ int
 test_case_1_10_11(int child)
 {
 	struct sockaddr_in addr = { AF_INET, addrs[child][0].sin_port,
-		{child == 0 ? 0 : addrs[child][0].sin_addr.s_addr}
+		{child == 0 ? 0 : addrs[child][0].sin_addr.s_addr}, 0
 	};
 
 	test_addr = &addr;
@@ -20166,8 +20161,8 @@ test_case_2_2_4_12_conn(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_conn(child);
@@ -20180,8 +20175,8 @@ test_case_2_2_4_12_resp(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_resp(child);
@@ -20194,8 +20189,8 @@ test_case_2_2_4_12_list(int child)
 		struct t_opthdr opt_hdr;
 		struct t_tcp_info opt_val;
 	} options = {
-		{
-	sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS},};
+		.opt_hdr = { sizeof(struct t_opthdr) + sizeof(struct t_tcp_info), T_INET_TCP, T_TCP_INFO, T_SUCCESS },
+	};
 	test_opts = &options;
 	test_olen = sizeof(options);
 	return test_case_2_2_list(child);
@@ -21926,10 +21921,8 @@ test_case_2_2_5_27_conn(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -21943,10 +21936,8 @@ test_case_2_2_5_27_resp(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -21960,10 +21951,8 @@ test_case_2_2_5_27_list(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_ADD_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -21995,10 +21984,8 @@ test_case_2_2_5_28_conn(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -22012,10 +21999,8 @@ test_case_2_2_5_28_resp(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -22029,10 +22014,8 @@ test_case_2_2_5_28_list(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_DEL_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -22064,10 +22047,8 @@ test_case_2_2_5_29_conn(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -22081,10 +22062,8 @@ test_case_2_2_5_29_resp(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -22098,10 +22077,8 @@ test_case_2_2_5_29_list(int child)
 		struct t_opthdr opt_hdr;
 		struct sockaddr_in opt_val;
 	} options = {
-		{
-		sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS}, {
-			AF_INET, 0, {
-		0x0500007f}}
+		{ sizeof(struct t_opthdr) + sizeof(struct sockaddr_in), T_INET_SCTP, T_SCTP_SET_IP, T_SUCCESS },
+		{ AF_INET, 0, { 0x0500007f }, 0 }
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
@@ -23076,6 +23053,7 @@ test_case_3_3_conn(int child)
 int
 test_case_3_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -28815,6 +28793,7 @@ test_case_5_1_resp(int child)
 int
 test_case_5_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -28929,6 +28908,7 @@ test_case_5_2_resp(int child)
 int
 test_case_5_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -29077,6 +29057,7 @@ test_case_5_3_resp(int child)
 int
 test_case_5_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -29215,6 +29196,7 @@ test_case_5_4_resp(int child)
 int
 test_case_5_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33124,6 +33106,7 @@ test_case_12_2_1_resp(int child)
 int
 test_case_12_2_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33219,6 +33202,7 @@ test_case_12_2_2_resp(int child)
 int
 test_case_12_2_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33312,6 +33296,7 @@ test_case_12_2_3_resp(int child)
 int
 test_case_12_2_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33401,6 +33386,7 @@ test_case_12_3_1_resp(int child)
 int
 test_case_12_3_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33497,6 +33483,7 @@ test_case_12_3_2_resp(int child)
 int
 test_case_12_3_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -33596,6 +33583,7 @@ test_case_12_3_3_resp(int child)
 int
 test_case_12_3_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34115,18 +34103,21 @@ error for the T_ADDR_REQ primitive."
 int
 test_case_13_1_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_1_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_1_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34155,18 +34146,21 @@ TSYSERR error for the T_ADDR_REQ primitive."
 int
 test_case_13_1_2_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_1_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_1_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34196,18 +34190,21 @@ so this test is not applicable."
 int
 test_case_13_2_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_2_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_2_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34559,12 +34556,14 @@ test_case_13_2_6_2_conn(int child)
 int
 test_case_13_2_6_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_2_6_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34593,12 +34592,14 @@ the TOUTSTATE error for the T_BIND_REQ primitive."
 int
 test_case_13_2_6_3_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_2_6_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34645,6 +34646,7 @@ test_case_13_2_6_4_resp(int child)
 int
 test_case_13_2_6_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34679,12 +34681,14 @@ test_case_13_2_6_5_conn(int child)
 int
 test_case_13_2_6_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_2_6_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34713,6 +34717,7 @@ the TOUTSTATE error for the T_BIND_REQ primitive."
 int
 test_case_13_2_6_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34725,6 +34730,7 @@ test_case_13_2_6_6_resp(int child)
 int
 test_case_13_2_6_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -34753,18 +34759,21 @@ TSYSERR error for the T_BIND_REQ primitive."
 int
 test_case_13_2_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_2_7_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_2_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34793,18 +34802,21 @@ the EPROTO error for the T_CAPABILITY_REQ primitive."
 int
 test_case_13_3_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_3_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_3_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34833,18 +34845,21 @@ the TSYSERR error for the T_CAPABILITY_REQ primitive."
 int
 test_case_13_3_2_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_3_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_3_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34873,18 +34888,21 @@ error for the T_CONN_REQ primitive."
 int
 test_case_13_4_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -34986,18 +35004,21 @@ the TADDRBUSY error for the T_CONN_REQ primitive."
 int
 test_case_13_4_3_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -35048,12 +35069,14 @@ test_case_13_4_4_conn(int child)
 int
 test_case_13_4_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35104,12 +35127,14 @@ test_case_13_4_5_conn(int child)
 int
 test_case_13_4_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35167,12 +35192,14 @@ test_case_13_4_6_conn(int child)
 int
 test_case_13_4_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35234,12 +35261,14 @@ test_case_13_4_7_conn(int child)
 int
 test_case_13_4_7_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35336,12 +35365,14 @@ test_case_13_4_8_2_conn(int child)
 int
 test_case_13_4_8_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_8_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35370,12 +35401,14 @@ the TOUTSTATE error for the T_CONN_REQ primitive."
 int
 test_case_13_4_8_3_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_8_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35422,6 +35455,7 @@ test_case_13_4_8_4_resp(int child)
 int
 test_case_13_4_8_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35456,12 +35490,14 @@ test_case_13_4_8_5_conn(int child)
 int
 test_case_13_4_8_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_4_8_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35490,6 +35526,7 @@ the TOUTSTATE error for the T_CONN_REQ primitive."
 int
 test_case_13_4_8_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35502,6 +35539,7 @@ test_case_13_4_8_6_resp(int child)
 int
 test_case_13_4_8_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35530,18 +35568,21 @@ TSYSERR error for the T_CONN_REQ primitive."
 int
 test_case_13_4_9_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_9_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_4_9_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -35570,18 +35611,21 @@ error for the T_CONN_RES primitive."
 int
 test_case_13_5_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -35692,6 +35736,7 @@ in an incorrect format or contained illegal information."
 int
 test_case_13_5_3_conn(int child)
 {
+	(void) child;
 	/* XXX: It is not possible to generate this error for TCP or SCTP. */
 	return (__RESULT_NOTAPPL);
 }
@@ -35699,12 +35744,14 @@ test_case_13_5_3_conn(int child)
 int
 test_case_13_5_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -35733,12 +35780,14 @@ TBADDATA error for the T_CONN_RES primitive."
 int
 test_case_13_5_4_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35797,12 +35846,14 @@ error for the T_CONN_RES primitive."
 int
 test_case_13_5_5_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35852,12 +35903,14 @@ TBADOPT error for the T_CONN_RES primitive."
 int
 test_case_13_5_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -35914,12 +35967,14 @@ TBADSEQ error for the T_CONN_RES primitive."
 int
 test_case_13_5_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_7_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36002,12 +36057,14 @@ test_case_13_5_8_conn(int child)
 int
 test_case_13_5_8_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_8_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -36144,12 +36201,14 @@ test_case_13_5_9_3_conn(int child)
 int
 test_case_13_5_9_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_9_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36190,6 +36249,7 @@ test_case_13_5_9_4_resp(int child)
 int
 test_case_13_5_9_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36224,12 +36284,14 @@ test_case_13_5_9_5_conn(int child)
 int
 test_case_13_5_9_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_9_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36258,18 +36320,21 @@ the TOUTSTATE error for the T_CONN_RES primitive."
 int
 test_case_13_5_9_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_5_9_6_resp(int child)
 {
+	(void) child;
 	return test_case_13_5_9(child);
 }
 
 int
 test_case_13_5_9_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36374,6 +36439,7 @@ referenced by ACCEPTOR_id and the listener) to be bound to the same address."
 int
 test_case_13_5_11_conn(int child)
 {
+	(void) child;
 	/* XXX: This test case is not applicable because we do not require that the accepting
 	   stream be bound to the same address as the listening stream; therefore, it is not
 	   possible to generate this error.  However, we could write the test case anyways. */
@@ -36383,12 +36449,14 @@ test_case_13_5_11_conn(int child)
 int
 test_case_13_5_11_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_13_5_11_list(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -36496,18 +36564,21 @@ TSYSERR error for the T_CONN_RES primitive."
 int
 test_case_13_5_13_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_13_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_13_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -36691,12 +36762,14 @@ test_case_13_6_1_3_conn(int child)
 int
 test_case_13_6_1_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_6_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36744,6 +36817,7 @@ test_case_13_6_1_4_conn(int child)
 int
 test_case_13_6_1_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36786,12 +36860,14 @@ test_case_13_6_1_5_conn(int child)
 int
 test_case_13_6_1_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_6_1_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36880,6 +36956,7 @@ test_case_13_6_2_resp(int child)
 int
 test_case_13_6_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -36908,18 +36985,21 @@ error for the T_DISCON_REQ primitive."
 int
 test_case_13_7_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_7_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_7_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -36967,12 +37047,14 @@ test_case_13_7_2_conn(int child)
 int
 test_case_13_7_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_7_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37001,12 +37083,14 @@ the TBADSEQ error for the T_DISCON_REQ primitive."
 int
 test_case_13_7_3_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_7_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37209,18 +37293,21 @@ the TSYSERR error for the T_DISCON_REQ primitive."
 int
 test_case_13_7_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_7_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_7_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -37404,12 +37491,14 @@ test_case_13_8_1_3_conn(int child)
 int
 test_case_13_8_1_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_8_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37456,6 +37545,7 @@ test_case_13_8_1_4_conn(int child)
 int
 test_case_13_8_1_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37498,12 +37588,14 @@ test_case_13_8_1_5_conn(int child)
 int
 test_case_13_8_1_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_8_1_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37592,6 +37684,7 @@ test_case_13_8_2_resp(int child)
 int
 test_case_13_8_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37620,18 +37713,21 @@ error for the T_INFO_REQ primitive."
 int
 test_case_13_9_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_9_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_9_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -37660,18 +37756,21 @@ TSYSERR error for the T_INFO_REQ primitive."
 int
 test_case_13_9_2_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_9_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_9_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -37861,12 +37960,14 @@ test_case_13_10_1_3_conn(int child)
 int
 test_case_13_10_1_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_10_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37913,6 +38014,7 @@ test_case_13_10_1_4_conn(int child)
 int
 test_case_13_10_1_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -37955,12 +38057,14 @@ test_case_13_10_1_5_conn(int child)
 int
 test_case_13_10_1_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_10_1_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38010,12 +38114,14 @@ test_case_13_10_2_conn(int child)
 int
 test_case_13_10_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_10_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38044,18 +38150,21 @@ the EPROTO error for the T_OPTMGMT_REQ primitive."
 int
 test_case_13_11_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -38226,18 +38335,21 @@ the TOUTSTATE error for the T_OPTMGMT_REQ primitive."
 int
 test_case_13_11_5_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -38266,18 +38378,21 @@ the TNOTSUPPORT error for the T_OPTMGMT_REQ primitive."
 int
 test_case_13_11_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -38306,18 +38421,21 @@ the TSYSERR error for the T_OPTMGMT_REQ primitive."
 int
 test_case_13_11_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_7_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_11_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -38450,12 +38568,14 @@ test_case_13_12_1_3_conn(int child)
 int
 test_case_13_12_1_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_12_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38502,6 +38622,7 @@ test_case_13_12_1_4_conn(int child)
 int
 test_case_13_12_1_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38544,12 +38665,14 @@ test_case_13_12_1_5_conn(int child)
 int
 test_case_13_12_1_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_12_1_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38578,18 +38701,21 @@ error for the T_UNBIND_REQ primitive."
 int
 test_case_13_13_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_13_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_13_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -38681,12 +38807,14 @@ test_case_13_13_2_2_conn(int child)
 int
 test_case_13_13_2_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_13_2_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38723,6 +38851,7 @@ test_case_13_13_2_3_conn(int child)
 int
 test_case_13_13_2_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38771,6 +38900,7 @@ test_case_13_13_2_4_resp(int child)
 int
 test_case_13_13_2_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38805,12 +38935,14 @@ test_case_13_13_2_5_conn(int child)
 int
 test_case_13_13_2_5_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_13_2_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38839,18 +38971,21 @@ the TOUTSTATE error for the T_UNBIND_REQ primitive."
 int
 test_case_13_13_2_6_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_13_13_2_6_resp(int child)
 {
+	(void) child;
 	return test_case_13_13_2(child);
 }
 
 int
 test_case_13_13_2_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -38879,18 +39014,21 @@ the TSYSERR error for the T_UNBIND_REQ primitive."
 int
 test_case_13_13_3_conn(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_13_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_13_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_NOTAPPL);
 }
 
@@ -39115,12 +39253,14 @@ test_case_14_1_3_conn(int child)
 int
 test_case_14_1_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_1_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39149,18 +39289,21 @@ in the TS_WRES_CIND state."
 int
 test_case_14_1_4_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_1_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_1_4_list(int child)
 {
+	(void) child;
 	return test_case_14_1(child);
 }
 
@@ -39201,6 +39344,7 @@ test_case_14_1_5_resp(int child)
 int
 test_case_14_1_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39235,12 +39379,14 @@ test_case_14_1_6_conn(int child)
 int
 test_case_14_1_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_1_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39269,6 +39415,7 @@ in the TS_WREQ_ORDREL state."
 int
 test_case_14_1_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39281,6 +39428,7 @@ test_case_14_1_7_resp(int child)
 int
 test_case_14_1_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39425,12 +39573,14 @@ test_case_14_3_3_conn(int child)
 int
 test_case_14_3_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_3_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39459,18 +39609,21 @@ T_CAPABILITY_REQ primitive in the TS_WRES_CIND state."
 int
 test_case_14_3_4_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_3_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_3_4_list(int child)
 {
+	(void) child;
 	return test_case_14_3(child);
 }
 
@@ -39511,6 +39664,7 @@ test_case_14_3_5_resp(int child)
 int
 test_case_14_3_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39545,12 +39699,14 @@ test_case_14_3_6_conn(int child)
 int
 test_case_14_3_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_3_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39579,6 +39735,7 @@ T_CAPABILITY_REQ primitive in the TS_WREQ_ORDREL state."
 int
 test_case_14_3_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39591,6 +39748,7 @@ test_case_14_3_7_resp(int child)
 int
 test_case_14_3_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39638,12 +39796,14 @@ test_case_14_4_1_conn(int child)
 int
 test_case_14_4_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_4_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39672,12 +39832,14 @@ in the TS_WRES_CIND state."
 int
 test_case_14_5_1_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_5_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39758,6 +39920,7 @@ test_case_14_6_1_resp(int child)
 int
 test_case_14_6_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39810,6 +39973,7 @@ test_case_14_6_2_resp(int child)
 int
 test_case_14_6_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39854,12 +40018,14 @@ test_case_14_7_1_conn(int child)
 int
 test_case_14_7_1_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_7_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39896,6 +40062,7 @@ test_case_14_7_2_conn(int child)
 int
 test_case_14_7_2_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -39969,6 +40136,7 @@ test_case_14_7_3_resp(int child)
 int
 test_case_14_7_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40024,6 +40192,7 @@ test_case_14_7_4_resp(int child)
 int
 test_case_14_7_4_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40085,6 +40254,7 @@ test_case_14_7_5_resp(int child)
 int
 test_case_14_7_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40163,6 +40333,7 @@ test_case_14_8_1_resp(int child)
 int
 test_case_14_8_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40225,6 +40396,7 @@ test_case_14_8_2_resp(int child)
 int
 test_case_14_8_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40259,7 +40431,7 @@ test_case_14_9(int child, t_uscalar_t CURRENT_state)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (last_info.CURRENT_state != CURRENT_state)
+	if (last_info.CURRENT_state != (t_scalar_t) CURRENT_state)
 		goto inconclusive;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -40358,12 +40530,14 @@ test_case_14_9_3_conn(int child)
 int
 test_case_14_9_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_9_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40400,6 +40574,7 @@ test_case_14_9_4_conn(int child)
 int
 test_case_14_9_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40448,6 +40623,7 @@ test_case_14_9_5_resp(int child)
 int
 test_case_14_9_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40482,12 +40658,14 @@ test_case_14_9_6_conn(int child)
 int
 test_case_14_9_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_9_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40516,6 +40694,7 @@ in the TS_WREQ_ORDREL state."
 int
 test_case_14_9_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40528,6 +40707,7 @@ test_case_14_9_7_resp(int child)
 int
 test_case_14_9_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40592,6 +40772,7 @@ test_case_14_10_1_resp(int child)
 int
 test_case_14_10_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40646,6 +40827,7 @@ test_case_14_10_2_resp(int child)
 int
 test_case_14_10_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40777,12 +40959,14 @@ test_case_14_11_3_conn(int child)
 int
 test_case_14_11_3_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_11_3_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40811,12 +40995,14 @@ T_OPTMGMT_REQ primitive in the TS_WRES_CIND state."
 int
 test_case_14_11_4_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_11_4_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40865,6 +41051,7 @@ test_case_14_11_5_resp(int child)
 int
 test_case_14_11_5_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40899,12 +41086,14 @@ test_case_14_11_6_conn(int child)
 int
 test_case_14_11_6_resp(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 int
 test_case_14_11_6_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40933,6 +41122,7 @@ T_OPTMGMT_REQ primitive in the TS_WREQ_ORDREL state."
 int
 test_case_14_11_7_conn(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40945,6 +41135,7 @@ test_case_14_11_7_resp(int child)
 int
 test_case_14_11_7_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -40996,6 +41187,7 @@ test_case_14_12_1_resp(int child)
 int
 test_case_14_12_1_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -41047,6 +41239,7 @@ test_case_14_12_2_resp(int child)
 int
 test_case_14_12_2_list(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -41466,8 +41659,8 @@ struct test_case {
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
-	int (*start) (int);		/* start function */
-	int (*stop) (int);		/* stop function */
+	int (*start) ();		/* start function */
+	int (*stop) ();		/* stop function */
 	ulong duration;			/* maximum duration */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
@@ -42801,7 +42994,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -43106,7 +43299,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -43162,7 +43355,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -43182,7 +43375,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -43196,7 +43389,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -43508,13 +43701,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -43530,7 +43723,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -43549,7 +43742,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
