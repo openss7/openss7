@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -269,13 +269,13 @@ const sdl_config_t sdl_conf_j1 = {
 sdl_config_t sdl_conf, sdl_conf_read;
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -324,7 +324,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -332,7 +332,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -344,7 +344,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permission.\
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -358,7 +358,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -504,7 +504,7 @@ stop_timer(void)
 int
 decode_msg(void)
 {
-	if (ctrl.len >= sizeof(p->sl_primitive))
+	if (ctrl.len >= (int) sizeof(p->sl_primitive))
 		return p->sl_primitive;
 	return -1;
 }
@@ -1380,6 +1380,7 @@ mymain(int argc, char **argv)
 {
 	int ret, state = 0;
 
+	(void) argc;
 	ppa = ((board - 1) << 12) | ((span - 1) << 8) | (channel << 0);
 	fprintf(stderr, "\nRunning %s on board %d, span %d, channel %d.\n\n", argv[0], board, span,
 		channel);
@@ -1755,7 +1756,8 @@ main(int argc, char **argv)
 			break;
 		switch (c) {
 		case 0:
-			usage(argc, argv);
+			usage(argv);
+			break;
 		case 'b':
 			board = atoi(optarg);
 			break;
@@ -1839,17 +1841,17 @@ main(int argc, char **argv)
 			output = val;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case ':':
 			fprintf(stderr, "%s: missing parm -- %s\n", argv[0], argv[optind - 1]);
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case '?':
 		default:
@@ -1862,7 +1864,7 @@ main(int argc, char **argv)
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
