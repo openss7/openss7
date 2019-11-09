@@ -366,6 +366,7 @@ sctp_accept(int fd, int fd2, int tok, int seq)
 {
 	int ret;
 
+	(void) fd2;
 	ctrl.len = sizeof(cmd.npi.conn_res);
 	cmd.prim = N_CONN_RES;
 	cmd.npi.conn_res.TOKEN_value = tok;
@@ -533,7 +534,7 @@ test_sctpc(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
@@ -590,7 +591,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -610,7 +611,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -624,7 +625,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -740,13 +741,13 @@ main(int argc, char **argv)
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -762,7 +763,7 @@ main(int argc, char **argv)
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}

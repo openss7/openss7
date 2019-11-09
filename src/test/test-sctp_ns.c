@@ -334,6 +334,7 @@ sctp_accept(int fd, int fd2, int tok)
 {
 	int ret, seq;
 
+	(void) fd2;
 	if ((ret = sctp_get(fd, -1)) < 0) {
 		fprintf(stderr, "sctp_accept: couldn't get message on listener\n");
 		return -1;
@@ -512,7 +513,7 @@ test_sctps(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
@@ -569,7 +570,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -589,7 +590,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -603,7 +604,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -719,13 +720,13 @@ main(int argc, char **argv)
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -741,7 +742,7 @@ main(int argc, char **argv)
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
