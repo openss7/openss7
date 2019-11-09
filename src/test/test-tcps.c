@@ -127,7 +127,7 @@ start_timer(void)
 	return 0;
 }
 
-static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
+static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, 0 };
 
 int len = MSG_LEN;
 
