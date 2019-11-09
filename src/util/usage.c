@@ -162,176 +162,176 @@ struct varbind_list {
 
 static struct varbind_list vars[] = {
 	/* *INDENT-OFF* */
-	{ OID_cdr2Scalars "\x01\x00",			 16, false, ASN_OCTET_STR, "fileName",		  0},
-	{ OID_cdr2Scalars "\x02\x00",			 16, false, ASN_INTEGER,   "reasonForOutput",	  0},
-	{ OID_cdr2Scalars "\x03\x00",			 16, false, ASN_INTEGER,   "sequenceNumber",	  0},
-	{ OID_cdr2Scalars "\x04\x00",			 16, false, ASN_OPAQUE,    "callRecord",	  0},
-	{ OID_callDetailRecordLogR2Entry "\x01\x00",	 18,  true, ASN_COUNTER64, "sequenceId",	  1},
-	{ OID_callDetailRecordLogR2Entry "\x02\x00",	 18,  true, ASN_COUNTER64, "zoneId",		  2},
-	{ OID_callDetailRecordLogR2Entry "\x03\x00",	 18,  true, ASN_COUNTER64, "recSeqId",		  3},
-	{ OID_callDetailRecordLogR2Entry "\x04\x00",	 18,  true, ASN_COUNTER64, "fileSeqId",		  4},
-	{ OID_callDetailRecordLogR2Entry "\x05\x00",	 18,  true, ASN_OCTET_STR, "callId",		  5},
-	{ OID_callDetailRecordLogR2Entry "\x06\x00",	 18,  true, ASN_OCTET_STR, "lastUpdate",	  6},
-	{ OID_callDetailRecordLogR2Entry "\x07\x00",	 18,  true, ASN_OCTET_STR, "eventOrder",	  7},
-	{ OID_callDetailRecordLogR2Entry "\x08\x00",	 18,  true, ASN_INTEGER,   "status",		  8},
-	{ OID_callDetailRecordLogR2Entry "\x09\x00",	 18, false, ASN_INTEGER,   "callType",		  9},
-	{ OID_callDetailRecordLogR2Entry "\x0a\x00",	 18, false, ASN_OCTET_STR, "clngPtyNbr",	 10},
-	{ OID_callDetailRecordLogR2Entry "\x0b\x00",	 18, false, ASN_OCTET_STR, "chargeNbr",		 11},
-	{ OID_callDetailRecordLogR2Entry "\x0c\x00",	 18, false, ASN_OCTET_STR, "clldPtyNbr",	 12},
-	{ OID_callDetailRecordLogR2Entry "\x0d\x00",	 18, false, ASN_INTEGER,   "clldPtyNoa",	 13},
-	{ OID_callDetailRecordLogR2Entry "\x0e\x00",	 18, false, ASN_OCTET_STR, "origLnInfo",	 14},
-	{ OID_callDetailRecordLogR2Entry "\x0f\x00",	 18, false, ASN_OCTET_STR, "ingLrn",		 15},
-	{ OID_callDetailRecordLogR2Entry "\x10\x00",	 18, false, ASN_OCTET_STR, "ingCic",		 16},
-	{ OID_callDetailRecordLogR2Entry "\x11\x00",	 18, false, ASN_INTEGER,   "ingCsi",		 17},
-	{ OID_callDetailRecordLogR2Entry "\x12\x00",	 18, false, ASN_UINTEGER,  "ingCceId",		 18},
-	{ OID_callDetailRecordLogR2Entry "\x13\x00",	 18, false, ASN_INTEGER,   "ingTgProt",		 19},
-	{ OID_callDetailRecordLogR2Entry "\x14\x00",	 18, false, ASN_INTEGER,   "ingTgType",		 20},
-	{ OID_callDetailRecordLogR2Entry "\x15\x00",	 18, false, ASN_UINTEGER,  "ingTgId",		 21},
-	{ OID_callDetailRecordLogR2Entry "\x16\x00",	 18, false, ASN_OCTET_STR, "ingCallStart",	 22},
-	{ OID_callDetailRecordLogR2Entry "\x17\x00",	 18, false, ASN_UINTEGER,  "ingGateId",		 23},
-	{ OID_callDetailRecordLogR2Entry "\x18\x00",	 18, false, ASN_UINTEGER,  "ingCardId",		 24},
-	{ OID_callDetailRecordLogR2Entry "\x19\x00",	 18, false, ASN_UINTEGER,  "ingSpanId",		 25},
-	{ OID_callDetailRecordLogR2Entry "\x1a\x00",	 18, false, ASN_UINTEGER,  "ingChanId",		 26},
-	{ OID_callDetailRecordLogR2Entry "\x1b\x00",	 18, false, ASN_UINTEGER,  "ingIsdnDChan",	 27},
-	{ OID_callDetailRecordLogR2Entry "\x1c\x00",	 18, false, ASN_UINTEGER,  "ingIsdnCrn",	 28},
-	{ OID_callDetailRecordLogR2Entry "\x1d\x00",	 18, false, ASN_OCTET_STR, "ingCreatConnCplt",	 29},
-	{ OID_callDetailRecordLogR2Entry "\x1e\x00",	 18, false, ASN_OCTET_STR, "ingAddrCplt",	 30},
-	{ OID_callDetailRecordLogR2Entry "\x1f\x00",	 18, false, ASN_OCTET_STR, "ingCallAns",	 31},
-	{ OID_callDetailRecordLogR2Entry "\x20\x00",	 18, false, ASN_OCTET_STR, "transNbr",		 32},
-	{ OID_callDetailRecordLogR2Entry "\x21\x00",	 18, false, ASN_OCTET_STR, "termLrn",		 33},
-	{ OID_callDetailRecordLogR2Entry "\x22\x00",	 18, false, ASN_OCTET_STR, "transCic",		 34},
-	{ OID_callDetailRecordLogR2Entry "\x23\x00",	 18, false, ASN_OCTET_STR, "ingCallRls",	 35},
-	{ OID_callDetailRecordLogR2Entry "\x24\x00",	 18, false, ASN_UINTEGER,  "ingRlsCause",	 36},
-	{ OID_callDetailRecordLogR2Entry "\x25\x00",	 18, false, ASN_UINTEGER,  "egrCceId",		 37},
-	{ OID_callDetailRecordLogR2Entry "\x26\x00",	 18, false, ASN_INTEGER,   "egrTgProt",		 38},
-	{ OID_callDetailRecordLogR2Entry "\x27\x00",	 18, false, ASN_INTEGER,   "egrTgType",		 39},
-	{ OID_callDetailRecordLogR2Entry "\x28\x00",	 18, false, ASN_UINTEGER,  "egrTgId",		 40},
-	{ OID_callDetailRecordLogR2Entry "\x29\x00",	 18, false, ASN_OCTET_STR, "egrCallStart",	 41},
-	{ OID_callDetailRecordLogR2Entry "\x2a\x00",	 18, false, ASN_UINTEGER,  "egrGateId",		 42},
-	{ OID_callDetailRecordLogR2Entry "\x2b\x00",	 18, false, ASN_UINTEGER,  "egrCardId",		 43},
-	{ OID_callDetailRecordLogR2Entry "\x2c\x00",	 18, false, ASN_UINTEGER,  "egrSpanId",		 44},
-	{ OID_callDetailRecordLogR2Entry "\x2d\x00",	 18, false, ASN_UINTEGER,  "egrChanId",		 45},
-	{ OID_callDetailRecordLogR2Entry "\x2e\x00",	 18, false, ASN_UINTEGER,  "egrIsdnDChan",	 46},
-	{ OID_callDetailRecordLogR2Entry "\x2f\x00",	 18, false, ASN_UINTEGER,  "egrIsdnCrn",	 47},
-	{ OID_callDetailRecordLogR2Entry "\x30\x00",	 18, false, ASN_OCTET_STR, "egrCreatConnCplt",	 48},
-	{ OID_callDetailRecordLogR2Entry "\x31\x00",	 18, false, ASN_OCTET_STR, "egrAddrCplt",	 49},
-	{ OID_callDetailRecordLogR2Entry "\x32\x00",	 18, false, ASN_OCTET_STR, "egrCallAns",	 50},
-	{ OID_callDetailRecordLogR2Entry "\x33\x00",	 18, false, ASN_OCTET_STR, "egrCallRls",	 51},
-	{ OID_callDetailRecordLogR2Entry "\x34\x00",	 18, false, ASN_UINTEGER,  "egrRlsCause",	 52},
-	{ OID_callDetailRecordLogR2Entry "\x35\x00",	 18, false, ASN_OCTET_STR, "chkptFirst",	 53},
-	{ OID_callDetailRecordLogR2Entry "\x36\x00",	 18, false, ASN_OCTET_STR, "chkptLast",		 54},
-	{ OID_callDetailRecordLogR2Entry "\x37\x00",	 18, false, ASN_OCTET_STR, "ingGateName",	 55},
-	{ OID_callDetailRecordLogR2Entry "\x38\x00",	 18, false, ASN_OCTET_STR, "egrGateName",	 56},
-	{ OID_callDetailRecordLogR2Entry "\x39\x00",	 18, false, ASN_OCTET_STR, "ingTgName",		 57},
-	{ OID_callDetailRecordLogR2Entry "\x3a\x00",	 18, false, ASN_OCTET_STR, "egrTgName",		 58},
-	{ OID_callDetailRecordLogR2Entry "\x3b\x00",	 18, false, ASN_OCTET_STR, "origGateIp",	 59},
-	{ OID_callDetailRecordLogR2Entry "\x3c\x00",	 18, false, ASN_OCTET_STR, "termGateIp",	 60},
-	{ OID_callDetailRecordLogR2Entry "\x3d\x00",	 18, false, ASN_OCTET_STR, "h323ConfId",	 61},
-	{ OID_callDetailRecordLogR2Entry "\x3e\x00",	 18, false, ASN_UINTEGER,  "ingCardPort",	 62},
-	{ OID_callDetailRecordLogR2Entry "\x3f\x00",	 18, false, ASN_UINTEGER,  "ingCardPath",	 63},
-	{ OID_callDetailRecordLogR2Entry "\x40\x00",	 18, false, ASN_UINTEGER,  "egrCardPort",	 64},
-	{ OID_callDetailRecordLogR2Entry "\x41\x00",	 18, false, ASN_UINTEGER,  "egrCardPath",	 65},
-	{ OID_callDetailRecordLogR2Entry "\x42\x00",	 18, false, ASN_UINTEGER,  "ingTg",		 66},
-	{ OID_callDetailRecordLogR2Entry "\x43\x00",	 18, false, ASN_UINTEGER,  "egrTg",		 67},
-	{ OID_callDetailRecordLogR2Entry "\x44\x00",	 18, false, ASN_OCTET_STR, "dialedNbr",		 68},
-	{ OID_callDetailRecordLogR2Entry "\x45\x00",	 18, false, ASN_INTEGER,   "dialedNoa",		 69},
-	{ OID_callDetailRecordLogR2Entry "\x46\x00",	 18, false, ASN_OCTET_STR, "redirNbr",		 70},
-	{ OID_callDetailRecordLogR2Entry "\x47\x00",	 18, false, ASN_INTEGER,   "redirNoa",		 71},
-	{ OID_callDetailRecordLogR2Entry "\x48\x00",	 18, false, ASN_INTEGER,   "redirInd",		 72},
-	{ OID_callDetailRecordLogR2Entry "\x49\x00",	 18, false, ASN_INTEGER,   "redirRsn",		 73},
-	{ OID_callDetailRecordLogR2Entry "\x4a\x00",	 18, false, ASN_OCTET_STR, "calledNbr",		 74},
-	{ OID_callDetailRecordLogR2Entry "\x4b\x00",	 18, false, ASN_INTEGER,   "calledNoa",		 75},
-	{ OID_callDetailRecordLogR2Entry "\x4c\x00",	 18, false, ASN_INTEGER,   "redirRsnOrig",	 76},
-	{ OID_callDetailRecordLogR2Entry "\x4d\x00",	 18, false, ASN_UINTEGER,  "redirCntr",		 77},
-	{ OID_callDetailRecordLogR2Entry "\x4e\x00",	 18, false, ASN_INTEGER,   "redirPrsntnInd",	 78},
-	{ OID_callDetailRecordLogR2Entry "\x4f\x00",	 18, false, ASN_OCTET_STR, "ingJuris",		 79},
-	{ OID_callDetailRecordLogR2Entry "\x50\x00",	 18, false, ASN_OCTET_STR, "egrJuris",		 80},
-	{ OID_callDetailRecordLogR2Entry "\x51\x00",	 18, false, ASN_INTEGER,   "ingTrunkBearCap",	 81},
-	{ OID_callDetailRecordLogR2Entry "\x52\x00",	 18, false, ASN_INTEGER,   "egrTrunkBearCap",	 82},
-	{ OID_callDetailRecordLogR2Entry "\x53\x00",	 18, false, ASN_OCTET_STR, "transNetSelCarr",	 83},
-	{ OID_callDetailRecordLogR2Entry "\x54\x00",	 18, false, ASN_UINTEGER,  "clngPtyNoa",	 84},
-	{ OID_callDetailRecordLogR2Entry "\x55\x00",	 18, false, ASN_OCTET_STR, "ingRlsCauseIntrnl",	 85},
-	{ OID_callDetailRecordLogR2Entry "\x56\x00",	 18, false, ASN_OCTET_STR, "egrRlsCauseIntrnl",	 86},
-	{ OID_callDetailRecordLogR2Entry "\x57\x00",	 18, false, ASN_OCTET_STR, "egrClldNbr",	 87},
-	{ OID_callDetailRecordLogR2Entry "\x58\x00",	 18, false, ASN_INTEGER,   "egrClldNoa",	 88},
-	{ OID_callDetailRecordLogR2Entry "\x59\x00",	 18, false, ASN_OCTET_STR, "egrCnndNbr",	 89},
-	{ OID_callDetailRecordLogR2Entry "\x5a\x00",	 18, false, ASN_INTEGER,   "egrCnndNoa",	 90},
-	{ OID_callDetailRecordLogR2Entry "\x5b\x00",	 18, false, ASN_INTEGER,   "clngPtyPrsntnInd",	 91},
-	{ OID_callDetailRecordLogR2Entry "\x5c\x00",	 18, false, ASN_INTEGER,   "ingIri",		 92},
-	{ OID_callDetailRecordLogR2Entry "\x5d\x00",	 18, false, ASN_INTEGER,   "egrOri",		 93},
-	{ OID_callDetailRecordLogR2Entry "\x5e\x00",	 18, false, ASN_OCTET_STR, "ingCallidExtrnl",	 94},
-	{ OID_callDetailRecordLogR2Entry "\x5f\x00",	 18, false, ASN_OCTET_STR, "egrCallidExtrnl",	 95},
-	{ OID_callDetailRecordLogR2Entry "\x60\x00",	 18, false, ASN_OCTET_STR, "ingChargeInfo",	 96},
-	{ OID_callDetailRecordLogR2Entry "\x61\x00",	 18, false, ASN_OCTET_STR, "egrChargeInfo",	 97},
-	{ OID_callDetailRecordLogR2Entry "\x62\x00",	 18, false, ASN_OCTET_STR, "ingPrtlInd",	 98},
-	{ OID_callDetailRecordLogR2Entry "\x63\x00",	 18, false, ASN_INTEGER,   "ingNatfwdCliblkInd", 99},
-	{ OID_callDetailRecordLogR2Entry "\x64\x00",	 18, false, ASN_INTEGER,   "ingNatfwdNtaInd",	100},
-	{ OID_callDetailRecordLogR2Entry "\x65\x00",	 18, false, ASN_OCTET_STR, "ingLastDvrtLnDigs",	101},
-	{ OID_callDetailRecordLogR2Entry "\x66\x00",	 18, false, ASN_INTEGER,   "ingLastDvrtLnNoa",	102},
-	{ OID_callDetailRecordLogR2Entry "\x67\x00",	 18, false, ASN_OCTET_STR, "j7IngAddlPtyCat",	103},
-	{ OID_callDetailRecordLogR2Entry "\x68\x00",	 18, false, ASN_OCTET_STR, "j7IngChgAreaInfo",	104},
-	{ OID_callDetailRecordLogR2Entry "\x69\x00",	 18, false, ASN_OCTET_STR, "j7IngFwdCallInd",	105},
-	{ OID_callDetailRecordLogR2Entry "\x6a\x00",	 18, false, ASN_OCTET_STR, "j7EgrAddlPtyCat",	106},
-	{ OID_callDetailRecordLogR2Entry "\x6b\x00",	 18, false, ASN_OCTET_STR, "j7EgrChgAreaInfo",	107},
-	{ OID_callDetailRecordLogR2Entry "\x6c\x00",	 18, false, ASN_OCTET_STR, "j7EgrBkwCallInd",	108},
-	{ OID_callDetailRecordLogR2Entry "\x6d\x00",	 18, false, ASN_OCTET_STR, "j7CarrInfoXfer",	109},
-	{ OID_callDetailRecordLogR2Entry "\x6e\x00",	 18, false, ASN_OCTET_STR, "ingSs7GnrcParm",	110},
-	{ OID_callDetailRecordLogR2Entry "\x6f\x00",	 18, false, ASN_OCTET_STR, "egrSs7GnrcParm",	111},
-	{ OID_callDetailRecordLogR2Entry "\x70\x00",	 18, false, ASN_UINTEGER,  "ingPktsSent",	112},
-	{ OID_callDetailRecordLogR2Entry "\x71\x00",	 18, false, ASN_UINTEGER,  "ingPktsRcvd",	113},
-	{ OID_callDetailRecordLogR2Entry "\x72\x00",	 18, false, ASN_UINTEGER,  "ingPktsLost",	114},
-	{ OID_callDetailRecordLogR2Entry "\x73\x00",	 18, false, ASN_UINTEGER,  "ingPktsXfer",	115},
-	{ OID_callDetailRecordLogR2Entry "\x74\x00",	 18, false, ASN_UINTEGER,  "ingJitter",		116},
-	{ OID_callDetailRecordLogR2Entry "\x75\x00",	 18, false, ASN_UINTEGER,  "ingLtncy",		117},
-	{ OID_callDetailRecordLogR2Entry "\x76\x00",	 18, false, ASN_UINTEGER,  "egrPktsSent",	118},
-	{ OID_callDetailRecordLogR2Entry "\x77\x00",	 18, false, ASN_UINTEGER,  "egrPktsRcvd",	119},
-	{ OID_callDetailRecordLogR2Entry "\x78\x00",	 18, false, ASN_UINTEGER,  "egrPktsLost",	120},
-	{ OID_callDetailRecordLogR2Entry "\x79\x00",	 18, false, ASN_UINTEGER,  "egrPktsXfer",	121},
-	{ OID_callDetailRecordLogR2Entry "\x7a\x00",	 18, false, ASN_UINTEGER,  "egrJitter",		122},
-	{ OID_callDetailRecordLogR2Entry "\x7b\x00",	 18, false, ASN_UINTEGER,  "egrLtncy",		123},
-	{ OID_callDetailRecordLogR2Entry "\x7c\x00",	 18, false, ASN_UINTEGER,  "ingCrctId",		124},
-	{ OID_callDetailRecordLogR2Entry "\x7d\x00",	 18, false, ASN_UINTEGER,  "egrCrctId",		125},
-	{ OID_callDetailRecordLogR2Entry "\x7e\x00",	 18, false, ASN_UINTEGER,  "ingCodec",		126},
-	{ OID_callDetailRecordLogR2Entry "\x7f\x00",	 18, false, ASN_UINTEGER,  "egrCodec",		127},
-	{ OID_callDetailRecordLogR2Entry "\x81\x00\x00", 19, false, ASN_UINTEGER,  "ingLocGateId",	128},
-	{ OID_callDetailRecordLogR2Entry "\x81\x01\x00", 19, false, ASN_UINTEGER,  "egrLocGateId",	129},
-	{ OID_callDetailRecordLogR2Entry "\x81\x02\x00", 19, false, ASN_OCTET_STR, "ingCasCrctSzr",	130},
-	{ OID_callDetailRecordLogR2Entry "\x81\x03\x00", 19, false, ASN_OCTET_STR, "egrCasCrctSzr",	131},
-	{ OID_callDetailRecordLogR2Entry "\x81\x04\x00", 19, false, ASN_OCTET_STR, "ingZz",		132},
-	{ OID_callDetailRecordLogR2Entry "\x81\x05\x00", 19, false, ASN_OCTET_STR, "egrZz",		133},
-	{ OID_callDetailRecordLogR2Entry "\x81\x06\x00", 19, false, ASN_OCTET_STR, "ingCtryAddrType",	134},
-	{ OID_callDetailRecordLogR2Entry "\x81\x07\x00", 19, false, ASN_OCTET_STR, "egrCtryAddrType",	135},
-	{ OID_callDetailRecordLogR2Entry "\x81\x08\x00", 19, false, ASN_UINTEGER,  "ingPartition",	136},
-	{ OID_callDetailRecordLogR2Entry "\x81\x09\x00", 19, false, ASN_UINTEGER,  "egrPartition",	137},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0a\x00", 19, false, ASN_UINTEGER,  "ingClngPtyCat",	138},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0b\x00", 19, false, ASN_UINTEGER,  "ingRlsCauseLctn",	139},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0c\x00", 19, false, ASN_UINTEGER,  "egrRlsCauseLctn",	140},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0d\x00", 19, false, ASN_UINTEGER,  "clldPtyCat",	141},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0e\x00", 19, false, ASN_UINTEGER,  "callDuration",	142},
-	{ OID_callDetailRecordLogR2Entry "\x81\x0f\x00", 19, false, ASN_UINTEGER,  "ingRlsDrctn",	143},
-	{ OID_callDetailRecordLogR2Entry "\x81\x00\x00", 19, false, ASN_UINTEGER,  "egrRlsDrctn",	144},
-	{ OID_callDetailRecordLogR2Entry "\x81\x01\x00", 19, false, ASN_OCTET_STR, "ingAnsLctim",	145},
-	{ OID_callDetailRecordLogR2Entry "\x81\x02\x00", 19, false, ASN_OCTET_STR, "egrAnsLctim",	146},
-	{ OID_callDetailRecordLogR2Entry "\x81\x03\x00", 19, false, ASN_UINTEGER,  "ingHlcChrsId",	147},
-	{ OID_callDetailRecordLogR2Entry "\x81\x04\x00", 19, false, ASN_UINTEGER,  "egrHlcChrsId",	148},
-	{ OID_callDetailRecordLogR2Entry "\x81\x05\x00", 19, false, ASN_UINTEGER,  "ingLlcXferCap",	149},
-	{ OID_callDetailRecordLogR2Entry "\x81\x06\x00", 19, false, ASN_UINTEGER,  "egrLlcXferCap",	150},
-	{ OID_callDetailRecordLogR2Entry "\x81\x07\x00", 19, false, ASN_OCTET_STR, "routeList",		151},
-	{ OID_callDetailRecordLogR2Entry "\x81\x08\x00", 19, false, ASN_UINTEGER,  "ingPointCode",	152},
-	{ OID_callDetailRecordLogR2Entry "\x81\x09\x00", 19, false, ASN_UINTEGER,  "egrPointCode",	153},
-	{ NULL, }
+	{ .oid = OID_cdr2Scalars "\x01\x00",			 16, false, ASN_OCTET_STR, "fileName",		  0},
+	{ .oid = OID_cdr2Scalars "\x02\x00",			 16, false, ASN_INTEGER,   "reasonForOutput",	  0},
+	{ .oid = OID_cdr2Scalars "\x03\x00",			 16, false, ASN_INTEGER,   "sequenceNumber",	  0},
+	{ .oid = OID_cdr2Scalars "\x04\x00",			 16, false, ASN_OPAQUE,    "callRecord",	  0},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x01\x00",	 18,  true, ASN_COUNTER64, "sequenceId",	  1},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x02\x00",	 18,  true, ASN_COUNTER64, "zoneId",		  2},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x03\x00",	 18,  true, ASN_COUNTER64, "recSeqId",		  3},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x04\x00",	 18,  true, ASN_COUNTER64, "fileSeqId",		  4},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x05\x00",	 18,  true, ASN_OCTET_STR, "callId",		  5},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x06\x00",	 18,  true, ASN_OCTET_STR, "lastUpdate",	  6},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x07\x00",	 18,  true, ASN_OCTET_STR, "eventOrder",	  7},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x08\x00",	 18,  true, ASN_INTEGER,   "status",		  8},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x09\x00",	 18, false, ASN_INTEGER,   "callType",		  9},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0a\x00",	 18, false, ASN_OCTET_STR, "clngPtyNbr",	 10},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0b\x00",	 18, false, ASN_OCTET_STR, "chargeNbr",		 11},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0c\x00",	 18, false, ASN_OCTET_STR, "clldPtyNbr",	 12},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0d\x00",	 18, false, ASN_INTEGER,   "clldPtyNoa",	 13},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0e\x00",	 18, false, ASN_OCTET_STR, "origLnInfo",	 14},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x0f\x00",	 18, false, ASN_OCTET_STR, "ingLrn",		 15},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x10\x00",	 18, false, ASN_OCTET_STR, "ingCic",		 16},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x11\x00",	 18, false, ASN_INTEGER,   "ingCsi",		 17},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x12\x00",	 18, false, ASN_UINTEGER,  "ingCceId",		 18},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x13\x00",	 18, false, ASN_INTEGER,   "ingTgProt",		 19},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x14\x00",	 18, false, ASN_INTEGER,   "ingTgType",		 20},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x15\x00",	 18, false, ASN_UINTEGER,  "ingTgId",		 21},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x16\x00",	 18, false, ASN_OCTET_STR, "ingCallStart",	 22},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x17\x00",	 18, false, ASN_UINTEGER,  "ingGateId",		 23},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x18\x00",	 18, false, ASN_UINTEGER,  "ingCardId",		 24},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x19\x00",	 18, false, ASN_UINTEGER,  "ingSpanId",		 25},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1a\x00",	 18, false, ASN_UINTEGER,  "ingChanId",		 26},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1b\x00",	 18, false, ASN_UINTEGER,  "ingIsdnDChan",	 27},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1c\x00",	 18, false, ASN_UINTEGER,  "ingIsdnCrn",	 28},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1d\x00",	 18, false, ASN_OCTET_STR, "ingCreatConnCplt",	 29},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1e\x00",	 18, false, ASN_OCTET_STR, "ingAddrCplt",	 30},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x1f\x00",	 18, false, ASN_OCTET_STR, "ingCallAns",	 31},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x20\x00",	 18, false, ASN_OCTET_STR, "transNbr",		 32},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x21\x00",	 18, false, ASN_OCTET_STR, "termLrn",		 33},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x22\x00",	 18, false, ASN_OCTET_STR, "transCic",		 34},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x23\x00",	 18, false, ASN_OCTET_STR, "ingCallRls",	 35},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x24\x00",	 18, false, ASN_UINTEGER,  "ingRlsCause",	 36},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x25\x00",	 18, false, ASN_UINTEGER,  "egrCceId",		 37},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x26\x00",	 18, false, ASN_INTEGER,   "egrTgProt",		 38},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x27\x00",	 18, false, ASN_INTEGER,   "egrTgType",		 39},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x28\x00",	 18, false, ASN_UINTEGER,  "egrTgId",		 40},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x29\x00",	 18, false, ASN_OCTET_STR, "egrCallStart",	 41},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2a\x00",	 18, false, ASN_UINTEGER,  "egrGateId",		 42},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2b\x00",	 18, false, ASN_UINTEGER,  "egrCardId",		 43},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2c\x00",	 18, false, ASN_UINTEGER,  "egrSpanId",		 44},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2d\x00",	 18, false, ASN_UINTEGER,  "egrChanId",		 45},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2e\x00",	 18, false, ASN_UINTEGER,  "egrIsdnDChan",	 46},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x2f\x00",	 18, false, ASN_UINTEGER,  "egrIsdnCrn",	 47},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x30\x00",	 18, false, ASN_OCTET_STR, "egrCreatConnCplt",	 48},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x31\x00",	 18, false, ASN_OCTET_STR, "egrAddrCplt",	 49},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x32\x00",	 18, false, ASN_OCTET_STR, "egrCallAns",	 50},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x33\x00",	 18, false, ASN_OCTET_STR, "egrCallRls",	 51},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x34\x00",	 18, false, ASN_UINTEGER,  "egrRlsCause",	 52},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x35\x00",	 18, false, ASN_OCTET_STR, "chkptFirst",	 53},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x36\x00",	 18, false, ASN_OCTET_STR, "chkptLast",		 54},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x37\x00",	 18, false, ASN_OCTET_STR, "ingGateName",	 55},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x38\x00",	 18, false, ASN_OCTET_STR, "egrGateName",	 56},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x39\x00",	 18, false, ASN_OCTET_STR, "ingTgName",		 57},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3a\x00",	 18, false, ASN_OCTET_STR, "egrTgName",		 58},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3b\x00",	 18, false, ASN_OCTET_STR, "origGateIp",	 59},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3c\x00",	 18, false, ASN_OCTET_STR, "termGateIp",	 60},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3d\x00",	 18, false, ASN_OCTET_STR, "h323ConfId",	 61},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3e\x00",	 18, false, ASN_UINTEGER,  "ingCardPort",	 62},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x3f\x00",	 18, false, ASN_UINTEGER,  "ingCardPath",	 63},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x40\x00",	 18, false, ASN_UINTEGER,  "egrCardPort",	 64},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x41\x00",	 18, false, ASN_UINTEGER,  "egrCardPath",	 65},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x42\x00",	 18, false, ASN_UINTEGER,  "ingTg",		 66},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x43\x00",	 18, false, ASN_UINTEGER,  "egrTg",		 67},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x44\x00",	 18, false, ASN_OCTET_STR, "dialedNbr",		 68},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x45\x00",	 18, false, ASN_INTEGER,   "dialedNoa",		 69},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x46\x00",	 18, false, ASN_OCTET_STR, "redirNbr",		 70},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x47\x00",	 18, false, ASN_INTEGER,   "redirNoa",		 71},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x48\x00",	 18, false, ASN_INTEGER,   "redirInd",		 72},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x49\x00",	 18, false, ASN_INTEGER,   "redirRsn",		 73},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4a\x00",	 18, false, ASN_OCTET_STR, "calledNbr",		 74},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4b\x00",	 18, false, ASN_INTEGER,   "calledNoa",		 75},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4c\x00",	 18, false, ASN_INTEGER,   "redirRsnOrig",	 76},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4d\x00",	 18, false, ASN_UINTEGER,  "redirCntr",		 77},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4e\x00",	 18, false, ASN_INTEGER,   "redirPrsntnInd",	 78},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x4f\x00",	 18, false, ASN_OCTET_STR, "ingJuris",		 79},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x50\x00",	 18, false, ASN_OCTET_STR, "egrJuris",		 80},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x51\x00",	 18, false, ASN_INTEGER,   "ingTrunkBearCap",	 81},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x52\x00",	 18, false, ASN_INTEGER,   "egrTrunkBearCap",	 82},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x53\x00",	 18, false, ASN_OCTET_STR, "transNetSelCarr",	 83},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x54\x00",	 18, false, ASN_UINTEGER,  "clngPtyNoa",	 84},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x55\x00",	 18, false, ASN_OCTET_STR, "ingRlsCauseIntrnl",	 85},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x56\x00",	 18, false, ASN_OCTET_STR, "egrRlsCauseIntrnl",	 86},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x57\x00",	 18, false, ASN_OCTET_STR, "egrClldNbr",	 87},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x58\x00",	 18, false, ASN_INTEGER,   "egrClldNoa",	 88},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x59\x00",	 18, false, ASN_OCTET_STR, "egrCnndNbr",	 89},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5a\x00",	 18, false, ASN_INTEGER,   "egrCnndNoa",	 90},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5b\x00",	 18, false, ASN_INTEGER,   "clngPtyPrsntnInd",	 91},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5c\x00",	 18, false, ASN_INTEGER,   "ingIri",		 92},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5d\x00",	 18, false, ASN_INTEGER,   "egrOri",		 93},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5e\x00",	 18, false, ASN_OCTET_STR, "ingCallidExtrnl",	 94},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x5f\x00",	 18, false, ASN_OCTET_STR, "egrCallidExtrnl",	 95},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x60\x00",	 18, false, ASN_OCTET_STR, "ingChargeInfo",	 96},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x61\x00",	 18, false, ASN_OCTET_STR, "egrChargeInfo",	 97},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x62\x00",	 18, false, ASN_OCTET_STR, "ingPrtlInd",	 98},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x63\x00",	 18, false, ASN_INTEGER,   "ingNatfwdCliblkInd", 99},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x64\x00",	 18, false, ASN_INTEGER,   "ingNatfwdNtaInd",	100},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x65\x00",	 18, false, ASN_OCTET_STR, "ingLastDvrtLnDigs",	101},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x66\x00",	 18, false, ASN_INTEGER,   "ingLastDvrtLnNoa",	102},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x67\x00",	 18, false, ASN_OCTET_STR, "j7IngAddlPtyCat",	103},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x68\x00",	 18, false, ASN_OCTET_STR, "j7IngChgAreaInfo",	104},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x69\x00",	 18, false, ASN_OCTET_STR, "j7IngFwdCallInd",	105},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6a\x00",	 18, false, ASN_OCTET_STR, "j7EgrAddlPtyCat",	106},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6b\x00",	 18, false, ASN_OCTET_STR, "j7EgrChgAreaInfo",	107},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6c\x00",	 18, false, ASN_OCTET_STR, "j7EgrBkwCallInd",	108},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6d\x00",	 18, false, ASN_OCTET_STR, "j7CarrInfoXfer",	109},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6e\x00",	 18, false, ASN_OCTET_STR, "ingSs7GnrcParm",	110},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x6f\x00",	 18, false, ASN_OCTET_STR, "egrSs7GnrcParm",	111},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x70\x00",	 18, false, ASN_UINTEGER,  "ingPktsSent",	112},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x71\x00",	 18, false, ASN_UINTEGER,  "ingPktsRcvd",	113},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x72\x00",	 18, false, ASN_UINTEGER,  "ingPktsLost",	114},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x73\x00",	 18, false, ASN_UINTEGER,  "ingPktsXfer",	115},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x74\x00",	 18, false, ASN_UINTEGER,  "ingJitter",		116},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x75\x00",	 18, false, ASN_UINTEGER,  "ingLtncy",		117},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x76\x00",	 18, false, ASN_UINTEGER,  "egrPktsSent",	118},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x77\x00",	 18, false, ASN_UINTEGER,  "egrPktsRcvd",	119},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x78\x00",	 18, false, ASN_UINTEGER,  "egrPktsLost",	120},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x79\x00",	 18, false, ASN_UINTEGER,  "egrPktsXfer",	121},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7a\x00",	 18, false, ASN_UINTEGER,  "egrJitter",		122},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7b\x00",	 18, false, ASN_UINTEGER,  "egrLtncy",		123},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7c\x00",	 18, false, ASN_UINTEGER,  "ingCrctId",		124},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7d\x00",	 18, false, ASN_UINTEGER,  "egrCrctId",		125},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7e\x00",	 18, false, ASN_UINTEGER,  "ingCodec",		126},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x7f\x00",	 18, false, ASN_UINTEGER,  "egrCodec",		127},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x00\x00", 19, false, ASN_UINTEGER,  "ingLocGateId",	128},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x01\x00", 19, false, ASN_UINTEGER,  "egrLocGateId",	129},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x02\x00", 19, false, ASN_OCTET_STR, "ingCasCrctSzr",	130},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x03\x00", 19, false, ASN_OCTET_STR, "egrCasCrctSzr",	131},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x04\x00", 19, false, ASN_OCTET_STR, "ingZz",		132},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x05\x00", 19, false, ASN_OCTET_STR, "egrZz",		133},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x06\x00", 19, false, ASN_OCTET_STR, "ingCtryAddrType",	134},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x07\x00", 19, false, ASN_OCTET_STR, "egrCtryAddrType",	135},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x08\x00", 19, false, ASN_UINTEGER,  "ingPartition",	136},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x09\x00", 19, false, ASN_UINTEGER,  "egrPartition",	137},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0a\x00", 19, false, ASN_UINTEGER,  "ingClngPtyCat",	138},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0b\x00", 19, false, ASN_UINTEGER,  "ingRlsCauseLctn",	139},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0c\x00", 19, false, ASN_UINTEGER,  "egrRlsCauseLctn",	140},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0d\x00", 19, false, ASN_UINTEGER,  "clldPtyCat",	141},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0e\x00", 19, false, ASN_UINTEGER,  "callDuration",	142},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x0f\x00", 19, false, ASN_UINTEGER,  "ingRlsDrctn",	143},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x00\x00", 19, false, ASN_UINTEGER,  "egrRlsDrctn",	144},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x01\x00", 19, false, ASN_OCTET_STR, "ingAnsLctim",	145},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x02\x00", 19, false, ASN_OCTET_STR, "egrAnsLctim",	146},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x03\x00", 19, false, ASN_UINTEGER,  "ingHlcChrsId",	147},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x04\x00", 19, false, ASN_UINTEGER,  "egrHlcChrsId",	148},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x05\x00", 19, false, ASN_UINTEGER,  "ingLlcXferCap",	149},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x06\x00", 19, false, ASN_UINTEGER,  "egrLlcXferCap",	150},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x07\x00", 19, false, ASN_OCTET_STR, "routeList",		151},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x08\x00", 19, false, ASN_UINTEGER,  "ingPointCode",	152},
+	{ .oid = OID_callDetailRecordLogR2Entry "\x81\x09\x00", 19, false, ASN_UINTEGER,  "egrPointCode",	153},
+	{ .oid = NULL, }
 	/* *INDENT-ON* */
 };
 
 static struct varbind_list traps[] = {
 
 	/* *INDENT-OFF* */
-	{ OID_cdr2Notifications "\x01",			 14, false, ASN_NULL, "blockRecordNotification",        1},
-	{ OID_cdr2Notifications "\x02",			 14, false, ASN_NULL, "callDetailRecordNotification",   2},
-	{ OID_cdr2Notifications "\x03",			 14,  true, ASN_NULL, "fileCreationNotification",       3},
-	{ OID_cdr2Notifications "\x04",			 14,  true, ASN_NULL, "blockRecordNotificationR2",      4},
-	{ OID_cdr2Notifications "\x05",			 14,  true, ASN_NULL, "callDetailRecordNotificationR2", 5},
-	{ NULL, }
+	{ .oid = OID_cdr2Notifications "\x01",			 14, false, ASN_NULL, "blockRecordNotification",        1},
+	{ .oid = OID_cdr2Notifications "\x02",			 14, false, ASN_NULL, "callDetailRecordNotification",   2},
+	{ .oid = OID_cdr2Notifications "\x03",			 14,  true, ASN_NULL, "fileCreationNotification",       3},
+	{ .oid = OID_cdr2Notifications "\x04",			 14,  true, ASN_NULL, "blockRecordNotificationR2",      4},
+	{ .oid = OID_cdr2Notifications "\x05",			 14,  true, ASN_NULL, "callDetailRecordNotificationR2", 5},
+	{ .oid = NULL, }
 	/* *INDENT-ON* */
 };
 
@@ -520,7 +520,7 @@ unpack_integer(unsigned char *p, unsigned char *e, long long *val)
 {
 	uint len;
 
-	if ((len = e - p) > sizeof(*val) || len < 0) {
+	if ((len = e - p) > sizeof(*val)) {
 		fprintf(stderr, "E: integer length (%u) out of bounds\n", len);
 		return (-1);
 	}
@@ -544,7 +544,7 @@ unpack_unsigned(unsigned char **p, unsigned char *e, unsigned long long *val)
 {
 	uint len;
 
-	if ((len = e - *p) > sizeof(*val) || len < 0) {
+	if ((len = e - *p) > sizeof(*val)) {
 		fprintf(stderr, "E: unsigned length (%u) out of bounds\n", len);
 		return (-1);
 	}
@@ -867,6 +867,7 @@ process_record(bool corrupt)
 {
 	int var;
 
+	(void) corrupt;
 	for (var = 0; vars[var].oid != NULL; var++) {
 		if (vars[var].index == 0 && vars[var].pointer == NULL)
 			continue;
@@ -916,6 +917,7 @@ parse_trap(unsigned char *p, unsigned char **e, int version)
 	unsigned char *m = *e;
 	int trap;
 
+	(void) version;
 	if (unpack_tagcls(&p, &m, ASN_SEQUENCE)) {
 		fprintf(stderr, "E: poorly formatted trap varbind\n");
 		goto error;
@@ -943,7 +945,7 @@ parse_trap(unsigned char *p, unsigned char **e, int version)
 	}
 	/* is this a trap that is known to us? */
 	for (trap = 0; traps[trap].oid != NULL; trap++) {
-		if (m - p != traps[trap].oidlen)
+		if (m - p != (int) traps[trap].oidlen)
 			continue;
 		if (memcmp(p, traps[trap].oid, traps[trap].oidlen))
 			continue;
@@ -984,7 +986,7 @@ parse_callrecord(unsigned char *p, unsigned char *e)
 			break;
 		}
 		for (var = 0; vars[var].oid != NULL; var++)
-			if (vars[var].index == tag)
+			if (vars[var].index == (int) tag)
 				break;
 		if (vars[var].oid == NULL) {
 			fprintf(stderr, "E: unknown tag %u in record: skipping\n", tag);
@@ -1020,7 +1022,7 @@ parse_varbind(unsigned char *p, unsigned char *e, int trap)
 	}
 	/* look for this varbind */
 	for (var = 0; vars[var].oid != NULL; var++) {
-		if (m - p != vars[var].oidlen)
+		if (m - p != (int) vars[var].oidlen)
 			continue;
 		if (memcmp(p, vars[var].oid, vars[var].oidlen))
 			continue;
@@ -1198,7 +1200,7 @@ parse_v1_pdu(unsigned char *p, unsigned char *e, int version)
 	for (trap = 0; traps[trap].oid != NULL; trap++) {
 		if (trapnum != traps[trap].index)
 			continue;
-		if (traps[trap].oidlen != oidlen + 2)
+		if ((int) traps[trap].oidlen != oidlen + 2)
 			continue;
 		if (memcmp(t, traps[trap].oid, oidlen))
 			continue;
@@ -1399,8 +1401,8 @@ parse_msg(unsigned char *p, unsigned char *e)
 	return (-1);
 }
 
-static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
-static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
+static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, 0 };
+static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, 0 };
 
 static int
 test_snmp(void)
@@ -1480,7 +1482,7 @@ test_snmp(void)
 }
 
 void
-dump(int argc, char *argv[])
+dump(char *argv[])
 {
 	int var, trap;
 
@@ -1503,7 +1505,7 @@ dump(int argc, char *argv[])
 }
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
@@ -1550,7 +1552,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -1572,7 +1574,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -1588,7 +1590,7 @@ Usage:\n\
 #define DEFAULT_PORT 162
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -1673,7 +1675,7 @@ main(int argc, char *argv[])
 			port = atoi(optarg);
 			break;
 		case 'D':
-			dump(argc, argv);
+			dump(argv);
 			exit(0);
 		case 'q':
 			verbose = 0;
@@ -1697,13 +1699,13 @@ main(int argc, char *argv[])
 			debug = val;
 			break;
 		case 'h':
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1717,13 +1719,13 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	loc_addr.sin_port = htons(port);
 	test_snmp();
 	exit(0);
