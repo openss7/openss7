@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -382,7 +382,7 @@ __nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
 		return ((*addrs = __inet_netdir_getbyname(nc, service)) ? 0 : -1);
 	} else {
 		struct __nsl_xlate *xl;
-		int i;
+		unsigned i;
 
 		for (i = 0; i < nc->nc_nlookups; i++) {
 			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
@@ -439,7 +439,7 @@ __nsl_netdir_getbyaddr(struct netconfig *nc, struct nd_hostservlist **service,
 		return ((*service = __inet_netdir_getbyaddr(nc, netaddr)) ? 0 : -1);
 	} else {
 		struct __nsl_xlate *xl;
-		int i;
+		unsigned i;
 
 		for (i = 0; i < nc->nc_nlookups; i++) {
 			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
@@ -543,7 +543,7 @@ __nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 		return (__inet_netdir_options(nc, option, fd, pta));
 	} else {
 		struct __nsl_xlate *xl;
-		int i;
+		unsigned i;
 
 		for (i = 0; i < nc->nc_nlookups; i++) {
 			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
@@ -600,7 +600,7 @@ __nsl_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 	} else {
 		struct __nsl_xlate *xl;
 		char *uaddr;
-		int i;
+		unsigned i;
 
 		for (i = 0; i < nc->nc_nlookups; i++) {
 			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))
@@ -656,7 +656,7 @@ __nsl_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 	} else {
 		struct __nsl_xlate *xl = NULL;
 		struct netbuf *taddr;
-		int i;
+		unsigned i;
 
 		for (i = 0; i < nc->nc_nlookups; i++) {
 			if ((xl = __nsl_lookup_xlate(nc->nc_lookups[i]))

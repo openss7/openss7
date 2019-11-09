@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -290,7 +290,7 @@ __sock_list_wrlock(void)
 	return __sock_lock_wrlock(&__sock_fd_lock);
 }
 static void
-__sock_list_unlock(void *ignore)
+__sock_list_unlock(void *ignore __attribute__((unused)))
 {
 	return __sock_lock_unlock(&__sock_fd_lock);
 }

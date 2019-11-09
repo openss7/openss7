@@ -604,7 +604,7 @@ __nsl_getnetconfigent(const char *netid)
 					break;
 				}
 				if ((*ncp)->nc_nlookups > 0) {
-					int i;
+					unsigned i;
 
 					nc->nc_nlookups = (*ncp)->nc_nlookups;
 					nc->nc_lookups =
