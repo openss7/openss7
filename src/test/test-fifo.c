@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -760,7 +760,7 @@ event_string(int event)
 }
 
 const char *
-ioctl_string(int cmd, intptr_t arg)
+ioctl_string(int cmd)
 {
 	switch (cmd) {
 	case I_NREAD:
@@ -1109,7 +1109,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -1514,9 +1514,9 @@ print_poll_value(int child, int value, short revents)
 }
 
 void
-print_ioctl(int child, int cmd, intptr_t arg)
+print_ioctl(int child, int cmd)
 {
-	print_command_info(child, "ioctl(2)------", ioctl_string(cmd, arg));
+	print_command_info(child, "ioctl(2)------", ioctl_string(cmd));
 }
 
 void
@@ -1644,7 +1644,7 @@ test_waitsig(int child)
 int
 test_ioctl(int child, int cmd, intptr_t arg)
 {
-	print_ioctl(child, cmd, arg);
+	print_ioctl(child, cmd);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -2064,7 +2064,7 @@ test_close(int child)
  */
 
 int
-stream_start(int child, int index)
+stream_start(int child)
 {
 	switch (child) {
 	case 1:
@@ -2142,7 +2142,7 @@ test_msleep(int child, unsigned long m)
  */
 
 static int
-begin_tests(int index)
+begin_tests()
 {
 	state = 0;
 	show_acks = 1;
@@ -2150,7 +2150,7 @@ begin_tests(int index)
 }
 
 static int
-end_tests(int index)
+end_tests()
 {
 	show_acks = 0;
 	return (__RESULT_SUCCESS);
@@ -2176,18 +2176,18 @@ preamble_0(int child)
 static long old_test_duration = 0;
 
 static int
-begin_sanity(int index)
+begin_sanity()
 {
 	old_test_duration = test_duration;
 	test_duration = 5000;
-	return begin_tests(index);
+	return begin_tests();
 }
 
 static int
-end_sanity(int index)
+end_sanity()
 {
 	test_duration = old_test_duration;
-	return end_tests(index);
+	return end_tests();
 }
 
 /*
@@ -2201,12 +2201,14 @@ end_sanity(int index)
 int
 preamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 postamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -3853,6 +3855,7 @@ preamble_test_case_3_1_11_rd(int child)
 int
 test_case_3_1_11_rd(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_3_1_11_rd = { &preamble_test_case_3_1_11_rd, &test_case_3_1_11_rd, &postamble_0 };
@@ -4416,6 +4419,7 @@ preamble_test_case_3_2_11_rd(int child)
 int
 test_case_3_2_11_rd(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_3_2_11_rd = { &preamble_test_case_3_2_11_rd, &test_case_3_2_11_rd, &postamble_0 };
@@ -4985,6 +4989,7 @@ preamble_test_case_3_3_11_rd(int child)
 int
 test_case_3_3_11_rd(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_3_3_11_rd = { &preamble_test_case_3_3_11_rd, &test_case_3_3_11_rd, &postamble_0 };
@@ -5291,8 +5296,8 @@ struct test_case {
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
-	int (*start) (int);		/* start function */
-	int (*stop) (int);		/* stop function */
+	int (*start) ();		/* start function */
+	int (*stop) ();			/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 	int expect;			/* expected result */
@@ -5443,7 +5448,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -5741,14 +5746,14 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -5797,7 +5802,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -5805,7 +5810,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved.\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
@@ -5817,7 +5822,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -5831,7 +5836,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -6082,13 +6087,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -6104,7 +6109,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -6123,7 +6128,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	exit(do_tests(tests_to_run));
 }
