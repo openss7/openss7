@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -490,7 +490,7 @@ unsigned char iut_sio = 0;
 unsigned char iut_len = 0;
 
 #define MSU_LEN 35
-int msu_len = MSU_LEN;
+unsigned msu_len = MSU_LEN;
 
 static int oldpsb = 0;
 static int oldmsg = 0;
@@ -659,6 +659,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -682,6 +683,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -695,6 +697,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -973,6 +976,7 @@ signal(int action)
 			printf("                                  :msu\n");
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
@@ -8247,13 +8251,13 @@ typedef struct ppa {
 void
 print_ppa(ppa_t * ppa, int len)
 {
-	if (len >= sizeof(ppa->loc)) {
+	if (len >= (int) sizeof(ppa->loc)) {
 		printf("PPA loc Address family = %d\n", ppa->loc.sin_family);
 		printf("PPA loc Port = %d\n", ppa->loc.sin_port);
 		printf("PPA loc Address = %s\n", inet_ntoa(ppa->loc.sin_addr));
 		FFLUSH(stdout);
 	}
-	if (len >= sizeof(ppa->loc) + sizeof(ppa->rem)) {
+	if (len >= (int) sizeof(ppa->loc) + (int) sizeof(ppa->rem)) {
 		printf("PPA rem Address family = %d\n", ppa->rem.sin_family);
 		printf("PPA rem Port = %d\n", ppa->rem.sin_port);
 		printf("PPA rem Address = %s\n", inet_ntoa(ppa->rem.sin_addr));
@@ -8324,7 +8328,7 @@ pt_attach(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct sockaddr_in loc = { AF_INET, htons(10001), {INADDR_ANY} };
+	struct sockaddr_in loc = { AF_INET, htons(10001), {INADDR_ANY}, 0 };
 	// inet_aton("127.0.0.1", &loc.sin_addr);
 	if (verbose) {
 		printf("     :attach\n");
@@ -8419,7 +8423,7 @@ pt_enable(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct sockaddr_in rem = { AF_INET, htons(10002), {INADDR_ANY} };
+	struct sockaddr_in rem = { AF_INET, htons(10002), {INADDR_ANY}, 0 };
 	inet_aton("127.0.0.1", &rem.sin_addr);
 	if (verbose) {
 		printf("     :enable\n");
@@ -8730,7 +8734,7 @@ iut_attach(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct sockaddr_in loc = { AF_INET, htons(10002), {INADDR_ANY}, };
+	struct sockaddr_in loc = { AF_INET, htons(10002), {INADDR_ANY}, 0 };
 	// inet_aton("127.0.0.1", &loc.sin_addr);
 	if (verbose) {
 		printf("                                  :attach\n");
@@ -8815,7 +8819,7 @@ iut_enable(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
-	struct sockaddr_in rem = { AF_INET, htons(10001), {INADDR_ANY}, };
+	struct sockaddr_in rem = { AF_INET, htons(10001), {INADDR_ANY}, 0 };
 	inet_aton("127.0.0.1", &rem.sin_addr);
 	if (verbose) {
 		printf("                                  :enable\n");
@@ -10018,8 +10022,8 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 int
 do_tests(void)
 {
-	int i, ret;
-	int failed = 0, passed = 0, inconc = 0, errored = 0;
+	unsigned i;
+	int ret, failed = 0, passed = 0, inconc = 0, errored = 0;
 	printf("\n");
 	FFLUSH(stdout);
 	for (i = 0; i < sizeof(test_suite) / sizeof(test_case_t); i++) {
@@ -10066,14 +10070,14 @@ do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose < 0)
 		return;
 	fprintf(stdout, "\
 ITU-T Recommendation Q.781 - Conformance Test Suite\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -10122,7 +10126,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose < 0)
 		return;
@@ -10130,7 +10134,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -10142,7 +10146,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -10156,7 +10160,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -10223,13 +10227,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -10245,7 +10249,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -10254,7 +10258,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
