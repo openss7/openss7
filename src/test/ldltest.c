@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -656,7 +656,7 @@ do_info(int fd)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_info: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -666,7 +666,7 @@ do_info(int fd)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_info: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_info: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -684,7 +684,7 @@ do_info(int fd)
 	case DL_INFO_ACK:
 		if (verbose > 2)
 			printf("do_info: Got DL_INFO_ACK\n");
-		if (ctlbuf.len < sizeof(dl_info_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_info_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_info: Bad DL_INFO_ACK length %d\n", ctlbuf.len);
 			return -1;
@@ -718,14 +718,14 @@ do_info(int fd)
 			printf("\tgrowth=%lu\n", (ulong) reply.ack.info_ack.dl_growth);
 			if (reply.ack.info_ack.dl_addr_length && reply.ack.info_ack.dl_addr_offset
 			    && reply.ack.info_ack.dl_addr_offset +
-			    reply.ack.info_ack.dl_addr_length <= ctlbuf.len)
+			    reply.ack.info_ack.dl_addr_length <= (unsigned) ctlbuf.len)
 				dumpaddr("\tAddress",
 					 &ctlbuf.buf[reply.ack.info_ack.dl_addr_offset],
 					 reply.ack.info_ack.dl_addr_length);
 			if (reply.ack.info_ack.dl_brdcst_addr_length
 			    && reply.ack.info_ack.dl_brdcst_addr_offset
 			    && reply.ack.info_ack.dl_brdcst_addr_offset +
-			    reply.ack.info_ack.dl_brdcst_addr_length <= ctlbuf.len)
+			    reply.ack.info_ack.dl_brdcst_addr_length <= (unsigned) ctlbuf.len)
 				dumpaddr("\tBroadcast address",
 					 &ctlbuf.buf[reply.ack.info_ack.dl_brdcst_addr_offset],
 					 reply.ack.info_ack.dl_brdcst_addr_length);
@@ -803,7 +803,7 @@ do_info(int fd)
 		if (reply.ack.info_ack.dl_brdcst_addr_length != 0
 		    && reply.ack.info_ack.dl_brdcst_addr_offset != 0) {
 			assert(reply.ack.info_ack.dl_addr_length == 0
-			       || reply.ack.info_ack.dl_brdcst_addr_length == addr_len);
+			       || reply.ack.info_ack.dl_brdcst_addr_length == (unsigned) addr_len);
 			memcpy(my_brd_addr, &ctlbuf.buf[reply.ack.info_ack.dl_brdcst_addr_offset],
 			       reply.ack.info_ack.dl_brdcst_addr_length);
 		}
@@ -855,7 +855,7 @@ do_curr_phys_addr(int fd)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_curr_phys_addr: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -865,7 +865,7 @@ do_curr_phys_addr(int fd)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_curr_phys_addr: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_curr_phys_addr: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -883,7 +883,7 @@ do_curr_phys_addr(int fd)
 	case DL_PHYS_ADDR_ACK:
 		if (verbose > 2)
 			printf("do_curr_phys_addr: Got DL_PHYS_ADDR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_phys_addr_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_phys_addr_ack_t)) {
 			if (verbose)
 				fprintf(stderr,
 					"do_curr_phys_addr: Bad DL_PHYS_ADDR_ACK length %d\n",
@@ -900,7 +900,7 @@ do_curr_phys_addr(int fd)
 			if (reply.ack.phys_addr_ack.dl_addr_length
 			    && reply.ack.phys_addr_ack.dl_addr_offset
 			    && reply.ack.phys_addr_ack.dl_addr_offset +
-			    reply.ack.phys_addr_ack.dl_addr_length <= ctlbuf.len)
+			    reply.ack.phys_addr_ack.dl_addr_length <= (unsigned) ctlbuf.len)
 				dumpaddr("\tAddress",
 					 &ctlbuf.buf[reply.ack.phys_addr_ack.dl_addr_offset],
 					 reply.ack.phys_addr_ack.dl_addr_length);
@@ -959,7 +959,7 @@ do_attach(int fd, dl_ulong ppa)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_attach: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -969,7 +969,7 @@ do_attach(int fd, dl_ulong ppa)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_attach: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_attach: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -987,7 +987,7 @@ do_attach(int fd, dl_ulong ppa)
 	case DL_OK_ACK:
 		if (verbose > 2)
 			printf("do_attach: Got DL_OK_ACK\n");
-		if (ctlbuf.len < sizeof(dl_ok_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_ok_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_attach: Bad DL_OK_ACK length %d\n", ctlbuf.len);
 			return -1;
@@ -1046,7 +1046,7 @@ do_promiscon(int fd, unsigned long level)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_promiscon: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -1056,7 +1056,7 @@ do_promiscon(int fd, unsigned long level)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_promiscon: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_promiscon: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -1074,7 +1074,7 @@ do_promiscon(int fd, unsigned long level)
 	case DL_OK_ACK:
 		if (verbose > 2)
 			printf("do_promiscon: Got DL_OK_ACK\n");
-		if (ctlbuf.len < sizeof(dl_ok_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_ok_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_promiscon: Bad DL_OK_ACK length %d\n",
 					ctlbuf.len);
@@ -1144,7 +1144,7 @@ do_bind(int fd, dl_ulong sap)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_bind: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -1154,7 +1154,7 @@ do_bind(int fd, dl_ulong sap)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_bind: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_bind: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -1172,7 +1172,7 @@ do_bind(int fd, dl_ulong sap)
 	case DL_BIND_ACK:
 		if (verbose > 2)
 			printf("do_bind: Got DL_BIND_ACK\n");
-		if (ctlbuf.len < sizeof(dl_bind_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_bind_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_bind: Bad DL_BIND_ACK length %d\n", ctlbuf.len);
 			return -1;
@@ -1251,7 +1251,7 @@ do_bind_peer(int fd, char *sap, int saplen)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		if (verbose)
 			fprintf(stderr, "do_bind_peer: Bad reply length %d\n", ctlbuf.len);
 		return -1;
@@ -1261,7 +1261,7 @@ do_bind_peer(int fd, char *sap, int saplen)
 	case DL_ERROR_ACK:
 		if (verbose)
 			printf("do_bind_peer: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_bind_peer: Bad DL_ERROR_ACK length %d\n",
 					ctlbuf.len);
@@ -1279,7 +1279,7 @@ do_bind_peer(int fd, char *sap, int saplen)
 	case DL_SUBS_BIND_ACK:
 		if (verbose > 2)
 			printf("do_bind_peer: Got DL_SUBS_BIND_ACK\n");
-		if (ctlbuf.len < sizeof(dl_subs_bind_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_subs_bind_ack_t)) {
 			if (verbose)
 				fprintf(stderr, "do_bind_peer: Bad DL_BIND_ACK length %d\n",
 					ctlbuf.len);
@@ -1433,7 +1433,7 @@ send_arp_request(int fd)
 }
 
 int
-process_arp_reply(int fd, char *databuf, int datalen, char *dlsap)
+process_arp_reply(char *databuf)
 {
 	struct arphdr *arp;
 	unsigned char *pr;
@@ -1548,7 +1548,7 @@ process_incoming_arp(int fd, char *databuf, int datalen, char *dlsap)
 	if (verbose > 2)
 		printf("process_incoming_arp() entered\n");
 
-	if (datalen < sizeof(struct arphdr)) {
+	if (datalen < (int) sizeof(struct arphdr)) {
 		if (verbose)
 			fprintf(stderr, "process_incoming_arp(): Received short ARP frame\n");
 		return -1;
@@ -1562,7 +1562,7 @@ process_incoming_arp(int fd, char *databuf, int datalen, char *dlsap)
 		return 0;	/* Not an IP request */
 	}
 
-	if (datalen < sizeof(struct arphdr) + 2 * (addr_len + 4)) {
+	if (datalen < (int) sizeof(struct arphdr) + 2 * (addr_len + 4)) {
 		if (verbose)
 			fprintf(stderr, "process_incoming_arp(): Received short ARP frame\n");
 		return -1;
@@ -1570,7 +1570,7 @@ process_incoming_arp(int fd, char *databuf, int datalen, char *dlsap)
 
 	switch (ntohs(arp->ar_op)) {
 	case ARPOP_REPLY:
-		return process_arp_reply(fd, databuf, datalen, dlsap);
+		return process_arp_reply(databuf);
 	case ARPOP_REQUEST:
 		return process_arp_request(fd, databuf, datalen, dlsap);
 	default:
@@ -1810,7 +1810,7 @@ _do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *src_d
 			break;
 		}
 	} else {
-		if (ctlbuf.len < sizeof(dl_unitdata_ind_t) + 2 * (addr_len + sap_len)) {
+		if (ctlbuf.len < (int) sizeof(dl_unitdata_ind_t) + 2 * (addr_len + sap_len)) {
 			if (ctlbuf.len == 0) {
 				if (verbose)
 					printf("_do_rcv_unitdata(): "
@@ -1856,7 +1856,7 @@ check_ip_packet(unsigned char *data, int datalen)
 
 	struct iphdr *hdr = (struct iphdr *) data;
 
-	if (datalen < sizeof(*hdr)) {
+	if (datalen < (int) sizeof(*hdr)) {
 		if (verbose)
 			fprintf(stderr, "check_ip_packet: Too short for IP header.\n");
 		return -1;
@@ -1969,11 +1969,12 @@ jmp_buf timeout_jmp;
 static void
 arp_timeout(int arg)
 {
+	(void) arg;
 	longjmp(timeout_jmp, 1);
 }
 
 int
-do_arp(int fd, struct in_addr ip, unsigned char *target_addr)
+do_arp(int fd, unsigned char *target_addr)
 {
 	/* 
 	 *  Sending out an ICMP PING packet using the DLPI directly
@@ -2435,7 +2436,7 @@ initialize(void)
 		arp_sap = ETH_P_ARP;
 		if (do_bind_peer(fd, (char *) &arp_sap, sap_len) < 0)
 			exit(1);
-		if (target_ip_addr.s_addr != 0 && do_arp(fd, target_ip_addr, target_addr) < 0)
+		if (target_ip_addr.s_addr != 0 && do_arp(fd, target_addr) < 0)
 			exit(1);
 	}
 
@@ -2443,7 +2444,7 @@ initialize(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2451,7 +2452,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
@@ -2488,14 +2489,14 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2008-2011  Monavacon Limited.    All Rights Reserved.\n\
+    Copyright (c) 2008-2019  Monavacon Limited.    All Rights Reserved.\n\
     Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\
@@ -2508,7 +2509,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2522,7 +2523,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -2592,7 +2593,7 @@ main(int argc, char *argv[])
 	char *endp;
 
 	int fd;
-	int i;
+	unsigned i;
 	struct timeval tv1, tv2;
 	int pid = getpid();
 	unsigned short seq = 0, rseq;
@@ -2716,13 +2717,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying(argv);
 			exit(0);
 		case '?':
 		default:
@@ -2736,7 +2737,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 			}
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
