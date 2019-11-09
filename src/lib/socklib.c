@@ -422,20 +422,23 @@ __asm__(".symver __so_socket,socket@@SOCKLIB_1.0");
  *   connect indications.)  If the application subsequently calls listen with a non-zero backlog
  *   value then the request translates to an ioctl that sockkmod services. [SI_LISTEN]  When sockmod
  *   receives the ioctl message, it first unbinds the endpoint, and then rebinds it to the same
- *   address, specifying the new backlog value.  The fact that in some cases the endpoint ahs to be
- *   unbind and then rebound introduces a window in which another application could request the same
- *   address.  HOwever, this window is small and we consider it acceptable." -- Implementing
+ *   address, specifying the new backlog value.  The fact that in some cases the endpoint has to be
+ *   unbound and then rebound introduces a window in which another application could request the same
+ *   address.  However, this window is small and we consider it acceptable." -- Implementing
  *   Berkeley Sockets in UNIX(R) System V Release 4.
  */
 int
 _so_listen(int fd, int backlog)
 {
+	(void) fd;
+	(void) backlog;
 	return (0);
 }
 
 int
 __so_sockatmark(int fd)
 {
+	(void) fd;
 	return (0);
 }
 
@@ -457,6 +460,10 @@ __so_setoption(int s, t_scalar_t level, t_scalar_t name, const void *optptr, siz
 		, T_NEGOTIATE,
 	};
 	int retval;
+
+	(void) level;	    /* XXX */
+	(void) name;	    /* XXX */
+	(void) optptr;	    /* XXX */
 
 	retval = t_optmgmt(s, &opts, &opts);
 	if (retval == -1) {
