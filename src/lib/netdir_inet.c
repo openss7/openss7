@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -179,6 +179,7 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 	struct netbuf *b;
 	int cnt;
 
+	(void) nc;
 	hints.ai_flags = 0;
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = 0;
@@ -525,6 +526,8 @@ static int
 __setresvport(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
+	(void) fd;
+	(void) addr;
 	nd_error = ND_NOCTRL;
 	return (-1);
 }
@@ -553,6 +556,8 @@ static int
 __joinmulticast(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
+	(void) fd;
+	(void) addr;
 	nd_error = ND_NOCTRL;
 	return (-1);
 }
@@ -560,6 +565,8 @@ static int
 __leavemulticast(int fd, struct netbuf *addr)
 {
 	/* not implemented yet */
+	(void) fd;
+	(void) addr;
 	nd_error = ND_NOCTRL;
 	return (-1);
 }
@@ -583,6 +590,7 @@ __inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr)
 	unsigned short port;
 	int len;
 
+	(void) nc;
 	if (taddr == NULL || taddr->buf == NULL || taddr->len == 0) {
 		nd_error = ND_BADARG;
 		return (NULL);
@@ -638,6 +646,7 @@ __inet_uaddr2taddr(struct netconfig *nc, struct netbuf *uaddr)
 	char *beg, *end;
 	int field;
 
+	(void) nc;
 	if (uaddr == NULL || uaddr->buf == NULL || uaddr->len == 0) {
 		nd_error = ND_BADARG;
 		return (NULL);
@@ -768,6 +777,9 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 	return (maddr);
 #endif
 	/* not implemented yet */
+	(void) nc;
+	(void) caddr;
+	(void) saddr;
 	nd_error = ND_NOCTRL;
 	return (NULL);
 }
