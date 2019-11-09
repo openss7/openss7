@@ -265,7 +265,7 @@ test_tcps(void)
 static int verbose = 1;
 
 void
-splash(int argc, char *argv[])
+splash(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -322,7 +322,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -342,7 +342,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -358,7 +358,7 @@ Usage:\n\
 #define TEST_PORT_NUMBER 18000
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -469,13 +469,13 @@ main(int argc, char **argv)
 			break;
 		case 'H':
 		case 'h':
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			splash(argc, argv);
+			splash(argv);
 			exit(0);
 		case '?':
 		default:
@@ -489,14 +489,14 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
 	if (optind < argc)
 		goto bad_nonopt;
 
-	splash(argc, argv);
+	splash(argv);
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
