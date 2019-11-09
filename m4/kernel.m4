@@ -598,17 +598,21 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
 	if test -r $_kmoddir/modules.dep
 	then
+	    linux_cv_k_compress='no'
 	    if ( egrep -q '\.(k)?o\.gz:' $_kmoddir/modules.dep )
 	    then
-		linux_cv_k_compress='yes'
-	    else
-		linux_cv_k_compress='no'
+		linux_cv_k_compress='gz'
+	    fi
+	    if ( egrep -q '\.(k)?o\.xz:' $_kmoddir/modules.dep )
+	    then
+		linux_cv_k_compress='xz'
 	    fi
 	else
 	    linux_cv_k_compress='unknown'
 	fi ])
     case $linux_cv_k_compress in
-	(yes)		COMPRESS_KERNEL_MODULES='gzip -f9v' ; kzip=".gz" ;;
+	(gz)		COMPRESS_KERNEL_MODULES='gzip -f9v' ; kzip=".gz" ;;
+	(xz)		COMPRESS_KERNEL_MODULES='xz -6e'    ; kzip=".xz" ;;
 	(no)		COMPRESS_KERNEL_MODULES= ; kzip= ;;
 	(unknown|*)	COMPRESS_KERNEL_MODULES= ; kzip=
 		AC_MSG_WARN([
