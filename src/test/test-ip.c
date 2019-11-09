@@ -954,7 +954,7 @@ nerrno_string(ulong nerr, long uerr)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -1491,7 +1491,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1517,7 +1517,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -1556,7 +1556,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -2099,7 +2099,7 @@ print_proto(char *pro_ptr, size_t pro_len)
 	size_t pnum = pro_len / sizeof(p[0]);
 
 	if (pro_len) {
-		int i;
+		unsigned i;
 
 		if (!pnum)
 			printf("(PROTOID_length = %lu)", (ulong) pro_len);
@@ -2336,7 +2336,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -2930,7 +2930,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -3875,6 +3875,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -4391,7 +4392,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	union N_primitives *p = (union N_primitives *) ctrl->buf;
 	char buf[64];
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((PRIM_type = p->type)) {
 		case N_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -4719,6 +4720,7 @@ expect(int child, int wait, int want)
 static int
 preamble_0(int child)
 {
+	(void) child;
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -4790,7 +4792,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
@@ -4852,7 +4854,7 @@ preamble_1_idle_cons(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY}, 0 };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
 
@@ -4986,9 +4988,9 @@ preamble_1_wres_cind_conn(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + 2);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)},0},
+		{AF_INET, port, {htonl(0x7f000002)},0},
+		{AF_INET, port, {htonl(0x7f000003)},0}
 	};
 	char buf[] = "xxxxTest Data";
 
@@ -5079,9 +5081,9 @@ preamble_1_data_xfer_list(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + 0);
 	struct sockaddr_in sin[3] = {
-		{AF_INET, port, {htonl(0x7f000001)}},
-		{AF_INET, port, {htonl(0x7f000002)}},
-		{AF_INET, port, {htonl(0x7f000003)}}
+		{AF_INET, port, {htonl(0x7f000001)},0},
+		{AF_INET, port, {htonl(0x7f000002)},0},
+		{AF_INET, port, {htonl(0x7f000003)},0}
 	};
 	char buf[] = "xxxxTest Data";
 	N_qos_sel_conn_ip_t qos = {
@@ -5813,6 +5815,7 @@ Checks that three streams can be opened and closed."
 int
 test_case_1_1(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
@@ -6225,7 +6228,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -6530,7 +6533,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -6586,7 +6589,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -6606,7 +6609,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -6620,7 +6623,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -6926,13 +6929,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -6948,7 +6951,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -6967,7 +6970,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
