@@ -1045,9 +1045,9 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
 			oh = NULL;
 			break;
 		}
-		if (oh->level != level)
+		if (oh->level != (t_uscalar_t) level)
 			continue;
-		if (oh->name != name)
+		if (oh->name != (t_uscalar_t) name)
 			continue;
 		break;
 	}
@@ -1564,7 +1564,7 @@ etype_string(t_uscalar_t etype)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -2116,7 +2116,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2142,7 +2142,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2863,7 +2863,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -2906,6 +2906,7 @@ print_open(int child, const char *name)
 		"                    .  . %-30.30s .                   \n",
 	};
 
+	(void) name;
 	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
@@ -3457,7 +3458,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -4400,6 +4401,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -5261,6 +5263,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
@@ -5274,7 +5277,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -5798,231 +5801,275 @@ expect(int child, int wait, int want)
 static int
 preamble_1_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_1_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_1_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_1_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_2_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_2_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_2_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_2_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_3_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_3_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_3_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_3_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_4_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_4_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_4_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_4_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_5_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_5_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_5_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_5_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_6_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_6_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_6_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_6_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_7_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_7_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_7_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_7_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_8_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_8_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_8_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_8_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_9_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_9_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_9_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_9_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_10_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_10_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_10_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_10_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_11_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 preamble_11_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_11_iut(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 static int
 postamble_11_pt(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -6033,6 +6080,7 @@ postamble_11_pt(int child)
 static int
 preamble_iut_unint_iut(int child)
 {
+	(void) child;
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -6042,6 +6090,7 @@ preamble_iut_unint_iut(int child)
 static int
 preamble_iut_unint_pt(int child)
 {
+	(void) child;
 	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -6800,12 +6849,14 @@ Checks that the IUT makes a complete association procedure."
 int
 test_case_1_1_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_1_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -6835,12 +6886,14 @@ an INIT from the PT."
 int
 test_case_1_1_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_1_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -6871,12 +6924,14 @@ again."
 int
 test_case_1_2_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_2_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -6907,12 +6962,14 @@ message again."
 int
 test_case_1_2_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_2_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -6943,12 +7000,14 @@ stops the initialization process."
 int
 test_case_1_3_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_3_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -6979,12 +7038,14 @@ MAX.INIT.RETRANS times, stops the initialization process."
 int
 test_case_1_3_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_3_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7017,12 +7078,14 @@ is not received."
 int
 test_case_1_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7053,12 +7116,14 @@ a random Initiate-Tag value in the INIT message."
 int
 test_case_1_5_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_5_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7089,12 +7154,14 @@ a random Initiate-Tag value in the INIT-ACK message."
 int
 test_case_1_5_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_5_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7128,12 +7195,14 @@ to it."
 int
 test_case_1_6_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_6_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7166,12 +7235,14 @@ accepts this message and responds to it."
 int
 test_case_1_6_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_6_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7203,12 +7274,14 @@ the association or settles with the lesser of the two values."
 int
 test_case_1_7_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_7_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7240,12 +7313,14 @@ the received message."
 int
 test_case_1_7_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_7_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7278,12 +7353,14 @@ the association or settles with the lesser of the two parameters."
 int
 test_case_1_7_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_7_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7316,12 +7393,14 @@ need to take place to verify the TCB removal from outside the SUT.)"
 int
 test_case_1_7_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_7_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7352,12 +7431,14 @@ streams."
 int
 test_case_1_7_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_7_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7390,12 +7471,14 @@ processing of further parameters."
 int
 test_case_1_8_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_8_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7428,12 +7511,14 @@ it."
 int
 test_case_1_8_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_8_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7467,12 +7552,14 @@ message."
 int
 test_case_1_8_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_8_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7504,12 +7591,14 @@ message, skips this parameter and processes further parameters."
 int
 test_case_1_8_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_8_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7541,12 +7630,14 @@ responds with an INIT-ACK message."
 int
 test_case_1_9_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_9_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7580,12 +7671,14 @@ error \"Restart of an association with new addresses\""
 int
 test_case_1_9_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_9_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7616,12 +7709,14 @@ message was received."
 int
 test_case_1_10_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_10_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7653,12 +7748,14 @@ which the INIT-ACK message was received."
 int
 test_case_1_10_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_10_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7692,12 +7789,14 @@ SCTP source port number as the destination transport address."
 int
 test_case_1_11_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_11_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7730,12 +7829,14 @@ of the transport addresses."
 int
 test_case_1_11_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_11_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7767,12 +7868,14 @@ Address\"."
 int
 test_case_1_12_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_12_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7804,12 +7907,14 @@ address and no other IP address sends an ABORT message with error\n\
 int
 test_case_1_12_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_12_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7841,12 +7946,14 @@ contained in the Supported address field in the received INIT."
 int
 test_case_1_13_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_13_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7879,12 +7986,14 @@ message with cause \"Unresolvable Address\"."
 int
 test_case_1_13_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_13_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7914,12 +8023,14 @@ zero (0) detroys the TCB and may send an ABORT."
 int
 test_case_1_14_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_14_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7949,12 +8060,14 @@ equal to zero destroys the TCB and may send an ABORT."
 int
 test_case_1_14_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_14_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -7985,12 +8098,14 @@ messages for association establishment."
 int
 test_case_1_15_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_15_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8025,12 +8140,14 @@ to verify the removal of the association from outside the SUT."
 int
 test_case_2_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8062,12 +8179,14 @@ acknowledged by the PT."
 int
 test_case_2_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8097,12 +8216,14 @@ SHUTDOWN message is sent again."
 int
 test_case_2_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8136,12 +8257,14 @@ the association from outside the SUT."
 int
 test_case_2_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8171,12 +8294,14 @@ state send a SHUTDOWN COMPLETE message and terminates the association."
 int
 test_case_2_6_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_6_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8206,12 +8331,14 @@ for transmission from upper layer, does not send this new data."
 int
 test_case_2_7_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_7_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8242,12 +8369,14 @@ data for transmission from upper layer, does not send this new data."
 int
 test_case_2_7_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_7_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8277,12 +8406,14 @@ data for transmission from upper layer, does not send this new data."
 int
 test_case_2_7_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_7_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8312,12 +8443,14 @@ data for transmission from upper layer, does not send this new data."
 int
 test_case_2_7_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_7_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8347,12 +8480,14 @@ acknowledges the message and restarts the T2-Shutdown timer."
 int
 test_case_2_8_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_8_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8383,12 +8518,14 @@ data, discards the data."
 int
 test_case_2_9_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_9_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8422,12 +8559,14 @@ SHUTDOWN-ACK on reception of a SHUTDOWN (even recevied multiple times)."
 int
 test_case_2_10_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_10_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8457,12 +8596,14 @@ SHUTDOWN-ACK message again."
 int
 test_case_2_11_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_11_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8493,12 +8634,14 @@ sends an ABORT."
 int
 test_case_2_12_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_12_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8528,12 +8671,14 @@ SHUTDOWN-COMPLETE message and removes the association."
 int
 test_case_2_13_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_13_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8564,12 +8709,14 @@ SHUTDOWN that acknowledges outstanding DATA, sends a SHUTDOWN-ACK."
 int
 test_case_2_14_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_2_14_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8605,12 +8752,14 @@ message or may send an ABORT message."
 int
 test_case_3_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8642,12 +8791,14 @@ message or may send an ABORT message."
 int
 test_case_3_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8678,12 +8829,14 @@ verification tag, discards the COOKIE-ECHO message."
 int
 test_case_3_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8713,12 +8866,14 @@ checksum, discards the INIT message."
 int
 test_case_3_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8749,12 +8904,14 @@ cookie than sent in INIT-ACK, discards the message."
 int
 test_case_3_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8786,12 +8943,14 @@ received in INIT-ACK messae has expired, should send an ERROR with cause\n\
 int
 test_case_3_6_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_6_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8821,12 +8980,14 @@ verification tag, discards the message."
 int
 test_case_3_7_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_7_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8857,12 +9018,14 @@ discards the message."
 int
 test_case_3_8_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_8_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8893,12 +9056,14 @@ verification tag, discards the message."
 int
 test_case_3_9_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_9_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8929,12 +9094,14 @@ invalid verification tag, discards the message."
 int
 test_case_3_10_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_3_10_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -8968,12 +9135,14 @@ message on its own, sends an INIT-ACK message."
 int
 test_case_4_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9005,12 +9174,14 @@ is not disturbed."
 int
 test_case_4_2_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_2_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9041,12 +9212,14 @@ SHUTDOWN-ACK message."
 int
 test_case_4_2_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_2_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9076,12 +9249,14 @@ sending a COOKIE-ECHO message, discards the INIT-ACK message."
 int
 test_case_4_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9112,12 +9287,14 @@ the association is established, discards the COOKIE-ACK message."
 int
 test_case_4_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9148,12 +9325,14 @@ SHUTDOWN message on its own, sends a SHUTDOWN-ACK message."
 int
 test_case_4_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9183,12 +9362,14 @@ message on its own, discards the SHUTDOWN message."
 int
 test_case_4_6_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_6_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9218,12 +9399,14 @@ state, sends an ABORT message"
 int
 test_case_4_6_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_6_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9254,12 +9437,14 @@ state, sends a SHUTDOWN-ACK message and restarts T2-Shutdown timer."
 int
 test_case_4_6_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_6_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9290,12 +9475,14 @@ disturbed."
 int
 test_case_4_7_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_7_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9325,12 +9512,14 @@ state, discards the message or sends an ABORT."
 int
 test_case_4_7_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_7_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9362,12 +9551,14 @@ association."
 int
 test_case_4_7_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_7_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9397,12 +9588,14 @@ state, discards the message and current state is not disturbed."
 int
 test_case_4_8_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_8_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9432,12 +9625,14 @@ Wait state, discards the message."
 int
 test_case_4_9_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_9_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9467,12 +9662,14 @@ state, discards the message and may send an ABORT."
 int
 test_case_4_10_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_4_10_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9507,12 +9704,14 @@ may send an ABORT."
 int
 test_case_5_1_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_1_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9544,12 +9743,14 @@ retransmission to an endpoint."
 int
 test_case_5_1_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_1_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9580,12 +9781,14 @@ message."
 int
 test_case_5_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9616,12 +9819,14 @@ message."
 int
 test_case_5_3_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_3_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9652,12 +9857,14 @@ message."
 int
 test_case_5_3_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_3_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9688,12 +9895,14 @@ a SHUTDOWN-COMPLETE message with T-Bit set."
 int
 test_case_5_3_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_3_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9724,12 +9933,14 @@ discards the message."
 int
 test_case_5_3_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_3_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9760,12 +9971,14 @@ message."
 int
 test_case_5_3_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_5_3_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9808,12 +10021,14 @@ depending on the implementation:\n\
 int
 test_case_6_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9844,12 +10059,14 @@ and association is not disturbed."
 int
 test_case_6_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9880,12 +10097,14 @@ or aborts the association."
 int
 test_case_6_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9916,12 +10135,14 @@ Parameter\" or may send an ABORT or no message at all."
 int
 test_case_6_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9952,12 +10173,14 @@ Parameters\"."
 int
 test_case_6_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -9988,12 +10211,14 @@ association."
 int
 test_case_6_6_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_6_6_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10027,12 +10252,14 @@ chunk discards this packet."
 int
 test_case_7_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10063,12 +10290,14 @@ ignores the DATA chunks."
 int
 test_case_7_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10101,12 +10330,14 @@ ignores the DATA chunks."
 int
 test_case_7_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10137,12 +10368,14 @@ a SACK or a single COOKIE-ACK and then a SACK."
 int
 test_case_7_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10172,12 +10405,14 @@ chunks, accepts the COOKIE-ACK and responds with a SACK."
 int
 test_case_7_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10207,12 +10442,14 @@ accepts the packet and responds with a SHUTDOWN-ACK."
 int
 test_case_7_6_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_6_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10243,12 +10480,14 @@ chunks."
 int
 test_case_7_7_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_7_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10280,12 +10519,14 @@ would mean that the IUT has to send a SHUTDOWN-COMPLETE."
 int
 test_case_7_8_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_7_8_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10320,12 +10561,14 @@ resolving sCTP packet is less than or equal to MTU size."
 int
 test_case_8_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10354,12 +10597,14 @@ Checks that the IUT, is able to perfom data segmentation and transmission."
 int
 test_case_8_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10388,12 +10633,14 @@ Checks that the IUT is able to receive segmented data."
 int
 test_case_8_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10422,12 +10669,14 @@ Checks that the IUT on receipt of SACK cancels the timer T3-rtx and does not inc
 int
 test_case_8_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10456,12 +10705,14 @@ Checks that the IUT, after expiry of the timer T3-rtx, sends the DATA message ag
 int
 test_case_8_5_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_5_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10492,12 +10743,14 @@ reported in SACK."
 int
 test_case_8_6_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_6_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10527,12 +10780,14 @@ buffer space, does not transmit more than one DATA."
 int
 test_case_8_7_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_7_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10564,12 +10819,14 @@ the rnwd indicates that the peer has buffer space again."
 int
 test_case_8_8_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_8_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10599,12 +10856,14 @@ any outstanding DATA chunks, which are marked for retransmission."
 int
 test_case_8_9_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_9_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10638,12 +10897,14 @@ accepts the SACK."
 int
 test_case_8_10_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_10_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10673,12 +10934,14 @@ an ABORT with cause \"No User Data\"."
 int
 test_case_8_11_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_11_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10710,12 +10973,14 @@ SACK."
 int
 test_case_8_12_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_12_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10746,12 +11011,14 @@ size defined by the upper layer."
 int
 test_case_8_13_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_13_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10782,12 +11049,14 @@ defined by the upper layer."
 int
 test_case_8_14_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_14_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10817,12 +11086,14 @@ sends an ABORT with cause \"Out of Resource\"."
 int
 test_case_8_15_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_8_15_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10856,12 +11127,14 @@ immediately."
 int
 test_case_9_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_9_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10890,12 +11163,14 @@ Checks that the IUT can acknowledge the reception of multiple DATA chunks."
 int
 test_case_9_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_9_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10926,12 +11201,14 @@ the GAP ACK block."
 int
 test_case_9_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_9_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -10967,12 +11244,14 @@ Chunk Type\" and a SACK for the DATA chunk."
 int
 test_case_10_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_10_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11004,12 +11283,14 @@ process the DATA chunk."
 int
 test_case_10_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_10_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11042,12 +11323,14 @@ process the DATA chunk.  Additionally it has to send an ERROR with cause\n\
 int
 test_case_10_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_10_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11079,12 +11362,14 @@ the DATA chunk."
 int
 test_case_10_4_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_10_4_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11119,12 +11404,14 @@ timer."
 int
 test_case_11_1_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_11_1_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11154,12 +11441,14 @@ increases the value of RTO for that address."
 int
 test_case_11_2_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_11_2_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11191,12 +11480,14 @@ address."
 int
 test_case_11_3_top(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_11_3_bot(int child)
 {
+	(void) child;
 	return (__RESULT_SKIPPED);
 }
 
@@ -11687,7 +11978,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -11992,7 +12283,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -12048,7 +12339,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12068,7 +12359,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12082,7 +12373,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12400,13 +12691,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -12422,7 +12713,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -12441,7 +12732,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
