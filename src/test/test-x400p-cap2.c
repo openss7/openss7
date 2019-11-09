@@ -692,6 +692,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -713,6 +714,7 @@ send(int msg)
 			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -725,6 +727,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -1037,6 +1040,7 @@ signal(int action)
 			printf("                                  :msu\n");
 			FFLUSH(stdout);
 		}
+		__attribute__((fallthrough));
 	case SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
@@ -2064,6 +2068,7 @@ test_1_8a(void)
 				break;
 			case SIO:
 				send(SIO);
+				__attribute__((fallthrough));
 			case SIN:
 				send(SIN);
 				break;
@@ -5956,7 +5961,7 @@ test_6_3(void)
 		case 0:
 			count++;
 			send(FISU_CORRUPT);
-			for (; count < iutconf.sdt.T + 1; count++)
+			for (; count < (int) iutconf.sdt.T + 1; count++)
 				send(FISU_CORRUPT_S);
 			start_tt(2000);
 			state = 1;
@@ -6094,7 +6099,7 @@ test_7_1(void)
 			switch ((event = wait_event(0))) {
 			case NO_MSG:
 			case SIN:
-				if (count < iutconf.sdt.Tin - 1) {
+				if (count < (int) iutconf.sdt.Tin - 1) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
@@ -6190,7 +6195,7 @@ test_7_2(void)
 			switch ((event = wait_event(0))) {
 			case NO_MSG:
 			case SIN:
-				if (count < iutconf.sdt.Tin) {
+				if (count < (int) iutconf.sdt.Tin) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
@@ -6289,19 +6294,19 @@ test_7_3(void)
 				break;
 			case SIOS:
 				send(COUNT);
-				if (tries == iutconf.sl.M)
+				if (tries == (int) iutconf.sl.M)
 					return SUCCESS;
 				return FAILURE;
 			case NO_MSG:
 			case SIN:
-				if (count <= iutconf.sdt.Tin) {
+				if (count <= (int) iutconf.sdt.Tin) {
 					send(LSSU_CORRUPT);
 					count++;
 				} else {
 					send(COUNT);
 					count = 0;
 					send(SIN);
-					if (tries < iutconf.sl.M) {
+					if (tries < (int) iutconf.sl.M) {
 						start_tt(iutconf.sl.t4n * 10 / 2);
 						state = 3;
 						tries++;
@@ -6386,7 +6391,7 @@ test_7_4(void)
 				break;
 			case TIMEOUT:
 				send(LSSU_CORRUPT);
-				for (count = 1; count < iutconf.sdt.Tie; count++)
+				for (count = 1; count < (int) iutconf.sdt.Tie; count++)
 					send(LSSU_CORRUPT_S);
 				send(COUNT);
 				send(SIE);
@@ -6505,6 +6510,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x80))
 					return FAILURE;
 				state = 2;
+				__attribute__((fallthrough));
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = pt_bib = 0x80;
@@ -6540,6 +6546,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x00))
 					return FAILURE;
 				state = 4;
+				__attribute__((fallthrough));
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
@@ -6609,6 +6616,7 @@ test_8_3(void)
 					break;
 				}
 				count++;
+				__attribute__((fallthrough));
 			case TIMEOUT:
 				signal(COUNT);
 				count = 0;
@@ -7266,6 +7274,7 @@ test_8_13(void)
 			switch ((event = wait_event(0))) {
 			case FISU:
 				send(FISU);
+				__attribute__((fallthrough));
 			case NO_MSG:
 				signal(STOP);
 				start_tt(1000);
@@ -7567,7 +7576,7 @@ test_9_4(void)
 
 	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
-	if (msu_len > iutconf.sdt.m)
+	if (msu_len > (int) iutconf.sdt.m)
 		return INCONCLUSIVE;
 	printf("(N1=%u, N2=%u, n=%d, l=%d)\n", iutconf.sl.N1, iutconf.sl.N2, n, msu_len);
 	fflush(stdout);
@@ -7655,7 +7664,7 @@ test_9_5(void)
 		n = iutconf.sl.N1 - 1;
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		if (msu_len > (int) iutconf.sdt.m)
 			return INCONCLUSIVE;
 	}
 	if (msu_len > 12)
@@ -7748,7 +7757,7 @@ test_9_6(void)
 		n = iutconf.sl.N1 - 1;
 		msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 		n = iutconf.sl.N2 / (msu_len + h) + 1;
-		if (msu_len > iutconf.sdt.m)
+		if (msu_len > (int) iutconf.sdt.m)
 			return INCONCLUSIVE;
 	}
 	if (msu_len > 12)
@@ -8211,6 +8220,7 @@ test_10_2(void)
 					break;
 				}
 				start_tt(iutconf.sl.t5 * 10);
+				__attribute__((fallthrough));
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -8290,6 +8300,7 @@ test_10_3(void)
 					return FAILURE;
 				}
 				start_tt(iutconf.sl.t5 * 10);
+				__attribute__((fallthrough));
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -10007,8 +10018,8 @@ do_tests(void)
 int
 old_do_tests(void)
 {
-	int i, ret;
-	int failed = 0, passed = 0, inconc = 0, errored = 0;
+	unsigned i;
+	int ret, failed = 0, passed = 0, inconc = 0, errored = 0;
 
 	// char cbuf[BUFSIZE];
 	// char dbuf[BUFSIZE];
@@ -10074,7 +10085,7 @@ old_do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -10129,7 +10140,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -10149,7 +10160,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10163,7 +10174,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -10228,13 +10239,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -10250,7 +10261,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -10259,7 +10270,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
