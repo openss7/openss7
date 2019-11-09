@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -140,7 +140,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -775,7 +775,7 @@ errno_string(long err)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -802,7 +802,7 @@ event_string(int child, int event)
 }
 
 const char *
-ioctl_string(int cmd, intptr_t arg)
+ioctl_string(int cmd)
 {
 	switch (cmd) {
 	case I_NREAD:
@@ -1153,6 +1153,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 void
 print_more(int child)
 {
+	(void) child;
 	show = 1;
 }
 
@@ -1556,9 +1557,9 @@ print_poll_value(int child, int value, short revents)
 }
 
 void
-print_ioctl(int child, int cmd, intptr_t arg)
+print_ioctl(int child, int cmd)
 {
-	print_command_info(child, "ioctl(2)------", ioctl_string(cmd, arg));
+	print_command_info(child, "ioctl(2)------", ioctl_string(cmd));
 }
 
 void
@@ -1592,7 +1593,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -1686,7 +1687,7 @@ test_waitsig(int child)
 int
 test_ioctl(int child, int cmd, intptr_t arg)
 {
-	print_ioctl(child, cmd, arg);
+	print_ioctl(child, cmd);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -2106,7 +2107,7 @@ test_close(int child)
  */
 
 int
-stream_start(int child, int index)
+stream_start(int child)
 {
 	switch (child) {
 	case 1:
@@ -2184,7 +2185,7 @@ test_msleep(int child, unsigned long m)
  */
 
 static int
-begin_tests(int index)
+begin_tests()
 {
 	state = 0;
 	show_acks = 1;
@@ -2192,18 +2193,18 @@ begin_tests(int index)
 }
 
 static int
-end_tests(int index)
+end_tests()
 {
 	show_acks = 0;
 	return (__RESULT_SUCCESS);
 }
 
 static int
-begin_pipe_tests(int index)
+begin_pipe_tests()
 {
 	int child = 0;
 
-	if (begin_tests(index) != __RESULT_SUCCESS)
+	if (begin_tests() != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	print_pipe(child);
 	if (pipe(test_fd) >= 0) {
@@ -2216,7 +2217,7 @@ begin_pipe_tests(int index)
 }
 
 static int
-end_pipe_tests(int index)
+end_pipe_tests()
 {
 	int result = __RESULT_SUCCESS;
 
@@ -2225,7 +2226,7 @@ end_pipe_tests(int index)
 		result = __RESULT_FAILURE;
 	if (test_close(1) != __RESULT_SUCCESS)
 		result = __RESULT_FAILURE;
-	if (end_tests(index) != __RESULT_SUCCESS)
+	if (end_tests() != __RESULT_SUCCESS)
 		result = __RESULT_FAILURE;
 	return (result);
 }
@@ -2263,24 +2264,25 @@ preamble_0(int child)
 int
 postamble_0(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 static long old_test_duration = 0;
 
 static int
-begin_sanity(int index)
+begin_sanity()
 {
 	old_test_duration = test_duration;
 	test_duration = 5000;
-	return begin_tests(index);
+	return begin_tests();
 }
 
 static int
-end_sanity(int index)
+end_sanity()
 {
 	test_duration = old_test_duration;
-	return end_tests(index);
+	return end_tests();
 }
 
 /*
@@ -2294,12 +2296,14 @@ end_sanity(int index)
 int
 preamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 postamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -2464,9 +2468,10 @@ Checks that one STREAMS-based pipe can be opened and closed."
 int
 test_case_1_1(int child)
 {
-	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+	(void) child;
+	if (begin_pipe_tests() != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
-	if (end_pipe_tests(child) != __RESULT_SUCCESS)
+	if (end_pipe_tests() != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -3553,7 +3558,7 @@ that has no readers."
 int
 preamble_test_case_3_1_11(int child)
 {
-	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+	if (begin_pipe_tests() != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_close(child) != __RESULT_SUCCESS)
@@ -4083,7 +4088,7 @@ that has no readers."
 int
 preamble_test_case_3_2_11(int child)
 {
-	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+	if (begin_pipe_tests() != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_close(child) != __RESULT_SUCCESS)
@@ -4614,7 +4619,7 @@ that has no readers."
 int
 preamble_test_case_3_3_11(int child)
 {
-	if (begin_pipe_tests(child) != __RESULT_SUCCESS)
+	if (begin_pipe_tests() != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (test_close(child) != __RESULT_SUCCESS)
@@ -5085,7 +5090,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -5105,7 +5110,7 @@ do_tests(int num_tests)
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (num_tests == 1 || begin_tests(0) == __RESULT_SUCCESS) {
+	if (num_tests == 1 || begin_tests() == __RESULT_SUCCESS) {
 		if (num_tests != 1)
 			end_tests(0);
 		show = 1;
@@ -5390,14 +5395,14 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -5446,7 +5451,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -5454,7 +5459,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -5466,7 +5471,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -5480,7 +5485,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -5731,13 +5736,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -5753,7 +5758,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -5772,7 +5777,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	exit(do_tests(tests_to_run));
 }
