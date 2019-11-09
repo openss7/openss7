@@ -5610,7 +5610,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -40441,7 +40441,7 @@ test_case_14_9(int child, t_uscalar_t CURRENT_state)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (last_info.CURRENT_state != CURRENT_state)
+	if (last_info.CURRENT_state != (t_scalar_t) CURRENT_state)
 		goto inconclusive;
 	(void) child;
 	state++;
