@@ -281,7 +281,7 @@ static int tries = 0;
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -511,7 +511,7 @@ struct {
 	N_qos_sel_conn_sctp_t conn;
 } qos[3] = {
 	{
-		{
+		.info = {
 			N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
 			    2,	/* i_streams */
 			    2,	/* o_streams */
@@ -530,15 +530,18 @@ struct {
 			    -1L,	/* rtx_path */
 			    -1L,	/* hb_itvl */
 			    0	/* options */
-		}, {
+		},
+		.data = {
 			N_QOS_SEL_DATA_SCTP,	/* n_qos_type */
 			    5,	/* ppi */
 			    1,	/* sid */
 			    0,	/* ssn */
 			    0,	/* tsn */
 			    0	/* more */
-	},}, {
-		{
+		},
+	},
+	{
+		.info = {
 			N_QOS_SEL_INFO_SCTP,	/* n_qos_type */
 			    2,	/* i_streams */
 			    2,	/* o_streams */
@@ -557,15 +560,22 @@ struct {
 			    -1L,	/* rtx_path */
 			    -1L,	/* hb_itvl */
 			    0,	/* options */
-		}, {
+		},
+		.data = {
 			N_QOS_SEL_DATA_SCTP,	/* n_qos_type */
 			    5,	/* ppi */
 			    1,	/* sid */
 			    0,	/* ssn */
 			    0,	/* tsn */
 			    0	/* more */
-	},}, {
-},};
+		},
+	},
+	{
+		.info = {
+			0,
+		},
+	},
+};
 #endif				/* TEST_M2PA */
 
 #if TEST_X400
@@ -3634,7 +3644,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -3660,7 +3670,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -3699,7 +3709,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -4456,7 +4466,7 @@ print_proto(char *pro_ptr, size_t pro_len)
 	size_t pnum = pro_len / sizeof(p[0]);
 
 	if (pro_len) {
-		int i;
+		unsigned i;
 
 		if (!pnum)
 			printf("(PROTOID_length = %lu)", (ulong) pro_len);
@@ -4966,7 +4976,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -5355,6 +5365,7 @@ print_tx_msg(int child, const char *string)
 				print_tx_msg_sn(child, string, bsn[child], fsn[child]);
 				return;
 			}
+			__attribute__((fallthrough));
 		default:
 			print_string_state(child, msgs, string);
 			return;
@@ -5395,6 +5406,7 @@ print_rx_msg(int child, const char *string)
 				print_rx_msg_sn(child, string, bsn[other], fsn[other]);
 				return;
 			}
+			__attribute__((fallthrough));
 		default:
 			print_string_state(child, msgs, string);
 			return;
@@ -7014,6 +7026,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 #if TEST_M2PA
 	qos_data.sid = 0;
 	qos_info.hmac = SCTP_HMAC_NONE;
@@ -8439,6 +8452,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 	int other = (child + 1) % 2;
 #endif				/* TEST_X400 || TEST_M2PA */
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		switch (child) {
 		default:
@@ -8883,7 +8897,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union primitives *p = (union primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->prim)) {
+	if (ctrl->len >= (int) sizeof(p->prim)) {
 		switch ((last_prim = p->prim)) {
 #if TEST_M2PA
 		case N_CONN_REQ:
@@ -9356,7 +9370,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -9396,6 +9410,7 @@ preamble_unbound(int child)
 static int
 postamble_unbound(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -10292,6 +10307,9 @@ check_snibs(int child, unsigned char bsnib, unsigned char fsnib)
 		return __RESULT_SUCCESS;
 	return __RESULT_FAILURE;
 #else
+	(void) child;
+	(void) bsnib;
+	(void) fsnib;
 	return __RESULT_SUCCESS;
 #endif
 }
@@ -10348,12 +10366,14 @@ Checks that two Streams can be opened and closed."
 int
 test_0_2_1_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_1_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -10374,12 +10394,14 @@ Checks that two Streams can be opened, information obtained, and closed."
 int
 test_0_2_2_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_2_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -10401,12 +10423,14 @@ pushed, popped, and closed."
 int
 test_0_2_3_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_3_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -12054,6 +12078,7 @@ test_1_9b_ptu(int child, int proving)
 static int
 test_1_9b_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -12380,6 +12405,7 @@ test_1_11_ptu(int child, int proving)
 static int
 test_1_11_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12499,6 +12525,7 @@ test_1_12a_ptu(int child, int proving)
 static int
 test_1_12a_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12606,6 +12633,7 @@ test_1_12b_ptu(int child, int proving)
 static int
 test_1_12b_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -12725,6 +12753,7 @@ test_1_13_ptu(int child, int proving)
 static int
 test_1_13_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_LPO))
 		goto failure;
 	state++;
@@ -12898,6 +12927,7 @@ test_1_15_ptu(int child, int proving)
 static int
 test_1_15_iut(int child, int proving)
 {
+	(void) proving;
 	if (do_signal(child, __TEST_START))
 		goto failure;
 	state++;
@@ -13255,6 +13285,7 @@ test_1_19_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __STATUS_ALIGNMENT) {
@@ -13270,6 +13301,7 @@ test_1_19_ptu(int child)
 				goto failure;
 			beg_time = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_PROVING_EMERG)) {
 				switch (last_event) {
@@ -13289,6 +13321,7 @@ test_1_19_ptu(int child)
 				goto failure;
 			print_less(child);
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -13376,6 +13409,7 @@ test_1_20_ptu(int child)
 			if (do_signal(child, last_event))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -13567,6 +13601,7 @@ test_1_23_ptu(int child)
 			beg_time = 0;
 			start_tt(config->sl.t4n / 2);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -13662,6 +13697,7 @@ test_1_24_ptu(int child)
 				goto failure;
 			origin = state;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT)) {
 				if (last_event == __STATUS_OUT_OF_SERVICE) {
@@ -13677,6 +13713,7 @@ test_1_24_ptu(int child)
 				goto failure;
 			beg_time = 0;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -13754,6 +13791,7 @@ test_1_25_ptu(int child)
 				goto failure;
 			origin = state;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_ALIGNMENT) {
@@ -13825,6 +13863,7 @@ test_1_26_ptu(int child)
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				switch (last_event) {
@@ -13892,6 +13931,7 @@ test_1_27_ptu(int child, int proving)
 			if (do_signal(child, __STATUS_IN_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -14007,6 +14047,7 @@ test_1_28_ptu(int child)
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14073,6 +14114,7 @@ test_1_29a_ptu(int child)
 			if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14191,6 +14233,7 @@ test_1_30a_ptu(int child)
 			if (do_signal(child, __STATUS_IN_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -14267,6 +14310,7 @@ test_1_30b_ptu(int child)
 			if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14336,6 +14380,7 @@ test_1_31a_ptu(int child)
 			if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14413,6 +14458,7 @@ test_1_31b_ptu(int child)
 			if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -14483,6 +14529,7 @@ test_1_32a_ptu(int child)
 			if (start_tt(config->sl.t4n / 2))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				switch (last_event) {
@@ -14502,6 +14549,7 @@ test_1_32a_ptu(int child)
 			if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				switch (last_event) {
@@ -14618,6 +14666,7 @@ test_1_33_ptu(int child)
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14684,6 +14733,7 @@ test_1_34_ptu(int child)
 			if (do_signal(child, __STATUS_OUT_OF_SERVICE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -14825,6 +14875,7 @@ test_2_1_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_ALIGNMENT)) {
 				if (last_event == __STATUS_OUT_OF_SERVICE) {
@@ -14837,6 +14888,7 @@ test_2_1_ptu(int child)
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -14946,6 +14998,7 @@ test_2_2_ptu(int child)
 			if (do_signal(child, __STATUS_ALIGNMENT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -15059,6 +15112,7 @@ test_2_3_ptu(int child)
 			if (do_signal(child, __STATUS_PROVING_NORMAL))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -15169,6 +15223,7 @@ test_2_4_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				switch (last_event) {
@@ -15393,6 +15448,7 @@ test_2_7_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -15407,6 +15463,7 @@ test_2_7_ptu(int child)
 			if (start_tt(LONG_WAIT))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __EVENT_TIMEOUT)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -15561,6 +15618,7 @@ test_3_1_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -15639,6 +15697,7 @@ test_3_2_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __STATUS_IN_SERVICE)
@@ -15647,6 +15706,7 @@ test_3_2_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -15723,6 +15783,7 @@ test_3_3_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE)
@@ -15803,6 +15864,7 @@ test_3_4_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __STATUS_PROCESSOR_OUTAGE)
@@ -15812,6 +15874,7 @@ test_3_4_ptu(int child)
 				goto failure;
 			fib[child] ^= 0x80;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -15882,6 +15945,7 @@ test_3_5_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE)
@@ -15958,6 +16022,7 @@ test_3_6_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __STATUS_IN_SERVICE)
@@ -15966,6 +16031,7 @@ test_3_6_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_IN_SERVICE) {
@@ -16044,6 +16110,7 @@ test_3_7_ptu(int child)
 			if (do_signal(child, __TEST_TX_BREAK))
 				goto inconclusive;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE)
@@ -16132,6 +16199,7 @@ test_3_8_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, SHORT_WAIT, __EVENT_NO_MSG)) {
 				if (last_event != __STATUS_PROCESSOR_OUTAGE)
@@ -16140,6 +16208,7 @@ test_3_8_ptu(int child)
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -16225,6 +16294,7 @@ test_4_1a_11_ptu(int child)
 			   Outage" command at SP A, and send another MSU from SP A. */
 			test_msleep(child, LONG_WAIT);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			/* (4) Send another data message from SP B to SP A and acknowledge the
 			   first data message sent from SP A. */
@@ -16265,6 +16335,7 @@ test_4_1a_11_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			/* (6) Check that the second data message sent after "Set Local Processor
 			   Outage" was asserted is not acknowledged or indicated. */
@@ -16281,6 +16352,7 @@ test_4_1a_11_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			/* (8) Check that this last message is neither acknowledged by nor
 			   indicated at SP A. */
@@ -16303,6 +16375,7 @@ test_4_1a_11_ptu(int child)
 			if (do_signal(child, __STATUS_SEQUENCE_SYNC))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 4:
 			/* (12) Check that the message sent before status "Ready" is neither
 			   acknowledged by nor indicated at SP A. */
@@ -16322,6 +16395,7 @@ test_4_1a_11_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 5:
 			/* (14) Check that SP A and SP B exchange this last set of data messages
 			   and akcnowledgements */
@@ -16877,6 +16951,7 @@ test_4_2_ptu(int child)
 			if (do_signal(child, __STATUS_PROCESSOR_ENDED))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_IN_SERVICE)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -16960,6 +17035,7 @@ test_4_3_ptu(int child)
 			if (do_signal(child, __STATUS_PROCESSOR_OUTAGE))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_PROCESSOR_ENDED)) {
 				if (last_event == __STATUS_PROCESSOR_OUTAGE) {
@@ -16978,6 +17054,7 @@ test_4_3_ptu(int child)
 			if (do_signal(child, __STATUS_PROCESSOR_ENDED))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				if (last_event != __STATUS_IN_SERVICE)
@@ -17084,6 +17161,7 @@ test_5_1_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17095,6 +17173,7 @@ test_5_1_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17157,6 +17236,7 @@ test_5_2_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17168,6 +17248,7 @@ test_5_2_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17247,6 +17328,7 @@ test_5_3_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_SUCCESS;
 #endif				/* TEST_X400 */
 }
@@ -17303,6 +17385,7 @@ test_5_4a_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17314,6 +17397,7 @@ test_5_4a_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17370,6 +17454,7 @@ test_5_4b_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17381,6 +17466,7 @@ test_5_4b_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17438,6 +17524,7 @@ test_5_5a_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17455,6 +17542,7 @@ test_5_5a_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17513,6 +17601,7 @@ test_5_5b_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17530,6 +17619,7 @@ test_5_5b_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17614,6 +17704,7 @@ test_6_1_ptu(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17630,6 +17721,7 @@ test_6_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17715,6 +17807,7 @@ test_6_2_ptu(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17731,6 +17824,7 @@ test_6_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17801,6 +17895,7 @@ test_6_3_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17815,6 +17910,7 @@ test_6_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17884,6 +17980,7 @@ test_6_4_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -17898,6 +17995,7 @@ test_6_4_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18009,6 +18107,7 @@ test_7_1_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18026,6 +18125,7 @@ test_7_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18137,6 +18237,7 @@ test_7_2_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18154,6 +18255,7 @@ test_7_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18281,6 +18383,7 @@ test_7_3_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18298,6 +18401,7 @@ test_7_3_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18400,6 +18504,7 @@ test_7_4_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18417,6 +18522,7 @@ test_7_4_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -18454,6 +18560,7 @@ test_8_1_ptu(int child)
 			if (start_tt(5000))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_ACK)) {
 #if TEST_X400
@@ -18476,6 +18583,7 @@ test_8_1_ptu(int child)
 				goto failure;
 #endif				/* TEST_X400 */
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_DATA)) {
 				if (last_event == __TEST_ACK) {
@@ -18512,6 +18620,7 @@ test_8_1_ptu(int child)
 				goto failure;
 #endif				/* TEST_M2PA */
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 #if TEST_X400
 			if (expect(child, INFINITE_WAIT, __TEST_FISU))
@@ -18662,6 +18771,7 @@ test_8_2_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
 }
@@ -18679,6 +18789,7 @@ test_8_2_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
 }
@@ -18718,6 +18829,7 @@ test_8_3_ptu(int child)
 			if (start_tt(config->sl.t7 / 2 - 200))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			switch (get_event(child)) {
 #if TEST_X400
@@ -18797,6 +18909,7 @@ test_8_3_ptu(int child)
 				goto failure;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			switch (get_event(child)) {
 #if TEST_X400
@@ -18925,6 +19038,7 @@ test_8_4_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			switch (get_event(child)) {
 			case __TEST_DATA:
@@ -19052,6 +19166,7 @@ test_8_5_ptu(int child)
 				break;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, config->sl.t7, __EVENT_NO_MSG))
 				goto failure;
@@ -19077,6 +19192,7 @@ test_8_5_ptu(int child)
 				break;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_ACK))
 				goto failure;
@@ -19222,6 +19338,7 @@ test_8_6_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19236,6 +19353,7 @@ test_8_6_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19319,6 +19437,7 @@ test_8_7_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19333,6 +19452,7 @@ test_8_7_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19412,6 +19532,7 @@ test_8_8_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19423,6 +19544,7 @@ test_8_8_iut(int child)
 	state++;
 	return __RESULT_SUCCESS;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -19601,6 +19723,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG)) {
 				switch (last_event) {
@@ -19625,6 +19748,7 @@ test_8_10_ptu(int child)
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __TEST_ACK))
 				goto failure;
@@ -19654,6 +19778,7 @@ test_8_10_ptu(int child)
 				break;
 			}
 			state++;
+			__attribute__((fallthrough));
 		case 3:
 			if (expect(child, INFINITE_WAIT, __TEST_ACK))
 				goto failure;
@@ -19747,6 +19872,7 @@ test_8_11_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __TEST_ACK && last_event != __STATUS_IN_SERVICE)
@@ -19780,6 +19906,7 @@ test_8_11_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __TEST_ACK) {
@@ -19857,6 +19984,7 @@ test_8_12a_ptu(int child)
 				goto failure;
 #endif
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_DATA)) {
 				if (last_event == __TEST_ACK) {
@@ -19874,6 +20002,7 @@ test_8_12a_ptu(int child)
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
+			__attribute__((fallthrough));
 		case 2:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE)) {
 				if (last_event == __TEST_ACK || last_event == __STATUS_IN_SERVICE) {
@@ -20229,6 +20358,7 @@ test_9_1_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20246,6 +20376,7 @@ test_9_1_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20400,6 +20531,7 @@ test_9_2_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20428,6 +20560,7 @@ test_9_2_iut(int child)
 	return __RESULT_FAILURE;
 #endif
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20539,6 +20672,7 @@ test_9_3_ptu(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20568,6 +20702,7 @@ test_9_3_iut(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20678,6 +20813,7 @@ test_9_4_ptu(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20709,6 +20845,7 @@ test_9_4_iut(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20842,6 +20979,7 @@ test_9_5_ptu(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20876,6 +21014,7 @@ test_9_5_iut(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -20975,6 +21114,7 @@ test_9_6_ptu(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21009,6 +21149,7 @@ test_9_6_iut(int child)
       inconclusive:
 	return __RESULT_INCONCLUSIVE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21116,6 +21257,7 @@ test_9_7_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21145,6 +21287,7 @@ test_9_7_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif
 }
@@ -21215,6 +21358,7 @@ test_9_8_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21229,6 +21373,7 @@ test_9_8_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21300,6 +21445,7 @@ test_9_9_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21314,6 +21460,7 @@ test_9_9_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21383,6 +21530,7 @@ test_9_10_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21400,6 +21548,7 @@ test_9_10_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21470,6 +21619,7 @@ test_9_11_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21487,6 +21637,7 @@ test_9_11_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21543,6 +21694,7 @@ test_9_12_ptu(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21557,6 +21709,7 @@ test_9_12_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21615,6 +21768,7 @@ test_9_13_ptu(int child)
       scripterror:
 	return __RESULT_SCRIPT_ERROR;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21629,6 +21783,7 @@ test_9_13_iut(int child)
       failure:
 	return __RESULT_FAILURE;
 #else				/* TEST_X400 */
+	(void) child;
 	return __RESULT_NOTAPPL;	/* can't do this */
 #endif				/* TEST_X400 */
 }
@@ -21721,6 +21876,7 @@ test_10_2a_ptu(int child)
 				goto failure;
 			beg_time = milliseconds(child, t6);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, config->sl.t6 - 100, __EVENT_NO_MSG))
 				goto failure;
@@ -21917,6 +22073,7 @@ test_10_3_ptu(int child)
 				goto failure;
 			beg_time = milliseconds(child, t6);
 			state++;
+			__attribute__((fallthrough));
 		case 1:
 			if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
 				goto failure;
@@ -22412,7 +22569,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -22717,7 +22874,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -22773,7 +22930,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -22793,7 +22950,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -22807,7 +22964,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -23381,13 +23538,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help, -?, --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -23403,7 +23560,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -23422,7 +23579,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
