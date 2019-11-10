@@ -1095,7 +1095,7 @@ static char const ident[] = \"makenodes (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\
 #endif\n\
 \n\
 #if !defined(USER)\n\
-void copying(int argc, char *argv[])\n\
+void copying()\n\
 {\n\
 	fprintf(stdout, \"\\\n\
 \\n\\\n\
@@ -1136,10 +1136,10 @@ regulations).\\n\\\n\
 Commercial  licensing  and  support of this  software is  available from OpenSS7\\n\\\n\
 Corporation at a fee.  See http://www.openss7.com/\\n\\\n\
 \\n\\\n\
-\", argv[0], ident);\n\
+\", NAME, ident);\n\
 }\n\
 \n\
-void version(int argc, char *argv[])\n\
+void version()\n\
 {\n\
 	fprintf(stdout, \"\\\n\
 \\n\\\n\
@@ -1160,7 +1160,7 @@ See `%1$s --copying' for copying permissions.\\n\\\n\
 \", NAME, PACKAGE, VERSION);\n\
 }\n\
 \n\
-void usage(int argc, char *argv[])\n\
+void usage(char *argv[])\n\
 {\n\
 	fprintf(stderr, \"\\\n\
 Usage:\\n\\\n\
@@ -1171,7 +1171,7 @@ Usage:\\n\\\n\
 \", argv[0]);\n\
 }\n\
 \n\
-void help(int argc, char *argv[])\n\
+void help(char *argv[])\n\
 {\n\
 	fprintf(stdout, \"\\\n\
 \\n\\\n\
@@ -1231,13 +1231,13 @@ int main(int argc, char *argv[])\n\
 			rmopt = 1;\n\
                         break;\n\
 		case 'h':	/* -h, --help */\n\
-			help(argc, argv);\n\
+			help(argv);\n\
 			exit(0);\n\
 		case 'V':	/* -V, --version */\n\
-			version(argc, argv);\n\
+			version();\n\
 			exit(0);\n\
 		case 'C':	/* -C, --copying */\n\
-			copying(argc, argv);\n\
+			copying();\n\
 			exit(0);\n\
 		case '?':\n\
 			optind--;\n\
@@ -1248,7 +1248,7 @@ int main(int argc, char *argv[])\n\
 					fprintf(stderr, \"%s \", argv[optind]);\n\
 				fprintf(stderr, \"\\n\");\n\
 			}\n\
-			usage(argc, argv);\n\
+			usage(argv);\n\
 			exit(2);\n\
 		}\n\
 	}\n\
