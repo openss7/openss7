@@ -92,7 +92,7 @@ char outpdir[127] = "/var/log/streams";
 char devname[127] = "";
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -139,7 +139,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -161,7 +161,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -175,7 +175,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -233,7 +233,7 @@ strvf_exit(int retval)
 }
 
 static void
-strvf(int argc, char *argv[])
+strvf()
 {
 	int fd;
 
@@ -442,17 +442,17 @@ main(int argc, char *argv[])
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -471,7 +471,7 @@ main(int argc, char *argv[])
 				}
 				fflush(stderr);
 			      bad_usage:
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}
@@ -481,6 +481,6 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	strvf(argc, argv);
+	strvf();
 	exit(0);
 }
