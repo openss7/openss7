@@ -31,11 +31,11 @@ BEGIN {
 		print "\t./mib2c -c ./mib2c.conf -f " root "_simple " name "::" root;
 		print "\tindent -nhnl " root "_simple.[ch]";
 		print "";
-		print root "_storage.c " root "_storage.h: mib2c mib2c.conf " FILENAME;
+		print root "_storage.c " root "_storage.h: mib2c mib2c.storage.conf " FILENAME;
 		print "\t./mib2c -c ./mib2c.storage.conf -f " root "_storage " name "::" root;
 		print "\tindent -nhnl " root "_storage.[ch]";
 		print "";
-		print root "_openss7.c " root "_openss7.h: mib2c mib2c.conf " FILENAME;
+		print root "_openss7.c " root "_openss7.h: mib2c mib2c.openss7.conf " FILENAME;
 		print "\t./mib2c -c ./mib2c.openss7.conf -f " root "_openss7 " name "::" root;
 		print "\tindent -nhnl " root "_openss7.[ch]";
 		print "";
