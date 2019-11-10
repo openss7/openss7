@@ -67,14 +67,14 @@ struct ds0_data {
 	uint ds0_rsvs;
 	uint ds0_tsts;
 	uint ds0_sets;
-	uint ds0_request;
+	int ds0_request;
 };
 struct dsx0ConfigTable_data {
 	struct dsx0ConfigTable_data *dsx0ConfigTable_old;
 	uint dsx0ConfigTable_rsvs;
 	uint dsx0ConfigTable_tsts;
 	uint dsx0ConfigTable_sets;
-	uint dsx0ConfigTable_request;
+	int dsx0ConfigTable_request;
 	uint dsx0ConfigTable_refs;
 	uint dsx0ConfigTable_id;
 	long ifIndex;			/* ReadOnly */
@@ -93,7 +93,7 @@ struct dsx0ChanMappingTable_data {
 	uint dsx0ChanMappingTable_rsvs;
 	uint dsx0ChanMappingTable_tsts;
 	uint dsx0ChanMappingTable_sets;
-	uint dsx0ChanMappingTable_request;
+	int dsx0ChanMappingTable_request;
 	uint dsx0ChanMappingTable_refs;
 	uint dsx0ChanMappingTable_id;
 	long ifIndex;			/* ReadOnly */

@@ -275,6 +275,10 @@ deinit_ds0(void)
 int
 term_ds0(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0", "term_ds0: terminating...  "));
 	deinit_ds0();
 	DEBUGMSGTL(("ds0", "done.\n"));
@@ -320,6 +324,7 @@ ds0_duplicate(struct ds0_data *thedata)
 {
 	struct ds0_data *StorageNew = SNMP_MALLOC_STRUCT(ds0_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("ds0", "ds0_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -389,6 +394,8 @@ ds0_add(struct ds0_data *thedata)
 void
 parse_ds0(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct ds0_data *StorageTmp = ds0_create();
 
@@ -414,6 +421,10 @@ store_ds0(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct ds0_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0", "store_ds0: storing data...  "));
 	refresh_ds0(1);
 	if ((StorageTmp = ds0Storage) == NULL) {
@@ -450,6 +461,8 @@ store_ds0(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_ds0(struct ds0_data *StorageTmp, struct ds0_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -471,6 +484,8 @@ check_ds0(struct ds0_data *StorageTmp, struct ds0_data *StorageOld)
 int
 update_ds0(struct ds0_data *StorageTmp, struct ds0_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	ds0_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -486,6 +501,7 @@ update_ds0(struct ds0_data *StorageTmp, struct ds0_data *StorageOld)
 void
 revert_ds0(struct ds0_data *StorageTmp, struct ds0_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_ds0(StorageOld, NULL);
 }
@@ -741,6 +757,8 @@ parse_dsx0ConfigTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx0ConfigTable_data *StorageTmp = dsx0ConfigTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds0", "parse_dsx0ConfigTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -779,6 +797,10 @@ store_dsx0ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct dsx0ConfigTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0", "store_dsx0ConfigTable: storing data...  "));
 	refresh_dsx0ConfigTable(1);
 	(void) tmpsize;
@@ -962,6 +984,8 @@ parse_dsx0ChanMappingTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx0ChanMappingTable_data *StorageTmp = dsx0ChanMappingTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds0", "parse_dsx0ChanMappingTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -989,6 +1013,10 @@ store_dsx0ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 	struct dsx0ChanMappingTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0", "store_dsx0ChanMappingTable: storing data...  "));
 	refresh_dsx0ChanMappingTable(1);
 	(void) tmpsize;
@@ -1029,6 +1057,8 @@ store_dsx0ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 int
 check_dsx0ConfigTable_row(struct dsx0ConfigTable_data *StorageTmp, struct dsx0ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1051,6 +1081,8 @@ check_dsx0ConfigTable_row(struct dsx0ConfigTable_data *StorageTmp, struct dsx0Co
 int
 update_dsx0ConfigTable_row(struct dsx0ConfigTable_data *StorageTmp, struct dsx0ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx0ConfigTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1065,6 +1097,7 @@ update_dsx0ConfigTable_row(struct dsx0ConfigTable_data *StorageTmp, struct dsx0C
 void
 revert_dsx0ConfigTable_row(struct dsx0ConfigTable_data *StorageTmp, struct dsx0ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx0ConfigTable_row(StorageOld, NULL);
 }
@@ -1211,6 +1244,8 @@ var_dsx0ConfigTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_dsx0ChanMappingTable_row(struct dsx0ChanMappingTable_data *StorageTmp, struct dsx0ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1233,6 +1268,8 @@ check_dsx0ChanMappingTable_row(struct dsx0ChanMappingTable_data *StorageTmp, str
 int
 update_dsx0ChanMappingTable_row(struct dsx0ChanMappingTable_data *StorageTmp, struct dsx0ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx0ChanMappingTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1247,6 +1284,7 @@ update_dsx0ChanMappingTable_row(struct dsx0ChanMappingTable_data *StorageTmp, st
 void
 revert_dsx0ChanMappingTable_row(struct dsx0ChanMappingTable_data *StorageTmp, struct dsx0ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx0ChanMappingTable_row(StorageOld, NULL);
 }
@@ -1347,6 +1385,10 @@ write_dsx0RobbedBitSignalling(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0", "write_dsx0RobbedBitSignalling entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1448,6 +1490,10 @@ write_dsx0CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0", "write_dsx0CircuitIdentifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1461,7 +1507,7 @@ write_dsx0CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || var_val_len > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx0CircuitIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -1554,6 +1600,10 @@ write_dsx0IdleCode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0", "write_dsx0IdleCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1652,6 +1702,10 @@ write_dsx0SeizedCode(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0", "write_dsx0SeizedCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1750,6 +1804,10 @@ write_dsx0TransmitCodesEnable(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0", "write_dsx0TransmitCodesEnable entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1884,6 +1942,8 @@ ds0_loop_handler(int sig)
 void
 ds0_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("ds0", "ds0_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("ds0", "done.\n"));
