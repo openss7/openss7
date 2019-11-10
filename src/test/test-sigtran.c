@@ -279,7 +279,7 @@ int tries = 0;
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -1372,7 +1372,7 @@ lmerrno_string(long uerr, ulong lmerr)
 #endif
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -3248,7 +3248,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -3959,7 +3959,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -5045,6 +5045,8 @@ stream_start(int child, int index)
 		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 	}
+#else
+	(void) index;
 #endif
 	switch (child) {
 	case 1:
@@ -5143,6 +5145,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 #if 0
 	qos_data.sid = 0;
 	qos_info.hmac = SCTP_HMAC_NONE;
@@ -5212,12 +5215,14 @@ end_sanity(int index)
 int
 preamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 postamble_none(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -5338,6 +5343,7 @@ Checks that three Streams can be opened and closed."
 int
 test_case_1_2(int child)
 {
+	(void) child;
 	return __RESULT_NOTAPPL;
 #if 0
 	/* just happens to work on UP (because it opens and closes so fast) */
@@ -5711,7 +5717,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -6017,7 +6023,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (verbose <= 0)
 		return;
@@ -6074,7 +6080,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (verbose <= 0)
 		return;
@@ -6094,7 +6100,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -6108,7 +6114,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (verbose <= 0)
 		return;
@@ -6592,13 +6598,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help, -?, --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -6614,7 +6620,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -6633,7 +6639,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
