@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -563,7 +563,7 @@ sdt_write(int fd)
 		perror("test");
 		exit(2);
 	} else {
-		int i;
+		unsigned i;
 
 		printf("Write succeeded, wrote %d bytes!\n", ret);
 		printf("Message[%ld]: ", (long) len);
@@ -919,14 +919,14 @@ do_tests(void)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 ITU-T RECOMMENDATAION Q.781 - Conformance Test Suite\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -974,7 +974,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -982,7 +982,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -994,7 +994,7 @@ incorporated herein by reference.  See `%1$s --copying' for copying permissions.
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1008,7 +1008,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1073,13 +1073,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1095,7 +1095,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -1104,7 +1104,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+	copying();
 	do_tests();
 	exit(0);
 }
