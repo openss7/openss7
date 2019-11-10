@@ -101,10 +101,10 @@ static char const ident[] = "src/util/slconf_yac.y (" PACKAGE_ENVR " " PACKAGE_D
 static char *prompt = "slconfig";
 extern int interactive;
 
-void version(int, char*[]);
-void copying(int, char*[]);
-void usage(int, char*[]);
-void help(int, char*[]);
+void version();
+void copying();
+void usage(char*[]);
+void help(char*[]);
 
 void newline(void);
 
@@ -351,40 +351,40 @@ struct select {
 
 int handle = 0;
 
-struct select cur = { "/dev/x400p-sl", "", 1, 1, 1, 0, -1, -1 };
+struct select cur = { .device = "/dev/x400p-sl", "", 1, 1, 1, 0, -1, -1 };
 struct select sel[MAX_HANDLES] = {
-    [0x00] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x01] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x02] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x03] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x04] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x05] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x06] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x07] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x08] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x09] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0a] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0b] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0c] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0d] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0e] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x0f] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x10] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x11] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x12] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x13] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x14] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x15] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x16] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x17] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x18] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x19] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1a] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1b] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1c] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1d] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1e] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
-    [0x1f] = {"/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x00] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x01] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x02] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x03] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x04] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x05] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x06] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x07] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x08] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x09] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0a] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0b] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0c] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0d] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0e] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x0f] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x10] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x11] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x12] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x13] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x14] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x15] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x16] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x17] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x18] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x19] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1a] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1b] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1c] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1d] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1e] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
+    [0x1f] = {.device="/dev/x400p-sl", "", 1, 1, 1, 1, 0, -1, -1},
 };
 
 #if 0
@@ -752,15 +752,15 @@ command:
     ;
 
 usage_command:
-    TOK_USAGE { help(1, &prompt); }
+    TOK_USAGE { help(&prompt); }
     ;
 
 copying_command:
-    TOK_COPYING { copying(1, &prompt); }
+    TOK_COPYING { copying(); }
     ;
 
 version_command:
-    TOK_VERSION { version(1, &prompt); }
+    TOK_VERSION { version(); }
     ;
 
 clear_command:
@@ -797,15 +797,15 @@ help_command:
 what:
     TOK_USAGE
     {
-	help(1, &prompt);
+	help(&prompt);
     }
     | TOK_VERSION
     {
-	version(1, &prompt);
+	version();
     }
     | TOK_COPYING
     {
-	copying(1, &prompt);
+	copying();
     }
     | TOK_OPEN
     {
@@ -2381,7 +2381,7 @@ yyinit(char *name, FILE *input, FILE *output)
 	yyout = output;
 	yyrestart(yyin);
 	if (interactive) {
-		copying(1, &prompt);
+		copying();
 		fprintf(stdout, "Type \"help\" for help...\n");
 	}
 	newline();

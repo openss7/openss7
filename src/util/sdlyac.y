@@ -97,10 +97,10 @@ extern int my_argc;
 extern char **my_argv;
 
 /* these are provided by the base program */
-void version(int, char*[]);
-void copying(int, char*[]);
-void usage(int, char*[]);
-void help(int, char*[]);
+void version();
+void copying();
+void usage(char*[]);
+void help(char*[]);
 void newline(void);
 void helpon(int what);
 
@@ -432,15 +432,15 @@ command:
     ;
 
 usage:
-    TOK_USAGE { help(1, &prompt); } TOK_EOL
+    TOK_USAGE { help(&prompt); } TOK_EOL
     ;
 
 copying:
-    TOK_COPYING { copying(1, &prompt); } TOK_EOL
+    TOK_COPYING { copying(); } TOK_EOL
     ;
 
 version:
-    TOK_VERSION { version(1, &prompt); } TOK_EOL
+    TOK_VERSION { version(); } TOK_EOL
     ;
 
 clear: TOK_CLEAR TOK_EOL { fprintf(stdout, "\f"); } ;
@@ -882,7 +882,7 @@ what:
 	", prompt);
     }
     | TOK_GET
-    | TOK_USAGE { usage(1, &prompt); }
+    | TOK_USAGE { usage(&prompt); }
     | TOK_CLEAR
     {
 	fprintf(stdout, "\n\
@@ -1058,24 +1058,24 @@ helpon(int what)
 {
 	switch (what) {
 	case TOK_USAGE:
-		usage(1, &prompt);
+		usage(&prompt);
 		break;
 	case TOK_COPYING:
-		copying(1, &prompt);
+		copying();
 		break;
 	case TOK_VERSION:
-		version(1, &prompt);
+		version();
 		break;
 	default:
 	case TOK_HELP:
-		help(1, &prompt);
+		help(&prompt);
 		break;
 	}
 	return;
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
@@ -1122,7 +1122,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -1144,7 +1144,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -1158,7 +1158,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -1191,7 +1191,7 @@ void
 sdlconf_int(void)
 {
 	interactive = 1;
-	copying(my_argc, my_argv);
+	copying();
 	fprintf(stdout, "Type \"help\" for help...\n");
 	newline();
 	yyinit();

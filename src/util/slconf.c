@@ -93,7 +93,7 @@ enum {
 int interactive = 0;
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -140,7 +140,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -162,7 +162,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -178,7 +178,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -314,22 +314,22 @@ main(int argc, char *argv[])
 		case 'h':	/* -h, --help [WHAT] */
 			if (source != SOURCE_NONE)
 				goto bad_option;
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (source != SOURCE_NONE)
 				goto bad_option;
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (source != SOURCE_NONE)
 				goto bad_option;
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case ':':	/* missing mandatory parameter */
 			optind--;
 			fprintf(stderr, "%s: missing parm -- %s\n", argv[0], argv[optind]);
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case '?':	/* illegal option */
 		default:
@@ -342,7 +342,7 @@ main(int argc, char *argv[])
 					fprintf(stderr, " %s", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 		if (source == SOURCE_CMDLINE)

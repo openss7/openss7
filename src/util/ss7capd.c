@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,7 +121,7 @@ uint32_t iftype = SDL_TYPE_DS0A;
 uint32_t ifrate = 56000;
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -129,7 +129,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -168,7 +168,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -176,7 +176,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -190,7 +190,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -205,7 +205,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -750,6 +750,7 @@ cap_attach(void)
 			syslog(LOG_ERR, "%s: error, unexpected response to LMI_ATTACH_REQ %d",
 			       __FUNCTION__, ret);
 			cap_exit(1);
+			__attribute__((fallthrough));
 		case CAP_FAILURE:
 			return CAP_FAILURE;
 		}
@@ -790,6 +791,7 @@ cap_enable(void)
 			syslog(LOG_ERR, "%s: error, unexpected response to LMI_ENABLE_REQ %d",
 			       __FUNCTION__, ret);
 			cap_exit(1);
+			__attribute__((fallthrough));
 		case CAP_FAILURE:
 			return CAP_FAILURE;
 		}
@@ -1298,24 +1300,28 @@ cap_start(void)
 		if (cap_open() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 1;
+		__attribute__((fallthrough));
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "attaching link");
 		if (cap_attach() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 2;
+		__attribute__((fallthrough));
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "configuring link");
 		if (cap_config() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 3;
+		__attribute__((fallthrough));
 	case 3:
 		if (output > 2)
 			syslog(LOG_NOTICE, "enabling link");
 		if (cap_enable() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 4;
+		__attribute__((fallthrough));
 	case 4:
 		if (output > 2)
 			syslog(LOG_NOTICE, "monitoring on link");
@@ -1339,14 +1345,17 @@ cap_stop(void)
 		if (cap_disable() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 3;
+		__attribute__((fallthrough));
 	case 3:
 		link_state = 2;
+		__attribute__((fallthrough));
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "detaching link");
 		if (cap_detach() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 1;
+		__attribute__((fallthrough));
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "closing link");
@@ -1477,7 +1486,7 @@ main(int argc, char **argv)
 		}
 		switch (c) {
 		case 0:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case 'd':	/* -d, --daemon */
 			if (debug)
@@ -1573,17 +1582,17 @@ main(int argc, char **argv)
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1604,7 +1613,7 @@ main(int argc, char **argv)
 				fflush(stderr);
 				goto bad_usage;
 			      bad_usage:
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}

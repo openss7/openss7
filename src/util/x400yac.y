@@ -93,10 +93,10 @@ static char *prompt = NAME;
 static int interactive = 1;
 static int output = 1;
 
-void version(int, char*[]);
-void copying(int, char*[]);
-void usage(int, char*[]);
-void help(int, char*[]);
+void version();
+void copying();
+void usage(char*[]);
+void help(char*[]);
 void newline(void);
 void helpon(int what);
 
@@ -428,15 +428,15 @@ command:
     ;
 
 usage:
-    TOK_USAGE { help(1, &prompt); } TOK_EOL
+    TOK_USAGE { help(&prompt); } TOK_EOL
     ;
 
 copying:
-    TOK_COPYING { copying(1, &prompt); } TOK_EOL
+    TOK_COPYING { copying(); } TOK_EOL
     ;
 
 version:
-    TOK_VERSION { version(1, &prompt); } TOK_EOL
+    TOK_VERSION { version(); } TOK_EOL
     ;
 
 clear: TOK_CLEAR TOK_EOL { fprintf(stdout, "\f"); } ;
@@ -867,7 +867,7 @@ what:
 	", prompt);
     }
     | TOK_GET
-    | TOK_USAGE { usage(1, &prompt); }
+    | TOK_USAGE { usage(&prompt); }
     | TOK_CLEAR
     {
 	fprintf(stdout, "\n\
@@ -1040,19 +1040,19 @@ helpon(int what)
 {
 	switch (what) {
 	case TOK_USAGE:
-		return usage(1, &prompt);
+		return usage(&prompt);
 	case TOK_COPYING:
-		return copying(1, &prompt);
+		return copying();
 	case TOK_VERSION:
-		return version(1, &prompt);
+		return version();
 	default:
 	case TOK_HELP:
-		return help(1, &prompt);
+		return help(&prompt);
 	}
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
@@ -1099,7 +1099,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -1121,7 +1121,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -1135,7 +1135,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -1346,13 +1346,13 @@ main(int argc, char **argv)
 			output = val;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1364,13 +1364,13 @@ main(int argc, char **argv)
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
 	/* Each of the remaining options arguments are either CLEIs or PPAs. */
 	if (interactive) {
-	    copying(argc, argv);
+	    copying();
 	    fprintf(stdout, "\
 Type \"help\" for help...\n\
 	    ");

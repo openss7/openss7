@@ -192,7 +192,7 @@ int pfd_num = 0;
   * --copying options.  This is a standard OpenSS7 coding practice.
   */
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -248,7 +248,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
   * format as GNU projects.  The last two paragraphs are OpenSS7 practice.
   */
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!verbose)
 		return;
@@ -270,7 +270,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -297,7 +297,7 @@ Usage:\n\
   * formatted according to OpenSS7 practices.
   */
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -1425,7 +1425,7 @@ option_error(int argc, char *argv[], int optind, const char *str, int retval)
 	while (optind < argc)
 		fprintf(stderr, " %s", argv[optind++]);
 	fprintf(stderr, "\n");
-	usage(argc, argv);
+	usage(argv);
 	exit(retval);
 }
 
@@ -1608,19 +1608,21 @@ main(int argc, char *argv[])
 			verbose++;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case ':':	/* required argument */
 			option_error(argc, argv, optind - 1, "required argument", 2);
+			__attribute__((fallthrough));
 		case '0':
 		case '?':	/* unrecognized option */
 			option_error(argc, argv, optind - 1, "unrecognized option", 2);
+			__attribute__((fallthrough));
 		default:	/* unrecognized switch */
 			option_error(argc, argv, optind - 1, "syntax error", 2);
 		}

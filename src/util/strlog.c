@@ -84,7 +84,7 @@ static int debug = 0;
 static int output = 1;
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -131,7 +131,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -153,7 +153,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -167,7 +167,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -228,6 +228,7 @@ void
 log_line(short mid, short sid, char priority, int logflags, unsigned long seq, const char *line,
 	 int stderr_also)
 {
+	(void) priority;
 	if (stderr_also) {
 		const char *flags = "???";
 		struct timespec tv = { 0, 0 };
@@ -324,12 +325,12 @@ main(int argc, char *argv[])
 		}
 		switch (c) {
 		case 'M':	/* -M, --mid MID */
-			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
+			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffL)
 				goto bad_option;
 			mid = val;
 			continue;
 		case 'S':	/* -S, --sid SID */
-			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffUL)
+			if ((val = strtol(optarg, NULL, 0)) < 0 || val > 0xffffL)
 				goto bad_option;
 			sid = val;
 			continue;
@@ -461,17 +462,17 @@ main(int argc, char *argv[])
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -494,7 +495,7 @@ main(int argc, char *argv[])
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}

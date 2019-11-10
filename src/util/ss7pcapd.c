@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,7 +121,7 @@ uint32_t iftype = SDL_TYPE_DS0A;
 uint32_t ifrate = 56000;
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -129,7 +129,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -168,7 +168,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -176,7 +176,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -190,7 +190,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -205,7 +205,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -1477,7 +1477,7 @@ main(int argc, char **argv)
 		}
 		switch (c) {
 		case 0:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case 'd':	/* -d, --daemon */
 			if (debug)
@@ -1573,17 +1573,17 @@ main(int argc, char **argv)
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1604,7 +1604,7 @@ main(int argc, char **argv)
 				fflush(stderr);
 				goto bad_usage;
 			      bad_usage:
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}

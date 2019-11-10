@@ -92,7 +92,7 @@ static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -139,7 +139,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -147,7 +147,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2016, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -161,7 +161,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -180,7 +180,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -378,6 +378,7 @@ autopush_set(char *argv[], char *devname, int major, int minor, int lastminor, i
 static int
 autopush_cln(char *argv[], char *devname, int major, int minor)
 {
+	(void) argv;
 	if (debug)
 		fprintf(stderr, "%s: devname=%s, major=%d, minor=%d\n", __FUNCTION__, devname,
 			major, minor);
@@ -453,7 +454,7 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 			return (1);
 		}
 		if (output || debug) {
-			int j;
+			unsigned j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
 			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
@@ -524,7 +525,7 @@ autopush_get(char *argv[], char *devname, int major, int minor)
 				header = 1;
 			}
 			if (output || debug) {
-				int j;
+				unsigned j;
 
 				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 				       (long) sap.sap_minor);
@@ -577,7 +578,7 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 			return (1);
 		}
 		if (output || debug) {
-			int j;
+			unsigned j;
 
 			printf("DeviceName Major Minor Lastminor Modules\n");
 			printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
@@ -638,7 +639,7 @@ autopush_res(char *argv[], char *devname, int major, int minor)
 				header = 1;
 			}
 			if (output || debug) {
-				int j;
+				unsigned j;
 
 				printf("%10s %5ld %5ld     ", sap.sap_module, (long) sap.sap_major,
 				       (long) sap.sap_minor);
@@ -930,17 +931,17 @@ main(int argc, char *argv[])
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -959,7 +960,7 @@ main(int argc, char *argv[])
 				}
 				fflush(stderr);
 			      bad_usage:
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}
@@ -1044,7 +1045,7 @@ main(int argc, char *argv[])
 		exit(autopush_cln(argv, devname, major, minor));
 	default:
 	case OPTION_NONE:
-		usage(argc, argv);
+		usage(argv);
 		exit(2);
 	}
 }

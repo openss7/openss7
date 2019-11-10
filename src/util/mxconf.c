@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -810,7 +810,7 @@ char devname[256] = "/dev/streams/clone/x400p-sl";
 char cfgfile[256] = "/etc/sysconfig/ss7/mx.config";
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
@@ -818,7 +818,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -857,7 +857,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -865,7 +865,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2012, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2012, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -879,7 +879,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -895,7 +895,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -3241,7 +3241,7 @@ main(int argc, char **argv)
 			break;
 		switch (c) {
 		case 0:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case 'g':	/* -g, --get */
 			if (cmd != CMD_NONE)
@@ -3309,21 +3309,21 @@ main(int argc, char **argv)
 		case 'h':	/* -h, --help */
 			if (cmd != CMD_NONE)
 				goto bad_option;
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (cmd != CMD_NONE)
 				goto bad_option;
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':
 			if (cmd != CMD_NONE)
 				goto bad_option;
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case ':':
 			fprintf(stderr, "%s: missing parm -- %s\n", argv[0], argv[optind - 1]);
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case '?':
 		default:
@@ -3336,14 +3336,14 @@ main(int argc, char **argv)
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
 	switch (cmd) {
 	default:
 	case CMD_NONE:
-		help(argc, argv);
+		help(argv);
 		exit(0);
 	case CMD_GET:
 		mxconf_get(what);

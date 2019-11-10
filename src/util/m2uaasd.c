@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -93,13 +93,13 @@ main(int argc, char **argv)
 			output = val;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -111,7 +111,7 @@ main(int argc, char **argv)
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -382,7 +382,7 @@ print_data(caddr_t ptr, size_t len)
 		'0', '1', '2', '3', '4', '5', '6', '7',
 		'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 	};
-	int i;
+	unsigned i;
 
 	for (i = 0; i < len; i++) {
 		fputc(hexchar[(ptr[i] >> 4) & 0x0f], stdout);
@@ -2043,12 +2043,14 @@ mon_start(void)
 		if (mon_open() != (0))
 			return (-1);
 		link_state = 1;
+		__attribute__((fallthrough));
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "attaching link");
 		if (mon_attach() != (0))
 			return (-1);
 		link_state = 2;
+		__attribute__((fallthrough));
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "getting configuration");
@@ -2067,12 +2069,14 @@ mon_stop(void)
 	switch (link_state) {
 	case 3:
 		link_state = 2;
+		__attribute__((fallthrough));
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "detaching link");
 		if (mon_detach() != (0))
 			return (-1);
 		link_state = 1;
+		__attribute__((fallthrough));
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "closing link");
@@ -2166,7 +2170,7 @@ slmon(void)
 }
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
@@ -2174,7 +2178,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -2213,7 +2217,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -2221,7 +2225,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -2235,7 +2239,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -2249,7 +2253,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -2331,7 +2335,7 @@ main(int argc, char **argv)
 			break;
 		switch (c) {
 		case 0:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		case 'd':	/* -d, --daemon */
 			nomead = 1;
@@ -2379,13 +2383,13 @@ main(int argc, char **argv)
 			output = val;
 			break;
 		case 'h':	/* -h, --help */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -2397,7 +2401,7 @@ main(int argc, char **argv)
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
