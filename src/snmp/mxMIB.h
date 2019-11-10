@@ -67,7 +67,7 @@ struct mxMIB_data {
 	uint mxMIB_rsvs;
 	uint mxMIB_tsts;
 	uint mxMIB_sets;
-	uint mxMIB_request;
+	int mxMIB_request;
 	ulong mxCardNextIndex;		/* ReadOnly */
 	long mxDiscontinuityTime;	/* ReadOnly */
 };
@@ -76,7 +76,7 @@ struct mxSyncTable_data {
 	uint mxSyncTable_rsvs;
 	uint mxSyncTable_tsts;
 	uint mxSyncTable_sets;
-	uint mxSyncTable_request;
+	int mxSyncTable_request;
 	uint mxSyncTable_refs;
 	uint mxSyncTable_id;
 	ulong mxSyncGroup;		/* NoAccess */
@@ -90,7 +90,7 @@ struct mxDrivTable_data {
 	uint mxDrivTable_rsvs;
 	uint mxDrivTable_tsts;
 	uint mxDrivTable_sets;
-	uint mxDrivTable_request;
+	int mxDrivTable_request;
 	uint mxDrivTable_refs;
 	uint mxDrivTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -117,7 +117,7 @@ struct mxCardTable_data {
 	uint mxCardTable_rsvs;
 	uint mxCardTable_tsts;
 	uint mxCardTable_sets;
-	uint mxCardTable_request;
+	int mxCardTable_request;
 	uint mxCardTable_refs;
 	uint mxCardTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -169,7 +169,7 @@ struct mxSpanTable_data {
 	uint mxSpanTable_rsvs;
 	uint mxSpanTable_tsts;
 	uint mxSpanTable_sets;
-	uint mxSpanTable_request;
+	int mxSpanTable_request;
 	uint mxSpanTable_refs;
 	uint mxSpanTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -242,7 +242,7 @@ struct mxBertTable_data {
 	uint mxBertTable_rsvs;
 	uint mxBertTable_tsts;
 	uint mxBertTable_sets;
-	uint mxBertTable_request;
+	int mxBertTable_request;
 	uint mxBertTable_refs;
 	uint mxBertTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -264,7 +264,7 @@ struct mxChanTable_data {
 	uint mxChanTable_rsvs;
 	uint mxChanTable_tsts;
 	uint mxChanTable_sets;
-	uint mxChanTable_request;
+	int mxChanTable_request;
 	uint mxChanTable_refs;
 	uint mxChanTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -297,7 +297,7 @@ struct mxXconTable_data {
 	uint mxXconTable_rsvs;
 	uint mxXconTable_tsts;
 	uint mxXconTable_sets;
-	uint mxXconTable_request;
+	int mxXconTable_request;
 	uint mxXconTable_refs;
 	uint mxXconTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -317,7 +317,7 @@ struct mxNearEndCurrentTable_data {
 	uint mxNearEndCurrentTable_rsvs;
 	uint mxNearEndCurrentTable_tsts;
 	uint mxNearEndCurrentTable_sets;
-	uint mxNearEndCurrentTable_request;
+	int mxNearEndCurrentTable_request;
 	uint mxNearEndCurrentTable_refs;
 	uint mxNearEndCurrentTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -344,7 +344,7 @@ struct mxNearEndIntervalTable_data {
 	uint mxNearEndIntervalTable_rsvs;
 	uint mxNearEndIntervalTable_tsts;
 	uint mxNearEndIntervalTable_sets;
-	uint mxNearEndIntervalTable_request;
+	int mxNearEndIntervalTable_request;
 	uint mxNearEndIntervalTable_refs;
 	uint mxNearEndIntervalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -372,7 +372,7 @@ struct mxNearEndTotalTable_data {
 	uint mxNearEndTotalTable_rsvs;
 	uint mxNearEndTotalTable_tsts;
 	uint mxNearEndTotalTable_sets;
-	uint mxNearEndTotalTable_request;
+	int mxNearEndTotalTable_request;
 	uint mxNearEndTotalTable_refs;
 	uint mxNearEndTotalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -400,7 +400,7 @@ struct mxFarEndCurrentTable_data {
 	uint mxFarEndCurrentTable_rsvs;
 	uint mxFarEndCurrentTable_tsts;
 	uint mxFarEndCurrentTable_sets;
-	uint mxFarEndCurrentTable_request;
+	int mxFarEndCurrentTable_request;
 	uint mxFarEndCurrentTable_refs;
 	uint mxFarEndCurrentTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -423,7 +423,7 @@ struct mxFarEndIntervalTable_data {
 	uint mxFarEndIntervalTable_rsvs;
 	uint mxFarEndIntervalTable_tsts;
 	uint mxFarEndIntervalTable_sets;
-	uint mxFarEndIntervalTable_request;
+	int mxFarEndIntervalTable_request;
 	uint mxFarEndIntervalTable_refs;
 	uint mxFarEndIntervalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */
@@ -447,7 +447,7 @@ struct mxFarEndTotalTable_data {
 	uint mxFarEndTotalTable_rsvs;
 	uint mxFarEndTotalTable_tsts;
 	uint mxFarEndTotalTable_sets;
-	uint mxFarEndTotalTable_request;
+	int mxFarEndTotalTable_request;
 	uint mxFarEndTotalTable_refs;
 	uint mxFarEndTotalTable_id;
 	uint8_t *mxDrivName;		/* NoAccess */

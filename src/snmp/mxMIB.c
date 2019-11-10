@@ -785,6 +785,10 @@ deinit_mxMIB(void)
 int
 term_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "term_mxMIB: terminating...  "));
 	deinit_mxMIB();
 	DEBUGMSGTL(("mxMIB", "done.\n"));
@@ -832,6 +836,7 @@ mxMIB_duplicate(struct mxMIB_data *thedata)
 {
 	struct mxMIB_data *StorageNew = SNMP_MALLOC_STRUCT(mxMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("mxMIB", "mxMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 		StorageNew->mxCardNextIndex = thedata->mxCardNextIndex;
@@ -903,6 +908,8 @@ mxMIB_add(struct mxMIB_data *thedata)
 void
 parse_mxMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct mxMIB_data *StorageTmp = mxMIB_create();
 
@@ -930,6 +937,10 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct mxMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxMIB: storing data...  "));
 	refresh_mxMIB(1);
 	if ((StorageTmp = mxMIBStorage) == NULL) {
@@ -968,6 +979,8 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -989,6 +1002,8 @@ check_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
 int
 update_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1004,6 +1019,7 @@ update_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
 void
 revert_mxMIB(struct mxMIB_data *StorageTmp, struct mxMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxMIB(StorageOld, NULL);
 }
@@ -1262,6 +1278,8 @@ parse_mxSyncTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxSyncTable_data *StorageTmp = mxSyncTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxSyncTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1295,6 +1313,10 @@ store_mxSyncTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxSyncTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxSyncTable: storing data...  "));
 	refresh_mxSyncTable(1);
 	(void) tmpsize;
@@ -1547,6 +1569,8 @@ parse_mxDrivTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxDrivTable_data *StorageTmp = mxDrivTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxDrivTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1617,6 +1641,10 @@ store_mxDrivTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxDrivTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxDrivTable: storing data...  "));
 	refresh_mxDrivTable(1);
 	(void) tmpsize;
@@ -1961,6 +1989,8 @@ parse_mxCardTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxCardTable_data *StorageTmp = mxCardTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxCardTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2080,6 +2110,10 @@ store_mxCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxCardTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxCardTable: storing data...  "));
 	refresh_mxCardTable(1);
 	(void) tmpsize;
@@ -2500,6 +2534,8 @@ parse_mxSpanTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxSpanTable_data *StorageTmp = mxSpanTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxSpanTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2652,6 +2688,10 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxSpanTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxSpanTable: storing data...  "));
 	refresh_mxSpanTable(1);
 	(void) tmpsize;
@@ -2915,6 +2955,8 @@ parse_mxBertTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxBertTable_data *StorageTmp = mxBertTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxBertTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2964,6 +3006,10 @@ store_mxBertTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxBertTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxBertTable: storing data...  "));
 	refresh_mxBertTable(1);
 	(void) tmpsize;
@@ -3234,6 +3280,8 @@ parse_mxChanTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxChanTable_data *StorageTmp = mxChanTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxChanTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3310,6 +3358,10 @@ store_mxChanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxChanTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxChanTable: storing data...  "));
 	refresh_mxChanTable(1);
 	(void) tmpsize;
@@ -3529,6 +3581,8 @@ parse_mxXconTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxXconTable_data *StorageTmp = mxXconTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxXconTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3568,6 +3622,10 @@ store_mxXconTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mxXconTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxXconTable: storing data...  "));
 	refresh_mxXconTable(1);
 	(void) tmpsize;
@@ -3791,6 +3849,8 @@ parse_mxNearEndCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxNearEndCurrentTable_data *StorageTmp = mxNearEndCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxNearEndCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3837,6 +3897,10 @@ store_mxNearEndCurrentTable(int majorID, int minorID, void *serverarg, void *cli
 	struct mxNearEndCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxNearEndCurrentTable: storing data...  "));
 	refresh_mxNearEndCurrentTable(1);
 	(void) tmpsize;
@@ -4070,6 +4134,8 @@ parse_mxNearEndIntervalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxNearEndIntervalTable_data *StorageTmp = mxNearEndIntervalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxNearEndIntervalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4117,6 +4183,10 @@ store_mxNearEndIntervalTable(int majorID, int minorID, void *serverarg, void *cl
 	struct mxNearEndIntervalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxNearEndIntervalTable: storing data...  "));
 	refresh_mxNearEndIntervalTable(1);
 	(void) tmpsize;
@@ -4350,6 +4420,8 @@ parse_mxNearEndTotalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxNearEndTotalTable_data *StorageTmp = mxNearEndTotalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxNearEndTotalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4397,6 +4469,10 @@ store_mxNearEndTotalTable(int majorID, int minorID, void *serverarg, void *clien
 	struct mxNearEndTotalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxNearEndTotalTable: storing data...  "));
 	refresh_mxNearEndTotalTable(1);
 	(void) tmpsize;
@@ -4620,6 +4696,8 @@ parse_mxFarEndCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxFarEndCurrentTable_data *StorageTmp = mxFarEndCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxFarEndCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4662,6 +4740,10 @@ store_mxFarEndCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 	struct mxFarEndCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxFarEndCurrentTable: storing data...  "));
 	refresh_mxFarEndCurrentTable(1);
 	(void) tmpsize;
@@ -4883,6 +4965,8 @@ parse_mxFarEndIntervalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxFarEndIntervalTable_data *StorageTmp = mxFarEndIntervalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxFarEndIntervalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4926,6 +5010,10 @@ store_mxFarEndIntervalTable(int majorID, int minorID, void *serverarg, void *cli
 	struct mxFarEndIntervalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxFarEndIntervalTable: storing data...  "));
 	refresh_mxFarEndIntervalTable(1);
 	(void) tmpsize;
@@ -5147,6 +5235,8 @@ parse_mxFarEndTotalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mxFarEndTotalTable_data *StorageTmp = mxFarEndTotalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mxMIB", "parse_mxFarEndTotalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5190,6 +5280,10 @@ store_mxFarEndTotalTable(int majorID, int minorID, void *serverarg, void *client
 	struct mxFarEndTotalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mxMIB", "store_mxFarEndTotalTable: storing data...  "));
 	refresh_mxFarEndTotalTable(1);
 	(void) tmpsize;
@@ -5236,6 +5330,7 @@ store_mxFarEndTotalTable(int majorID, int minorID, void *serverarg, void *client
 int
 activate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5253,6 +5348,7 @@ activate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 int
 deactivate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5270,6 +5366,7 @@ deactivate_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 int
 activate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5287,6 +5384,7 @@ activate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 int
 deactivate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5304,6 +5402,7 @@ deactivate_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 int
 activate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5321,6 +5420,7 @@ activate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 int
 deactivate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5338,6 +5438,7 @@ deactivate_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 int
 activate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5355,6 +5456,7 @@ activate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 int
 deactivate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5372,6 +5474,7 @@ deactivate_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 int
 activate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5389,6 +5492,7 @@ activate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 int
 deactivate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5411,6 +5515,8 @@ deactivate_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 int
 check_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5433,6 +5539,8 @@ check_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_da
 int
 update_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxSyncTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5447,6 +5555,7 @@ update_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_d
 void
 revert_mxSyncTable_row(struct mxSyncTable_data *StorageTmp, struct mxSyncTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxSyncTable_row(StorageOld, NULL);
 }
@@ -5545,7 +5654,7 @@ refresh_mxSyncTable(int force)
 			goto retry;
 		}
 		for (i = 0, val = (typeof(val)) (cptr + 1); i < count2; i++, val++) {
-			int j;
+			unsigned j;
 			struct {
 				struct mx_attr attr;
 				struct mx_attr_sync sync;
@@ -5703,6 +5812,8 @@ var_mxSyncTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5725,6 +5836,8 @@ check_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_da
 int
 update_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxDrivTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5739,6 +5852,7 @@ update_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_d
 void
 revert_mxDrivTable_row(struct mxDrivTable_data *StorageTmp, struct mxDrivTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxDrivTable_row(StorageOld, NULL);
 }
@@ -6029,6 +6143,8 @@ var_mxDrivTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6051,6 +6167,8 @@ check_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_da
 int
 update_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxCardTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6065,6 +6183,7 @@ update_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_d
 void
 revert_mxCardTable_row(struct mxCardTable_data *StorageTmp, struct mxCardTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxCardTable_row(StorageOld, NULL);
 }
@@ -6808,6 +6927,8 @@ var_mxCardTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6830,6 +6951,8 @@ check_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_da
 int
 update_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxSpanTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6844,6 +6967,7 @@ update_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_d
 void
 revert_mxSpanTable_row(struct mxSpanTable_data *StorageTmp, struct mxSpanTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxSpanTable_row(StorageOld, NULL);
 }
@@ -7524,6 +7648,8 @@ var_mxSpanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7546,6 +7672,8 @@ check_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_da
 int
 update_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxBertTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7560,6 +7688,7 @@ update_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_d
 void
 revert_mxBertTable_row(struct mxBertTable_data *StorageTmp, struct mxBertTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxBertTable_row(StorageOld, NULL);
 }
@@ -7867,6 +7996,8 @@ var_mxBertTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7889,6 +8020,8 @@ check_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_da
 int
 update_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxChanTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7903,6 +8036,7 @@ update_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_d
 void
 revert_mxChanTable_row(struct mxChanTable_data *StorageTmp, struct mxChanTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxChanTable_row(StorageOld, NULL);
 }
@@ -8254,6 +8388,8 @@ var_mxChanTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8276,6 +8412,8 @@ check_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_da
 int
 update_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxXconTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8290,6 +8428,7 @@ update_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_d
 void
 revert_mxXconTable_row(struct mxXconTable_data *StorageTmp, struct mxXconTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxXconTable_row(StorageOld, NULL);
 }
@@ -8607,6 +8746,8 @@ var_mxXconTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8629,6 +8770,8 @@ check_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, s
 int
 update_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxNearEndCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8643,6 +8786,7 @@ update_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, 
 void
 revert_mxNearEndCurrentTable_row(struct mxNearEndCurrentTable_data *StorageTmp, struct mxNearEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxNearEndCurrentTable_row(StorageOld, NULL);
 }
@@ -8975,6 +9119,8 @@ var_mxNearEndCurrentTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8997,6 +9143,8 @@ check_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp,
 int
 update_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxNearEndIntervalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9011,6 +9159,7 @@ update_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp
 void
 revert_mxNearEndIntervalTable_row(struct mxNearEndIntervalTable_data *StorageTmp, struct mxNearEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxNearEndIntervalTable_row(StorageOld, NULL);
 }
@@ -9355,6 +9504,8 @@ var_mxNearEndIntervalTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9377,6 +9528,8 @@ check_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struc
 int
 update_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxNearEndTotalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9391,6 +9544,7 @@ update_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, stru
 void
 revert_mxNearEndTotalTable_row(struct mxNearEndTotalTable_data *StorageTmp, struct mxNearEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxNearEndTotalTable_row(StorageOld, NULL);
 }
@@ -9737,6 +9891,8 @@ var_mxNearEndTotalTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9759,6 +9915,8 @@ check_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, str
 int
 update_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxFarEndCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9773,6 +9931,7 @@ update_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, st
 void
 revert_mxFarEndCurrentTable_row(struct mxFarEndCurrentTable_data *StorageTmp, struct mxFarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxFarEndCurrentTable_row(StorageOld, NULL);
 }
@@ -10088,6 +10247,8 @@ var_mxFarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10110,6 +10271,8 @@ check_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, s
 int
 update_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxFarEndIntervalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10124,6 +10287,7 @@ update_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, 
 void
 revert_mxFarEndIntervalTable_row(struct mxFarEndIntervalTable_data *StorageTmp, struct mxFarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxFarEndIntervalTable_row(StorageOld, NULL);
 }
@@ -10320,6 +10484,8 @@ var_mxFarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10342,6 +10508,8 @@ check_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct 
 int
 update_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mxFarEndTotalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10356,6 +10524,7 @@ update_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct
 void
 revert_mxFarEndTotalTable_row(struct mxFarEndTotalTable_data *StorageTmp, struct mxFarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mxFarEndTotalTable_row(StorageOld, NULL);
 }
@@ -10559,6 +10728,10 @@ write_mxSyncSpanId(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSyncSpanId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10678,6 +10851,10 @@ write_mxCardSpanType(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardSpanType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10794,6 +10971,10 @@ write_mxCardMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10920,6 +11101,10 @@ write_mxCardSyncMaster(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncMaster entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11034,6 +11219,10 @@ write_mxCardSyncSource(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncSource entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11153,6 +11342,10 @@ write_mxCardSyncGroup(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardSyncGroup entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11264,6 +11457,10 @@ write_mxCardAdministrativeState(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11380,6 +11577,10 @@ write_mxCardAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11507,6 +11708,10 @@ write_mxCardControlStatus(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardControlStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11634,6 +11839,10 @@ write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11658,7 +11867,7 @@ write_mxSpanName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || (var_val_len > 32)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -11754,6 +11963,10 @@ write_mxSpanDevice(int action, u_char *var_val, u_char var_val_type, size_t var_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanDevice entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11871,6 +12084,10 @@ write_mxSpanEquipmentId(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanEquipmentId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11990,6 +12207,10 @@ write_mxSpanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12110,6 +12331,10 @@ write_mxSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanNumber entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12138,7 +12363,7 @@ write_mxSpanNumber(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..32 */
-		if ((0 > set_value || set_value > 32)) {
+		if (set_value > 32) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanNumber: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -12221,6 +12446,10 @@ write_mxSpanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12348,6 +12577,10 @@ write_mxSpanCrc(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanCrc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12466,6 +12699,10 @@ write_mxSpanClocking(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanClocking entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12584,6 +12821,10 @@ write_mxSpanPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanPriority entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12690,6 +12931,10 @@ write_mxSpanCoding(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanCoding entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12809,6 +13054,10 @@ write_mxSpanFraming(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanFraming entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12927,6 +13176,10 @@ write_mxSpanLineImpedance(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineImpedance entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13043,6 +13296,10 @@ write_mxSpanLineMode(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13160,6 +13417,10 @@ write_mxSpanLineLength(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineLength entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13279,6 +13540,10 @@ write_mxSpanLineAttenuation(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineAttenuation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13397,6 +13662,10 @@ write_mxSpanLineGain(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineGain entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13517,6 +13786,10 @@ write_mxSpanLineDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13624,6 +13897,10 @@ write_mxSpanTxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanTxLevel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13740,6 +14017,10 @@ write_mxSpanRxLevel(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanRxLevel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13856,6 +14137,10 @@ write_mxSpanAlarmSettleTime(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSettleTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13968,6 +14253,10 @@ write_mxSpanLineCodeTime(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineCodeTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14080,6 +14369,10 @@ write_mxSpanPrimary(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanPrimary entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14186,6 +14479,10 @@ write_mxSpanDataLink(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanDataLink entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14312,6 +14609,10 @@ write_mxSpanLineCode(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanLineCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14432,6 +14733,10 @@ write_mxSpanAlarmSeverityMapProfile(int action, u_char *var_val, u_char var_val_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmSeverityMapProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14549,6 +14854,10 @@ write_mxSpanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14665,6 +14974,10 @@ write_mxSpanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14792,6 +15105,10 @@ write_mxSpanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanControlStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14918,6 +15235,10 @@ write_mxSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanReceiveThreshold entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14946,7 +15267,7 @@ write_mxSpanReceiveThreshold(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..600 */
-		if ((0 > set_value || set_value > 600)) {
+		if (set_value > 600) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxSpanReceiveThreshold: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -15029,6 +15350,10 @@ write_mxBertMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxBertMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15133,6 +15458,10 @@ write_mxBertSelect(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxBertSelect entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15242,6 +15571,10 @@ write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxBertPattern entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15255,7 +15588,7 @@ write_mxBertPattern(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..33 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 33))) {
+		if (var_val_len > SPRINT_MAX_LEN || (var_val_len > 33)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxBertPattern: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -15349,6 +15682,10 @@ write_mxChanType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15452,6 +15789,10 @@ write_mxChanFormat(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanFormat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15557,6 +15898,10 @@ write_mxChanRate(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanRate entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15661,6 +16006,10 @@ write_mxChanMode(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15774,6 +16123,10 @@ write_mxChanAdministrativeState(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15877,6 +16230,10 @@ write_mxChanControlStatus(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanControlStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15990,6 +16347,10 @@ write_mxChanAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxChanAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16103,6 +16464,10 @@ write_mxXconCardIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconCardIndex entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16209,6 +16574,10 @@ write_mxXconSpanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconSpanIndex entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16315,6 +16684,10 @@ write_mxXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconChanIndex entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16343,7 +16716,7 @@ write_mxXconChanIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..31 */
-		if ((0 > set_value || set_value > 31)) {
+		if (set_value > 31) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mxXconChanIndex: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -16426,6 +16799,10 @@ write_mxXconType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16542,6 +16919,10 @@ write_mxXconStorageType(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16654,6 +17035,7 @@ write_mxXconStorageType(int action, u_char *var_val, u_char var_val_type, size_t
 int
 can_act_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16671,6 +17053,7 @@ can_act_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 int
 can_deact_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16688,6 +17071,7 @@ can_deact_mxSyncTable_row(struct mxSyncTable_data *StorageTmp)
 int
 can_act_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	int fd;
 	struct mx_info *info;
@@ -16753,6 +17137,7 @@ can_act_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 int
 can_deact_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16770,6 +17155,7 @@ can_deact_mxDrivTable_row(struct mxDrivTable_data *StorageTmp)
 int
 can_act_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16787,6 +17173,7 @@ can_act_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 int
 can_deact_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16804,6 +17191,7 @@ can_deact_mxCardTable_row(struct mxCardTable_data *StorageTmp)
 int
 can_act_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16821,6 +17209,7 @@ can_act_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 int
 can_deact_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16838,6 +17227,7 @@ can_deact_mxSpanTable_row(struct mxSpanTable_data *StorageTmp)
 int
 can_act_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16855,6 +17245,7 @@ can_act_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 int
 can_deact_mxXconTable_row(struct mxXconTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -16879,6 +17270,10 @@ write_mxSyncRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSyncRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxSyncTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -17170,6 +17565,10 @@ write_mxDrivRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxDrivRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxDrivTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -17437,6 +17836,10 @@ write_mxCardStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxCardStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxCardTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -17724,6 +18127,10 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxSpanRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxSpanTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -17797,7 +18204,7 @@ write_mxSpanRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			/* Note: ranges 0..32 */
-			if ((0 > (ulong) *vp->val.integer || (ulong) *vp->val.integer > 32)) {
+			if ((0 > *vp->val.integer || *vp->val.integer > 32)) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mxSpanIndex: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -18031,6 +18438,10 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mxMIB", "write_mxXconRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mxXconTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -18109,7 +18520,7 @@ write_mxXconRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			/* Note: ranges 0..32 */
-			if ((0 > (ulong) *vp->val.integer || (ulong) *vp->val.integer > 32)) {
+			if ((0 > *vp->val.integer || *vp->val.integer > 32)) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mxSpanIndex: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -18424,6 +18835,8 @@ mxMIB_loop_handler(int sig)
 void
 mxMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("mxMIB", "mxMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("mxMIB", "done.\n"));
