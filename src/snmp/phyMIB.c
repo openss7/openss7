@@ -325,6 +325,10 @@ deinit_phyMIB(void)
 int
 term_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "term_phyMIB: terminating...  "));
 	deinit_phyMIB();
 	DEBUGMSGTL(("phyMIB", "done.\n"));
@@ -370,6 +374,7 @@ phyMIB_duplicate(struct phyMIB_data *thedata)
 {
 	struct phyMIB_data *StorageNew = SNMP_MALLOC_STRUCT(phyMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("phyMIB", "phyMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -439,6 +444,8 @@ phyMIB_add(struct phyMIB_data *thedata)
 void
 parse_phyMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct phyMIB_data *StorageTmp = phyMIB_create();
 
@@ -464,6 +471,10 @@ store_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct phyMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "store_phyMIB: storing data...  "));
 	refresh_phyMIB(1);
 	if ((StorageTmp = phyMIBStorage) == NULL) {
@@ -500,6 +511,8 @@ store_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -521,6 +534,8 @@ check_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
 int
 update_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	phyMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -536,6 +551,7 @@ update_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
 void
 revert_phyMIB(struct phyMIB_data *StorageTmp, struct phyMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_phyMIB(StorageOld, NULL);
 }
@@ -789,6 +805,8 @@ parse_physicalEntityTable(const char *token, char *line)
 	size_t tmpsize;
 	struct physicalEntityTable_data *StorageTmp = physicalEntityTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("phyMIB", "parse_physicalEntityTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -832,6 +850,10 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 	struct physicalEntityTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "store_physicalEntityTable: storing data...  "));
 	refresh_physicalEntityTable(1);
 	(void) tmpsize;
@@ -1035,6 +1057,8 @@ parse_physicalSAPTable(const char *token, char *line)
 	size_t tmpsize;
 	struct physicalSAPTable_data *StorageTmp = physicalSAPTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("phyMIB", "parse_physicalSAPTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1079,6 +1103,10 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct physicalSAPTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "store_physicalSAPTable: storing data...  "));
 	refresh_physicalSAPTable(1);
 	(void) tmpsize;
@@ -1350,6 +1378,8 @@ parse_dataCircuitTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dataCircuitTable_data *StorageTmp = dataCircuitTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("phyMIB", "parse_dataCircuitTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1429,6 +1459,10 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct dataCircuitTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "store_dataCircuitTable: storing data...  "));
 	refresh_dataCircuitTable(1);
 	(void) tmpsize;
@@ -1679,6 +1713,8 @@ parse_physicalConnectionTable(const char *token, char *line)
 	size_t tmpsize;
 	struct physicalConnectionTable_data *StorageTmp = physicalConnectionTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("phyMIB", "parse_physicalConnectionTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1741,6 +1777,10 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 	struct physicalConnectionTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("phyMIB", "store_physicalConnectionTable: storing data...  "));
 	refresh_physicalConnectionTable(1);
 	(void) tmpsize;
@@ -1781,6 +1821,7 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 int
 activate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1798,6 +1839,7 @@ activate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 int
 deactivate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1815,6 +1857,7 @@ deactivate_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 int
 activate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1832,6 +1875,7 @@ activate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 int
 deactivate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1849,6 +1893,7 @@ deactivate_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 int
 activate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1866,6 +1911,7 @@ activate_physicalConnectionTable_row(struct physicalConnectionTable_data *Storag
 int
 deactivate_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1888,6 +1934,8 @@ deactivate_physicalConnectionTable_row(struct physicalConnectionTable_data *Stor
 int
 check_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1910,6 +1958,8 @@ check_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struc
 int
 update_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	physicalEntityTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1924,6 +1974,7 @@ update_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, stru
 void
 revert_physicalEntityTable_row(struct physicalEntityTable_data *StorageTmp, struct physicalEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_physicalEntityTable_row(StorageOld, NULL);
 }
@@ -2035,6 +2086,8 @@ var_physicalEntityTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2057,6 +2110,8 @@ check_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct phys
 int
 update_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	physicalSAPTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2071,6 +2126,7 @@ update_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct phy
 void
 revert_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp, struct physicalSAPTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_physicalSAPTable_row(StorageOld, NULL);
 }
@@ -2183,6 +2239,8 @@ var_physicalSAPTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2205,6 +2263,8 @@ check_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct data
 int
 update_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dataCircuitTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2219,6 +2279,7 @@ update_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dat
 void
 revert_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp, struct dataCircuitTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dataCircuitTable_row(StorageOld, NULL);
 }
@@ -2392,6 +2453,8 @@ var_dataCircuitTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2414,6 +2477,8 @@ check_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTm
 int
 update_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	physicalConnectionTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2428,6 +2493,7 @@ update_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageT
 void
 revert_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp, struct physicalConnectionTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_physicalConnectionTable_row(StorageOld, NULL);
 }
@@ -2554,6 +2620,10 @@ write_dataCircuitBitErrorsThreshold(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("phyMIB", "write_dataCircuitBitErrorsThreshold entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2672,6 +2742,10 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("phyMIB", "write_physicalConnectionEndpointIdentifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2784,6 +2858,7 @@ write_physicalConnectionEndpointIdentifier(int action, u_char *var_val, u_char v
 int
 can_act_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2801,6 +2876,7 @@ can_act_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 int
 can_deact_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2818,6 +2894,7 @@ can_deact_physicalSAPTable_row(struct physicalSAPTable_data *StorageTmp)
 int
 can_act_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2835,6 +2912,7 @@ can_act_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 int
 can_deact_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2852,6 +2930,7 @@ can_deact_dataCircuitTable_row(struct dataCircuitTable_data *StorageTmp)
 int
 can_act_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2869,6 +2948,7 @@ can_act_physicalConnectionTable_row(struct physicalConnectionTable_data *Storage
 int
 can_deact_physicalConnectionTable_row(struct physicalConnectionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -2893,6 +2973,10 @@ write_physicalSAPRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("phyMIB", "write_physicalSAPRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(physicalSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -3176,6 +3260,10 @@ write_dataCircuitRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("phyMIB", "write_dataCircuitRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(dataCircuitTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -3459,6 +3547,10 @@ write_physicalConnectionRowStatus(int action, u_char *var_val, u_char var_val_ty
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("phyMIB", "write_physicalConnectionRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(physicalConnectionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -3790,6 +3882,8 @@ phyMIB_loop_handler(int sig)
 void
 phyMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("phyMIB", "phyMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("phyMIB", "done.\n"));

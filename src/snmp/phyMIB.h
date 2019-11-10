@@ -67,14 +67,14 @@ struct phyMIB_data {
 	uint phyMIB_rsvs;
 	uint phyMIB_tsts;
 	uint phyMIB_sets;
-	uint phyMIB_request;
+	int phyMIB_request;
 };
 struct physicalEntityTable_data {
 	struct physicalEntityTable_data *physicalEntityTable_old;
 	uint physicalEntityTable_rsvs;
 	uint physicalEntityTable_tsts;
 	uint physicalEntityTable_sets;
-	uint physicalEntityTable_request;
+	int physicalEntityTable_request;
 	uint physicalEntityTable_refs;
 	uint physicalEntityTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
@@ -90,7 +90,7 @@ struct physicalSAPTable_data {
 	uint physicalSAPTable_rsvs;
 	uint physicalSAPTable_tsts;
 	uint physicalSAPTable_sets;
-	uint physicalSAPTable_request;
+	int physicalSAPTable_request;
 	uint physicalSAPTable_refs;
 	uint physicalSAPTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
@@ -107,7 +107,7 @@ struct dataCircuitTable_data {
 	uint dataCircuitTable_rsvs;
 	uint dataCircuitTable_tsts;
 	uint dataCircuitTable_sets;
-	uint dataCircuitTable_request;
+	int dataCircuitTable_request;
 	uint dataCircuitTable_refs;
 	uint dataCircuitTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
@@ -139,7 +139,7 @@ struct physicalConnectionTable_data {
 	uint physicalConnectionTable_rsvs;
 	uint physicalConnectionTable_tsts;
 	uint physicalConnectionTable_sets;
-	uint physicalConnectionTable_request;
+	int physicalConnectionTable_request;
 	uint physicalConnectionTable_refs;
 	uint physicalConnectionTable_id;
 	uint8_t *physicalEntityId;	/* NoAccess */
