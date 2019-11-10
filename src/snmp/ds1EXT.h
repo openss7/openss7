@@ -67,14 +67,14 @@ struct ds1EXT_data {
 	uint ds1EXT_rsvs;
 	uint ds1EXT_tsts;
 	uint ds1EXT_sets;
-	uint ds1EXT_request;
+	int ds1EXT_request;
 };
 struct dsx1ConfigTable_data {
 	struct dsx1ConfigTable_data *dsx1ConfigTable_old;
 	uint dsx1ConfigTable_rsvs;
 	uint dsx1ConfigTable_tsts;
 	uint dsx1ConfigTable_sets;
-	uint dsx1ConfigTable_request;
+	int dsx1ConfigTable_request;
 	uint dsx1ConfigTable_refs;
 	uint dsx1ConfigTable_id;
 	long dsx1LineIndex;		/* NoAccess */
@@ -110,7 +110,7 @@ struct dsx1CurrentTable_data {
 	uint dsx1CurrentTable_rsvs;
 	uint dsx1CurrentTable_tsts;
 	uint dsx1CurrentTable_sets;
-	uint dsx1CurrentTable_request;
+	int dsx1CurrentTable_request;
 	uint dsx1CurrentTable_refs;
 	uint dsx1CurrentTable_id;
 	long dsx1CurrentIndex;		/* NoAccess */
@@ -130,7 +130,7 @@ struct dsx1IntervalTable_data {
 	uint dsx1IntervalTable_rsvs;
 	uint dsx1IntervalTable_tsts;
 	uint dsx1IntervalTable_sets;
-	uint dsx1IntervalTable_request;
+	int dsx1IntervalTable_request;
 	uint dsx1IntervalTable_refs;
 	uint dsx1IntervalTable_id;
 	long dsx1IntervalIndex;		/* NoAccess */
@@ -152,7 +152,7 @@ struct dsx1TotalTable_data {
 	uint dsx1TotalTable_rsvs;
 	uint dsx1TotalTable_tsts;
 	uint dsx1TotalTable_sets;
-	uint dsx1TotalTable_request;
+	int dsx1TotalTable_request;
 	uint dsx1TotalTable_refs;
 	uint dsx1TotalTable_id;
 	long dsx1TotalIndex;		/* NoAccess */
@@ -172,7 +172,7 @@ struct dsx1FarEndCurrentTable_data {
 	uint dsx1FarEndCurrentTable_rsvs;
 	uint dsx1FarEndCurrentTable_tsts;
 	uint dsx1FarEndCurrentTable_sets;
-	uint dsx1FarEndCurrentTable_request;
+	int dsx1FarEndCurrentTable_request;
 	uint dsx1FarEndCurrentTable_refs;
 	uint dsx1FarEndCurrentTable_id;
 	long dsx1FarEndCurrentIndex;	/* NoAccess */
@@ -194,7 +194,7 @@ struct dsx1FarEndIntervalTable_data {
 	uint dsx1FarEndIntervalTable_rsvs;
 	uint dsx1FarEndIntervalTable_tsts;
 	uint dsx1FarEndIntervalTable_sets;
-	uint dsx1FarEndIntervalTable_request;
+	int dsx1FarEndIntervalTable_request;
 	uint dsx1FarEndIntervalTable_refs;
 	uint dsx1FarEndIntervalTable_id;
 	long dsx1FarEndIntervalIndex;	/* NoAccess */
@@ -215,7 +215,7 @@ struct dsx1FarEndTotalTable_data {
 	uint dsx1FarEndTotalTable_rsvs;
 	uint dsx1FarEndTotalTable_tsts;
 	uint dsx1FarEndTotalTable_sets;
-	uint dsx1FarEndTotalTable_request;
+	int dsx1FarEndTotalTable_request;
 	uint dsx1FarEndTotalTable_refs;
 	uint dsx1FarEndTotalTable_id;
 	long dsx1FarEndTotalIndex;	/* NoAccess */
@@ -234,7 +234,7 @@ struct dsx1FracTable_data {
 	uint dsx1FracTable_rsvs;
 	uint dsx1FracTable_tsts;
 	uint dsx1FracTable_sets;
-	uint dsx1FracTable_request;
+	int dsx1FracTable_request;
 	uint dsx1FracTable_refs;
 	uint dsx1FracTable_id;
 	long dsx1FracIndex;		/* NoAccess */
@@ -246,7 +246,7 @@ struct dsx1ChanMappingTable_data {
 	uint dsx1ChanMappingTable_rsvs;
 	uint dsx1ChanMappingTable_tsts;
 	uint dsx1ChanMappingTable_sets;
-	uint dsx1ChanMappingTable_request;
+	int dsx1ChanMappingTable_request;
 	uint dsx1ChanMappingTable_refs;
 	uint dsx1ChanMappingTable_id;
 	long ifIndex;			/* ReadOnly */

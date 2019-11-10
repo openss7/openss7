@@ -489,6 +489,10 @@ deinit_ds1EXT(void)
 int
 term_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "term_ds1EXT: terminating...  "));
 	deinit_ds1EXT();
 	DEBUGMSGTL(("ds1EXT", "done.\n"));
@@ -534,6 +538,7 @@ ds1EXT_duplicate(struct ds1EXT_data *thedata)
 {
 	struct ds1EXT_data *StorageNew = SNMP_MALLOC_STRUCT(ds1EXT_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("ds1EXT", "ds1EXT_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -603,6 +608,8 @@ ds1EXT_add(struct ds1EXT_data *thedata)
 void
 parse_ds1EXT(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct ds1EXT_data *StorageTmp = ds1EXT_create();
 
@@ -628,6 +635,10 @@ store_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct ds1EXT_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_ds1EXT: storing data...  "));
 	refresh_ds1EXT(1);
 	if ((StorageTmp = ds1EXTStorage) == NULL) {
@@ -664,6 +675,8 @@ store_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_ds1EXT(struct ds1EXT_data *StorageTmp, struct ds1EXT_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -685,6 +698,8 @@ check_ds1EXT(struct ds1EXT_data *StorageTmp, struct ds1EXT_data *StorageOld)
 int
 update_ds1EXT(struct ds1EXT_data *StorageTmp, struct ds1EXT_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	ds1EXT_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -700,6 +715,7 @@ update_ds1EXT(struct ds1EXT_data *StorageTmp, struct ds1EXT_data *StorageOld)
 void
 revert_ds1EXT(struct ds1EXT_data *StorageTmp, struct ds1EXT_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_ds1EXT(StorageOld, NULL);
 }
@@ -1006,6 +1022,8 @@ parse_dsx1ConfigTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1ConfigTable_data *StorageTmp = dsx1ConfigTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1ConfigTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1073,6 +1091,10 @@ store_dsx1ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct dsx1ConfigTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1ConfigTable: storing data...  "));
 	refresh_dsx1ConfigTable(1);
 	(void) tmpsize;
@@ -1283,6 +1305,8 @@ parse_dsx1CurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1CurrentTable_data *StorageTmp = dsx1CurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1CurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1318,6 +1342,10 @@ store_dsx1CurrentTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct dsx1CurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1CurrentTable: storing data...  "));
 	refresh_dsx1CurrentTable(1);
 	(void) tmpsize;
@@ -1521,6 +1549,8 @@ parse_dsx1IntervalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1IntervalTable_data *StorageTmp = dsx1IntervalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1IntervalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1558,6 +1588,10 @@ store_dsx1IntervalTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct dsx1IntervalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1IntervalTable: storing data...  "));
 	refresh_dsx1IntervalTable(1);
 	(void) tmpsize;
@@ -1758,6 +1792,8 @@ parse_dsx1TotalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1TotalTable_data *StorageTmp = dsx1TotalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1TotalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1793,6 +1829,10 @@ store_dsx1TotalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct dsx1TotalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1TotalTable: storing data...  "));
 	refresh_dsx1TotalTable(1);
 	(void) tmpsize;
@@ -1995,6 +2035,8 @@ parse_dsx1FarEndCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1FarEndCurrentTable_data *StorageTmp = dsx1FarEndCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1FarEndCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2032,6 +2074,10 @@ store_dsx1FarEndCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 	struct dsx1FarEndCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1FarEndCurrentTable: storing data...  "));
 	refresh_dsx1FarEndCurrentTable(1);
 	(void) tmpsize;
@@ -2235,6 +2281,8 @@ parse_dsx1FarEndIntervalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1FarEndIntervalTable_data *StorageTmp = dsx1FarEndIntervalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1FarEndIntervalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2271,6 +2319,10 @@ store_dsx1FarEndIntervalTable(int majorID, int minorID, void *serverarg, void *c
 	struct dsx1FarEndIntervalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1FarEndIntervalTable: storing data...  "));
 	refresh_dsx1FarEndIntervalTable(1);
 	(void) tmpsize;
@@ -2468,6 +2520,8 @@ parse_dsx1FarEndTotalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1FarEndTotalTable_data *StorageTmp = dsx1FarEndTotalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1FarEndTotalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2502,6 +2556,10 @@ store_dsx1FarEndTotalTable(int majorID, int minorID, void *serverarg, void *clie
 	struct dsx1FarEndTotalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1FarEndTotalTable: storing data...  "));
 	refresh_dsx1FarEndTotalTable(1);
 	(void) tmpsize;
@@ -2684,6 +2742,8 @@ parse_dsx1FracTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1FracTable_data *StorageTmp = dsx1FracTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1FracTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2711,6 +2771,10 @@ store_dsx1FracTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct dsx1FracTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1FracTable: storing data...  "));
 	refresh_dsx1FracTable(1);
 	(void) tmpsize;
@@ -2888,6 +2952,8 @@ parse_dsx1ChanMappingTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx1ChanMappingTable_data *StorageTmp = dsx1ChanMappingTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ds1EXT", "parse_dsx1ChanMappingTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2915,6 +2981,10 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 	struct dsx1ChanMappingTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds1EXT", "store_dsx1ChanMappingTable: storing data...  "));
 	refresh_dsx1ChanMappingTable(1);
 	(void) tmpsize;
@@ -2955,6 +3025,8 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 int
 check_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2977,6 +3049,8 @@ check_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1Co
 int
 update_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1ConfigTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2991,6 +3065,7 @@ update_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1C
 void
 revert_dsx1ConfigTable_row(struct dsx1ConfigTable_data *StorageTmp, struct dsx1ConfigTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1ConfigTable_row(StorageOld, NULL);
 }
@@ -3349,6 +3424,8 @@ var_dsx1ConfigTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3371,6 +3448,8 @@ check_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1
 int
 update_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1CurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3385,6 +3464,7 @@ update_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx
 void
 revert_dsx1CurrentTable_row(struct dsx1CurrentTable_data *StorageTmp, struct dsx1CurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1CurrentTable_row(StorageOld, NULL);
 }
@@ -3538,6 +3618,8 @@ var_dsx1CurrentTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3560,6 +3642,8 @@ check_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct ds
 int
 update_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1IntervalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3574,6 +3658,7 @@ update_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct d
 void
 revert_dsx1IntervalTable_row(struct dsx1IntervalTable_data *StorageTmp, struct dsx1IntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1IntervalTable_row(StorageOld, NULL);
 }
@@ -3733,6 +3818,8 @@ var_dsx1IntervalTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3755,6 +3842,8 @@ check_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1Tota
 int
 update_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1TotalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3769,6 +3858,7 @@ update_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1Tot
 void
 revert_dsx1TotalTable_row(struct dsx1TotalTable_data *StorageTmp, struct dsx1TotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1TotalTable_row(StorageOld, NULL);
 }
@@ -3922,6 +4012,8 @@ var_dsx1TotalTable(struct variable *vp, oid * name, size_t *length, int exact, s
 int
 check_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3944,6 +4036,8 @@ check_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp,
 int
 update_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1FarEndCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3958,6 +4052,7 @@ update_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp
 void
 revert_dsx1FarEndCurrentTable_row(struct dsx1FarEndCurrentTable_data *StorageTmp, struct dsx1FarEndCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1FarEndCurrentTable_row(StorageOld, NULL);
 }
@@ -4123,6 +4218,8 @@ var_dsx1FarEndCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4145,6 +4242,8 @@ check_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTm
 int
 update_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1FarEndIntervalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4159,6 +4258,7 @@ update_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageT
 void
 revert_dsx1FarEndIntervalTable_row(struct dsx1FarEndIntervalTable_data *StorageTmp, struct dsx1FarEndIntervalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1FarEndIntervalTable_row(StorageOld, NULL);
 }
@@ -4312,6 +4412,8 @@ var_dsx1FarEndIntervalTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4334,6 +4436,8 @@ check_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, str
 int
 update_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1FarEndTotalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4348,6 +4452,7 @@ update_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, st
 void
 revert_dsx1FarEndTotalTable_row(struct dsx1FarEndTotalTable_data *StorageTmp, struct dsx1FarEndTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1FarEndTotalTable_row(StorageOld, NULL);
 }
@@ -4495,6 +4600,8 @@ var_dsx1FarEndTotalTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4517,6 +4624,8 @@ check_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTa
 int
 update_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1FracTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4531,6 +4640,7 @@ update_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracT
 void
 revert_dsx1FracTable_row(struct dsx1FracTable_data *StorageTmp, struct dsx1FracTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1FracTable_row(StorageOld, NULL);
 }
@@ -4631,6 +4741,8 @@ var_dsx1FracTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4653,6 +4765,8 @@ check_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, str
 int
 update_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx1ChanMappingTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4667,6 +4781,7 @@ update_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, st
 void
 revert_dsx1ChanMappingTable_row(struct dsx1ChanMappingTable_data *StorageTmp, struct dsx1ChanMappingTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx1ChanMappingTable_row(StorageOld, NULL);
 }
@@ -4767,6 +4882,10 @@ write_dsx1LineType(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4881,6 +5000,10 @@ write_dsx1LineCoding(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineCoding entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4987,6 +5110,10 @@ write_dsx1SendCode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1SendCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5094,6 +5221,10 @@ write_dsx1CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1CircuitIdentifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5107,7 +5238,7 @@ write_dsx1CircuitIdentifier(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || (var_val_len > 255)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1CircuitIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -5200,6 +5331,10 @@ write_dsx1LoopbackConfig(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LoopbackConfig entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5305,6 +5440,10 @@ write_dsx1SignalMode(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1SignalMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5409,6 +5548,10 @@ write_dsx1TransmitClockSource(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1TransmitClockSource entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5512,6 +5655,10 @@ write_dsx1Fdl(int action, u_char *var_val, u_char var_val_type, size_t var_val_l
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1Fdl entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5625,6 +5772,10 @@ write_dsx1LineLength(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineLength entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5723,6 +5874,10 @@ write_dsx1LineStatusChangeTrapEnable(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineStatusChangeTrapEnable entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5825,6 +5980,10 @@ write_dsx1Channelization(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1Channelization entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5927,6 +6086,10 @@ write_dsx1LineMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6028,6 +6191,10 @@ write_dsx1LineBuildOut(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineBuildOut entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6132,6 +6299,10 @@ write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1LineImpedance entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6235,6 +6406,10 @@ write_dsx1FracIfIndex(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds1EXT", "write_dsx1FracIfIndex entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6383,6 +6558,8 @@ ds1EXT_loop_handler(int sig)
 void
 ds1EXT_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("ds1EXT", "ds1EXT_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("ds1EXT", "done.\n"));
