@@ -419,6 +419,10 @@ deinit_strMIB(void)
 int
 term_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "term_strMIB: terminating...  "));
 	deinit_strMIB();
 	DEBUGMSGTL(("strMIB", "done.\n"));
@@ -579,6 +583,7 @@ strMIB_add(struct strMIB_data *thedata)
 void
 parse_strMIB(const char *token, char *line)
 {
+	(void) token;
 	size_t tmpsize;
 	struct strMIB_data *StorageTmp = strMIB_create();
 
@@ -627,6 +632,10 @@ store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct strMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strMIB: storing data...  "));
 	refresh_strMIB(1);
 	if ((StorageTmp = strMIBStorage) == NULL) {
@@ -686,6 +695,8 @@ store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_strMIB(struct strMIB_data *StorageTmp, struct strMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -707,6 +718,8 @@ check_strMIB(struct strMIB_data *StorageTmp, struct strMIB_data *StorageOld)
 int
 update_strMIB(struct strMIB_data *StorageTmp, struct strMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -722,6 +735,7 @@ update_strMIB(struct strMIB_data *StorageTmp, struct strMIB_data *StorageOld)
 void
 revert_strMIB(struct strMIB_data *StorageTmp, struct strMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strMIB(StorageOld, NULL);
 }
@@ -1335,6 +1349,7 @@ parse_strModTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strModTable_data *StorageTmp = strModTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strMIB", "parse_strModTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1369,6 +1384,10 @@ store_strModTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct strModTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strModTable: storing data...  "));
 	refresh_strModTable(1);
 	(void) tmpsize;
@@ -1574,6 +1593,7 @@ parse_strModInfoTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strModInfoTable_data *StorageTmp = strModInfoTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strMIB", "parse_strModInfoTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1616,6 +1636,10 @@ store_strModInfoTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct strModInfoTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strModInfoTable: storing data...  "));
 	refresh_strModInfoTable(1);
 	(void) tmpsize;
@@ -1837,6 +1861,7 @@ parse_strModStatTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strModStatTable_data *StorageTmp = strModStatTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strMIB", "parse_strModStatTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1886,6 +1911,10 @@ store_strModStatTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct strModStatTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strModStatTable: storing data...  "));
 	refresh_strModStatTable(1);
 	(void) tmpsize;
@@ -2095,6 +2124,7 @@ parse_strApshTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strApshTable_data *StorageTmp = strApshTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strMIB", "parse_strApshTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2135,6 +2165,10 @@ store_strApshTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct strApshTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strApshTable: storing data...  "));
 	refresh_strApshTable(1);
 	(void) tmpsize;
@@ -2312,6 +2346,7 @@ parse_strStatsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strStatsTable_data *StorageTmp = strStatsTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strMIB", "parse_strStatsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2339,6 +2374,10 @@ store_strStatsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct strStatsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strMIB", "store_strStatsTable: storing data...  "));
 	refresh_strStatsTable(1);
 	(void) tmpsize;
@@ -2374,6 +2413,7 @@ store_strStatsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 activate_strModTable_row(struct strModTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -2391,6 +2431,7 @@ activate_strModTable_row(struct strModTable_data *StorageTmp)
 int
 deactivate_strModTable_row(struct strModTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -2408,6 +2449,7 @@ deactivate_strModTable_row(struct strModTable_data *StorageTmp)
 int
 activate_strApshTable_row(struct strApshTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -2425,6 +2467,7 @@ activate_strApshTable_row(struct strApshTable_data *StorageTmp)
 int
 deactivate_strApshTable_row(struct strApshTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -2447,6 +2490,8 @@ deactivate_strApshTable_row(struct strApshTable_data *StorageTmp)
 int
 check_strModTable_row(struct strModTable_data *StorageTmp, struct strModTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2469,6 +2514,8 @@ check_strModTable_row(struct strModTable_data *StorageTmp, struct strModTable_da
 int
 update_strModTable_row(struct strModTable_data *StorageTmp, struct strModTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strModTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2483,6 +2530,7 @@ update_strModTable_row(struct strModTable_data *StorageTmp, struct strModTable_d
 void
 revert_strModTable_row(struct strModTable_data *StorageTmp, struct strModTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strModTable_row(StorageOld, NULL);
 }
@@ -2528,7 +2576,9 @@ refresh_strModTable(int force)
 	strModInfoTable_refresh = 0;
 	strModStatTable_refresh = 0;
 	{
-		int fd, count, i, j, modid, len;
+		int fd, count, i, modid;
+		ulong j;
+		size_t len;
 		struct sc_list *list = NULL;
 		struct header_complex_index *hciptr, *hciptr_next;
 
@@ -2865,6 +2915,8 @@ var_strModTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_strModInfoTable_row(struct strModInfoTable_data *StorageTmp, struct strModInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -2887,6 +2939,8 @@ check_strModInfoTable_row(struct strModInfoTable_data *StorageTmp, struct strMod
 int
 update_strModInfoTable_row(struct strModInfoTable_data *StorageTmp, struct strModInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strModInfoTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -2901,6 +2955,7 @@ update_strModInfoTable_row(struct strModInfoTable_data *StorageTmp, struct strMo
 void
 revert_strModInfoTable_row(struct strModInfoTable_data *StorageTmp, struct strModInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strModInfoTable_row(StorageOld, NULL);
 }
@@ -3036,6 +3091,8 @@ var_strModInfoTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_strModStatTable_row(struct strModStatTable_data *StorageTmp, struct strModStatTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3058,6 +3115,8 @@ check_strModStatTable_row(struct strModStatTable_data *StorageTmp, struct strMod
 int
 update_strModStatTable_row(struct strModStatTable_data *StorageTmp, struct strModStatTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strModStatTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3072,6 +3131,7 @@ update_strModStatTable_row(struct strModStatTable_data *StorageTmp, struct strMo
 void
 revert_strModStatTable_row(struct strModStatTable_data *StorageTmp, struct strModStatTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strModStatTable_row(StorageOld, NULL);
 }
@@ -3214,6 +3274,8 @@ var_strModStatTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_strApshTable_row(struct strApshTable_data *StorageTmp, struct strApshTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3236,6 +3298,8 @@ check_strApshTable_row(struct strApshTable_data *StorageTmp, struct strApshTable
 int
 update_strApshTable_row(struct strApshTable_data *StorageTmp, struct strApshTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strApshTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3250,6 +3314,7 @@ update_strApshTable_row(struct strApshTable_data *StorageTmp, struct strApshTabl
 void
 revert_strApshTable_row(struct strApshTable_data *StorageTmp, struct strApshTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strApshTable_row(StorageOld, NULL);
 }
@@ -3297,7 +3362,7 @@ refresh_strApshTable_row(struct strApshTable_data *StorageTmp, int force)
 		}
 		close(fd);
 		if ((tmp = calloc(MAXAPUSH, FMNAMESZ + 1))) {
-			int i;
+			uint i;
 
 			for (ptr = tmp, i = 0; i < sap.sap_npush; i++)
 				ptr += snprintf(ptr, FMNAMESZ + 1, "%s ", sap.sap_list[i]);
@@ -3342,7 +3407,8 @@ refresh_strApshTable(int force)
 		struct strModTable_data *d = h->data;
 		struct strapush sap;
 		char *tmp, *ptr;
-		int i, minor = 0;
+		int minor = 0;
+		uint i;
 
 	      next_minor:
 		sap.sap_cmd = SAD_LAP;
@@ -3364,7 +3430,7 @@ refresh_strApshTable(int force)
 			struct strApshTable_data *data = hciptr->data;
 
 			if (d->strModNameLen == data->strModNameLen && !strncmp((char *) d->strModName, (char *) data->strModName, d->strModNameLen)
-			    && data->strApshMinor == sap.sap_minor && data->strApshLastMinor == sap.sap_lastminor)
+			    && data->strApshMinor == (ulong) sap.sap_minor && data->strApshLastMinor == (ulong) sap.sap_lastminor)
 				break;
 		}
 		if (hciptr) {
@@ -3492,6 +3558,8 @@ var_strApshTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 int
 check_strStatsTable_row(struct strStatsTable_data *StorageTmp, struct strStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3514,6 +3582,8 @@ check_strStatsTable_row(struct strStatsTable_data *StorageTmp, struct strStatsTa
 int
 update_strStatsTable_row(struct strStatsTable_data *StorageTmp, struct strStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strStatsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3528,6 +3598,7 @@ update_strStatsTable_row(struct strStatsTable_data *StorageTmp, struct strStatsT
 void
 revert_strStatsTable_row(struct strStatsTable_data *StorageTmp, struct strStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strStatsTable_row(StorageOld, NULL);
 }
@@ -3706,6 +3777,10 @@ write_strModInfoMinpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModInfoMinpsz entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -3803,6 +3878,10 @@ write_strModInfoMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModInfoMaxpsz entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -3900,6 +3979,10 @@ write_strModInfoHiwat(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModInfoHiwat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -3997,6 +4080,10 @@ write_strModInfoLowat(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModInfoLowat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4094,6 +4181,10 @@ write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModInfoTraceLevel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4111,7 +4202,7 @@ write_strModInfoTraceLevel(int action, u_char *var_val, u_char var_val_type, siz
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..255 */
-		if ((0 > set_value || set_value > 255)) {
+		if (set_value > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strModInfoTraceLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -4196,6 +4287,10 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strApshModules entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4220,7 +4315,7 @@ write_strApshModules(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || var_val_len > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strApshModules: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -4318,6 +4413,10 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strCltime entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4333,7 +4432,7 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 		}
 		/* Note: default value 1500 */
 		/* Note: ranges 0..2147483647 */
-		if ((0 > set_value || set_value > 2147483647)) {
+		if (set_value > 2147483647) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strCltime: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -4434,6 +4533,10 @@ write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMaxApush entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4545,6 +4648,10 @@ write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMaxMblk entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4656,6 +4763,10 @@ write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMaxStramod entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4767,6 +4878,10 @@ write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMsgPriority entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4886,6 +5001,10 @@ write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strNstrmsgs entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -4997,6 +5116,10 @@ write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strNstrpush entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5108,6 +5231,10 @@ write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strHiwat entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5219,6 +5346,10 @@ write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strLowat entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5330,6 +5461,10 @@ write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMaxpsz entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5446,6 +5581,10 @@ write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMinpsz entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5562,6 +5701,10 @@ write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strReuseFmodsw entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5681,6 +5824,10 @@ write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strRtime entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5797,6 +5944,10 @@ write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strStrhold entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5916,6 +6067,10 @@ write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strStrctlsz entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6032,6 +6187,10 @@ write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strStrmsgsz entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6148,6 +6307,10 @@ write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strStrthresh entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6259,6 +6422,10 @@ write_strLowthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strLowthresh entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6349,6 +6516,10 @@ write_strMedthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strMedthresh entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6439,6 +6610,10 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strIoctime entering action=%d...  \n", action));
 	if ((StorageTmp = strMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6550,6 +6725,7 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 int
 can_act_strModTable_row(struct strModTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	/* Creating a row in the strModTable has the effect of attempting to verify the module by loading it.  We could use the sad(4) driver's ability to verify a module list; however, it does not
 	   work for drivers.  So, we use the sc(4) modules' ability to tune a module or driver, but don't really tune any of it (just for the side-effect of demand loading). */
@@ -6594,6 +6770,7 @@ can_act_strModTable_row(struct strModTable_data *StorageTmp)
 int
 can_deact_strModTable_row(struct strModTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	/* Unfortunately, the sad(4) driver does not have the ability to remove a module from the
 	   system.  I think that I will add an SAD_RML input-output control to do exactly that. */
@@ -6614,6 +6791,7 @@ can_deact_strModTable_row(struct strModTable_data *StorageTmp)
 int
 can_act_strApshTable_row(struct strApshTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -6631,6 +6809,7 @@ can_act_strApshTable_row(struct strApshTable_data *StorageTmp)
 int
 can_deact_strApshTable_row(struct strApshTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -6655,6 +6834,10 @@ write_strModRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strModRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(strModTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -6929,6 +7112,10 @@ write_strApshRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strMIB", "write_strApshRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(strApshTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -6989,7 +7176,7 @@ write_strApshRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			/* Note: ranges 0..16383 -1..-1 */
-			if ((0 > (ulong) *vp->val.integer || (ulong) *vp->val.integer > 16383) && (ulong) *vp->val.integer != -1) {
+			if ((0 > *vp->val.integer || *vp->val.integer > 16383) && *vp->val.integer != -1) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index strApshMinor: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -7002,7 +7189,7 @@ write_strApshRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			/* Note: ranges 0..16383 */
-			if ((0 > (ulong) *vp->val.integer || (ulong) *vp->val.integer > 16383)) {
+			if ((0 > *vp->val.integer || *vp->val.integer > 16383)) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index strApshLastMinor: bad value\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -7268,6 +7455,8 @@ strMIB_loop_handler(int sig)
 void
 strMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("strMIB", "strMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("strMIB", "done.\n"));

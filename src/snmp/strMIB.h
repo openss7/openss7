@@ -67,7 +67,7 @@ struct strMIB_data {
 	uint strMIB_rsvs;
 	uint strMIB_tsts;
 	uint strMIB_sets;
-	uint strMIB_request;
+	int strMIB_request;
 	long strCltime;			/* ReadWrite */
 	ulong strMaxApush;		/* ReadWrite */
 	ulong strMaxMblk;		/* ReadWrite */
@@ -97,7 +97,7 @@ struct strModTable_data {
 	uint strModTable_rsvs;
 	uint strModTable_tsts;
 	uint strModTable_sets;
-	uint strModTable_request;
+	int strModTable_request;
 	uint strModTable_refs;
 	uint strModTable_id;
 	uint8_t *strModName;		/* NoAccess */
@@ -112,7 +112,7 @@ struct strModInfoTable_data {
 	uint strModInfoTable_rsvs;
 	uint strModInfoTable_tsts;
 	uint strModInfoTable_sets;
-	uint strModInfoTable_request;
+	int strModInfoTable_request;
 	uint strModInfoTable_refs;
 	uint strModInfoTable_id;
 	uint8_t *strModName;		/* NoAccess */
@@ -131,7 +131,7 @@ struct strModStatTable_data {
 	uint strModStatTable_rsvs;
 	uint strModStatTable_tsts;
 	uint strModStatTable_sets;
-	uint strModStatTable_request;
+	int strModStatTable_request;
 	uint strModStatTable_refs;
 	uint strModStatTable_id;
 	uint8_t *strModName;		/* NoAccess */
@@ -153,7 +153,7 @@ struct strApshTable_data {
 	uint strApshTable_rsvs;
 	uint strApshTable_tsts;
 	uint strApshTable_sets;
-	uint strApshTable_request;
+	int strApshTable_request;
 	uint strApshTable_refs;
 	uint strApshTable_id;
 	uint8_t *strModName;		/* NoAccess */
@@ -170,7 +170,7 @@ struct strStatsTable_data {
 	uint strStatsTable_rsvs;
 	uint strStatsTable_tsts;
 	uint strStatsTable_sets;
-	uint strStatsTable_request;
+	int strStatsTable_request;
 	uint strStatsTable_refs;
 	uint strStatsTable_id;
 	long strStatsStructure;		/* NoAccess */
