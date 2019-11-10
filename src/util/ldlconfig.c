@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -329,7 +329,7 @@ do_info(int fd)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		fprintf(stderr, "do_info: Bad reply length %d\n", ctlbuf.len);
 		return -1;
 	}
@@ -337,7 +337,7 @@ do_info(int fd)
 	switch (reply.ack.dl_primitive) {
 	case DL_ERROR_ACK:
 		printf("do_info: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			fprintf(stderr, "do_info: Bad DL_ERROR_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -351,7 +351,7 @@ do_info(int fd)
 	case DL_INFO_ACK:
 		if (output > 2)
 			printf("do_info: Got DL_INFO_ACK\n");
-		if (ctlbuf.len < sizeof(dl_info_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_info_ack_t)) {
 			fprintf(stderr, "do_info: Bad DL_INFO_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -387,14 +387,14 @@ do_info(int fd)
 			printf("\tgrowth=%lu\n", (ulong) reply.ack.info_ack.dl_growth);
 			if (reply.ack.info_ack.dl_addr_length && reply.ack.info_ack.dl_addr_offset
 			    && reply.ack.info_ack.dl_addr_offset +
-			    reply.ack.info_ack.dl_addr_length <= ctlbuf.len)
+			    reply.ack.info_ack.dl_addr_length <= (dl_ulong) ctlbuf.len)
 				dumpaddr("\tAddress",
 					 &ctlbuf.buf[reply.ack.info_ack.dl_addr_offset],
 					 reply.ack.info_ack.dl_addr_length);
 			if (reply.ack.info_ack.dl_brdcst_addr_length
 			    && reply.ack.info_ack.dl_brdcst_addr_offset
 			    && reply.ack.info_ack.dl_brdcst_addr_offset +
-			    reply.ack.info_ack.dl_brdcst_addr_length <= ctlbuf.len)
+			    reply.ack.info_ack.dl_brdcst_addr_length <= (dl_ulong) ctlbuf.len)
 				dumpaddr("\tBroadcast address",
 					 &ctlbuf.buf[reply.ack.info_ack.dl_brdcst_addr_offset],
 					 reply.ack.info_ack.dl_brdcst_addr_length);
@@ -471,7 +471,7 @@ do_info(int fd)
 		if (reply.ack.info_ack.dl_brdcst_addr_length != 0
 		    && reply.ack.info_ack.dl_brdcst_addr_offset != 0) {
 			assert(reply.ack.info_ack.dl_addr_length == 0
-			       || reply.ack.info_ack.dl_brdcst_addr_length == addr_len);
+			       || reply.ack.info_ack.dl_brdcst_addr_length == (dl_ulong) addr_len);
 			memcpy(my_brd_addr, &ctlbuf.buf[reply.ack.info_ack.dl_brdcst_addr_offset],
 			       reply.ack.info_ack.dl_brdcst_addr_length);
 		}
@@ -522,7 +522,7 @@ do_attach(int fd, dl_ulong ppa)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		fprintf(stderr, "do_attach: Bad reply length %d\n", ctlbuf.len);
 		return -1;
 	}
@@ -530,7 +530,7 @@ do_attach(int fd, dl_ulong ppa)
 	switch (reply.ack.dl_primitive) {
 	case DL_ERROR_ACK:
 		printf("do_attach: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			fprintf(stderr, "do_attach: Bad DL_ERROR_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -544,7 +544,7 @@ do_attach(int fd, dl_ulong ppa)
 	case DL_OK_ACK:
 		if (output > 2)
 			printf("do_attach: Got DL_OK_ACK\n");
-		if (ctlbuf.len < sizeof(dl_ok_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_ok_ack_t)) {
 			fprintf(stderr, "do_attach: Bad DL_OK_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -601,7 +601,7 @@ do_promiscon(int fd, unsigned long level)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		fprintf(stderr, "do_promiscon: Bad reply length %d\n", ctlbuf.len);
 		return -1;
 	}
@@ -609,7 +609,7 @@ do_promiscon(int fd, unsigned long level)
 	switch (reply.ack.dl_primitive) {
 	case DL_ERROR_ACK:
 		printf("do_promiscon: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			fprintf(stderr, "do_promiscon: Bad DL_ERROR_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -623,7 +623,7 @@ do_promiscon(int fd, unsigned long level)
 	case DL_OK_ACK:
 		if (output > 2)
 			printf("do_promiscon: Got DL_OK_ACK\n");
-		if (ctlbuf.len < sizeof(dl_ok_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_ok_ack_t)) {
 			fprintf(stderr, "do_promiscon: Bad DL_OK_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -688,7 +688,7 @@ do_bind(int fd, dl_ulong sap)
 		dumpbuf(ctlbuf);
 	}
 
-	if (ctlbuf.len < sizeof(dl_ulong)) {
+	if (ctlbuf.len < (int) sizeof(dl_ulong)) {
 		fprintf(stderr, "do_bind: Bad reply length %d\n", ctlbuf.len);
 		return -1;
 	}
@@ -696,7 +696,7 @@ do_bind(int fd, dl_ulong sap)
 	switch (reply.ack.dl_primitive) {
 	case DL_ERROR_ACK:
 		printf("do_bind: Got DL_ERROR_ACK\n");
-		if (ctlbuf.len < sizeof(dl_error_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_error_ack_t)) {
 			fprintf(stderr, "do_bind: Bad DL_ERROR_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -710,7 +710,7 @@ do_bind(int fd, dl_ulong sap)
 	case DL_BIND_ACK:
 		if (output > 2)
 			printf("do_bind: Got DL_BIND_ACK\n");
-		if (ctlbuf.len < sizeof(dl_bind_ack_t)) {
+		if (ctlbuf.len < (int) sizeof(dl_bind_ack_t)) {
 			fprintf(stderr, "do_bind: Bad DL_BIND_ACK length %d\n", ctlbuf.len);
 			return -1;
 		}
@@ -737,7 +737,7 @@ do_bind(int fd, dl_ulong sap)
 }
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output)
 		return;
@@ -745,7 +745,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
@@ -786,7 +786,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output)
 		return;
@@ -794,7 +794,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2018, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -808,7 +808,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output)
 		return;
@@ -822,7 +822,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output)
 		return;
@@ -994,13 +994,13 @@ get_options(int argc, char *argv[])
 			}
 			break;
 		case 'h':	/* -h, --help, -? --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1013,7 +1013,7 @@ get_options(int argc, char *argv[])
 					fprintf(stderr, "%s ", argv[optind]);
 				fprintf(stderr, "\n");
 			}
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 
 		}
