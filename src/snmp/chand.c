@@ -137,7 +137,7 @@ int deny_severity = LOG_WARNING;
 FILE *stdlog = NULL;			/* file stream for log file */
 
 static void
-sa_version(int argc, char *argv[])
+sa_version(char *argv[])
 {
 	if (!sa_output && !sa_debug)
 		return;
@@ -150,7 +150,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-sa_usage(int argc, char *argv[])
+sa_usage(char *argv[])
 {
 	if (!sa_output && !sa_debug)
 		return;
@@ -165,7 +165,7 @@ Usage:\n\
 }
 
 static void
-sa_help(int argc, char *argv[])
+sa_help(char *argv[])
 {
 	if (!sa_output && !sa_debug)
 		return;
@@ -256,7 +256,7 @@ Options:\n\
 }
 
 static void
-sa_copying(int argc, char *argv[])
+sa_copying()
 {
 	if (!sa_output && !sa_debug)
 		return;
@@ -303,7 +303,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 void
-sa_help_directives(int argc, char *argv[])
+sa_help_directives()
 {
 	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
 	init_agent("chand");
@@ -339,18 +339,10 @@ static int sa_int_signal = 0;
 static int sa_trm_signal = 0;
 static int sa_alm_handle = 0;
 
-void
-sa_alm_callback(uint req, void *arg)
-{
-	if (req == sa_alm_handle)
-		sa_alm_handle = 0;
-	sa_alm_signal = 1;
-	return;
-}
-
 static RETSIGTYPE
 sa_alm_handler(int signum)
 {
+	(void) signum;
 	sa_alm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
@@ -358,6 +350,8 @@ sa_alm_handler(int signum)
 static void
 sa_snmp_alm_handler(uint reg, void *clientarg)
 {
+	(void) reg;
+	(void) clientarg;
 	sa_alm_signal = 1;
 	return;
 }
@@ -394,6 +388,7 @@ sa_alm_action(void)
 static RETSIGTYPE
 sa_pol_handler(int signum)
 {
+	(void) signum;
 	sa_pol_signal = 1;
 	return (RETSIGTYPE) (0);
 }
@@ -439,6 +434,7 @@ sa_pol_action(void)
 static RETSIGTYPE
 sa_hup_handler(int signum)
 {
+	(void) signum;
 	sa_hup_signal = 1;
 	return (RETSIGTYPE) (0);
 }
@@ -484,6 +480,7 @@ sa_hup_action(void)
 static RETSIGTYPE
 sa_int_handler(int signum)
 {
+	(void) signum;
 	sa_int_signal = 1;
 	return (RETSIGTYPE) (0);
 }
@@ -517,6 +514,7 @@ sa_int_action(void)
 static RETSIGTYPE
 sa_trm_handler(int signum)
 {
+	(void) signum;
 	sa_trm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
@@ -609,7 +607,7 @@ sa_exit(int retval)
 }
 
 static void
-sa_init_logging(int argc, char *argv[])
+sa_init_logging(char *argv[])
 {
 	static char progname[256];
 
@@ -652,6 +650,7 @@ sa_init_logging(int argc, char *argv[])
 static void
 sa_enter(int argc, char *argv[])
 {
+	(void) argc;
 	if (sa_nomead) {
 		pid_t pid;
 
@@ -703,7 +702,7 @@ sa_enter(int argc, char *argv[])
 		fclose(stdin);
 	}
 	/* continue as foreground or background */
-	sa_init_logging(argc, argv);
+	sa_init_logging(argv);
 	sa_sig_catch();
 	if (sa_agentx) {
 		if (sa_debug)
@@ -845,6 +844,7 @@ sa_mloop(int argc, char *argv[])
 {
 	int retval;
 
+	(void) argc;
 	for (;;) {
 
 		if ((retval = sa_check_and_process()) <= 0) {
@@ -1054,12 +1054,12 @@ main(int argc, char *argv[])
 		case 'h':	/* -h, --help, -?, --? */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing help message\n", argv[0]);
-			sa_help(argc, argv);
+			sa_help(argv);
 			exit(0);
 		case 'H':	/* -H, --help-directives */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing config directives\n", argv[0]);
-			sa_help_directives(argc, argv);
+			sa_help_directives();
 			exit(0);
 		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
 			if (sa_debug)
@@ -1227,7 +1227,7 @@ main(int argc, char *argv[])
 		case 'v':	/* -v, --version */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing version message\n", argv[0]);
-			sa_version(argc, argv);
+			sa_version(argv);
 			exit(0);
 		case 'V':	/* -V, --verbose [LEVEL] */
 			if (sa_debug)
@@ -1259,7 +1259,7 @@ main(int argc, char *argv[])
 		case 'y':	/* -y, --copying */
 			if (sa_debug)
 				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing copying message\n", argv[0]);
-			sa_copying(argc, argv);
+			sa_copying();
 			exit(0);
 		case '?':
 		case ':':
@@ -1280,7 +1280,7 @@ main(int argc, char *argv[])
 				}
 				fflush(stderr);
 			      bad_usage:
-				sa_usage(argc, argv);
+				sa_usage(argv);
 			}
 			exit(2);
 		}
