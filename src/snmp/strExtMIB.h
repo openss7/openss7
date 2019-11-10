@@ -67,7 +67,7 @@ struct strExtMIB_data {
 	uint strExtMIB_rsvs;
 	uint strExtMIB_tsts;
 	uint strExtMIB_sets;
-	uint strExtMIB_request;
+	int strExtMIB_request;
 	ulong strExtStrlogRecordNextIndex;	/* ReadOnly */
 	ulong strNlogargs;		/* ReadWrite */
 	ulong strExtLogMsgSize;		/* ReadWrite */
@@ -80,7 +80,7 @@ struct strExtStrlogRecordTable_data {
 	uint strExtStrlogRecordTable_rsvs;
 	uint strExtStrlogRecordTable_tsts;
 	uint strExtStrlogRecordTable_sets;
-	uint strExtStrlogRecordTable_request;
+	int strExtStrlogRecordTable_request;
 	uint strExtStrlogRecordTable_refs;
 	uint strExtStrlogRecordTable_id;
 	ulong strExtStrlogRecordIndex;	/* NoAccess */
@@ -102,7 +102,7 @@ struct strExtTraceTable_data {
 	uint strExtTraceTable_rsvs;
 	uint strExtTraceTable_tsts;
 	uint strExtTraceTable_sets;
-	uint strExtTraceTable_request;
+	int strExtTraceTable_request;
 	uint strExtTraceTable_refs;
 	uint strExtTraceTable_id;
 	ulong strExtTraceId;		/* NoAccess */

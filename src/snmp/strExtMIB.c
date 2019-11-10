@@ -338,6 +338,10 @@ deinit_strExtMIB(void)
 int
 term_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strExtMIB", "term_strExtMIB: terminating...  "));
 	deinit_strExtMIB();
 	DEBUGMSGTL(("strExtMIB", "done.\n"));
@@ -464,6 +468,7 @@ strExtMIB_add(struct strExtMIB_data *thedata)
 void
 parse_strExtMIB(const char *token, char *line)
 {
+	(void) token;
 	size_t tmpsize;
 	struct strExtMIB_data *StorageTmp = strExtMIB_create();
 
@@ -495,6 +500,10 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct strExtMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strExtMIB", "store_strExtMIB: storing data...  "));
 	refresh_strExtMIB(1);
 	if ((StorageTmp = strExtMIBStorage) == NULL) {
@@ -537,6 +546,8 @@ store_strExtMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -558,6 +569,8 @@ check_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *Storag
 int
 update_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strExtMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -573,6 +586,7 @@ update_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *Stora
 void
 revert_strExtMIB(struct strExtMIB_data *StorageTmp, struct strExtMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strExtMIB(StorageOld, NULL);
 }
@@ -888,6 +902,7 @@ parse_strExtStrlogRecordTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strExtStrlogRecordTable_data *StorageTmp = strExtStrlogRecordTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strExtMIB", "parse_strExtStrlogRecordTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -937,6 +952,10 @@ store_strExtStrlogRecordTable(int majorID, int minorID, void *serverarg, void *c
 	struct strExtStrlogRecordTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strExtMIB", "store_strExtStrlogRecordTable: storing data...  "));
 	refresh_strExtStrlogRecordTable(1);
 	(void) tmpsize;
@@ -1123,6 +1142,7 @@ parse_strExtTraceTable(const char *token, char *line)
 	size_t tmpsize;
 	struct strExtTraceTable_data *StorageTmp = strExtTraceTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("strExtMIB", "parse_strExtTraceTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1152,6 +1172,10 @@ store_strExtTraceTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct strExtTraceTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("strExtMIB", "store_strExtTraceTable: storing data...  "));
 	refresh_strExtTraceTable(1);
 	(void) tmpsize;
@@ -1189,6 +1213,7 @@ store_strExtTraceTable(int majorID, int minorID, void *serverarg, void *clientar
 int
 activate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1206,6 +1231,7 @@ activate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Storag
 int
 deactivate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1223,6 +1249,7 @@ deactivate_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Stor
 int
 activate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1240,6 +1267,7 @@ activate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 int
 deactivate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1262,6 +1290,8 @@ deactivate_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 int
 check_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1284,6 +1314,8 @@ check_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTm
 int
 update_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strExtStrlogRecordTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1298,6 +1330,7 @@ update_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageT
 void
 revert_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp, struct strExtStrlogRecordTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strExtStrlogRecordTable_row(StorageOld, NULL);
 }
@@ -1451,6 +1484,8 @@ var_strExtStrlogRecordTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1473,6 +1508,8 @@ check_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strE
 int
 update_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	strExtTraceTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1487,6 +1524,7 @@ update_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct str
 void
 revert_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp, struct strExtTraceTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_strExtTraceTable_row(StorageOld, NULL);
 }
@@ -1609,6 +1647,10 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMid entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1637,7 +1679,7 @@ write_strExtStrlogRecordMid(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..16383 */
-		if ((0 > set_value || set_value > 16383)) {
+		if (set_value > 16383) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordMid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -1720,6 +1762,10 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordSid entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1748,7 +1794,7 @@ write_strExtStrlogRecordSid(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..16383 */
-		if ((0 > set_value || set_value > 16383)) {
+		if (set_value > 16383) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordSid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -1831,6 +1877,10 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordLevel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1859,7 +1909,7 @@ write_strExtStrlogRecordLevel(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..255 */
-		if ((0 > set_value || set_value > 255)) {
+		if (set_value > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -1942,6 +1992,10 @@ write_strExtStrlogRecordFlags(int action, u_char *var_val, u_char var_val_type, 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordFlags entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2068,6 +2122,10 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordMsgString entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2092,7 +2150,7 @@ write_strExtStrlogRecordMsgString(int action, u_char *var_val, u_char var_val_ty
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || var_val_len > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtStrlogRecordMsgString: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -2187,6 +2245,10 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceMid entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2298,6 +2360,10 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceSid entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2409,6 +2475,10 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLevel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2519,6 +2589,10 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strNlogargs entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2534,7 +2608,7 @@ write_strNlogargs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 		}
 		/* Note: default value 20 */
 		/* Note: ranges 0..64 */
-		if ((0 > set_value || set_value > 64)) {
+		if (set_value > 64) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNlogargs: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -2614,6 +2688,10 @@ write_strExtLogMsgSize(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtLogMsgSize entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2747,6 +2825,10 @@ write_strExtConsoleLog(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtConsoleLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -2911,6 +2993,10 @@ write_strExtErrorLog(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtErrorLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -3105,6 +3191,10 @@ write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceLog entering action=%d...  \n", action));
 	if ((StorageTmp = strExtMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -3226,6 +3316,7 @@ write_strExtTraceLog(int action, u_char *var_val, u_char var_val_type, size_t va
 int
 can_act_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -3243,6 +3334,7 @@ can_act_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Storage
 int
 can_deact_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -3260,6 +3352,7 @@ can_deact_strExtStrlogRecordTable_row(struct strExtStrlogRecordTable_data *Stora
 int
 can_act_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -3277,6 +3370,7 @@ can_act_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 int
 can_deact_strExtTraceTable_row(struct strExtTraceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -3301,6 +3395,10 @@ write_strExtStrlogRecordRowStatus(int action, u_char *var_val, u_char var_val_ty
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtStrlogRecordRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(strExtStrlogRecordTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -3566,6 +3664,10 @@ write_strExtTraceRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("strExtMIB", "write_strExtTraceRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(strExtTraceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -4305,8 +4407,8 @@ snprintfit(char *sbuf, size_t slen, const char *buf, int len, struct variable_li
 				args += splen;
 			else
 				args = aend;
-			if (slen > (size_t) decimal)
-				slen = (size_t) decimal;
+			if (slen > decimal)
+				slen = decimal;
 			if (!(flags & FLAG_LEFT))
 				if (slen < width) {
 					while (slen < width--) {
@@ -4356,6 +4458,7 @@ snprintfit(char *sbuf, size_t slen, const char *buf, int len, struct variable_li
 				break;
 			case 'X':
 				flags |= FLAG_LARGE;
+				__attribute__((fallthrough));
 			case 'x':
 				base = 16;
 				break;
@@ -4593,6 +4696,8 @@ strExtMIB_fd_handler(int fd, void *dummy)
 	struct tm tm;
 	uint8_t dateandtime[8], flags[1];
 
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("strExtMIB", "strExtMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	for (;;) {
@@ -4616,7 +4721,7 @@ strExtMIB_fd_handler(int fd, void *dummy)
 			continue;;
 		}
 		lc = (struct log_ctl *) cbuf;
-		if (ctl.len < sizeof(*lc))
+		if (ctl.len < (int) sizeof(*lc))
 			continue;
 		if (dat.len <= 0)
 			continue;
