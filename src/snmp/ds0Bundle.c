@@ -274,6 +274,10 @@ deinit_ds0Bundle(void)
 int
 term_ds0Bundle(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0Bundle", "term_ds0Bundle: terminating...  "));
 	deinit_ds0Bundle();
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));
@@ -390,6 +394,7 @@ ds0Bundle_add(struct ds0Bundle_data *thedata)
 void
 parse_ds0Bundle(const char *token, char *line)
 {
+	(void) token;
 	size_t tmpsize;
 	struct ds0Bundle_data *StorageTmp = ds0Bundle_create();
 
@@ -416,6 +421,10 @@ store_ds0Bundle(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct ds0Bundle_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0Bundle", "store_ds0Bundle: storing data...  "));
 	refresh_ds0Bundle(1);
 	if ((StorageTmp = ds0BundleStorage) == NULL) {
@@ -453,6 +462,8 @@ store_ds0Bundle(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -474,6 +485,8 @@ check_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *Storag
 int
 update_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	ds0Bundle_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -489,6 +502,7 @@ update_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *Stora
 void
 revert_ds0Bundle(struct ds0Bundle_data *StorageTmp, struct ds0Bundle_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_ds0Bundle(StorageOld, NULL);
 }
@@ -733,6 +747,7 @@ parse_dsx0BondingTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx0BondingTable_data *StorageTmp = dsx0BondingTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("ds0Bundle", "parse_dsx0BondingTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -761,6 +776,10 @@ store_dsx0BondingTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct dsx0BondingTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0Bundle", "store_dsx0BondingTable: storing data...  "));
 	refresh_dsx0BondingTable(1);
 	(void) tmpsize;
@@ -948,6 +967,7 @@ parse_dsx0BundleTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dsx0BundleTable_data *StorageTmp = dsx0BundleTable_create();
 
+	(void) token;
 	DEBUGMSGTL(("ds0Bundle", "parse_dsx0BundleTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -981,6 +1001,10 @@ store_dsx0BundleTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct dsx0BundleTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ds0Bundle", "store_dsx0BundleTable: storing data...  "));
 	refresh_dsx0BundleTable(1);
 	(void) tmpsize;
@@ -1017,6 +1041,7 @@ store_dsx0BundleTable(int majorID, int minorID, void *serverarg, void *clientarg
 int
 activate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1034,6 +1059,7 @@ activate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 int
 deactivate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1051,6 +1077,7 @@ deactivate_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 int
 activate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1068,6 +1095,7 @@ activate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 int
 deactivate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -1090,6 +1118,8 @@ deactivate_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 int
 check_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1112,6 +1142,8 @@ check_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0
 int
 update_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx0BondingTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1126,6 +1158,7 @@ update_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx
 void
 revert_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp, struct dsx0BondingTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx0BondingTable_row(StorageOld, NULL);
 }
@@ -1239,6 +1272,8 @@ var_dsx0BondingTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1261,6 +1296,8 @@ check_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0Bu
 int
 update_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	dsx0BundleTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1275,6 +1312,7 @@ update_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0B
 void
 revert_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp, struct dsx0BundleTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_dsx0BundleTable_row(StorageOld, NULL);
 }
@@ -1389,6 +1427,10 @@ write_dsx0BondMode(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BondMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1507,6 +1549,10 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleCircuitIdentifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1531,7 +1577,7 @@ write_dsx0BundleCircuitIdentifier(int action, u_char *var_val, u_char var_val_ty
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || var_val_len > 255) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx0BundleCircuitIdentifier: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -1625,6 +1671,10 @@ write_dsx0BundleNextIndex(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleNextIndex entering action=%d...  \n", action));
 	if ((StorageTmp = ds0BundleStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1714,6 +1764,7 @@ write_dsx0BundleNextIndex(int action, u_char *var_val, u_char var_val_type, size
 int
 can_act_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1731,6 +1782,7 @@ can_act_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 int
 can_deact_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1748,6 +1800,7 @@ can_deact_dsx0BondingTable_row(struct dsx0BondingTable_data *StorageTmp)
 int
 can_act_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1765,6 +1818,7 @@ can_act_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 int
 can_deact_dsx0BundleTable_row(struct dsx0BundleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1789,6 +1843,10 @@ write_dsx0BondRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BondRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(dsx0BondingTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -2060,6 +2118,10 @@ write_dsx0BundleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ds0Bundle", "write_dsx0BundleRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(dsx0BundleTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -2363,6 +2425,8 @@ ds0Bundle_loop_handler(int sig)
 void
 ds0Bundle_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("ds0Bundle", "ds0Bundle_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("ds0Bundle", "done.\n"));

@@ -67,7 +67,7 @@ struct ds0Bundle_data {
 	uint ds0Bundle_rsvs;
 	uint ds0Bundle_tsts;
 	uint ds0Bundle_sets;
-	uint ds0Bundle_request;
+	int ds0Bundle_request;
 	long dsx0BundleNextIndex;	/* ReadWrite */
 };
 struct dsx0BondingTable_data {
@@ -75,7 +75,7 @@ struct dsx0BondingTable_data {
 	uint dsx0BondingTable_rsvs;
 	uint dsx0BondingTable_tsts;
 	uint dsx0BondingTable_sets;
-	uint dsx0BondingTable_request;
+	int dsx0BondingTable_request;
 	uint dsx0BondingTable_refs;
 	uint dsx0BondingTable_id;
 	long ifIndex;			/* ReadOnly */
@@ -88,7 +88,7 @@ struct dsx0BundleTable_data {
 	uint dsx0BundleTable_rsvs;
 	uint dsx0BundleTable_tsts;
 	uint dsx0BundleTable_sets;
-	uint dsx0BundleTable_request;
+	int dsx0BundleTable_request;
 	uint dsx0BundleTable_refs;
 	uint dsx0BundleTable_id;
 	long dsx0BundleIndex;		/* NoAccess */
