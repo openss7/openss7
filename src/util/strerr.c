@@ -450,8 +450,8 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				args += splen;
 			else
 				args = aend;
-			if (slen > (size_t) decimal)
-				slen = (size_t) decimal;
+			if (slen > decimal)
+				slen = decimal;
 			if (!(flags & FLAG_LEFT))
 				if (slen < width) {
 					while (slen < width--) {
@@ -501,6 +501,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				break;
 			case 'X':
 				flags |= FLAG_LARGE;
+				__attribute__((fallthrough));
 			case 'x':
 				base = 16;
 				break;
@@ -614,7 +615,7 @@ strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 	struct log_ctl lc;
 	int len;
 
-	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
+	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < (int) sizeof(lc)) {
 		errno = -EINVAL;
 		return (-1);
 	}
@@ -661,7 +662,7 @@ strace_pstrlog(FILE *file, struct strbuf *ctrl, struct strbuf *data)
 }
 
 static void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!output && !debug)
 		return;
@@ -708,7 +709,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 
 static void
-version(int argc, char *argv[])
+version()
 {
 	if (!output && !debug)
 		return;
@@ -730,7 +731,7 @@ See `%1$s --copying' for copying permissions.\n\
 }
 
 static void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -744,7 +745,7 @@ Usage:\n\
 }
 
 static void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -822,7 +823,7 @@ int hup_signal = 0;
 int trm_signal = 0;
 
 RETSIGTYPE
-alm_handler(int signum)
+alm_handler(int signum __attribute__((unused)))
 {
 	alm_signal = 1;
 	return (RETSIGTYPE) (0);
@@ -848,7 +849,7 @@ alm_action(void)
 }
 
 RETSIGTYPE
-hup_handler(int signum)
+hup_handler(int signum __attribute__((unused)))
 {
 	hup_signal = 1;
 	return (RETSIGTYPE) (0);
@@ -896,7 +897,7 @@ hup_action(void)
 }
 
 RETSIGTYPE
-trm_handler(int signum)
+trm_handler(int signum __attribute__((unused)))
 {
 	trm_signal = 1;
 	return (RETSIGTYPE) (0);
@@ -969,7 +970,7 @@ strlog_exit(int retval)
 }
 
 void
-strlog_enter(int argc, char *argv[])
+strlog_enter(int argc __attribute__((unused)), char *argv[])
 {
 	if (nomead) {
 		pid_t pid;
@@ -1062,7 +1063,7 @@ strlog_enter(int argc, char *argv[])
 }
 
 void
-strlog_open(int argc, char *argv[], struct trace_ids *tids, size_t count)
+strlog_open(int argc __attribute__((unused)), char *argv[], struct trace_ids *tids, size_t count)
 {
 	struct strioctl ioc;
 
@@ -1109,7 +1110,7 @@ strlog_open(int argc, char *argv[], struct trace_ids *tids, size_t count)
 }
 
 void
-strlog_close(int argc, char *argv[])
+strlog_close(int argc __attribute__((unused)), char *argv[])
 {
 	if (close(strlog_fd) < 0)
 		perror(argv[0]);
@@ -1222,17 +1223,17 @@ main(int argc, char *argv[])
 		case 'H':	/* -H, --? */
 			if (debug)
 				fprintf(stderr, "%s: printing help message\n", argv[0]);
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
 			if (debug)
 				fprintf(stderr, "%s: printing version message\n", argv[0]);
-			version(argc, argv);
+			version();
 			exit(0);
 		case 'C':	/* -C, --copying */
 			if (debug)
 				fprintf(stderr, "%s: printing copying message\n", argv[0]);
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -1251,7 +1252,7 @@ main(int argc, char *argv[])
 				}
 				fflush(stderr);
 			      bad_usage:
-				usage(argc, argv);
+				usage(argv);
 			}
 			exit(2);
 		}
@@ -1322,7 +1323,7 @@ main(int argc, char *argv[])
 					exit(1);
 				}
 				lc = (struct log_ctl *) cbuf;
-				if (ctl.len < sizeof(*lc)) {
+				if (ctl.len < (int) sizeof(*lc)) {
 					if (output > 2)
 						fprintf(stderr, "ctl.len = %d, skipping\n", ctl.len);
 					continue;
