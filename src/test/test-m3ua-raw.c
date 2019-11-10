@@ -223,7 +223,7 @@ static int count = 0;
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -1183,9 +1183,9 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
 			oh = NULL;
 			break;
 		}
-		if (oh->level != level)
+		if (oh->level != (t_uscalar_t) level)
 			continue;
-		if (oh->name != name)
+		if (oh->name != (t_uscalar_t) name)
 			continue;
 		break;
 	}
@@ -1702,7 +1702,7 @@ etype_string(t_uscalar_t etype)
 }
 
 const char *
-event_string(int child, int event)
+event_string(int event)
 {
 	switch (event) {
 	case __EVENT_EOF:
@@ -2233,7 +2233,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2259,7 +2259,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -2298,7 +2298,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -3026,7 +3026,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -3662,7 +3662,7 @@ print_expect(int child, int want)
 	};
 
 	if (verbose > 0 && show)
-		print_string_state(child, msgs, event_string(child, want));
+		print_string_state(child, msgs, event_string(want));
 }
 
 void
@@ -4520,6 +4520,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
 		goto failure;
@@ -6017,7 +6018,7 @@ void
 clear_parms(struct m3ua *m3ua)
 {
 	struct ua_parm *uap = (typeof(uap)) m3ua;
-	int i;
+	unsigned i;
 
 	for (i = 0; i < sizeof(*m3ua) / sizeof(*uap); i++) {
 		uap->cp = NULL;
@@ -6028,7 +6029,7 @@ clear_parms(struct m3ua *m3ua)
 static int
 do_decode_parm(int child, uint32_t *wp, uint32_t *e)
 {
-	int len, plen;
+	unsigned len, plen;
 
 	for (wp += 2; wp < e; wp += plen) {
 		len = UA_PLEN(*wp);
@@ -6268,11 +6269,12 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		event = __TEST_DATA;
 		print_rx_data(child, "M_DATA----------", data->len);
 
-		if (data->len >= UA_MHDR_SIZE) {
+		if (data->len >= (int) UA_MHDR_SIZE) {
 			uint32_t *wp = (typeof(wp)) data->buf;
 			uint32_t *e = (typeof(e)) (data->buf + UA_PAD4(ntohl(wp[1])));
 
@@ -6438,7 +6440,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->type)) {
+	if (ctrl->len >= (int) sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
 			event = __TEST_CONN_REQ;
@@ -6843,7 +6845,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -7289,6 +7291,7 @@ preamble_aspup(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7316,6 +7319,7 @@ preamble_aspup(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7342,6 +7346,7 @@ postamble_aspdn(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7361,6 +7366,7 @@ postamble_aspdn(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
+						__attribute__((fallthrough));
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 						state++;
@@ -7395,6 +7401,7 @@ preamble_reg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7416,6 +7423,7 @@ preamble_reg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 					state++;
@@ -7443,6 +7451,7 @@ postamble_dereg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7464,6 +7473,7 @@ postamble_dereg(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
+						__attribute__((fallthrough));
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 						state++;
@@ -7521,6 +7531,7 @@ preamble_active(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 				case __TEST_DAVA_MSG:
@@ -7554,6 +7565,7 @@ postamble_inactive(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
+					__attribute__((fallthrough));
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 				case __TEST_DAVA_MSG:
@@ -7580,6 +7592,7 @@ postamble_inactive(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
+						__attribute__((fallthrough));
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 					case __TEST_DAVA_MSG:
@@ -7678,12 +7691,14 @@ Checks that Streams can be opened and closed."
 int
 test_0_2_1_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_1_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7704,12 +7719,14 @@ Checks that Streams can be opened, information obtained, and closed."
 int
 test_0_2_2_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_2_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7730,12 +7747,14 @@ Checks that Streams can be opened, information obtained in the unbound state, an
 int
 test_0_2_3_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_3_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7757,12 +7776,14 @@ and closed."
 int
 test_0_2_4_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_4_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7784,12 +7805,14 @@ streams bound, unbound, and closed."
 int
 test_0_2_5_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
 int
 test_0_2_5_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7815,11 +7838,13 @@ connected, disconnected, unbound and closed."
 int
 test_1_1_1_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 int
 test_1_1_1_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7841,11 +7866,13 @@ connected, released, unbound and closed."
 int
 test_1_1_2_ptu(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 int
 test_1_1_2_iut(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -7960,6 +7987,7 @@ test_2_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8078,6 +8106,7 @@ test_2_3_1_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_NTFY_MSG:
 				state++;
 				continue;
@@ -8129,6 +8158,7 @@ test_2_3_3_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8153,6 +8183,7 @@ test_2_3_3_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8194,6 +8225,7 @@ test_3_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_ERR_MSG:
 				state++;
@@ -8244,6 +8276,7 @@ test_3_1_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8274,6 +8307,7 @@ test_3_1_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8320,6 +8354,7 @@ test_3_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8370,6 +8405,7 @@ test_3_2_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8400,6 +8436,7 @@ test_3_2_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8448,6 +8485,7 @@ test_4_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8497,6 +8535,7 @@ test_4_1_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8525,6 +8564,7 @@ test_4_1_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				/* it is permitted for the SG to send SNMM between ASPAC and ASPAC Ack, and DATA might
@@ -8574,6 +8614,7 @@ test_4_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_DAUD_MSG:
 			case __TEST_SCON_MSG:
@@ -8625,6 +8666,7 @@ test_4_2_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_DAUD_MSG:
 			case __TEST_SCON_MSG:
@@ -8656,6 +8698,7 @@ test_4_2_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				/* it is permitted for the SG to send SNMM between ASPAC and ASPAC Ack, and DATA might
@@ -8705,6 +8748,7 @@ test_5_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
+				__attribute__((fallthrough));
 			case __TEST_HBEAT_ACK:
 			case __TEST_XFER_DATA:
 				state++;
@@ -9113,7 +9157,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -9418,7 +9462,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -9474,7 +9518,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -9494,7 +9538,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -9508,7 +9552,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -9905,13 +9949,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help, -?, --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -9927,7 +9971,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -9946,7 +9990,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
