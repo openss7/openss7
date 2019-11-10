@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -271,7 +271,7 @@ __cdi_list_wrlock(void)
 	return __cdi_lock_wrlock(&__cdi_fd_lock);
 }
 static void
-__cdi_list_unlock(void *ignore)
+__cdi_list_unlock(void *ignore __attribute__((unused)))
 {
 	return __cdi_lock_unlock(&__cdi_fd_lock);
 }
@@ -1839,7 +1839,7 @@ __asm__(".symver __cdi_open_data_r,cdi_open_data@@CDIAPI_1.0");
   * @param hostname name of remote host (or NULL).
   */
 static int
-_cdi_open(char *hostname)
+_cdi_open(char *hostname __attribute__((unused)))
 {
 	return _cdi_open_data();
 }
@@ -1962,6 +1962,7 @@ __asm__(".symver __cdi_close_r,cdi_close@@CDIAPI_1.0");
 static int
 _cdi_init_FILE(int log_options, FILE *log_file)
 {
+	(void) log_file;	/* XXX */
 	if (unlikely(__cdi_initialized != 0)) {
 		errno = EALREADY;
 		cerrno = CD_SYSERR;
@@ -3023,151 +3024,151 @@ _cdi_decode_ctl(char *msg)
 {
 	union CD_primitives *p = (typeof(p)) msg;
 
-	if (cdi_ctl_cnt >= sizeof(p->cd_primitive)) {
+	if (cdi_ctl_cnt >= (int) sizeof(p->cd_primitive)) {
 		switch (p->cd_primitive) {
 		case CD_INFO_REQ:
 			syslog(LOG_INFO, "%s: CD_INFO_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->info_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->info_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_INFO_ACK:
 			syslog(LOG_INFO, "%s: CD_INFO_ACK", msg);
-			if (cdi_ctl_cnt >= sizeof(p->info_ack)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->info_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ATTACH_REQ:
 			syslog(LOG_INFO, "%s: CD_ATTACH_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->attach_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->attach_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_DETACH_REQ:
 			syslog(LOG_INFO, "%s: CD_DETACH_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->detach_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->detach_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ENABLE_REQ:
 			syslog(LOG_INFO, "%s: CD_ENABLE_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->enable_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->enable_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_DISABLE_REQ:
 			syslog(LOG_INFO, "%s: CD_DISABLE_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->disable_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->disable_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_OK_ACK:
 			syslog(LOG_INFO, "%s: CD_OK_ACK", msg);
-			if (cdi_ctl_cnt >= sizeof(p->ok_ack)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->ok_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ERROR_ACK:
 			syslog(LOG_INFO, "%s: CD_ERROR_ACK", msg);
-			if (cdi_ctl_cnt >= sizeof(p->error_ack)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->error_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ENABLE_CON:
 			syslog(LOG_INFO, "%s: CD_ENABLE_CON", msg);
-			if (cdi_ctl_cnt >= sizeof(p->enable_con)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->enable_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_DISABLE_CON:
 			syslog(LOG_INFO, "%s: CD_DISABL_CON", msg);
-			if (cdi_ctl_cnt >= sizeof(p->disable_con)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->disable_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ERROR_IND:
 			syslog(LOG_INFO, "%s: CD_ERROR_IND", msg);
-			if (cdi_ctl_cnt >= sizeof(p->error_ind)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->error_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ALLOW_INPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_ALLOW_INPUT_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->allow_input_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->allow_input_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_READ_REQ:
 			syslog(LOG_INFO, "%s: CD_READ_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->read_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->read_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_UNITDATA_REQ:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->unitdata_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->unitdata_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_WRITE_READ_REQ:
 			syslog(LOG_INFO, "%s: CD_WRITE_READ_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->write_read_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->write_read_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_UNITDATA_ACK:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_ACK", msg);
-			if (cdi_ctl_cnt >= sizeof(p->unitdata_ack)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->unitdata_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_UNITDATA_IND:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_IND", msg);
-			if (cdi_ctl_cnt >= sizeof(p->unitdata_ind)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->unitdata_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_HALT_INPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_HALT_INPUT_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->halt_input_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->halt_input_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_ABORT_OUTPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_ABORT_OUTPUT_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->abort_output_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->abort_output_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 #if 0
 		case CD_MUX_NAME_REQ:
 			syslog(LOG_INFO, "%s: CD_MUX_NAME_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->mux_name_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->mux_name_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 #endif
 		case CD_BAD_FRAME_IND:
 			syslog(LOG_INFO, "%s: CD_BAD_FRAME_IND", msg);
-			if (cdi_ctl_cnt >= sizeof(p->bad_frame_ind)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->bad_frame_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_MODEM_SIG_REQ:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_REQ", msg);
-			if (cdi_ctl_cnt >= sizeof(p->modem_sig_req)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->modem_sig_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_MODEM_SIG_IND:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_IND", msg);
-			if (cdi_ctl_cnt >= sizeof(p->modem_sig_ind)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->modem_sig_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case CD_MODEM_SIG_POLL:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_POLL", msg);
-			if (cdi_ctl_cnt >= sizeof(p->modem_sig_poll)) {
+			if (cdi_ctl_cnt >= (int) sizeof(p->modem_sig_poll)) {
 				/* XXX decode more */
 			}
 			return (0);
@@ -3261,6 +3262,11 @@ __asm__(".symver __cdi_decode_modem_sigs_r,cdi_decode_modem_sigs@@CDIAPI_1.0");
 static int
 _cdi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat)
 {
+	(void) fd;
+	(void) upa;
+	(void) on_off;
+	(void) hi_wat;
+	(void) lo_wat;
 	errno = ENOTSUP;
 	cerrno = CD_SYSERR;
 	return (-1);

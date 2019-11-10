@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -280,7 +280,7 @@ __dlpi_list_wrlock(void)
 	return __dlpi_lock_wrlock(&__dlpi_fd_lock);
 }
 static void
-__dlpi_list_unlock(void *ignore)
+__dlpi_list_unlock(void *ignore __attribute__((unused)))
 {
 	return __dlpi_lock_unlock(&__dlpi_fd_lock);
 }
@@ -845,6 +845,7 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 	int ret, flag;
 	struct pollfd pfd;
 
+	(void) caller;
 	(void) _dlpi_complete_req;
       tryagain:
 	pfd.fd = fd;
@@ -890,7 +891,7 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 	if (ret != 0)
 		goto tryagain;
 
-	if (dlpi_ctl_cnt < sizeof(p->dl_primitive))
+	if (dlpi_ctl_cnt < (int) sizeof(p->dl_primitive))
 		goto tryagain;
 
 	switch (p->dl_primitive) {
@@ -898,9 +899,9 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 		/* handle DL_ERROR_ACK reply */
 		if (flag != RS_HIPRI)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->error_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->error_ack))
 			goto tryagain;
-		if (p->error_ack.dl_error_primitive != request)
+		if (p->error_ack.dl_error_primitive != (dl_ulong) request)
 			goto tryagain;
 		if (p->error_ack.dl_errno == DL_SYSERR) {
 			errno = p->error_ack.dl_unix_errno;
@@ -911,9 +912,9 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 		/* handle DL_OK_ACK reply */
 		if (flag != RS_HIPRI)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->ok_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->ok_ack))
 			goto tryagain;
-		if (p->ok_ack.dl_correct_primitive != request)
+		if (p->ok_ack.dl_correct_primitive != (dl_ulong) request)
 			goto tryagain;
 		return (ret);
 	case DL_INFO_ACK:
@@ -922,21 +923,21 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_INFO_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->info_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->info_ack))
 			goto tryagain;
 		if (p->info_ack.dl_addr_length != 0
-		    && dlpi_ctl_cnt < p->info_ack.dl_addr_length + p->info_ack.dl_addr_offset)
+		    && dlpi_ctl_cnt < (int) (p->info_ack.dl_addr_length + p->info_ack.dl_addr_offset))
 			goto tryagain;
 		if (p->info_ack.dl_qos_length != 0
-		    && dlpi_ctl_cnt < p->info_ack.dl_qos_length + p->info_ack.dl_qos_offset)
+		    && dlpi_ctl_cnt < (int) (p->info_ack.dl_qos_length + p->info_ack.dl_qos_offset))
 			goto tryagain;
 		if (p->info_ack.dl_qos_range_length != 0
 		    && dlpi_ctl_cnt <
-		    p->info_ack.dl_qos_range_length + p->info_ack.dl_qos_range_offset)
+		    (int) (p->info_ack.dl_qos_range_length + p->info_ack.dl_qos_range_offset))
 			goto tryagain;
 		if (p->info_ack.dl_brdcst_addr_length != 0
 		    && dlpi_ctl_cnt <
-		    p->info_ack.dl_brdcst_addr_length + p->info_ack.dl_brdcst_addr_offset)
+		    (int) (p->info_ack.dl_brdcst_addr_length + p->info_ack.dl_brdcst_addr_offset))
 			goto tryagain;
 		return (ret);
 	case DL_BIND_ACK:
@@ -945,10 +946,10 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_BIND_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->bind_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->bind_ack))
 			goto tryagain;
 		if (p->bind_ack.dl_addr_length != 0
-		    && dlpi_ctl_cnt < p->bind_ack.dl_addr_length + p->bind_ack.dl_addr_offset)
+		    && dlpi_ctl_cnt < (int)(p->bind_ack.dl_addr_length + p->bind_ack.dl_addr_offset))
 			goto tryagain;
 		return (ret);
 	case DL_PHYS_ADDR_ACK:
@@ -957,11 +958,11 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_PHYS_ADDR_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->phys_addr_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->phys_addr_ack))
 			goto tryagain;
 		if (p->phys_addr_ack.dl_addr_length != 0
 		    && dlpi_ctl_cnt <
-		    p->phys_addr_ack.dl_addr_length + p->phys_addr_ack.dl_addr_offset)
+		    (int)(p->phys_addr_ack.dl_addr_length + p->phys_addr_ack.dl_addr_offset))
 			goto tryagain;
 		return (ret);
 	case DL_GET_STATISTICS_ACK:
@@ -970,11 +971,11 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_GET_STATISTICS_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->get_statistics_ack))
+		if (dlpi_ctl_cnt < (int) sizeof(p->get_statistics_ack))
 			goto tryagain;
 		if (p->get_statistics_ack.dl_stat_length != 0
 		    && dlpi_ctl_cnt <
-		    p->get_statistics_ack.dl_stat_length + p->get_statistics_ack.dl_stat_offset)
+		    (int)(p->get_statistics_ack.dl_stat_length + p->get_statistics_ack.dl_stat_offset))
 			goto tryagain;
 		return (ret);
 	case DL_NOTIFY_ACK:
@@ -983,7 +984,7 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_NOTIFY_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->notify_req))
+		if (dlpi_ctl_cnt < (int) sizeof(p->notify_req))
 			goto tryagain;
 		return (ret);
 	case DL_CONNECT_CON:
@@ -992,11 +993,11 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_CONNECT_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->connect_con))
+		if (dlpi_ctl_cnt < (int) sizeof(p->connect_con))
 			goto tryagain;
 		if (p->connect_con.dl_resp_addr_length != 0
 		    && dlpi_ctl_cnt <
-		    p->connect_con.dl_resp_addr_length + p->connect_con.dl_resp_addr_offset)
+		    (int)(p->connect_con.dl_resp_addr_length + p->connect_con.dl_resp_addr_offset))
 			goto tryagain;
 		return (ret);
 	case DL_RESET_CON:
@@ -1005,7 +1006,7 @@ _dlpi_complete_req(int fd, int request, char *caller, int discard)
 			goto tryagain;
 		if (request != DL_RESET_REQ)
 			goto tryagain;
-		if (dlpi_ctl_cnt < sizeof(p->reset_con))
+		if (dlpi_ctl_cnt < (int) sizeof(p->reset_con))
 			goto tryagain;
 		return (ret);
 	case DL_UNITDATA_IND:
@@ -2047,6 +2048,7 @@ __asm__(".symver __dlpi_open_data_r,dlpi_open_data@@DLPIAPI_1.0");
 static int
 _dlpi_open_GCOM(char *hostname)
 {
+	(void) hostname;
 	return _dlpi_open_data();
 }
 
@@ -2135,6 +2137,7 @@ __asm__(".symver __dlpi_close_GCOM_r,dlpi_close_GCOM@@DLPIAPI_1.0");
 static int
 _dlpi_init_FILE(uint log_options, FILE *log_file)
 {
+	(void) log_file;	/* XXX */
 	if (unlikely(__dlpi_initialized != 0)) {
 		errno = EALREADY;
 		dlerrno = DL_SYSERR;
@@ -2654,521 +2657,521 @@ _dlpi_decode_ctl(char *msg)
 {
 	union DL_primitives *p = (typeof(p)) msg;
 
-	if (dlpi_ctl_cnt >= sizeof(p->dl_primitive)) {
+	if (dlpi_ctl_cnt >= (int) sizeof(p->dl_primitive)) {
 		switch (p->dl_primitive) {
 		case DL_INFO_REQ:
 			syslog(LOG_INFO, "%s: DL_INFO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->info_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->info_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_BIND_REQ:
 			syslog(LOG_INFO, "%s: DL_BIND_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->bind_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->bind_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UNBIND_REQ:
 			syslog(LOG_INFO, "%s: DL_UNBIND_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->unbind_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->unbind_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_INFO_ACK:
 			syslog(LOG_INFO, "%s: DL_INFO_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->info_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->info_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_BIND_ACK:
 			syslog(LOG_INFO, "%s: DL_BIND_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->bind_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->bind_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_ERROR_ACK:
 			syslog(LOG_INFO, "%s: DL_ERROR_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->error_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->error_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_OK_ACK:
 			syslog(LOG_INFO, "%s: DL_OK_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->ok_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->ok_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UNITDATA_REQ:
 			syslog(LOG_INFO, "%s: DL_UNITDATA_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->unitdata_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->unitdata_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UNITDATA_IND:
 			syslog(LOG_INFO, "%s: DL_UNITDATA_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->unitdata_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->unitdata_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UDERROR_IND:
 			syslog(LOG_INFO, "%s: DL_UDERROR_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->uderror_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->uderror_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UDQOS_REQ:
 			syslog(LOG_INFO, "%s: DL_UDQOS_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->udqos_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->udqos_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_ATTACH_REQ:
 			syslog(LOG_INFO, "%s: DL_ATTACH_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->attach_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->attach_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DETACH_REQ:
 			syslog(LOG_INFO, "%s: DL_DETACH_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->detach_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->detach_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONNECT_REQ:
 			syslog(LOG_INFO, "%s: DL_CONNECT_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->connect_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->connect_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONNECT_IND:
 			syslog(LOG_INFO, "%s: DL_CONNECT_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->connect_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->connect_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONNECT_RES:
 			syslog(LOG_INFO, "%s: DL_CONNECT_RES", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->connect_res)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->connect_res)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONNECT_CON:
 			syslog(LOG_INFO, "%s: DL_CONNECT_CON", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->connect_con)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->connect_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TOKEN_REQ:
 			syslog(LOG_INFO, "%s: DL_TOKEN_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->token_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->token_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TOKEN_ACK:
 			syslog(LOG_INFO, "%s: DL_TOKEN_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->token_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->token_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DISCONNECT_REQ:
 			syslog(LOG_INFO, "%s: DL_DISCONNECT_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->disconnect_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->disconnect_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DISCONNECT_IND:
 			syslog(LOG_INFO, "%s: DL_DISCONNECT_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->disconnect_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->disconnect_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_SUBS_UNBIND_REQ:
 			syslog(LOG_INFO, "%s: DL_SUBS_UNBIND_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->subs_unbind_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->subs_unbind_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_RESET_REQ:
 			syslog(LOG_INFO, "%s: DL_RESET_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reset_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reset_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_RESET_IND:
 			syslog(LOG_INFO, "%s: DL_RESET_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reset_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reset_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_RESET_RES:
 			syslog(LOG_INFO, "%s: DL_RESET_RES", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reset_res)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reset_res)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_RESET_CON:
 			syslog(LOG_INFO, "%s: DL_RESET_CON", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reset_con)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reset_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_SUBS_BIND_REQ:
 			syslog(LOG_INFO, "%s: DL_SUBS_BIND_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->subs_bind_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->subs_bind_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_SUBS_BIND_ACK:
 			syslog(LOG_INFO, "%s: DL_SUBS_BIND_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->subs_bind_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->subs_bind_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_ENABMULTI_REQ:
 			syslog(LOG_INFO, "%s: DL_ENABMULTI_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->enabmulti_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->enabmulti_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DISABMULTI_REQ:
 			syslog(LOG_INFO, "%s: DL_DISABMULTI_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->disabmulti_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->disabmulti_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_PROMISCON_REQ:
 			syslog(LOG_INFO, "%s: DL_PROMISCON_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->promiscon_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->promiscon_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_PROMISCOFF_REQ:
 			syslog(LOG_INFO, "%s: DL_PROMISCOFF_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->promiscoff_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->promiscoff_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DATA_ACK_REQ:
 			syslog(LOG_INFO, "%s: DL_DATA_ACK_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->data_ack_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->data_ack_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DATA_ACK_IND:
 			syslog(LOG_INFO, "%s: DL_DATA_ACK_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->data_ack_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->data_ack_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_DATA_ACK_STATUS_IND:
 			syslog(LOG_INFO, "%s: DL_DATA_ACK_STATUS_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->data_ack_status_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->data_ack_status_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_REPLY_REQ:
 			syslog(LOG_INFO, "%s: DL_REPLY_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reply_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reply_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_REPLY_IND:
 			syslog(LOG_INFO, "%s: DL_REPLY_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reply_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reply_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_REPLY_STATUS_IND:
 			syslog(LOG_INFO, "%s: DL_REPLY_STATUS_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reply_status_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reply_status_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_REPLY_UPDATE_REQ:
 			syslog(LOG_INFO, "%s: DL_REPLY_UPDATE_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reply_update_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reply_update_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_REPLY_UPDATE_STATUS_IND:
 			syslog(LOG_INFO, "%s: DL_REPLY_UPDATE_STATUS_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reply_update_status_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reply_update_status_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_XID_REQ:
 			syslog(LOG_INFO, "%s: DL_XID_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->xid_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->xid_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_XID_IND:
 			syslog(LOG_INFO, "%s: DL_XID_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->xid_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->xid_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_XID_RES:
 			syslog(LOG_INFO, "%s: DL_XID_RES", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->xid_res)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->xid_res)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_XID_CON:
 			syslog(LOG_INFO, "%s: DL_XID_CON", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->xid_con)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->xid_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TEST_REQ:
 			syslog(LOG_INFO, "%s: DL_TEST_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->test_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->test_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TEST_IND:
 			syslog(LOG_INFO, "%s: DL_TEST_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->test_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->test_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TEST_RES:
 			syslog(LOG_INFO, "%s: DL_TEST_RES", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->test_res)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->test_res)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_TEST_CON:
 			syslog(LOG_INFO, "%s: DL_TEST_CON", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->test_con)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->test_con)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_PHYS_ADDR_REQ:
 			syslog(LOG_INFO, "%s: DL_PHYS_ADDR_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->phys_addr_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->phys_addr_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_PHYS_ADDR_ACK:
 			syslog(LOG_INFO, "%s: DL_PHYS_ADDR_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->phys_addr_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->phys_addr_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_SET_PHYS_ADDR_REQ:
 			syslog(LOG_INFO, "%s: DL_SET_PHYS_ADDR_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_phys_addr_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_phys_addr_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_GET_STATISTICS_REQ:
 			syslog(LOG_INFO, "%s: DL_GET_STATISTICS_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->get_statistics_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->get_statistics_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_GET_STATISTICS_ACK:
 			syslog(LOG_INFO, "%s: DL_GET_STATISTICS_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->get_statistics_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->get_statistics_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_NOTIFY_REQ:
 			syslog(LOG_INFO, "%s: DL_NOTIFY_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->notify_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->notify_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_NOTIFY_ACK:
 			syslog(LOG_INFO, "%s: DL_NOTIFY_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->notify_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->notify_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_NOTIFY_IND:
 			syslog(LOG_INFO, "%s: DL_NOTIFY_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->notify_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->notify_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_AGGR_REQ:
 			syslog(LOG_INFO, "%s: DL_AGGR_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->aggr_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->aggr_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_AGGR_IND:
 			syslog(LOG_INFO, "%s: DL_AGGR_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->aggr_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->aggr_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_UNAGGR_REQ:
 			syslog(LOG_INFO, "%s: DL_UNAGGR_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->unaggr_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->unaggr_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CAPABILITY_REQ:
 			syslog(LOG_INFO, "%s: DL_CAPAILITY_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->capability_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->capability_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CAPABILITY_ACK:
 			syslog(LOG_INFO, "%s: DL_CAPABILITY_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->capability_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->capability_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONTROL_REQ:
 			syslog(LOG_INFO, "%s: DL_CONTROL_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->control_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->control_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_CONTROL_ACK:
 			syslog(LOG_INFO, "%s: DL_CONTROL_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->control_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->control_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_PASSIVE_REQ:
 			syslog(LOG_INFO, "%s: DL_PASSIVE_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->passive_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->passive_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_INTR_MODE_REQ:
 			syslog(LOG_INFO, "%s: DL_INTR_MODE_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->intr_mode_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->intr_mode_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_PPA_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_PPA_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->ppa_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->ppa_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_PPA_ACK:
 			syslog(LOG_INFO, "%s: DL_HP_PPA_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->ppa_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->ppa_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_MULTICAST_LIST_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_MULTICAST_LIST_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->multicast_list_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->multicast_list_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_MULTICAST_LIST_ACK:
 			syslog(LOG_INFO, "%s: DL_HP_MULTICAST_LIST_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->multicast_list_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->multicast_list_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_RAWDATA_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_RAWDATA_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->rawdata_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->rawdata_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_RAWDATA_IND:
 			syslog(LOG_INFO, "%s: DL_HP_RAWDATA_IND", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->rawdata_ind)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->rawdata_ind)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_HW_RESET_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_HW_RESET_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->reset_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->reset_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_INFO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_INFO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->hp_info_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->hp_info_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_INFO_ACK:
 			syslog(LOG_INFO, "%s: DL_HP_INFO_ACK", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->hp_info_ack)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->hp_info_ack)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_ACK_TO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_ACK_TO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_ack_to_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_ack_to_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_P_TO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_P_TO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_p_to_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_p_to_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_REJ_TO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_REJ_TO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_rej_to_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_rej_to_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_BUSY_TO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_BUSY_TO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_busy_to_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_busy_to_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_SEND_ACK_TO_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_SEND_ACK_TO_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_send_ack_to_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_send_ack_to_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_MAX_RETRIES_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_MAX_RETRIES_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_max_retries_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_max_retries_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_ACK_THRESHOLD_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_ACK_THRESHOLD_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_ack_threshold_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_ack_threshold_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_LOCAL_WIN_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_LOCAL_WIN_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_local_win_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_local_win_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_REMOTE_WIN_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_REMOTE_WIN_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_remote_win_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_remote_win_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_CLEAR_STATS_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_CLEAR_STATS_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->clear_stats_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->clear_stats_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_SET_LOCAL_BUSY_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_SET_LOCAL_BUSY_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->set_local_busy_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->set_local_busy_req)) {
 				/* XXX decode more */
 			}
 			return (0);
 		case DL_HP_CLEAR_LOCAL_BUSY_REQ:
 			syslog(LOG_INFO, "%s: DL_HP_CLEAR_LOCAL_BUSY_REQ", msg);
-			if (dlpi_ctl_cnt >= sizeof(p->clear_local_busy_req)) {
+			if (dlpi_ctl_cnt >= (int) sizeof(p->clear_local_busy_req)) {
 				/* XXX decode more */
 			}
 			return (0);
@@ -3232,6 +3235,9 @@ __asm__(".symver __dlpi_clear_zombies_r,dlpi_clear_zombies@@DLPIAPI_1.0");
 static int
 _dlpi_configure_dlsaps(int fd, ulong local_dlsap, ulong remote_dlsap)
 {
+	(void) fd;
+	(void) local_dlsap;
+	(void) remote_dlsap;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3253,6 +3259,10 @@ __asm__(".symver __dlpi_configure_dlsaps_r,dlpi_configure_dlsaps@@DLPIAPI_1.0");
 static int
 _dlpi_connect(ulong ppa, ulong bind_dlsap, ulong local_dlsap, ulong remote_dlsap)
 {
+	(void) ppa;
+	(void) bind_dlsap;
+	(void) local_dlsap;
+	(void) remote_dlsap;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3274,6 +3284,7 @@ __asm__(".symver __dlpi_connect_r,dlpi_connect@@DLPIAPI_1.0");
 static int
 _dlpi_connect_wait(int data)
 {
+	(void) data;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3295,6 +3306,7 @@ __asm__(".symver __dlpi_connect_wait_r,dlpi_connect_wait@@DLPIAPI_1.0");
 static char *
 _dlpi_decode_disconnect_reason(long reason)
 {
+	(void) reason;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (NULL);
@@ -3317,6 +3329,8 @@ __asm__(".symver __dlpi_decode_disconnect_reason_r,dlpi_decode_disconnect_reason
 static int
 _dlpi_discon_req(int fd, int reason)
 {
+	(void) fd;
+	(void) reason;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3339,6 +3353,7 @@ __asm__(".symver __dlpi_discon_req_r,dlpi_discon_req@@DLPIAPI_1.0");
 static int
 _dlpi_get_info(char *ptr)
 {
+	(void) ptr;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3383,6 +3398,11 @@ __asm__(".symver __dlpi_get_style_r,dlpi_get_style@@DLPIAPI_1.0");
 static int
 _dlpi_listen(ulong ppa, ulong bind_dlsap, ulong local_dlsap, ulong remote_dlsap, uint fork_options)
 {
+	(void) ppa;
+	(void) bind_dlsap;
+	(void) local_dlsap;
+	(void) remote_dlsap;
+	(void) fork_options;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3428,6 +3448,11 @@ __asm__(".symver __dlpi_open_log_r,dlpi_open_log@@DLPIAPI_1.0");
 static int
 _dlpi_rcv(int fd, char *data_ptr, int bfr_len, int flags, long *out_code)
 {
+	(void) fd;
+	(void) data_ptr;
+	(void) bfr_len;
+	(void) flags;
+	(void) out_code;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3450,6 +3475,10 @@ __asm__(".symver __dlpi_rcv_r,dlpi_rcv@@DLPIAPI_1.0");
 static int
 _dlpi_rcv_msg(int fd, char *data_ptr, int data_cnt, int flags)
 {
+	(void) fd;
+	(void) data_ptr;
+	(void) data_cnt;
+	(void) flags;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3472,6 +3501,9 @@ __asm__(".symver __dlpi_rcv_msg_r,dlpi_rcv_msg@@DLPIAPI_1.0");
 static int
 _dlpi_read_data(int fd, char *buf, int cnt)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3493,6 +3525,7 @@ __asm__(".symver __dlpi_read_data_r,dlpi_read_data@@DLPIAPI_1.0");
 static int
 _dlpi_reset_req(int fd)
 {
+	(void) fd;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3514,6 +3547,7 @@ __asm__(".symver __dlpi_reset_req_r,dlpi_reset_req@@DLPIAPI_1.0");
 static int
 _dlpi_reset_res(int fd)
 {
+	(void) fd;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3535,6 +3569,11 @@ __asm__(".symver __dlpi_reset_res_r,dlpi_reset_res@@DLPIAPI_1.0");
 static int
 _dlpi_send_uic(int fd, char *datap, int data_len, unsigned char *addr_ptr, int addr_len)
 {
+	(void) fd;
+	(void) datap;
+	(void) data_len;
+	(void) addr_ptr;
+	(void) addr_len;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3556,6 +3595,10 @@ __asm__(".symver __dlpi_send_uic_r,dlpi_send_uic@@DLPIAPI_1.0");
 static int
 _dlpi_set_signal_handling(int fd, dlpi_sig_func_t func, int sig_num, int primitive_mask)
 {
+	(void) fd;
+	(void) func;
+	(void) sig_num;
+	(void) primitive_mask;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3577,6 +3620,8 @@ __asm__(".symver __dlpi_set_signal_handling_r,dlpi_set_signal_handling@@DLPIAPI_
 static int
 _dlpi_set_unnum_frame_handler(int fd, unnum_frame_t handler)
 {
+	(void) fd;
+	(void) handler;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3598,6 +3643,10 @@ __asm__(".symver __dlpi_set_unnum_frame_handler_r,dlpi_set_unnum_frame_handler@@
 static int
 _dlpi_test_req(int fd, ulong pfb, char *datap, int length)
 {
+	(void) fd;
+	(void) pfb;
+	(void) datap;
+	(void) length;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3619,6 +3668,10 @@ __asm__(".symver __dlpi_test_req_r,dlpi_test_req@@DLPIAPI_1.0");
 static int
 _dlpi_test_res(int fd, ulong pfb, char *datap, int length)
 {
+	(void) fd;
+	(void) pfb;
+	(void) datap;
+	(void) length;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3640,6 +3693,9 @@ __asm__(".symver __dlpi_test_res_r,dlpi_test_res@@DLPIAPI_1.0");
 static int
 _dlpi_uic_req(int fd, char *datap, int length)
 {
+	(void) fd;
+	(void) datap;
+	(void) length;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3661,6 +3717,9 @@ __asm__(".symver __dlpi_uic_req_r,dlpi_uic_req@@DLPIAPI_1.0");
 static int
 _dlpi_write_data(int fd, char *buf, int cnt)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3682,6 +3741,10 @@ __asm__(".symver __dlpi_write_data_r,dlpi_write_data@@DLPIAPI_1.0");
 static int
 _dlpi_xid_req(int fd, ulong pfb, char *datap, int length)
 {
+	(void) fd;
+	(void) pfb;
+	(void) datap;
+	(void) length;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3703,6 +3766,10 @@ __asm__(".symver __dlpi_xid_req_r,dlpi_xid_req@@DLPIAPI_1.0");
 static int
 _dlpi_xid_res(int fd, ulong pfb, char *datap, int length)
 {
+	(void) fd;
+	(void) pfb;
+	(void) datap;
+	(void) length;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);
@@ -3724,6 +3791,11 @@ __asm__(".symver __dlpi_xid_res_r,dlpi_xid_res@@DLPIAPI_1.0");
 static int
 _dlpi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat)
 {
+	(void) fd;
+	(void) upa;
+	(void) on_off;
+	(void) hi_wat;
+	(void) lo_wat;
 	errno = ENOTSUP;
 	dlerrno = DL_SYSERR;
 	return (-1);

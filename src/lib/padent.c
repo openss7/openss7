@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -127,6 +127,8 @@ static char const ident[] __attribute__ ((unused)) = "src/lib/padent.c (" PACKAG
 int
 __sx25_padtos(struct padent *p, unsigned char *strp)
 {
+	(void) p;
+	(void) strp;
 	return (0);
 }
 
@@ -313,6 +315,7 @@ __asm__(".symver __sx25_x25tosnid,x25tosnid@@SX25_1.0");
 int
 __sx25_getnettype(unsigned char *linkid)
 {
+	(void) linkid;
 	return (0);
 }
 
@@ -334,6 +337,7 @@ __asm__(".symver __sx25_getnettype,getnettype@@SX25_1.0");
 void
 __sx25_setpadent(int stayopen)
 {
+	(void) stayopen;
 }
 
 /** @fn void setpadent(int stayopen)
@@ -354,6 +358,7 @@ __asm__(".symver __sx25_setpadent,setpadent@@SX25_1.0");
 struct padent *
 __sx25_getpadbyaddr(char *addr)
 {
+	(void) addr;
 	return ((struct padent *) 0);
 }
 

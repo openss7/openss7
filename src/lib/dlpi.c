@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -283,7 +283,7 @@ __dlpi_list_wrlock(void)
 }
 
 static void
-__dlpi_list_unlock(void *ignore)
+__dlpi_list_unlock(void *ignore __attribute__((unused)))
 {
 	return __dlpi_lock_unlock(&__dlpi_fd_lock);
 }
@@ -662,14 +662,14 @@ __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl)
 		return (DL_SYSERR);
 	if (ret != 0)
 		return (DLPI_EBADMSG);
-	if (ctrl->len < sizeof(p->dl_primitive))
+	if (ctrl->len < (int) sizeof(p->dl_primitive))
 		return (DLPI_EBADMSG);
 	switch (p->dl_primitive) {
 	case DL_ERROR_ACK:
 		/* handle DL_ERROR_ACK reply */
-		if (ctrl->len < sizeof(p->error_ack))
+		if (ctrl->len < (int) sizeof(p->error_ack))
 			return (DLPI_EBADMSG);
-		if (p->error_ack.dl_error_primitive != prim)
+		if (p->error_ack.dl_error_primitive != (dl_ulong) prim)
 			return (DLPI_EBADMSG);
 		if (p->error_ack.dl_errno == DL_SYSERR) {
 			errno = p->error_ack.dl_unix_errno;
@@ -678,48 +678,48 @@ __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl)
 		return (p->error_ack.dl_errno);
 	case DL_OK_ACK:
 		/* handle DL_OK_ACK reply */
-		if (ctrl->len < sizeof(p->ok_ack))
+		if (ctrl->len < (int) sizeof(p->ok_ack))
 			return (DLPI_EBADMSG);
-		if (p->ok_ack.dl_correct_primitive != prim)
+		if (p->ok_ack.dl_correct_primitive != (dl_ulong) prim)
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_INFO_ACK:
 		if (prim != DL_INFO_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(p->info_ack))
+		if (ctrl->len < (int) sizeof(p->info_ack))
 			return (DLPI_EBADMSG);
 		if (p->info_ack.dl_addr_length != 0
-		    && ctrl->len < p->info_ack.dl_addr_length + p->info_ack.dl_addr_offset)
+		    && ctrl->len < (int)(p->info_ack.dl_addr_length + p->info_ack.dl_addr_offset))
 			return (DLPI_EBADMSG);
 		if (p->info_ack.dl_qos_length != 0
-		    && ctrl->len < p->info_ack.dl_qos_length + p->info_ack.dl_qos_offset)
+		    && ctrl->len < (int)(p->info_ack.dl_qos_length + p->info_ack.dl_qos_offset))
 			return (DLPI_EBADMSG);
 		if (p->info_ack.dl_qos_range_length != 0
 		    && ctrl->len <
-		    p->info_ack.dl_qos_range_length + p->info_ack.dl_qos_range_offset)
+		    (int)(p->info_ack.dl_qos_range_length + p->info_ack.dl_qos_range_offset))
 			return (DLPI_EBADMSG);
 		if (p->info_ack.dl_brdcst_addr_length != 0
 		    && ctrl->len <
-		    p->info_ack.dl_brdcst_addr_length + p->info_ack.dl_brdcst_addr_offset)
+		    (int)(p->info_ack.dl_brdcst_addr_length + p->info_ack.dl_brdcst_addr_offset))
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_BIND_ACK:
 		if (prim != DL_BIND_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(p->bind_ack))
+		if (ctrl->len < (int) sizeof(p->bind_ack))
 			return (DLPI_EBADMSG);
 		if (p->bind_ack.dl_addr_length != 0
-		    && ctrl->len < p->bind_ack.dl_addr_length + p->bind_ack.dl_addr_offset)
+		    && ctrl->len < (int)(p->bind_ack.dl_addr_length + p->bind_ack.dl_addr_offset))
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_PHYS_ADDR_ACK:
 		if (prim != DL_PHYS_ADDR_REQ)
 			return (DLPI_EBADMSG);
-		if (ctrl->len < sizeof(p->phys_addr_ack))
+		if (ctrl->len < (int) sizeof(p->phys_addr_ack))
 			return (DLPI_EBADMSG);
 		if (p->phys_addr_ack.dl_addr_length != 0
 		    && ctrl->len <
-		    p->phys_addr_ack.dl_addr_length + p->phys_addr_ack.dl_addr_offset)
+		    (int)(p->phys_addr_ack.dl_addr_length + p->phys_addr_ack.dl_addr_offset))
 			return (DLPI_EBADMSG);
 		return (DLPI_SUCCESS);
 	case DL_NOTIFY_ACK:
@@ -1639,7 +1639,7 @@ _dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
 
 	len = *alen;
 	*alen = buf.prim.phys_addr_ack.dl_addr_length;
-	if (len > *alen)
+	if (len > (int) *alen)
 		len = *alen;
 	ptr = (unsigned char *) &buf;
 	ptr += buf.prim.phys_addr_ack.dl_addr_offset;
@@ -1811,6 +1811,7 @@ __asm__(".symver __dlpi_iftype_r,dlpi_iftype@@DLPI_1.1");
 static int
 _dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt)
 {
+	(void) opt;
 	union {
 		union DL_primitives prim;
 		unsigned char buffer[BUFSIZ];
@@ -2146,7 +2147,7 @@ TRANS  type is a Solaris extension.
 static const char *
 _dlpi_mactype(uint mactype)
 {
-	if (mactype >= 0 && mactype <= DL_LOOP)
+	if (mactype <= DL_LOOP)
 		return __dlpi_maclist[mactype];
 	if (mactype >= DL_IPV4 && mactype <= DL_WIFI)
 		return __dlpi_maclist_sun[mactype - DL_IPV4];
@@ -2270,18 +2271,18 @@ _dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags)
 	if (getmsg(fd, &ctrl, NULL, &flag) < 0)
 		goto syserr;
 
-	if (ctrl.len < sizeof(prim.dl_primitive))
+	if (ctrl.len < (int) sizeof(prim.dl_primitive))
 		goto badmsg;
 
 	switch (prim.dl_primitive) {
 	case DL_OK_ACK:
-		if (ctrl.len < sizeof(prim.ok_ack))
+		if (ctrl.len < (int) sizeof(prim.ok_ack))
 			goto badmsg;
 		if (prim.ok_ack.dl_correct_primitive != DL_ATTACH_REQ)
 			goto badmsg;
 		break;
 	case DL_ERROR_ACK:
-		if (ctrl.len < sizeof(prim.error_ack))
+		if (ctrl.len < (int) sizeof(prim.error_ack))
 			goto badmsg;
 		if (prim.error_ack.dl_error_primitive != DL_ATTACH_REQ)
 			goto badmsg;
@@ -2349,18 +2350,18 @@ _dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags)
 		if (getmsg(fd, &ctrl, NULL, &flag) < 0)
 			goto syserr;
 
-		if (ctrl.len < sizeof(prim.dl_primitive))
+		if (ctrl.len < (int) sizeof(prim.dl_primitive))
 			goto badmsg;
 
 		switch (prim.dl_primitive) {
 		case DL_OK_ACK:
-			if (ctrl.len < sizeof(prim.ok_ack))
+			if (ctrl.len < (int) sizeof(prim.ok_ack))
 				goto badmsg;
 			if (prim.ok_ack.dl_correct_primitive != DL_PASSIVE_REQ)
 				goto badmsg;
 			break;
 		case DL_ERROR_ACK:
-			if (ctrl.len < sizeof(prim.error_ack))
+			if (ctrl.len < (int) sizeof(prim.error_ack))
 				goto badmsg;
 			if (prim.error_ack.dl_error_primitive != DL_PASSIVE_REQ)
 				goto badmsg;
@@ -2656,9 +2657,14 @@ static int
 _dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait,
 	   dlpi_recvinfo_t * recvp)
 {
-	if (salen != NULL && (*salen < 0 || *salen > DLPI_PHYSADDR_MAX))
+	(void) dh;
+	(void) buf;
+	(void) buflen;
+	(void) wait;
+	(void) recvp;
+	if (salen != NULL && *salen > DLPI_PHYSADDR_MAX)
 		return (DLPI_EINVAL);
-	if (salen != NULL && *salen > 0 && saptr == NULL)
+	if (salen != NULL && saptr == NULL)
 		return (DLPI_EINVAL);
 	return (DLPI_FAILURE);
 }
@@ -2736,7 +2742,11 @@ static int
 _dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen,
 	   const dlpi_sendinfo_t * sendp)
 {
-	if (daptr == NULL || dalen < 0 || dalen > DLPI_PHYSADDR_MAX)
+	(void) dh;
+	(void) buf;
+	(void) buflen;
+	(void) sendp;
+	if (daptr == NULL || dalen > DLPI_PHYSADDR_MAX)
 		return (DLPI_EINVAL);
 	return (DLPI_FAILURE);
 }
@@ -3531,6 +3541,9 @@ __asm__(".symver __dlpi_unbind_r,dlpi_unbind@@DLPI_1.1");
 static void
 _dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags)
 {
+	(void) fn;
+	(void) arg;
+	(void) flags;
 	return;
 }
 

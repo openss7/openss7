@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -127,6 +127,9 @@ __asm__(".symver __sx25_equalx25,equalx25@@SX25_1.0");
 int
 __sx25_stox25(unsigned char *cp, struct xaddrf *xad, int lookup)
 {
+	(void) cp;
+	(void) xad;
+	(void) lookup;
 	return (-1);
 }
 
@@ -164,6 +167,9 @@ __asm__(".symver __sx25_stox25,stox25@@SX25_1.0");
 int
 __sx25_x25tos(struct xaddrf *xad, unsigned char *cp, int lookup)
 {
+	(void) xad;
+	(void) cp;
+	(void) lookup;
 	return (-1);
 }
 
@@ -187,6 +193,7 @@ __asm__(".symver __sx25_x25tos,x25tos@@SX25_1.0");
 void
 __sx25_setxhostent(int stayopen)
 {
+	(void) stayopen;
 }
 
 /** @fn void setxhostent(int stayopen)
@@ -219,6 +226,9 @@ __asm__(".symver __sx25_setxhostent,setxhostent@@SX25_1.0");
 struct xhostent *
 __sx25_getxhostbyaddr(char *addr, int len, int type)
 {
+	(void) addr;
+	(void) len;
+	(void) type;
 	return (NULL);
 }
 
@@ -251,6 +261,7 @@ __asm__(".symver __sx25_getxhostbyaddr,getxhostbyaddr@@SX25_1.0");
 struct xhostent *
 __sx25_getxhostbyname(char *name)
 {
+	(void) name;
 	return (NULL);
 }
 

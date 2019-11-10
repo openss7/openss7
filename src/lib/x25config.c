@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,6 +67,7 @@ struct WAN_config_data;
 int
 __sx25_find_link_parameters(struct link_data **lptr)
 {
+	(void) lptr;
 	return (0);
 }
 
@@ -102,6 +103,15 @@ __sx25_read_config_parameters(int linkid,
 			      struct LAPB_config_data *lbp,
 			      struct LLC2_config_data *l2p, struct WAN_config_data *wpt, int *flags)
 {
+	(void) linkid;
+	(void) ipt;
+	(void) lpt;
+	(void) xpt;
+	(void) mpt;
+	(void) lbp;
+	(void) l2p;
+	(void) wpt;
+	(void) flags;
 	return (0);
 }
 
@@ -146,6 +156,15 @@ __sx25_read_config_parameters_file(char *filename,
 				   struct LLC2_config_data *l2p,
 				   struct WAN_config_data *wpt, int *flags)
 {
+	(void) filename;
+	(void) ipt;
+	(void) lpt;
+	(void) xpt;
+	(void) mpt;
+	(void) lbp;
+	(void) l2p;
+	(void) wpt;
+	(void) flags;
 	return (0);
 }
 
@@ -175,6 +194,7 @@ __asm__(".symver __sx25_read_config_parameters_file,x25_read_config_parameters_f
 int
 __sx25_save_link_parameters(struct link_data *linkid)
 {
+	(void) linkid;
 	return (0);
 }
 
@@ -195,6 +215,7 @@ __asm__(".symver __sx25_save_link_parameters,x25_save_link_parameters@@SX25_1.0"
   */
 int (*__sx25_set_parse_error_function(int (*func)(char *))) (char *)
 {
+	(void) func;
 	return ((int (*)(char *))0);
 }
 
@@ -229,6 +250,14 @@ __sx25_write_config_parameters(int linkid,
 			       struct LAPB_config_data *lbp,
 			       struct LLC2_config_data *l2p, struct WAN_config_data *wpt)
 {
+	(void) linkid;
+	(void) ipt;
+	(void) lpt;
+	(void) xpt;
+	(void) mpt;
+	(void) lbp;
+	(void) l2p;
+	(void) wpt;
 	return (0);
 }
 
@@ -270,6 +299,14 @@ __sx25_write_config_parameters_file(char *filename,
 				    struct LAPB_config_data *lbp,
 				    struct LLC2_config_data *l2p, struct WAN_config_data *wpt)
 {
+	(void) filename;
+	(void) ipt;
+	(void) lpt;
+	(void) xpt;
+	(void) mpt;
+	(void) lbp;
+	(void) l2p;
+	(void) wpt;
 	return (0);
 }
 

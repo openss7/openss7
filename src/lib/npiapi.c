@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -343,7 +343,7 @@ __npi_list_wrlock(void)
 	return __npi_lock_wrlock(&__npi_fd_lock);
 }
 static void
-__npi_list_unlock(void *ignore)
+__npi_list_unlock(void *ignore __attribute__((unused)))
 {
 	return __npi_lock_unlock(&__npi_fd_lock);
 }
@@ -1324,11 +1324,11 @@ _npi_want_a_proto(int fd, int primitive)
 	if (ret != 0)
 		goto tryagain;
 
-	if (npi_ctl_cnt < sizeof(p->type))
+	if (npi_ctl_cnt < (int) sizeof(p->type))
 		goto tryagain;
 
 	if (p->type != N_ERROR_ACK
-	    && p->type != N_DISCON_IND && p->type != primitive)
+	    && p->type != N_DISCON_IND && p->type != (np_ulong) primitive)
 		goto tryagain;
 	switch (p->type) {
 	case N_CONN_IND:
@@ -1336,7 +1336,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->conn_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->conn_ind)))
 			goto tryagain;
 		return (ret);
 	case N_CONN_CON:
@@ -1344,7 +1344,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->conn_con)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->conn_con)))
 			goto tryagain;
 		return (ret);
 	case N_DISCON_IND:
@@ -1352,7 +1352,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->discon_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->discon_ind)))
 			goto tryagain;
 		return (ret);
 	case N_DATA_IND:
@@ -1360,7 +1360,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->data_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->data_ind)))
 			goto tryagain;
 		return (ret);
 	case N_EXDATA_IND:
@@ -1368,7 +1368,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 1))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->exdata_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->exdata_ind)))
 			goto tryagain;
 		return (ret);
 	case N_INFO_ACK:
@@ -1376,7 +1376,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->info_ack)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->info_ack)))
 			goto tryagain;
 		return (ret);
 	case N_BIND_ACK:
@@ -1384,7 +1384,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->bind_ack)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->bind_ack)))
 			goto tryagain;
 		return (ret);
 	case N_ERROR_ACK:
@@ -1392,7 +1392,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->error_ack)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->error_ack)))
 			goto tryagain;
 		return (-1);
 	case N_OK_ACK:
@@ -1400,7 +1400,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->ok_ack)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->ok_ack)))
 			goto tryagain;
 		return (ret);
 	case N_UNITDATA_IND:
@@ -1408,7 +1408,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->unitdata_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->unitdata_ind)))
 			goto tryagain;
 		return (ret);
 	case N_UDERROR_IND:
@@ -1416,7 +1416,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->uderror_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->uderror_ind)))
 			goto tryagain;
 		return (ret);
 	case N_DATACK_IND:
@@ -1424,7 +1424,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->datack_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->datack_ind)))
 			goto tryagain;
 		return (ret);
 	case N_RESET_IND:
@@ -1432,7 +1432,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->reset_ind)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->reset_ind)))
 			goto tryagain;
 		return (ret);
 	case N_RESET_CON:
@@ -1440,7 +1440,7 @@ _npi_want_a_proto(int fd, int primitive)
 			goto tryagain;
 		if (unlikely(band != 0))
 			goto tryagain;
-		if (unlikely(npi_ctl_cnt < sizeof(p->reset_con)))
+		if (unlikely(npi_ctl_cnt < (int) sizeof(p->reset_con)))
 			goto tryagain;
 		return (ret);
 	}
@@ -1516,6 +1516,10 @@ __npi_ascii_facil(int fref, char *fval, unsigned int flgth, int marker)
 {
 	char *buf = __npi_get_tsd()->strbuf;
 
+	(void) fref;
+	(void) fval;
+	(void) flgth;
+	(void) marker;
 	/* FIXME: write out message */
 	return (buf);
 }
@@ -1534,6 +1538,10 @@ __npi_ascii_facil_r(int fref, char *fval, unsigned int flgth, int marker)
 {
 	char *buf = __npi_get_tsd()->strbuf;
 
+	(void) fref;
+	(void) fval;
+	(void) flgth;
+	(void) marker;
 	/* FIXME: write out message */
 	return (buf);
 }
@@ -1655,6 +1663,11 @@ __asm__(".symver __npi_bind_ascii_nsap_r,npi_bind_ascii_nsap@@NPIAPI_1.0");
 int
 __npi_bind_nsap(int fd, char *bind_nsap, int len, int coninds, unsigned flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) len;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1666,6 +1679,11 @@ __npi_bind_nsap(int fd, char *bind_nsap, int len, int coninds, unsigned flags)
 int
 __npi_bind_nsap_r(int fd, char *bind_nsap, int len, int coninds, unsigned flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) len;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1681,6 +1699,9 @@ __asm__(".symver __npi_bind_nsap_r,npi_bind_nsap@@NPIAPI_1.0");
 int
 __npi_conn_res(int fd, N_conn_ind_t * c, long tknval)
 {
+	(void) fd;
+	(void) c;
+	(void) tknval;
 	return (-1);		/* FIXME */
 }
 
@@ -1692,6 +1713,9 @@ __npi_conn_res(int fd, N_conn_ind_t * c, long tknval)
 int
 __npi_conn_res_r(int fd, N_conn_ind_t * c, long tknval)
 {
+	(void) fd;
+	(void) c;
+	(void) tknval;
 	return (-1);		/* FIXME */
 }
 
@@ -1707,6 +1731,8 @@ __asm__(".symver __npi_conn_res_r,npi_conn_res@@NPIAPI_1.0");
 int
 __npi_connect(char *remote_asp, unsigned bind_flags)
 {
+	(void) remote_asp;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1718,6 +1744,8 @@ __npi_connect(char *remote_asp, unsigned bind_flags)
 int
 __npi_connect_r(char *remote_asp, unsigned bind_flags)
 {
+	(void) remote_asp;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1733,6 +1761,10 @@ __asm__(".symver __npi_connect_r,npi_connect@@NPIAPI_1.0");
 int
 __npi_connect_req(int fd, char *peer_sap, char *buf, int cnt)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1744,6 +1776,10 @@ __npi_connect_req(int fd, char *peer_sap, char *buf, int cnt)
 int
 __npi_connect_req_r(int fd, char *peer_sap, char *buf, int cnt)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1759,6 +1795,7 @@ __asm__(".symver __npi_connect_req_r,npi_connect_req@@NPIAPI_1.0");
 int
 __npi_connect_wait(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -1770,6 +1807,7 @@ __npi_connect_wait(int fd)
 int
 __npi_connect_wait_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -1785,6 +1823,7 @@ __asm__(".symver __npi_connect_wait_r,npi_connect_wait@@NPIAPI_1.0");
 int
 __npi_datack_req(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -1796,6 +1835,7 @@ __npi_datack_req(int fd)
 int
 __npi_datack_req_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -1811,6 +1851,7 @@ __asm__(".symver __npi_datack_req_r,npi_datack_req@@NPIAPI_1.0");
 void
 __npi_decode_ctl(char *p)
 {
+	(void) p;
 }
 
 /** @brief The reentrant version of __npi_decode_ctl().
@@ -1821,6 +1862,7 @@ __npi_decode_ctl(char *p)
 void
 __npi_decode_ctl_r(char *p)
 {
+	(void) p;
 }
 
 /** @fn
@@ -1835,6 +1877,7 @@ __asm__(".symver __npi_decode_ctl_r,npi_decode_ctl@@NPIAPI_1.0");
 char *
 __npi_decode_primitive(long primitive)
 {
+	(void) primitive;
 	return (NULL);		/* FIXME */
 }
 
@@ -1846,6 +1889,7 @@ __npi_decode_primitive(long primitive)
 char *
 __npi_decode_primitive_r(long primitive)
 {
+	(void) primitive;
 	return (NULL);		/* FIXME */
 }
 
@@ -1861,6 +1905,7 @@ __asm__(".symver __npi_decode_primitive_r,npi_decode_primitive@@NPIAPI_1.0");
 char *
 __npi_decode_reason(long reason)
 {
+	(void) reason;
 	return (NULL);		/* FIXME */
 }
 
@@ -1872,6 +1917,7 @@ __npi_decode_reason(long reason)
 char *
 __npi_decode_reason_r(long reason)
 {
+	(void) reason;
 	return (NULL);		/* FIXME */
 }
 
@@ -1887,6 +1933,10 @@ __asm__(".symver __npi_decode_reason_r,npi_decode_reason@@NPIAPI_1.0");
 int
 __npi_discon_req(int fd, int reason, char *buf, int cnt)
 {
+	(void) fd;
+	(void) reason;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1898,6 +1948,10 @@ __npi_discon_req(int fd, int reason, char *buf, int cnt)
 int
 __npi_discon_req_r(int fd, int reason, char *buf, int cnt)
 {
+	(void) fd;
+	(void) reason;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1913,6 +1967,11 @@ __asm__(".symver __npi_discon_req_r,npi_discon_req@@NPIAPI_1.0");
 int
 __npi_discon_req_seq(int fd, int reason, long seq, char *buf, int cnt)
 {
+	(void) fd;
+	(void) reason;
+	(void) seq;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1924,6 +1983,11 @@ __npi_discon_req_seq(int fd, int reason, long seq, char *buf, int cnt)
 int
 __npi_discon_req_seq_r(int fd, int reason, long seq, char *buf, int cnt)
 {
+	(void) fd;
+	(void) reason;
+	(void) seq;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -1948,6 +2012,14 @@ int
 __npi_ext_bind_nsap(int fd, char *bind_nsap, int bind_len, char *rem_nsap, int rem_len, long lpa,
 		    int coninds, unsigned int flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) bind_len;
+	(void) rem_nsap;
+	(void) rem_len;
+	(void) lpa;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1968,6 +2040,14 @@ int
 __npi_ext_bind_nsap_r(int fd, char *bind_nsap, int bind_len, char *rem_nsap, int
 		      rem_len, long lpa, int coninds, unsigned int flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) bind_len;
+	(void) rem_nsap;
+	(void) rem_len;
+	(void) lpa;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -1998,6 +2078,12 @@ int
 __npi_ext_bind_nsap_ascii(int fd, char *bind_nsap, char *rem_nsap, long lpa, int
 			  coninds, unsigned int flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) rem_nsap;
+	(void) lpa;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2016,6 +2102,12 @@ int
 __npi_ext_bind_nsap_ascii_r(int fd, char *bind_nsap, char *rem_nsap, long lpa, int coninds,
 			    unsigned int flags)
 {
+	(void) fd;
+	(void) bind_nsap;
+	(void) rem_nsap;
+	(void) lpa;
+	(void) coninds;
+	(void) flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2031,6 +2123,12 @@ __asm__(".symver __npi_ext_bind_nsap_ascii_r,npi_ext_bind_nsap_ascii@@NPIAPI_1.0
 int
 __npi_ext_connect_req(int fd, char *peer_sap, char *buf, int nbytes, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) nbytes;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2042,6 +2140,12 @@ __npi_ext_connect_req(int fd, char *peer_sap, char *buf, int nbytes, char *fac_p
 int
 __npi_ext_connect_req_r(int fd, char *peer_sap, char *buf, int nbytes, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) nbytes;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2057,6 +2161,9 @@ __asm__(".symver __npi_ext_connect_req_r,npi_ext_connect_req@@NPIAPI_1.0");
 int
 __npi_ext_connect_wait(int listen_fid, char *fac_ptr, int fac_len)
 {
+	(void) listen_fid;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2068,6 +2175,9 @@ __npi_ext_connect_wait(int listen_fid, char *fac_ptr, int fac_len)
 int
 __npi_ext_connect_wait_r(int listen_fid, char *fac_ptr, int fac_len)
 {
+	(void) listen_fid;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2084,6 +2194,11 @@ int
 __npi_ext_conn_res(int fd, N_conn_ind_t * c, long tknval, char *fac_ptr, int
 		   fac_len)
 {
+	(void) fd;
+	(void) c;
+	(void) tknval;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2095,6 +2210,11 @@ __npi_ext_conn_res(int fd, N_conn_ind_t * c, long tknval, char *fac_ptr, int
 int
 __npi_ext_conn_res_r(int fd, N_conn_ind_t * c, long tknval, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) c;
+	(void) tknval;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2110,6 +2230,10 @@ __asm__(".symver __npi_ext_conn_res_r,npi_ext_conn_res@@NPIAPI_1.0");
 int
 __npi_ext_listen(char *bind_nsap, unsigned int fork_optns, char *fac_ptr, int fac_len)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2121,6 +2245,10 @@ __npi_ext_listen(char *bind_nsap, unsigned int fork_optns, char *fac_ptr, int fa
 int
 __npi_ext_listen_r(char *bind_nsap, unsigned int fork_optns, char *fac_ptr, int fac_len)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2136,6 +2264,10 @@ __asm__(".symver __npi_ext_listen_r,npi_ext_listen@@NPIAPI_1.0");
 int
 __npi_ext_nbio_complete_listen(int listen_fid, int options, char *fac_ptr, int fac_len)
 {
+	(void) listen_fid;
+	(void) options;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2147,6 +2279,10 @@ __npi_ext_nbio_complete_listen(int listen_fid, int options, char *fac_ptr, int f
 int
 __npi_ext_nbio_complete_listen_r(int listen_fid, int options, char *fac_ptr, int fac_len)
 {
+	(void) listen_fid;
+	(void) options;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2162,6 +2298,9 @@ __asm__(".symver __npi_ext_nbio_complete_listen_r,npi_ext_nbio_complete_listen@@
 int
 __npi_fac_walk(char *facp, unsigned int facl, facil_proc_t * fcn)
 {
+	(void) facp;
+	(void) facl;
+	(void) fcn;
 	return (-1);		/* FIXME */
 }
 
@@ -2173,6 +2312,9 @@ __npi_fac_walk(char *facp, unsigned int facl, facil_proc_t * fcn)
 int
 __npi_fac_walk_r(char *facp, unsigned int facl, facil_proc_t * fcn)
 {
+	(void) facp;
+	(void) facl;
+	(void) fcn;
 	return (-1);		/* FIXME */
 }
 
@@ -2188,6 +2330,10 @@ __asm__(".symver __npi_fac_walk_r,npi_fac_walk@@NPIAPI_1.0");
 int
 __npi_flags_connect_wait(int listen_fid, char *fac_ptr, int fac_len, int bind_flags)
 {
+	(void) listen_fid;
+	(void) fac_ptr;
+	(void) fac_len;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2199,6 +2345,10 @@ __npi_flags_connect_wait(int listen_fid, char *fac_ptr, int fac_len, int bind_fl
 int
 __npi_flags_connect_wait_r(int listen_fid, char *fac_ptr, int fac_len, int bind_flags)
 {
+	(void) listen_fid;
+	(void) fac_ptr;
+	(void) fac_len;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2215,6 +2365,11 @@ int
 __npi_flags_listen(char *bind_nsap, unsigned int fork_optns, char *fac_ptr, int fac_len,
 		   int bind_flags)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
+	(void) fac_ptr;
+	(void) fac_len;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2227,6 +2382,11 @@ int
 __npi_flags_listen_r(char *bind_nsap, unsigned int fork_optns, char *fac_ptr, int fac_len,
 		     int bind_flags)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
+	(void) fac_ptr;
+	(void) fac_len;
+	(void) bind_flags;
 	return (-1);		/* FIXME */
 }
 
@@ -2242,6 +2402,8 @@ __asm__(".symver __npi_flags_listen_r,npi_flags_listen@@NPIAPI_1.0");
 int
 __npi_flow_req(int fd, unsigned long flow_incr)
 {
+	(void) fd;
+	(void) flow_incr;
 	return (-1);		/* FIXME */
 }
 
@@ -2253,6 +2415,8 @@ __npi_flow_req(int fd, unsigned long flow_incr)
 int
 __npi_flow_req_r(int fd, unsigned long flow_incr)
 {
+	(void) fd;
+	(void) flow_incr;
 	return (-1);		/* FIXME */
 }
 
@@ -2268,6 +2432,7 @@ __asm__(".symver __npi_flow_req_r,npi_flow_req@@NPIAPI_1.0");
 int
 __npi_get_and_log_facils(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2279,6 +2444,7 @@ __npi_get_and_log_facils(int fd)
 int
 __npi_get_and_log_facils_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2294,6 +2460,9 @@ __asm__(".symver __npi_get_and_log_facils_r,npi_get_and_log_facils@@NPIAPI_1.0")
 int
 __npi_get_facils(int fd, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2305,6 +2474,9 @@ __npi_get_facils(int fd, char *fac_ptr, int fac_len)
 int
 __npi_get_facils_r(int fd, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2320,6 +2492,7 @@ __asm__(".symver __npi_get_facils_r,npi_get_facils@@NPIAPI_1.0");
 int
 __npi_info_req(int strm)
 {
+	(void) strm;
 	return (-1);		/* FIXME */
 }
 
@@ -2331,6 +2504,7 @@ __npi_info_req(int strm)
 int
 __npi_info_req_r(int strm)
 {
+	(void) strm;
 	return (-1);		/* FIXME */
 }
 
@@ -2383,6 +2557,7 @@ __asm__(".symver __npi_info_req_r,npi_info_req@@NPIAPI_1.0");
 int
 __npi_init(unsigned int log_options, char *log_name)
 {
+	(void) log_name;
 	__npi_log_options = log_options;
 
 	/* FIXME: open a file using the syslog facility and determine whether
@@ -2418,6 +2593,8 @@ __asm__(".symver __npi_init_r,npi_init@@NPIAPI_1.0");
 int
 __npi_init_FILE(unsigned int log_options, FILE * log_FILE)
 {
+	(void) log_options;
+	(void) log_FILE;
 	return (-1);		/* FIXME */
 }
 
@@ -2448,6 +2625,8 @@ __asm__(".symver __npi_init_FILE_r,npi_init_FILE@@NPIAPI_1.0");
 int
 __npi_listen(char *bind_nsap, unsigned int fork_optns)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
 	return (-1);		/* FIXME */
 }
 
@@ -2459,6 +2638,8 @@ __npi_listen(char *bind_nsap, unsigned int fork_optns)
 int
 __npi_listen_r(char *bind_nsap, unsigned int fork_optns)
 {
+	(void) bind_nsap;
+	(void) fork_optns;
 	return (-1);		/* FIXME */
 }
 
@@ -2474,6 +2655,7 @@ __asm__(".symver __npi_listen_r,npi_listen@@NPIAPI_1.0");
 int
 __npi_max_sdu(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2485,6 +2667,7 @@ __npi_max_sdu(int fd)
 int
 __npi_max_sdu_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2500,6 +2683,8 @@ __asm__(".symver __npi_max_sdu_r,npi_max_sdu@@NPIAPI_1.0");
 int
 __npi_nbio_complete_listen(int listen_fd, int options)
 {
+	(void) listen_fd;
+	(void) options;
 	return (-1);		/* FIXME */
 }
 
@@ -2511,6 +2696,8 @@ __npi_nbio_complete_listen(int listen_fd, int options)
 int
 __npi_nbio_complete_listen_r(int listen_fd, int options)
 {
+	(void) listen_fd;
+	(void) options;
 	return (-1);		/* FIXME */
 }
 
@@ -2552,6 +2739,7 @@ __asm__(".symver __npi_open_data_r,npi_open_data@@NPIAPI_1.0");
 void
 __npi_perror(char *msg)
 {
+	(void) msg;
 }
 
 /** @brief The reentrant version of __npi_perror().
@@ -2562,6 +2750,7 @@ __npi_perror(char *msg)
 void
 __npi_perror_r(char *msg)
 {
+	(void) msg;
 }
 
 /** @fn
@@ -2576,6 +2765,9 @@ __asm__(".symver __npi_perror_r,npi_perror@@NPIAPI_1.0");
 void
 __npi_print_msg(unsigned char *p, unsigned n, int indent)
 {
+	(void) p;
+	(void) n;
+	(void) indent;
 }
 
 /** @brief The reentrant version of __npi_print_msg().
@@ -2586,6 +2778,9 @@ __npi_print_msg(unsigned char *p, unsigned n, int indent)
 void
 __npi_print_msg_r(unsigned char *p, unsigned n, int indent)
 {
+	(void) p;
+	(void) n;
+	(void) indent;
 }
 
 /** @fn
@@ -2600,6 +2795,7 @@ __asm__(".symver __npi_print_msg_r,npi_print_msg@@NPIAPI_1.0");
 void
 __npi_printf(char *fmt, ...)
 {
+	(void) fmt;
 }
 
 /** @brief The reentrant version of __npi_printf().
@@ -2610,6 +2806,7 @@ __npi_printf(char *fmt, ...)
 void
 __npi_printf_r(char *fmt, ...)
 {
+	(void) fmt;
 }
 
 /** @fn
@@ -2624,6 +2821,11 @@ __asm__(".symver __npi_printf_r,npi_printf@@NPIAPI_1.0");
 int
 __npi_rcv(int fd, char *buf, int cnt, long flags_in, long *flags_out)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
+	(void) flags_in;
+	(void) flags_out;
 	return (-1);		/* FIXME */
 }
 
@@ -2635,6 +2837,11 @@ __npi_rcv(int fd, char *buf, int cnt, long flags_in, long *flags_out)
 int
 __npi_rcv_r(int fd, char *buf, int cnt, long flags_in, long *flags_out)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
+	(void) flags_in;
+	(void) flags_out;
 	return (-1);		/* FIXME */
 }
 
@@ -2650,6 +2857,9 @@ __asm__(".symver __npi_rcv_r,npi_rcv@@NPIAPI_1.0");
 int
 __npi_read_data(int fd, char *buf, int cnt)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -2661,6 +2871,9 @@ __npi_read_data(int fd, char *buf, int cnt)
 int
 __npi_read_data_r(int fd, char *buf, int cnt)
 {
+	(void) fd;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -2676,6 +2889,7 @@ __asm__(".symver __npi_read_data_r,npi_read_data@@NPIAPI_1.0");
 int
 __npi_reset_req(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2687,6 +2901,7 @@ __npi_reset_req(int fd)
 int
 __npi_reset_req_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2702,6 +2917,7 @@ __asm__(".symver __npi_reset_req_r,npi_reset_req@@NPIAPI_1.0");
 int
 __npi_reset_res(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2713,6 +2929,7 @@ __npi_reset_res(int fd)
 int
 __npi_reset_res_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2728,6 +2945,10 @@ __asm__(".symver __npi_reset_res_r,npi_reset_res@@NPIAPI_1.0");
 int
 __npi_send_connect_req(int fd, char *peer_sap, char *buf, int cnt)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -2739,6 +2960,10 @@ __npi_send_connect_req(int fd, char *peer_sap, char *buf, int cnt)
 int
 __npi_send_connect_req_r(int fd, char *peer_sap, char *buf, int cnt)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
 	return (-1);		/* FIXME */
 }
 
@@ -2754,6 +2979,12 @@ __asm__(".symver __npi_send_connect_req_r,npi_send_connect_req@@NPIAPI_1.0");
 int
 __npi_send_ext_connect_req(int fd, char *peer_sap, char *buf, int cnt, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2765,6 +2996,12 @@ __npi_send_ext_connect_req(int fd, char *peer_sap, char *buf, int cnt, char *fac
 int
 __npi_send_ext_connect_req_r(int fd, char *peer_sap, char *buf, int cnt, char *fac_ptr, int fac_len)
 {
+	(void) fd;
+	(void) peer_sap;
+	(void) buf;
+	(void) cnt;
+	(void) fac_ptr;
+	(void) fac_len;
 	return (-1);		/* FIXME */
 }
 
@@ -2780,6 +3017,7 @@ __asm__(".symver __npi_send_ext_connect_req_r,npi_send_ext_connect_req@@NPIAPI_1
 int
 __npi_send_info_req(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2791,6 +3029,7 @@ __npi_send_info_req(int fd)
 int
 __npi_send_info_req_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2806,6 +3045,7 @@ __asm__(".symver __npi_send_info_req_r,npi_send_info_req@@NPIAPI_1.0");
 int
 __npi_send_reset_req(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2817,6 +3057,7 @@ __npi_send_reset_req(int fd)
 int
 __npi_send_reset_req_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2832,6 +3073,7 @@ __asm__(".symver __npi_send_reset_req_r,npi_send_reset_req@@NPIAPI_1.0");
 int
 __npi_send_reset_res(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2843,6 +3085,7 @@ __npi_send_reset_res(int fd)
 int
 __npi_send_reset_res_r(int fd)
 {
+	(void) fd;
 	return (-1);		/* FIXME */
 }
 
@@ -2858,6 +3101,7 @@ __asm__(".symver __npi_send_reset_res_r,npi_send_reset_res@@NPIAPI_1.0");
 int
 __npi_set_log_size(long nbytes)
 {
+	(void) nbytes;
 	return (-1);		/* FIXME */
 }
 
@@ -2869,6 +3113,7 @@ __npi_set_log_size(long nbytes)
 int
 __npi_set_log_size_r(long nbytes)
 {
+	(void) nbytes;
 	return (-1);		/* FIXME */
 }
 
@@ -2885,6 +3130,11 @@ int
 __npi_set_marks(int fid, unsigned int rd_lo_make, unsigned int rd_hi_mark, unsigned int wr_lo_mark,
 		unsigned int wr_hi_mark)
 {
+	(void) fid;
+	(void) rd_lo_make;
+	(void) rd_hi_mark;
+	(void) wr_lo_mark;
+	(void) wr_hi_mark;
 	return (-1);		/* FIXME */
 }
 
@@ -2897,6 +3147,11 @@ int
 __npi_set_marks_r(int fid, unsigned int rd_lo_make, unsigned int rd_hi_mark,
 		  unsigned int wr_lo_mark, unsigned int wr_hi_mark)
 {
+	(void) fid;
+	(void) rd_lo_make;
+	(void) rd_hi_mark;
+	(void) wr_lo_mark;
+	(void) wr_hi_mark;
 	return (-1);		/* FIXME */
 }
 
@@ -2912,6 +3167,7 @@ __asm__(".symver __npi_set_marks_r,npi_set_marks@@NPIAPI_1.0");
 int
 __npi_set_pid(int fid)
 {
+	(void) fid;
 	return (-1);		/* FIXME */
 }
 
@@ -2923,6 +3179,7 @@ __npi_set_pid(int fid)
 int
 __npi_set_pid_r(int fid)
 {
+	(void) fid;
 	return (-1);		/* FIXME */
 }
 
@@ -2938,6 +3195,10 @@ __asm__(".symver __npi_set_pid_r,npi_set_pid@@NPIAPI_1.0");
 int
 __npi_set_signal_handling(int fid, npi_sig_func_t func, int sig_num, int primitive_mask)
 {
+	(void) fid;
+	(void) func;
+	(void) sig_num;
+	(void) primitive_mask;
 	return (-1);		/* FIXME */
 }
 
@@ -2949,6 +3210,10 @@ __npi_set_signal_handling(int fid, npi_sig_func_t func, int sig_num, int primiti
 int
 __npi_set_signal_handling_r(int fid, npi_sig_func_t func, int sig_num, int primitive_mask)
 {
+	(void) fid;
+	(void) func;
+	(void) sig_num;
+	(void) primitive_mask;
 	return (-1);		/* FIXME */
 }
 
@@ -2973,16 +3238,16 @@ int
 __npi_write_data(int fd, char *buf, int nbytes)
 {
 	struct __npi_user *nu;
-	int len, written = 0;
+	unsigned len, written = 0;
 
 	if (__npi_getuser(fd) != 0)
 		goto nbadf;
 	nu = __npi_fds[fd];
 	len = nbytes;
 	if ((np_long) nu->nu_info.NSDU_size > 0)
-		if (len > (np_long) nu->nu_info.NSDU_size)
+		if (len > nu->nu_info.NSDU_size)
 			len = nu->nu_info.NSDU_size;
-	if (len < nbytes) {
+	if (len < (unsigned) nbytes) {
 		if ((np_long) nu->nu_info.NIDU_size > 0)
 			if (len > nu->nu_info.NIDU_size)
 				len = nu->nu_info.NIDU_size;
@@ -2995,9 +3260,9 @@ __npi_write_data(int fd, char *buf, int nbytes)
 		N_data_req_t prim;
 		struct strbuf ctrl, data;
 
-		while (nbytes > written) {
+		while (nbytes > (int) written) {
 			prim.PRIM_type = N_DATA_REQ;
-			if (nbytes > written + len)
+			if (nbytes > (int)(written + len))
 				prim.DATA_xfer_flags = N_MORE_DATA_FLAG;
 			else
 				prim.DATA_xfer_flags = 0;
@@ -3061,6 +3326,7 @@ __asm__(".symver __npi_write_data_r,npi_write_data@@NPIAPI_1.0");
 char *
 __npi_x25_clear_cause(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3072,6 +3338,7 @@ __npi_x25_clear_cause(int cause)
 char *
 __npi_x25_clear_cause_r(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3087,6 +3354,7 @@ __asm__(".symver __npi_x25_clear_cause_r,npi_x25_clear_cause@@NPIAPI_1.0");
 char *
 __npi_x25_diagnostic(int diagnostic)
 {
+	(void) diagnostic;
 	return (NULL);		/* FIXME */
 }
 
@@ -3098,6 +3366,7 @@ __npi_x25_diagnostic(int diagnostic)
 char *
 __npi_x25_diagnostic_r(int diagnostic)
 {
+	(void) diagnostic;
 	return (NULL);		/* FIXME */
 }
 
@@ -3113,6 +3382,7 @@ __asm__(".symver __npi_x25_diagnostic_r,npi_x25_diagnostic@@NPIAPI_1.0");
 char *
 __npi_x25_registration_cause(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3124,6 +3394,7 @@ __npi_x25_registration_cause(int cause)
 char *
 __npi_x25_registration_cause_r(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3139,6 +3410,7 @@ __asm__(".symver __npi_x25_registration_cause_r,npi_x25_registration_cause@@NPIA
 char *
 __npi_x25_reset_cause(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3150,6 +3422,7 @@ __npi_x25_reset_cause(int cause)
 char *
 __npi_x25_reset_cause_r(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3165,6 +3438,7 @@ __asm__(".symver __npi_x25_reset_cause_r,npi_x25_reset_cause@@NPIAPI_1.0");
 char *
 __npi_x25_restart_cause(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3176,6 +3450,7 @@ __npi_x25_restart_cause(int cause)
 char *
 __npi_x25_restart_cause_r(int cause)
 {
+	(void) cause;
 	return (NULL);		/* FIXME */
 }
 
@@ -3191,6 +3466,8 @@ __asm__(".symver __npi_x25_restart_cause_r,npi_x25_restart_cause@@NPIAPI_1.0");
 int
 __npi_put_npi_proto(int fid, int len)
 {
+	(void) fid;
+	(void) len;
 	return (-1);		/* FIXME */
 }
 
@@ -3202,6 +3479,8 @@ __npi_put_npi_proto(int fid, int len)
 int
 __npi_put_npi_proto_r(int fid, int len)
 {
+	(void) fid;
+	(void) len;
 	return (-1);		/* FIXME */
 }
 
@@ -3215,6 +3494,7 @@ __asm__(".symver __npi_put_npi_proto_r,put_npi_proto@@NPIAPI_1.0");
 static char *
 _pu_decode_handle(unsigned long pu_handle)
 {
+	(void) pu_handle;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (NULL);
@@ -3236,6 +3516,10 @@ __asm__(".symver __pu_decode_handle_r,pu_decode_handle@@NPIAPI_1.0");
 static int
 _pu_dlpi_upa(int board, int port, int station, int *upa_ptr)
 {
+	(void) board;
+	(void) port;
+	(void) station;
+	(void) upa_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3257,6 +3541,11 @@ __asm__(".symver __pu_dlpi_upa_r,pu_dlpi_upa@@NPIAPI_1.0");
 static int
 _pu_get_pu_id(int board, int port, int station, int *pu_id_ptr, unsigned long *pu_hndl_ptr)
 {
+	(void) board;
+	(void) port;
+	(void) station;
+	(void) pu_id_ptr;
+	(void) pu_hndl_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3279,6 +3568,11 @@ static int
 _pu_get_stats(unsigned long pu_handle, int pu_id, int *pu_up_down_ptr, int *link_state_ptr,
 	      int *modem_state_ptr)
 {
+	(void) pu_handle;
+	(void) pu_id;
+	(void) pu_up_down_ptr;
+	(void) link_state_ptr;
+	(void) modem_state_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3302,6 +3596,10 @@ __asm__(".symver __pu_get_stats_r,pu_get_stats@@NPIAPI_1.0");
 static int
 _pu_get_board_info(unsigned long pu_handle, int pu_id, int *board_ptr, int *port_ptr)
 {
+	(void) pu_handle;
+	(void) pu_id;
+	(void) board_ptr;
+	(void) port_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3323,6 +3621,8 @@ __asm__(".symver __pu_get_board_info_r,pu_get_board_info@@NPIAPI_1.0");
 static int
 _pu_id_to_pu_handle(int pu_id, unsigned long *pu_handle_ptr)
 {
+	(void) pu_id;
+	(void) pu_handle_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3344,6 +3644,7 @@ __asm__(".symver __pu_id_to_pu_handle_r,pu_id_to_pu_handle@@NPIAPI_1.0");
 static int
 _pu_id_to_pu_number(unsigned long pu_id)
 {
+	(void) pu_id;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3365,6 +3666,9 @@ __asm__(".symver __pu_id_to_pu_number_r,pu_id_to_pu_number@@NPIAPI_1.0");
 static int
 _pu_map_npi_lpa_to_handle(int npi_lpa, int *pu_id_ptr, unsigned long handle_ptr)
 {
+	(void) npi_lpa;
+	(void) pu_id_ptr;
+	(void) handle_ptr;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
@@ -3386,6 +3690,7 @@ __asm__(".symver __pu_map_npi_lpa_to_handle_r,pu_map_npi_lpa_to_handle@@NPIAPI_1
 static int
 _pu_strerror(int pu_errnum)
 {
+	(void) pu_errnum;
 	errno = ENOTSUP;
 	nerrno = NSYSERR;
 	return (-1);
