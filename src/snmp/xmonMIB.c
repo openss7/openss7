@@ -923,6 +923,10 @@ deinit_xmonMIB(void)
 int
 term_xmonMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "term_xmonMIB: terminating...  "));
 	deinit_xmonMIB();
 	DEBUGMSGTL(("xmonMIB", "done.\n"));
@@ -1106,6 +1110,7 @@ xmonMIB_duplicate(struct xmonMIB_data *thedata)
 {
 	struct xmonMIB_data *StorageNew = SNMP_MALLOC_STRUCT(xmonMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("xmonMIB", "xmonMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 		if (!(StorageNew->xmonProbeName = malloc(thedata->xmonProbeNameLen + 1)))
@@ -1397,6 +1402,8 @@ xmonMIB_add(struct xmonMIB_data *thedata)
 void
 parse_xmonMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct xmonMIB_data *StorageTmp = xmonMIB_create();
 
@@ -1622,6 +1629,10 @@ store_xmonMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct xmonMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonMIB: storing data...  "));
 	refresh_xmonMIB(1);
 	if ((StorageTmp = xmonMIBStorage) == NULL) {
@@ -1748,6 +1759,8 @@ store_xmonMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_xmonMIB(struct xmonMIB_data *StorageTmp, struct xmonMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1769,6 +1782,8 @@ check_xmonMIB(struct xmonMIB_data *StorageTmp, struct xmonMIB_data *StorageOld)
 int
 update_xmonMIB(struct xmonMIB_data *StorageTmp, struct xmonMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1784,6 +1799,7 @@ update_xmonMIB(struct xmonMIB_data *StorageTmp, struct xmonMIB_data *StorageOld)
 void
 revert_xmonMIB(struct xmonMIB_data *StorageTmp, struct xmonMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonMIB(StorageOld, NULL);
 }
@@ -2648,6 +2664,8 @@ parse_xmonSourceTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonSourceTable_data *StorageTmp = xmonSourceTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonSourceTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2696,6 +2714,10 @@ store_xmonSourceTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct xmonSourceTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonSourceTable: storing data...  "));
 	refresh_xmonSourceTable(1);
 	(void) tmpsize;
@@ -2891,6 +2913,8 @@ parse_xmonSourceStatsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonSourceStatsTable_data *StorageTmp = xmonSourceStatsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonSourceStatsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2925,6 +2949,10 @@ store_xmonSourceStatsTable(int majorID, int minorID, void *serverarg, void *clie
 	struct xmonSourceStatsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonSourceStatsTable: storing data...  "));
 	refresh_xmonSourceStatsTable(1);
 	(void) tmpsize;
@@ -3116,6 +3144,8 @@ parse_xmonSourceHistTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonSourceHistTable_data *StorageTmp = xmonSourceHistTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonSourceHistTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3147,6 +3177,10 @@ store_xmonSourceHistTable(int majorID, int minorID, void *serverarg, void *clien
 	struct xmonSourceHistTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonSourceHistTable: storing data...  "));
 	refresh_xmonSourceHistTable(1);
 	(void) tmpsize;
@@ -3334,6 +3368,8 @@ parse_xmonSourceTotalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonSourceTotalTable_data *StorageTmp = xmonSourceTotalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonSourceTotalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3365,6 +3401,10 @@ store_xmonSourceTotalTable(int majorID, int minorID, void *serverarg, void *clie
 	struct xmonSourceTotalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonSourceTotalTable: storing data...  "));
 	refresh_xmonSourceTotalTable(1);
 	(void) tmpsize;
@@ -3629,6 +3669,8 @@ parse_xmonInterfaceTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonInterfaceTable_data *StorageTmp = xmonInterfaceTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonInterfaceTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3703,6 +3745,10 @@ store_xmonInterfaceTable(int majorID, int minorID, void *serverarg, void *client
 	struct xmonInterfaceTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonInterfaceTable: storing data...  "));
 	refresh_xmonInterfaceTable(1);
 	(void) tmpsize;
@@ -3947,6 +3993,8 @@ parse_xmonRmonTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonRmonTable_data *StorageTmp = xmonRmonTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonRmonTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4003,6 +4051,10 @@ store_xmonRmonTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct xmonRmonTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonRmonTable: storing data...  "));
 	refresh_xmonRmonTable(1);
 	(void) tmpsize;
@@ -4225,6 +4277,8 @@ parse_xmonArchiveTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonArchiveTable_data *StorageTmp = xmonArchiveTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonArchiveTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4272,6 +4326,10 @@ store_xmonArchiveTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct xmonArchiveTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonArchiveTable: storing data...  "));
 	refresh_xmonArchiveTable(1);
 	(void) tmpsize;
@@ -4473,6 +4531,8 @@ parse_xmonFeedListenTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonFeedListenTable_data *StorageTmp = xmonFeedListenTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonFeedListenTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4506,6 +4566,10 @@ store_xmonFeedListenTable(int majorID, int minorID, void *serverarg, void *clien
 	struct xmonFeedListenTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonFeedListenTable: storing data...  "));
 	refresh_xmonFeedListenTable(1);
 	(void) tmpsize;
@@ -4740,6 +4804,8 @@ parse_xmonFeedTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonFeedTable_data *StorageTmp = xmonFeedTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonFeedTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4799,6 +4865,10 @@ store_xmonFeedTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct xmonFeedTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonFeedTable: storing data...  "));
 	refresh_xmonFeedTable(1);
 	(void) tmpsize;
@@ -5005,6 +5075,8 @@ parse_xmonFeedStatsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonFeedStatsTable_data *StorageTmp = xmonFeedStatsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonFeedStatsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5041,6 +5113,10 @@ store_xmonFeedStatsTable(int majorID, int minorID, void *serverarg, void *client
 	struct xmonFeedStatsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonFeedStatsTable: storing data...  "));
 	refresh_xmonFeedStatsTable(1);
 	(void) tmpsize;
@@ -5236,6 +5312,8 @@ parse_xmonPushListenTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonPushListenTable_data *StorageTmp = xmonPushListenTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonPushListenTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5269,6 +5347,10 @@ store_xmonPushListenTable(int majorID, int minorID, void *serverarg, void *clien
 	struct xmonPushListenTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonPushListenTable: storing data...  "));
 	refresh_xmonPushListenTable(1);
 	(void) tmpsize;
@@ -5503,6 +5585,8 @@ parse_xmonPushTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonPushTable_data *StorageTmp = xmonPushTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonPushTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5562,6 +5646,10 @@ store_xmonPushTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct xmonPushTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonPushTable: storing data...  "));
 	refresh_xmonPushTable(1);
 	(void) tmpsize;
@@ -5760,6 +5848,8 @@ parse_xmonPullListenTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonPullListenTable_data *StorageTmp = xmonPullListenTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonPullListenTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5793,6 +5883,10 @@ store_xmonPullListenTable(int majorID, int minorID, void *serverarg, void *clien
 	struct xmonPullListenTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonPullListenTable: storing data...  "));
 	refresh_xmonPullListenTable(1);
 	(void) tmpsize;
@@ -6027,6 +6121,8 @@ parse_xmonPullTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonPullTable_data *StorageTmp = xmonPullTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonPullTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6086,6 +6182,10 @@ store_xmonPullTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct xmonPullTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonPullTable: storing data...  "));
 	refresh_xmonPullTable(1);
 	(void) tmpsize;
@@ -6348,6 +6448,8 @@ parse_xmonUploadTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonUploadTable_data *StorageTmp = xmonUploadTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonUploadTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6418,6 +6520,10 @@ store_xmonUploadTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct xmonUploadTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonUploadTable: storing data...  "));
 	refresh_xmonUploadTable(1);
 	(void) tmpsize;
@@ -6681,6 +6787,8 @@ parse_xmonDownloadTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonDownloadTable_data *StorageTmp = xmonDownloadTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonDownloadTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6751,6 +6859,10 @@ store_xmonDownloadTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct xmonDownloadTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonDownloadTable: storing data...  "));
 	refresh_xmonDownloadTable(1);
 	(void) tmpsize;
@@ -6973,6 +7085,8 @@ parse_xmonSctpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct xmonSctpTable_data *StorageTmp = xmonSctpTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("xmonMIB", "parse_xmonSctpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7019,6 +7133,10 @@ store_xmonSctpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct xmonSctpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("xmonMIB", "store_xmonSctpTable: storing data...  "));
 	refresh_xmonSctpTable(1);
 	(void) tmpsize;
@@ -7068,6 +7186,7 @@ store_xmonSctpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 activate_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7085,6 +7204,7 @@ activate_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 int
 deactivate_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7102,6 +7222,7 @@ deactivate_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 int
 activate_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7119,6 +7240,7 @@ activate_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 int
 deactivate_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7136,6 +7258,7 @@ deactivate_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 int
 activate_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7153,6 +7276,7 @@ activate_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 int
 deactivate_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7170,6 +7294,7 @@ deactivate_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 int
 activate_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7187,6 +7312,7 @@ activate_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 int
 deactivate_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7204,6 +7330,7 @@ deactivate_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 int
 activate_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7221,6 +7348,7 @@ activate_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 int
 deactivate_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7238,6 +7366,7 @@ deactivate_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 int
 activate_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7255,6 +7384,7 @@ activate_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 int
 deactivate_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7272,6 +7402,7 @@ deactivate_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 int
 activate_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7289,6 +7420,7 @@ activate_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 int
 deactivate_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7306,6 +7438,7 @@ deactivate_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 int
 activate_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7323,6 +7456,7 @@ activate_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 int
 deactivate_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7340,6 +7474,7 @@ deactivate_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 int
 activate_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7357,6 +7492,7 @@ activate_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 int
 deactivate_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7374,6 +7510,7 @@ deactivate_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 int
 activate_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7391,6 +7528,7 @@ activate_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 int
 deactivate_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7408,6 +7546,7 @@ deactivate_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 int
 activate_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7425,6 +7564,7 @@ activate_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 int
 deactivate_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -7447,6 +7587,8 @@ deactivate_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 int
 check_xmonSourceTable_row(struct xmonSourceTable_data *StorageTmp, struct xmonSourceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7469,6 +7611,8 @@ check_xmonSourceTable_row(struct xmonSourceTable_data *StorageTmp, struct xmonSo
 int
 update_xmonSourceTable_row(struct xmonSourceTable_data *StorageTmp, struct xmonSourceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonSourceTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7483,6 +7627,7 @@ update_xmonSourceTable_row(struct xmonSourceTable_data *StorageTmp, struct xmonS
 void
 revert_xmonSourceTable_row(struct xmonSourceTable_data *StorageTmp, struct xmonSourceTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonSourceTable_row(StorageOld, NULL);
 }
@@ -7626,6 +7771,8 @@ var_xmonSourceTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_xmonSourceStatsTable_row(struct xmonSourceStatsTable_data *StorageTmp, struct xmonSourceStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7648,6 +7795,8 @@ check_xmonSourceStatsTable_row(struct xmonSourceStatsTable_data *StorageTmp, str
 int
 update_xmonSourceStatsTable_row(struct xmonSourceStatsTable_data *StorageTmp, struct xmonSourceStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonSourceStatsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7662,6 +7811,7 @@ update_xmonSourceStatsTable_row(struct xmonSourceStatsTable_data *StorageTmp, st
 void
 revert_xmonSourceStatsTable_row(struct xmonSourceStatsTable_data *StorageTmp, struct xmonSourceStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonSourceStatsTable_row(StorageOld, NULL);
 }
@@ -7809,6 +7959,8 @@ var_xmonSourceStatsTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_xmonSourceHistTable_row(struct xmonSourceHistTable_data *StorageTmp, struct xmonSourceHistTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7831,6 +7983,8 @@ check_xmonSourceHistTable_row(struct xmonSourceHistTable_data *StorageTmp, struc
 int
 update_xmonSourceHistTable_row(struct xmonSourceHistTable_data *StorageTmp, struct xmonSourceHistTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonSourceHistTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7845,6 +7999,7 @@ update_xmonSourceHistTable_row(struct xmonSourceHistTable_data *StorageTmp, stru
 void
 revert_xmonSourceHistTable_row(struct xmonSourceHistTable_data *StorageTmp, struct xmonSourceHistTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonSourceHistTable_row(StorageOld, NULL);
 }
@@ -7968,6 +8123,8 @@ var_xmonSourceHistTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_xmonSourceTotalTable_row(struct xmonSourceTotalTable_data *StorageTmp, struct xmonSourceTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7990,6 +8147,8 @@ check_xmonSourceTotalTable_row(struct xmonSourceTotalTable_data *StorageTmp, str
 int
 update_xmonSourceTotalTable_row(struct xmonSourceTotalTable_data *StorageTmp, struct xmonSourceTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonSourceTotalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8004,6 +8163,7 @@ update_xmonSourceTotalTable_row(struct xmonSourceTotalTable_data *StorageTmp, st
 void
 revert_xmonSourceTotalTable_row(struct xmonSourceTotalTable_data *StorageTmp, struct xmonSourceTotalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonSourceTotalTable_row(StorageOld, NULL);
 }
@@ -8133,6 +8293,8 @@ var_xmonSourceTotalTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp, struct xmonInterfaceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8155,6 +8317,8 @@ check_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp, struct 
 int
 update_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp, struct xmonInterfaceTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonInterfaceTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8169,6 +8333,7 @@ update_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp, struct
 void
 revert_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp, struct xmonInterfaceTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonInterfaceTable_row(StorageOld, NULL);
 }
@@ -8390,6 +8555,8 @@ var_xmonInterfaceTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 check_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp, struct xmonRmonTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8412,6 +8579,8 @@ check_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp, struct xmonRmonTa
 int
 update_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp, struct xmonRmonTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonRmonTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8426,6 +8595,7 @@ update_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp, struct xmonRmonT
 void
 revert_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp, struct xmonRmonTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonRmonTable_row(StorageOld, NULL);
 }
@@ -8588,6 +8758,8 @@ var_xmonRmonTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_xmonArchiveTable_row(struct xmonArchiveTable_data *StorageTmp, struct xmonArchiveTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8610,6 +8782,8 @@ check_xmonArchiveTable_row(struct xmonArchiveTable_data *StorageTmp, struct xmon
 int
 update_xmonArchiveTable_row(struct xmonArchiveTable_data *StorageTmp, struct xmonArchiveTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonArchiveTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8624,6 +8798,7 @@ update_xmonArchiveTable_row(struct xmonArchiveTable_data *StorageTmp, struct xmo
 void
 revert_xmonArchiveTable_row(struct xmonArchiveTable_data *StorageTmp, struct xmonArchiveTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonArchiveTable_row(StorageOld, NULL);
 }
@@ -8822,6 +8997,8 @@ var_xmonArchiveTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp, struct xmonFeedListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8844,6 +9021,8 @@ check_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp, struc
 int
 update_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp, struct xmonFeedListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonFeedListenTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8858,6 +9037,7 @@ update_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp, stru
 void
 revert_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp, struct xmonFeedListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonFeedListenTable_row(StorageOld, NULL);
 }
@@ -8972,6 +9152,8 @@ var_xmonFeedListenTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp, struct xmonFeedTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8994,6 +9176,8 @@ check_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp, struct xmonFeedTa
 int
 update_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp, struct xmonFeedTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonFeedTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9008,6 +9192,7 @@ update_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp, struct xmonFeedT
 void
 revert_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp, struct xmonFeedTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonFeedTable_row(StorageOld, NULL);
 }
@@ -9194,6 +9379,8 @@ var_xmonFeedTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_xmonFeedStatsTable_row(struct xmonFeedStatsTable_data *StorageTmp, struct xmonFeedStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9216,6 +9403,8 @@ check_xmonFeedStatsTable_row(struct xmonFeedStatsTable_data *StorageTmp, struct 
 int
 update_xmonFeedStatsTable_row(struct xmonFeedStatsTable_data *StorageTmp, struct xmonFeedStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonFeedStatsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9230,6 +9419,7 @@ update_xmonFeedStatsTable_row(struct xmonFeedStatsTable_data *StorageTmp, struct
 void
 revert_xmonFeedStatsTable_row(struct xmonFeedStatsTable_data *StorageTmp, struct xmonFeedStatsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonFeedStatsTable_row(StorageOld, NULL);
 }
@@ -9383,6 +9573,8 @@ var_xmonFeedStatsTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 check_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp, struct xmonPushListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9405,6 +9597,8 @@ check_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp, struc
 int
 update_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp, struct xmonPushListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonPushListenTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9419,6 +9613,7 @@ update_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp, stru
 void
 revert_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp, struct xmonPushListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonPushListenTable_row(StorageOld, NULL);
 }
@@ -9533,6 +9728,8 @@ var_xmonPushListenTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_xmonPushTable_row(struct xmonPushTable_data *StorageTmp, struct xmonPushTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9555,6 +9752,8 @@ check_xmonPushTable_row(struct xmonPushTable_data *StorageTmp, struct xmonPushTa
 int
 update_xmonPushTable_row(struct xmonPushTable_data *StorageTmp, struct xmonPushTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonPushTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9569,6 +9768,7 @@ update_xmonPushTable_row(struct xmonPushTable_data *StorageTmp, struct xmonPushT
 void
 revert_xmonPushTable_row(struct xmonPushTable_data *StorageTmp, struct xmonPushTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonPushTable_row(StorageOld, NULL);
 }
@@ -9755,6 +9955,8 @@ var_xmonPushTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp, struct xmonPullListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9777,6 +9979,8 @@ check_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp, struc
 int
 update_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp, struct xmonPullListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonPullListenTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9791,6 +9995,7 @@ update_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp, stru
 void
 revert_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp, struct xmonPullListenTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonPullListenTable_row(StorageOld, NULL);
 }
@@ -9905,6 +10110,8 @@ var_xmonPullListenTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_xmonPullTable_row(struct xmonPullTable_data *StorageTmp, struct xmonPullTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9927,6 +10134,8 @@ check_xmonPullTable_row(struct xmonPullTable_data *StorageTmp, struct xmonPullTa
 int
 update_xmonPullTable_row(struct xmonPullTable_data *StorageTmp, struct xmonPullTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonPullTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9941,6 +10150,7 @@ update_xmonPullTable_row(struct xmonPullTable_data *StorageTmp, struct xmonPullT
 void
 revert_xmonPullTable_row(struct xmonPullTable_data *StorageTmp, struct xmonPullTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonPullTable_row(StorageOld, NULL);
 }
@@ -10127,6 +10337,8 @@ var_xmonPullTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp, struct xmonUploadTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10149,6 +10361,8 @@ check_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp, struct xmonUp
 int
 update_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp, struct xmonUploadTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonUploadTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10163,6 +10377,7 @@ update_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp, struct xmonU
 void
 revert_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp, struct xmonUploadTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonUploadTable_row(StorageOld, NULL);
 }
@@ -10359,6 +10574,8 @@ var_xmonUploadTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp, struct xmonDownloadTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10381,6 +10598,8 @@ check_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp, struct xm
 int
 update_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp, struct xmonDownloadTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonDownloadTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10395,6 +10614,7 @@ update_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp, struct x
 void
 revert_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp, struct xmonDownloadTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonDownloadTable_row(StorageOld, NULL);
 }
@@ -10591,6 +10811,8 @@ var_xmonDownloadTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp, struct xmonSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10613,6 +10835,8 @@ check_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp, struct xmonSctpTa
 int
 update_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp, struct xmonSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	xmonSctpTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10627,6 +10851,7 @@ update_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp, struct xmonSctpT
 void
 revert_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp, struct xmonSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_xmonSctpTable_row(StorageOld, NULL);
 }
@@ -10833,6 +11058,10 @@ write_xmonSourceName(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSourceName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10846,7 +11075,7 @@ write_xmonSourceName(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonSourceName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -10939,6 +11168,10 @@ write_xmonSourceAdminState(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSourceAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11042,6 +11275,10 @@ write_xmonInterfaceLinkType(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceLinkType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11204,6 +11441,10 @@ write_xmonInterfaceSnapLen(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceSnapLen entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11311,6 +11552,10 @@ write_xmonInterfacePromiscuous(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfacePromiscuous entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11426,6 +11671,10 @@ write_xmonInterfaceMonitor(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceMonitor entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11541,6 +11790,10 @@ write_xmonInterfaceDirection(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceDirection entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11658,6 +11911,10 @@ write_xmonInterfaceTsRes(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceTsRes entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11779,6 +12036,10 @@ write_xmonInterfaceTzone(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceTzone entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11886,6 +12147,10 @@ write_xmonInterfaceFilterType(int action, u_char *var_val, u_char var_val_type, 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceFilterType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12013,6 +12278,10 @@ write_xmonInterfaceFilter(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceFilter entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12037,7 +12306,7 @@ write_xmonInterfaceFilter(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonInterfaceFilter: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -12133,6 +12402,10 @@ write_xmonInterfaceFilterBpf(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceFilterBpf entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12252,6 +12525,10 @@ write_xmonInterfaceOs(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceOs entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12276,7 +12553,7 @@ write_xmonInterfaceOs(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonInterfaceOs: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -12371,6 +12648,10 @@ write_xmonInterfaceFcsLen(int action, u_char *var_val, u_char var_val_type, size
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceFcsLen entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12477,6 +12758,10 @@ write_xmonInterfaceStorageType(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12595,6 +12880,10 @@ write_xmonRmonAddrType(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12724,6 +13013,10 @@ write_xmonRmonAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12748,7 +13041,7 @@ write_xmonRmonAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonRmonAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -12843,6 +13136,10 @@ write_xmonRmonSnmpVersion(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonSnmpVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12959,6 +13256,10 @@ write_xmonRmonCommunity(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonCommunity entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12983,7 +13284,7 @@ write_xmonRmonCommunity(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonRmonCommunity: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -13079,6 +13380,10 @@ write_xmonRmonUsername(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonUsername entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13103,7 +13408,7 @@ write_xmonRmonUsername(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonRmonUsername: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -13199,6 +13504,10 @@ write_xmonRmonPassword(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonPassword entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13223,7 +13532,7 @@ write_xmonRmonPassword(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonRmonPassword: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -13319,6 +13628,10 @@ write_xmonRmonBuffCtrlIndex(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonBuffCtrlIndex entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13430,6 +13743,10 @@ write_xmonRmonStorageType(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13548,6 +13865,10 @@ write_xmonArchiveName(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonArchiveName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13561,7 +13882,7 @@ write_xmonArchiveName(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonArchiveName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -13654,6 +13975,10 @@ write_xmonArchiveCompressed(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonArchiveCompressed entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13758,6 +14083,10 @@ write_xmonArchiveActionResult(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonArchiveActionResult entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13863,6 +14192,10 @@ write_xmonFeedListenAddrType(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedListenAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13992,6 +14325,10 @@ write_xmonFeedListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedListenAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14016,7 +14353,7 @@ write_xmonFeedListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonFeedListenAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -14111,6 +14448,10 @@ write_xmonFeedName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14135,7 +14476,7 @@ write_xmonFeedName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonFeedName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -14230,6 +14571,10 @@ write_xmonFeedAddrType(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14359,6 +14704,10 @@ write_xmonFeedAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14383,7 +14732,7 @@ write_xmonFeedAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonFeedAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -14478,6 +14827,10 @@ write_xmonFeedConnInterval(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedConnInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14590,6 +14943,10 @@ write_xmonFeedConnAttempts(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedConnAttempts entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14697,6 +15054,10 @@ write_xmonFeedProfile(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14817,6 +15178,10 @@ write_xmonFeedAdminState(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14933,6 +15298,10 @@ write_xmonFeedStorageType(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15051,6 +15420,10 @@ write_xmonPushListenAddrType(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushListenAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15180,6 +15553,10 @@ write_xmonPushListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushListenAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15204,7 +15581,7 @@ write_xmonPushListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPushListenAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -15299,6 +15676,10 @@ write_xmonPushName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15323,7 +15704,7 @@ write_xmonPushName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPushName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -15418,6 +15799,10 @@ write_xmonPushAddrType(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15548,6 +15933,10 @@ write_xmonPushAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15572,7 +15961,7 @@ write_xmonPushAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPushAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -15667,6 +16056,10 @@ write_xmonPushConnInterval(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushConnInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15779,6 +16172,10 @@ write_xmonPushConnAttempts(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushConnAttempts entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15886,6 +16283,10 @@ write_xmonPushProfile(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16006,6 +16407,10 @@ write_xmonPushAdminState(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16122,6 +16527,10 @@ write_xmonPushStorageType(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16240,6 +16649,10 @@ write_xmonPullListenAddrType(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullListenAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16369,6 +16782,10 @@ write_xmonPullListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullListenAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16393,7 +16810,7 @@ write_xmonPullListenAddr(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPullListenAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -16488,6 +16905,10 @@ write_xmonPullName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16512,7 +16933,7 @@ write_xmonPullName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPullName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -16607,6 +17028,10 @@ write_xmonPullAddrType(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullAddrType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16736,6 +17161,10 @@ write_xmonPullAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullAddr entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16760,7 +17189,7 @@ write_xmonPullAddr(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPullAddr: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -16855,6 +17284,10 @@ write_xmonPullConnInterval(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullConnInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16967,6 +17400,10 @@ write_xmonPullConnAttempts(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullConnAttempts entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17074,6 +17511,10 @@ write_xmonPullProfile(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17194,6 +17635,10 @@ write_xmonPullAdminState(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17310,6 +17755,10 @@ write_xmonPullStorageType(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17428,6 +17877,10 @@ write_xmonUploadSpec(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadSpec entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17452,7 +17905,7 @@ write_xmonUploadSpec(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonUploadSpec: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -17547,6 +18000,10 @@ write_xmonUploadUsername(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadUsername entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17571,7 +18028,7 @@ write_xmonUploadUsername(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonUploadUsername: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -17667,6 +18124,10 @@ write_xmonUploadPassword(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadPassword entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17691,7 +18152,7 @@ write_xmonUploadPassword(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonUploadPassword: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -17787,6 +18248,10 @@ write_xmonUploadPeriod(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadPeriod entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17899,6 +18364,10 @@ write_xmonUploadStartTime(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadStartTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18006,6 +18475,10 @@ write_xmonUploadStopTime(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadStopTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18113,6 +18586,10 @@ write_xmonUploadIntervalsOfDay(int action, u_char *var_val, u_char var_val_type,
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadIntervalsOfDay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18232,6 +18709,10 @@ write_xmonUploadWeekMask(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadWeekMask entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18351,6 +18832,10 @@ write_xmonUploadOnRotation(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadOnRotation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18465,6 +18950,10 @@ write_xmonUploadSelection(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadSelection entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18581,6 +19070,10 @@ write_xmonUploadAdminState(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18697,6 +19190,10 @@ write_xmonUploadStorageType(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18815,6 +19312,10 @@ write_xmonDownloadSpec(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadSpec entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18839,7 +19340,7 @@ write_xmonDownloadSpec(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonDownloadSpec: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -18934,6 +19435,10 @@ write_xmonDownloadUsername(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadUsername entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18958,7 +19463,7 @@ write_xmonDownloadUsername(int action, u_char *var_val, u_char var_val_type, siz
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonDownloadUsername: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -19054,6 +19559,10 @@ write_xmonDownloadPassword(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadPassword entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19078,7 +19587,7 @@ write_xmonDownloadPassword(int action, u_char *var_val, u_char var_val_type, siz
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonDownloadPassword: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -19174,6 +19683,10 @@ write_xmonDownloadPeriod(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadPeriod entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19286,6 +19799,10 @@ write_xmonDownloadStartTime(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadStartTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19393,6 +19910,10 @@ write_xmonDownloadStopTime(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadStopTime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19500,6 +20021,10 @@ write_xmonDownloadIntervalsOfDay(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadIntervalsOfDay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19619,6 +20144,10 @@ write_xmonDownloadWeekMask(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadWeekMask entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19738,6 +20267,10 @@ write_xmonDownloadOnRotation(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadOnRotation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19852,6 +20385,10 @@ write_xmonDownloadSelection(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadSelection entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19968,6 +20505,10 @@ write_xmonDownloadAdminState(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadAdminState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20084,6 +20625,10 @@ write_xmonDownloadStorageType(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadStorageType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20202,6 +20747,10 @@ write_xmonSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpNoDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20316,6 +20865,10 @@ write_xmonSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpMaxseg entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20422,6 +20975,10 @@ write_xmonSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpHeartbeatItvl entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20528,6 +21085,10 @@ write_xmonSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpHeartbeat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20642,6 +21203,10 @@ write_xmonSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, size_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpRtoInitial entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20748,6 +21313,10 @@ write_xmonSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpRtoMin entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20854,6 +21423,10 @@ write_xmonSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpRtoMax entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20960,6 +21533,10 @@ write_xmonSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpPathMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21066,6 +21643,10 @@ write_xmonSctpCookieLife(int action, u_char *var_val, u_char var_val_type, size_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpCookieLife entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21172,6 +21753,10 @@ write_xmonSctpCookieInc(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpCookieInc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21278,6 +21863,10 @@ write_xmonSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpMaxInitRetries entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21384,6 +21973,10 @@ write_xmonSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpMaxBurst entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21490,6 +22083,10 @@ write_xmonSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpAssocMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21597,6 +22194,10 @@ write_xmonSctpSackDelay(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpSackDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21704,6 +22305,10 @@ write_xmonSctpLifetime(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpLifetime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21809,6 +22414,10 @@ write_xmonProbeName(int action, u_char *var_val, u_char var_val_type, size_t var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonProbeName entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21819,7 +22428,7 @@ write_xmonProbeName(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonProbeName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -21911,6 +22520,10 @@ write_xmonProbeUuid(int action, u_char *var_val, u_char var_val_type, size_t var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonProbeUuid entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22013,6 +22626,10 @@ write_xmonProbeHardware(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonProbeHardware entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22023,7 +22640,7 @@ write_xmonProbeHardware(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonProbeHardware: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22115,6 +22732,10 @@ write_xmonProbeOs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonProbeOs entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22125,7 +22746,7 @@ write_xmonProbeOs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonProbeOs: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22217,6 +22838,10 @@ write_xmonBufferAdminState(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferAdminState entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22315,6 +22940,10 @@ write_xmonBufferFullAction(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferFullAction entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22413,6 +23042,10 @@ write_xmonBufferMaxSize(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferMaxSize entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22503,6 +23136,10 @@ write_xmonBufferMaxPackets(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferMaxPackets entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22592,6 +23229,10 @@ write_xmonBufferMaxTime(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferMaxTime entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22686,6 +23327,10 @@ write_xmonBufferAlarmThreshold(int action, u_char *var_val, u_char var_val_type,
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferAlarmThreshold entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22788,6 +23433,10 @@ write_xmonBufferReset(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferReset entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22885,6 +23534,10 @@ write_xmonBufferActionResult(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonBufferActionResult entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22983,6 +23636,10 @@ write_xmonCapturePath(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCapturePath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22993,7 +23650,7 @@ write_xmonCapturePath(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCapturePath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -23086,6 +23743,10 @@ write_xmonCaptureFilename(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureFilename entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23096,7 +23757,7 @@ write_xmonCaptureFilename(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCaptureFilename: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -23189,6 +23850,10 @@ write_xmonCaptureAdminState(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureAdminState entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23287,6 +23952,10 @@ write_xmonCaptureFullAction(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureFullAction entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23385,6 +24054,10 @@ write_xmonCaptureMaxSize(int action, u_char *var_val, u_char var_val_type, size_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureMaxSize entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23475,6 +24148,10 @@ write_xmonCaptureMaxPackets(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureMaxPackets entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23564,6 +24241,10 @@ write_xmonCaptureMaxTime(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureMaxTime entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23658,6 +24339,10 @@ write_xmonCaptureAlarmThreshold(int action, u_char *var_val, u_char var_val_type
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCaptureAlarmThreshold entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23760,6 +24445,10 @@ write_xmonArchivePath(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonArchivePath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23770,7 +24459,7 @@ write_xmonArchivePath(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonArchivePath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -23863,6 +24552,10 @@ write_xmonFeedTypes(int action, u_char *var_val, u_char var_val_type, size_t var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedTypes entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23973,6 +24666,10 @@ write_xmonFeedPort(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedPort entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24068,6 +24765,10 @@ write_xmonPushPort(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushPort entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24163,6 +24864,10 @@ write_xmonPullPort(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullPort entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24257,6 +24962,10 @@ write_xmonPullSpoolPath(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullSpoolPath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24267,7 +24976,7 @@ write_xmonPullSpoolPath(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPullSpoolPath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -24360,6 +25069,10 @@ write_xmonPullArchivePath(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullArchivePath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24370,7 +25083,7 @@ write_xmonPullArchivePath(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonPullArchivePath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -24463,6 +25176,10 @@ write_xmonCollectorExtensions(int action, u_char *var_val, u_char var_val_type, 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorExtensions entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24572,6 +25289,10 @@ write_xmonCollectorAdminState(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorAdminState entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24671,6 +25392,10 @@ write_xmonCollectorFullAction(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorFullAction entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24768,6 +25493,10 @@ write_xmonCollectorAlarmThreshold(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorAlarmThreshold entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24870,6 +25599,10 @@ write_xmonCollectorCachePath(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorCachePath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24880,7 +25613,7 @@ write_xmonCollectorCachePath(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCollectorCachePath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -24973,6 +25706,10 @@ write_xmonCollectorSpoolPath(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorSpoolPath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24983,7 +25720,7 @@ write_xmonCollectorSpoolPath(int action, u_char *var_val, u_char var_val_type, s
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCollectorSpoolPath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -25076,6 +25813,10 @@ write_xmonCollectorArchivePath(int action, u_char *var_val, u_char var_val_type,
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorArchivePath entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25086,7 +25827,7 @@ write_xmonCollectorArchivePath(int action, u_char *var_val, u_char var_val_type,
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..127 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 127))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 127))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCollectorArchivePath: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -25179,6 +25920,10 @@ write_xmonCollectorArchiveSubdirs(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorArchiveSubdirs entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25289,6 +26034,10 @@ write_xmonCollectorCompression(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorCompression entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25390,6 +26139,10 @@ write_xmonCollectorFileSystemAlloc(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorFileSystemAlloc entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25405,7 +26158,7 @@ write_xmonCollectorFileSystemAlloc(int action, u_char *var_val, u_char var_val_t
 		}
 		/* Note: default value 90 */
 		/* Note: ranges 0..100 */
-		if ((0 > set_value || set_value > 100)) {
+		if ((set_value > 100)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCollectorFileSystemAlloc: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -25485,6 +26238,10 @@ write_xmonCollectorMaxDiskUsage(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorMaxDiskUsage entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25500,7 +26257,7 @@ write_xmonCollectorMaxDiskUsage(int action, u_char *var_val, u_char var_val_type
 		}
 		/* Note: default value 80 */
 		/* Note: ranges 0..100 */
-		if ((0 > set_value || set_value > 100)) {
+		if ((set_value > 100)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to xmonCollectorMaxDiskUsage: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -25580,6 +26337,10 @@ write_xmonCollectorDiscardPolicy(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonCollectorDiscardPolicy entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25679,6 +26440,10 @@ write_xmonSctpDefaultNoDelay(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultNoDelay entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25777,6 +26542,10 @@ write_xmonSctpDefaultMaxseg(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultMaxseg entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25867,6 +26636,10 @@ write_xmonSctpDefaultHeartbeatItvl(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultHeartbeatItvl entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25957,6 +26730,10 @@ write_xmonSctpDefaultHeartbeat(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultHeartbeat entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26055,6 +26832,10 @@ write_xmonSctpDefaultRtoInitial(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultRtoInitial entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26145,6 +26926,10 @@ write_xmonSctpDefaultRtoMin(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultRtoMin entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26235,6 +27020,10 @@ write_xmonSctpDefaultRtoMax(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultRtoMax entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26325,6 +27114,10 @@ write_xmonSctpDefaultPathMaxRetrans(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultPathMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26415,6 +27208,10 @@ write_xmonSctpDefaultCookieLife(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultCookieLife entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26505,6 +27302,10 @@ write_xmonSctpDefaultCookieInc(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultCookieInc entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26595,6 +27396,10 @@ write_xmonSctpDefaultMaxInitRetries(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultMaxInitRetries entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26685,6 +27490,10 @@ write_xmonSctpDefaultMaxBurst(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultMaxBurst entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26775,6 +27584,10 @@ write_xmonSctpDefaultAssocMaxRetrans(int action, u_char *var_val, u_char var_val
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultAssocMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26865,6 +27678,10 @@ write_xmonSctpDefaultSackDelay(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultSackDelay entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26955,6 +27772,10 @@ write_xmonSctpDefaultLifetime(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpDefaultLifetime entering action=%d...  \n", action));
 	if ((StorageTmp = xmonMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27040,6 +27861,7 @@ write_xmonSctpDefaultLifetime(int action, u_char *var_val, u_char var_val_type, 
 int
 can_act_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27057,6 +27879,7 @@ can_act_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 int
 can_deact_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27074,6 +27897,7 @@ can_deact_xmonInterfaceTable_row(struct xmonInterfaceTable_data *StorageTmp)
 int
 can_act_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27091,6 +27915,7 @@ can_act_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 int
 can_deact_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27108,6 +27933,7 @@ can_deact_xmonRmonTable_row(struct xmonRmonTable_data *StorageTmp)
 int
 can_act_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27125,6 +27951,7 @@ can_act_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 int
 can_deact_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27142,6 +27969,7 @@ can_deact_xmonFeedListenTable_row(struct xmonFeedListenTable_data *StorageTmp)
 int
 can_act_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27159,6 +27987,7 @@ can_act_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 int
 can_deact_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27176,6 +28005,7 @@ can_deact_xmonFeedTable_row(struct xmonFeedTable_data *StorageTmp)
 int
 can_act_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27193,6 +28023,7 @@ can_act_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 int
 can_deact_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27210,6 +28041,7 @@ can_deact_xmonPushListenTable_row(struct xmonPushListenTable_data *StorageTmp)
 int
 can_act_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27227,6 +28059,7 @@ can_act_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 int
 can_deact_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27244,6 +28077,7 @@ can_deact_xmonPushTable_row(struct xmonPushTable_data *StorageTmp)
 int
 can_act_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27261,6 +28095,7 @@ can_act_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 int
 can_deact_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27278,6 +28113,7 @@ can_deact_xmonPullListenTable_row(struct xmonPullListenTable_data *StorageTmp)
 int
 can_act_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27295,6 +28131,7 @@ can_act_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 int
 can_deact_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27312,6 +28149,7 @@ can_deact_xmonPullTable_row(struct xmonPullTable_data *StorageTmp)
 int
 can_act_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27329,6 +28167,7 @@ can_act_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 int
 can_deact_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27346,6 +28185,7 @@ can_deact_xmonUploadTable_row(struct xmonUploadTable_data *StorageTmp)
 int
 can_act_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27363,6 +28203,7 @@ can_act_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 int
 can_deact_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27380,6 +28221,7 @@ can_deact_xmonDownloadTable_row(struct xmonDownloadTable_data *StorageTmp)
 int
 can_act_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27397,6 +28239,7 @@ can_act_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 int
 can_deact_xmonSctpTable_row(struct xmonSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -27421,6 +28264,10 @@ write_xmonInterfaceRowStatus(int action, u_char *var_val, u_char var_val_type, s
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonInterfaceRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonInterfaceTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -27692,6 +28539,10 @@ write_xmonRmonRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonRmonRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonRmonTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -27963,6 +28814,10 @@ write_xmonFeedListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedListenRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonFeedListenTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28228,6 +29083,10 @@ write_xmonFeedRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonFeedRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonFeedTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28493,6 +29352,10 @@ write_xmonPushListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushListenRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonPushListenTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28758,6 +29621,10 @@ write_xmonPushRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPushRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonPushTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -29023,6 +29890,10 @@ write_xmonPullListenRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullListenRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonPullListenTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -29288,6 +30159,10 @@ write_xmonPullRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonPullRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonPullTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -29553,6 +30428,10 @@ write_xmonUploadRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonUploadRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonUploadTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -29818,6 +30697,10 @@ write_xmonDownloadRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonDownloadRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonDownloadTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -30083,6 +30966,10 @@ write_xmonSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("xmonMIB", "write_xmonSctpRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(xmonSctpTableStorage, NULL, &name[14], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -30382,6 +31269,8 @@ xmonMIB_loop_handler(int sig)
 void
 xmonMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("xmonMIB", "xmonMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("xmonMIB", "done.\n"));

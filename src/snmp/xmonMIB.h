@@ -67,7 +67,7 @@ struct xmonMIB_data {
 	uint xmonMIB_rsvs;
 	uint xmonMIB_tsts;
 	uint xmonMIB_sets;
-	uint xmonMIB_request;
+	int xmonMIB_request;
 	uint8_t *xmonProbeName;		/* ReadWrite */
 	size_t xmonProbeNameLen;
 	uint8_t *xmonProbeUuid;		/* ReadWrite */
@@ -186,7 +186,7 @@ struct xmonSourceTable_data {
 	uint xmonSourceTable_rsvs;
 	uint xmonSourceTable_tsts;
 	uint xmonSourceTable_sets;
-	uint xmonSourceTable_request;
+	int xmonSourceTable_request;
 	uint xmonSourceTable_refs;
 	uint xmonSourceTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -207,7 +207,7 @@ struct xmonSourceStatsTable_data {
 	uint xmonSourceStatsTable_rsvs;
 	uint xmonSourceStatsTable_tsts;
 	uint xmonSourceStatsTable_sets;
-	uint xmonSourceStatsTable_request;
+	int xmonSourceStatsTable_request;
 	uint xmonSourceStatsTable_refs;
 	uint xmonSourceStatsTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -226,7 +226,7 @@ struct xmonSourceHistTable_data {
 	uint xmonSourceHistTable_rsvs;
 	uint xmonSourceHistTable_tsts;
 	uint xmonSourceHistTable_sets;
-	uint xmonSourceHistTable_request;
+	int xmonSourceHistTable_request;
 	uint xmonSourceHistTable_refs;
 	uint xmonSourceHistTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -242,7 +242,7 @@ struct xmonSourceTotalTable_data {
 	uint xmonSourceTotalTable_rsvs;
 	uint xmonSourceTotalTable_tsts;
 	uint xmonSourceTotalTable_sets;
-	uint xmonSourceTotalTable_request;
+	int xmonSourceTotalTable_request;
 	uint xmonSourceTotalTable_refs;
 	uint xmonSourceTotalTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -258,7 +258,7 @@ struct xmonInterfaceTable_data {
 	uint xmonInterfaceTable_rsvs;
 	uint xmonInterfaceTable_tsts;
 	uint xmonInterfaceTable_sets;
-	uint xmonInterfaceTable_request;
+	int xmonInterfaceTable_request;
 	uint xmonInterfaceTable_refs;
 	uint xmonInterfaceTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -293,7 +293,7 @@ struct xmonRmonTable_data {
 	uint xmonRmonTable_rsvs;
 	uint xmonRmonTable_tsts;
 	uint xmonRmonTable_sets;
-	uint xmonRmonTable_request;
+	int xmonRmonTable_request;
 	uint xmonRmonTable_refs;
 	uint xmonRmonTable_id;
 	long xmonSourceIndex;		/* NoAccess */
@@ -318,7 +318,7 @@ struct xmonArchiveTable_data {
 	uint xmonArchiveTable_rsvs;
 	uint xmonArchiveTable_tsts;
 	uint xmonArchiveTable_sets;
-	uint xmonArchiveTable_request;
+	int xmonArchiveTable_request;
 	uint xmonArchiveTable_refs;
 	uint xmonArchiveTable_id;
 	ulong xmonArchiveIndex;		/* NoAccess */
@@ -346,7 +346,7 @@ struct xmonFeedListenTable_data {
 	uint xmonFeedListenTable_rsvs;
 	uint xmonFeedListenTable_tsts;
 	uint xmonFeedListenTable_sets;
-	uint xmonFeedListenTable_request;
+	int xmonFeedListenTable_request;
 	uint xmonFeedListenTable_refs;
 	uint xmonFeedListenTable_id;
 	ulong xmonFeedListenIndex;	/* NoAccess */
@@ -360,7 +360,7 @@ struct xmonFeedTable_data {
 	uint xmonFeedTable_rsvs;
 	uint xmonFeedTable_tsts;
 	uint xmonFeedTable_sets;
-	uint xmonFeedTable_request;
+	int xmonFeedTable_request;
 	uint xmonFeedTable_refs;
 	uint xmonFeedTable_id;
 	ulong xmonFeedIndex;		/* NoAccess */
@@ -388,7 +388,7 @@ struct xmonFeedStatsTable_data {
 	uint xmonFeedStatsTable_rsvs;
 	uint xmonFeedStatsTable_tsts;
 	uint xmonFeedStatsTable_sets;
-	uint xmonFeedStatsTable_request;
+	int xmonFeedStatsTable_request;
 	uint xmonFeedStatsTable_refs;
 	uint xmonFeedStatsTable_id;
 	ulong xmonFeedIndex;		/* NoAccess */
@@ -409,7 +409,7 @@ struct xmonPushListenTable_data {
 	uint xmonPushListenTable_rsvs;
 	uint xmonPushListenTable_tsts;
 	uint xmonPushListenTable_sets;
-	uint xmonPushListenTable_request;
+	int xmonPushListenTable_request;
 	uint xmonPushListenTable_refs;
 	uint xmonPushListenTable_id;
 	ulong xmonPushListenIndex;	/* NoAccess */
@@ -423,7 +423,7 @@ struct xmonPushTable_data {
 	uint xmonPushTable_rsvs;
 	uint xmonPushTable_tsts;
 	uint xmonPushTable_sets;
-	uint xmonPushTable_request;
+	int xmonPushTable_request;
 	uint xmonPushTable_refs;
 	uint xmonPushTable_id;
 	ulong xmonPushIndex;		/* NoAccess */
@@ -451,7 +451,7 @@ struct xmonPullListenTable_data {
 	uint xmonPullListenTable_rsvs;
 	uint xmonPullListenTable_tsts;
 	uint xmonPullListenTable_sets;
-	uint xmonPullListenTable_request;
+	int xmonPullListenTable_request;
 	uint xmonPullListenTable_refs;
 	uint xmonPullListenTable_id;
 	ulong xmonPullListenIndex;	/* NoAccess */
@@ -465,7 +465,7 @@ struct xmonPullTable_data {
 	uint xmonPullTable_rsvs;
 	uint xmonPullTable_tsts;
 	uint xmonPullTable_sets;
-	uint xmonPullTable_request;
+	int xmonPullTable_request;
 	uint xmonPullTable_refs;
 	uint xmonPullTable_id;
 	ulong xmonPullIndex;		/* NoAccess */
@@ -493,7 +493,7 @@ struct xmonUploadTable_data {
 	uint xmonUploadTable_rsvs;
 	uint xmonUploadTable_tsts;
 	uint xmonUploadTable_sets;
-	uint xmonUploadTable_request;
+	int xmonUploadTable_request;
 	uint xmonUploadTable_refs;
 	uint xmonUploadTable_id;
 	ulong xmonUploadIndex;		/* NoAccess */
@@ -524,7 +524,7 @@ struct xmonDownloadTable_data {
 	uint xmonDownloadTable_rsvs;
 	uint xmonDownloadTable_tsts;
 	uint xmonDownloadTable_sets;
-	uint xmonDownloadTable_request;
+	int xmonDownloadTable_request;
 	uint xmonDownloadTable_refs;
 	uint xmonDownloadTable_id;
 	ulong xmonDownloadIndex;	/* NoAccess */
@@ -555,7 +555,7 @@ struct xmonSctpTable_data {
 	uint xmonSctpTable_rsvs;
 	uint xmonSctpTable_tsts;
 	uint xmonSctpTable_sets;
-	uint xmonSctpTable_request;
+	int xmonSctpTable_request;
 	uint xmonSctpTable_refs;
 	uint xmonSctpTable_id;
 	uint8_t *xmonSctpProfileName;	/* NoAccess */
