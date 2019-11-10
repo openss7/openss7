@@ -67,14 +67,14 @@ struct ss7MIB_data {
 	uint ss7MIB_rsvs;
 	uint ss7MIB_tsts;
 	uint ss7MIB_sets;
-	uint ss7MIB_request;
+	int ss7MIB_request;
 };
 struct ss7NetworkTable_data {
 	struct ss7NetworkTable_data *ss7NetworkTable_old;
 	uint ss7NetworkTable_rsvs;
 	uint ss7NetworkTable_tsts;
 	uint ss7NetworkTable_sets;
-	uint ss7NetworkTable_request;
+	int ss7NetworkTable_request;
 	uint ss7NetworkTable_refs;
 	uint ss7NetworkTable_id;
 	long ss7NetworkId;		/* NoAccess */

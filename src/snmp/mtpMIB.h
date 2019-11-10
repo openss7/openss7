@@ -67,7 +67,7 @@ struct mtpMIB_data {
 	uint mtpMIB_rsvs;
 	uint mtpMIB_tsts;
 	uint mtpMIB_sets;
-	uint mtpMIB_request;
+	int mtpMIB_request;
 	long mtpDefaultSctpNoDelay;	/* ReadWrite */
 	ulong mtpDefaultSctpMaxseg;	/* ReadWrite */
 	ulong mtpDefaultSctpHeartbeatItvl;	/* ReadWrite */
@@ -89,7 +89,7 @@ struct mtpSapTable_data {
 	uint mtpSapTable_rsvs;
 	uint mtpSapTable_tsts;
 	uint mtpSapTable_sets;
-	uint mtpSapTable_request;
+	int mtpSapTable_request;
 	uint mtpSapTable_refs;
 	uint mtpSapTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -116,7 +116,7 @@ struct mtpNaTable_data {
 	uint mtpNaTable_rsvs;
 	uint mtpNaTable_tsts;
 	uint mtpNaTable_sets;
-	uint mtpNaTable_request;
+	int mtpNaTable_request;
 	uint mtpNaTable_refs;
 	uint mtpNaTable_id;
 	long mtpNaId;			/* NoAccess */
@@ -140,7 +140,7 @@ struct mtpMsTable_data {
 	uint mtpMsTable_rsvs;
 	uint mtpMsTable_tsts;
 	uint mtpMsTable_sets;
-	uint mtpMsTable_request;
+	int mtpMsTable_request;
 	uint mtpMsTable_refs;
 	uint mtpMsTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -171,7 +171,7 @@ struct mtpSpProfileTable_data {
 	uint mtpSpProfileTable_rsvs;
 	uint mtpSpProfileTable_tsts;
 	uint mtpSpProfileTable_sets;
-	uint mtpSpProfileTable_request;
+	int mtpSpProfileTable_request;
 	uint mtpSpProfileTable_refs;
 	uint mtpSpProfileTable_id;
 	uint8_t *mtpSpProfileId;	/* NoAccess */
@@ -216,7 +216,7 @@ struct mtpSpTable_data {
 	uint mtpSpTable_rsvs;
 	uint mtpSpTable_tsts;
 	uint mtpSpTable_sets;
-	uint mtpSpTable_request;
+	int mtpSpTable_request;
 	uint mtpSpTable_refs;
 	uint mtpSpTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -251,7 +251,7 @@ struct mtpL3Table_data {
 	uint mtpL3Table_rsvs;
 	uint mtpL3Table_tsts;
 	uint mtpL3Table_sets;
-	uint mtpL3Table_request;
+	int mtpL3Table_request;
 	uint mtpL3Table_refs;
 	uint mtpL3Table_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -273,7 +273,7 @@ struct mtpGsTable_data {
 	uint mtpGsTable_rsvs;
 	uint mtpGsTable_tsts;
 	uint mtpGsTable_sets;
-	uint mtpGsTable_request;
+	int mtpGsTable_request;
 	uint mtpGsTable_refs;
 	uint mtpGsTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -293,7 +293,7 @@ struct mtpGsLineTable_data {
 	uint mtpGsLineTable_rsvs;
 	uint mtpGsLineTable_tsts;
 	uint mtpGsLineTable_sets;
-	uint mtpGsLineTable_request;
+	int mtpGsLineTable_request;
 	uint mtpGsLineTable_refs;
 	uint mtpGsLineTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -310,7 +310,7 @@ struct mtpGsLineContentTable_data {
 	uint mtpGsLineContentTable_rsvs;
 	uint mtpGsLineContentTable_tsts;
 	uint mtpGsLineContentTable_sets;
-	uint mtpGsLineContentTable_request;
+	int mtpGsLineContentTable_request;
 	uint mtpGsLineContentTable_refs;
 	uint mtpGsLineContentTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -334,7 +334,7 @@ struct mtpRsProfileTable_data {
 	uint mtpRsProfileTable_rsvs;
 	uint mtpRsProfileTable_tsts;
 	uint mtpRsProfileTable_sets;
-	uint mtpRsProfileTable_request;
+	int mtpRsProfileTable_request;
 	uint mtpRsProfileTable_refs;
 	uint mtpRsProfileTable_id;
 	uint8_t *mtpRsProfileId;	/* NoAccess */
@@ -355,7 +355,7 @@ struct mtpRsTable_data {
 	uint mtpRsTable_rsvs;
 	uint mtpRsTable_tsts;
 	uint mtpRsTable_sets;
-	uint mtpRsTable_request;
+	int mtpRsTable_request;
 	uint mtpRsTable_refs;
 	uint mtpRsTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -390,7 +390,7 @@ struct mtpRtProfileTable_data {
 	uint mtpRtProfileTable_rsvs;
 	uint mtpRtProfileTable_tsts;
 	uint mtpRtProfileTable_sets;
-	uint mtpRtProfileTable_request;
+	int mtpRtProfileTable_request;
 	uint mtpRtProfileTable_refs;
 	uint mtpRtProfileTable_id;
 	uint8_t *mtpRtProfileId;	/* NoAccess */
@@ -404,7 +404,7 @@ struct mtpRtTable_data {
 	uint mtpRtTable_rsvs;
 	uint mtpRtTable_tsts;
 	uint mtpRtTable_sets;
-	uint mtpRtTable_request;
+	int mtpRtTable_request;
 	uint mtpRtTable_refs;
 	uint mtpRtTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -440,7 +440,7 @@ struct mtpRtLsaTable_data {
 	uint mtpRtLsaTable_rsvs;
 	uint mtpRtLsaTable_tsts;
 	uint mtpRtLsaTable_sets;
-	uint mtpRtLsaTable_request;
+	int mtpRtLsaTable_request;
 	uint mtpRtLsaTable_refs;
 	uint mtpRtLsaTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -457,7 +457,7 @@ struct mtpLsProfileTable_data {
 	uint mtpLsProfileTable_rsvs;
 	uint mtpLsProfileTable_tsts;
 	uint mtpLsProfileTable_sets;
-	uint mtpLsProfileTable_request;
+	int mtpLsProfileTable_request;
 	uint mtpLsProfileTable_refs;
 	uint mtpLsProfileTable_id;
 	uint8_t *mtpLsProfileId;	/* NoAccess */
@@ -485,7 +485,7 @@ struct mtpLsTable_data {
 	uint mtpLsTable_rsvs;
 	uint mtpLsTable_tsts;
 	uint mtpLsTable_sets;
-	uint mtpLsTable_request;
+	int mtpLsTable_request;
 	uint mtpLsTable_refs;
 	uint mtpLsTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -523,7 +523,7 @@ struct mtpSlL3ProfileTable_data {
 	uint mtpSlL3ProfileTable_rsvs;
 	uint mtpSlL3ProfileTable_tsts;
 	uint mtpSlL3ProfileTable_sets;
-	uint mtpSlL3ProfileTable_request;
+	int mtpSlL3ProfileTable_request;
 	uint mtpSlL3ProfileTable_refs;
 	uint mtpSlL3ProfileTable_id;
 	uint8_t *mtpSlL3ProfileId;	/* NoAccess */
@@ -561,7 +561,7 @@ struct mtpSlL2ProfileTable_data {
 	uint mtpSlL2ProfileTable_rsvs;
 	uint mtpSlL2ProfileTable_tsts;
 	uint mtpSlL2ProfileTable_sets;
-	uint mtpSlL2ProfileTable_request;
+	int mtpSlL2ProfileTable_request;
 	uint mtpSlL2ProfileTable_refs;
 	uint mtpSlL2ProfileTable_id;
 	uint8_t *mtpSlL2ProfileId;	/* NoAccess */
@@ -612,7 +612,7 @@ struct mtpSlTable_data {
 	uint mtpSlTable_rsvs;
 	uint mtpSlTable_tsts;
 	uint mtpSlTable_sets;
-	uint mtpSlTable_request;
+	int mtpSlTable_request;
 	uint mtpSlTable_refs;
 	uint mtpSlTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -662,7 +662,7 @@ struct mtpSlSdlListTable_data {
 	uint mtpSlSdlListTable_rsvs;
 	uint mtpSlSdlListTable_tsts;
 	uint mtpSlSdlListTable_sets;
-	uint mtpSlSdlListTable_request;
+	int mtpSlSdlListTable_request;
 	uint mtpSlSdlListTable_refs;
 	uint mtpSlSdlListTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -679,7 +679,7 @@ struct mtpSlSdtListTable_data {
 	uint mtpSlSdtListTable_rsvs;
 	uint mtpSlSdtListTable_tsts;
 	uint mtpSlSdtListTable_sets;
-	uint mtpSlSdtListTable_request;
+	int mtpSlSdtListTable_request;
 	uint mtpSlSdtListTable_refs;
 	uint mtpSlSdtListTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -696,7 +696,7 @@ struct mtpNbTable_data {
 	uint mtpNbTable_rsvs;
 	uint mtpNbTable_tsts;
 	uint mtpNbTable_sets;
-	uint mtpNbTable_request;
+	int mtpNbTable_request;
 	uint mtpNbTable_refs;
 	uint mtpNbTable_id;
 	uint8_t *mtpSdtProfileId;	/* NoAccess */
@@ -721,7 +721,7 @@ struct mtpSaalTable_data {
 	uint mtpSaalTable_rsvs;
 	uint mtpSaalTable_tsts;
 	uint mtpSaalTable_sets;
-	uint mtpSaalTable_request;
+	int mtpSaalTable_request;
 	uint mtpSaalTable_refs;
 	uint mtpSaalTable_id;
 	uint8_t *mtpSdtProfileId;	/* NoAccess */
@@ -758,7 +758,7 @@ struct mtpM2paTable_data {
 	uint mtpM2paTable_rsvs;
 	uint mtpM2paTable_tsts;
 	uint mtpM2paTable_sets;
-	uint mtpM2paTable_request;
+	int mtpM2paTable_request;
 	uint mtpM2paTable_refs;
 	uint mtpM2paTable_id;
 	uint8_t *mtpSdtProfileId;	/* NoAccess */
@@ -793,7 +793,7 @@ struct mtpSdtTable_data {
 	uint mtpSdtTable_rsvs;
 	uint mtpSdtTable_tsts;
 	uint mtpSdtTable_sets;
-	uint mtpSdtTable_request;
+	int mtpSdtTable_request;
 	uint mtpSdtTable_refs;
 	uint mtpSdtTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -821,7 +821,7 @@ struct mtpSdlTable_data {
 	uint mtpSdlTable_rsvs;
 	uint mtpSdlTable_tsts;
 	uint mtpSdlTable_sets;
-	uint mtpSdlTable_request;
+	int mtpSdlTable_request;
 	uint mtpSdlTable_refs;
 	uint mtpSdlTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -852,7 +852,7 @@ struct mtpSctpProfileTable_data {
 	uint mtpSctpProfileTable_rsvs;
 	uint mtpSctpProfileTable_tsts;
 	uint mtpSctpProfileTable_sets;
-	uint mtpSctpProfileTable_request;
+	int mtpSctpProfileTable_request;
 	uint mtpSctpProfileTable_refs;
 	uint mtpSctpProfileTable_id;
 	uint8_t *mtpSctpProfileId;	/* NoAccess */
@@ -881,7 +881,7 @@ struct mtpSctpTable_data {
 	uint mtpSctpTable_rsvs;
 	uint mtpSctpTable_tsts;
 	uint mtpSctpTable_sets;
-	uint mtpSctpTable_request;
+	int mtpSctpTable_request;
 	uint mtpSctpTable_refs;
 	uint mtpSctpTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -902,7 +902,7 @@ struct mtpSctpLocalTable_data {
 	uint mtpSctpLocalTable_rsvs;
 	uint mtpSctpLocalTable_tsts;
 	uint mtpSctpLocalTable_sets;
-	uint mtpSctpLocalTable_request;
+	int mtpSctpLocalTable_request;
 	uint mtpSctpLocalTable_refs;
 	uint mtpSctpLocalTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -916,7 +916,7 @@ struct mtpSctpRemoteTable_data {
 	uint mtpSctpRemoteTable_rsvs;
 	uint mtpSctpRemoteTable_tsts;
 	uint mtpSctpRemoteTable_sets;
-	uint mtpSctpRemoteTable_request;
+	int mtpSctpRemoteTable_request;
 	uint mtpSctpRemoteTable_refs;
 	uint mtpSctpRemoteTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -930,7 +930,7 @@ struct mtpM2uaAspTable_data {
 	uint mtpM2uaAspTable_rsvs;
 	uint mtpM2uaAspTable_tsts;
 	uint mtpM2uaAspTable_sets;
-	uint mtpM2uaAspTable_request;
+	int mtpM2uaAspTable_request;
 	uint mtpM2uaAspTable_refs;
 	uint mtpM2uaAspTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -953,7 +953,7 @@ struct mtpM2uaAsTable_data {
 	uint mtpM2uaAsTable_rsvs;
 	uint mtpM2uaAsTable_tsts;
 	uint mtpM2uaAsTable_sets;
-	uint mtpM2uaAsTable_request;
+	int mtpM2uaAsTable_request;
 	uint mtpM2uaAsTable_refs;
 	uint mtpM2uaAsTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -973,7 +973,7 @@ struct mtpM3uaAspTable_data {
 	uint mtpM3uaAspTable_rsvs;
 	uint mtpM3uaAspTable_tsts;
 	uint mtpM3uaAspTable_sets;
-	uint mtpM3uaAspTable_request;
+	int mtpM3uaAspTable_request;
 	uint mtpM3uaAspTable_refs;
 	uint mtpM3uaAspTable_id;
 	ulong mtpSctpId;		/* NoAccess */
@@ -997,7 +997,7 @@ struct mtpM3uaAsTable_data {
 	uint mtpM3uaAsTable_rsvs;
 	uint mtpM3uaAsTable_tsts;
 	uint mtpM3uaAsTable_sets;
-	uint mtpM3uaAsTable_request;
+	int mtpM3uaAsTable_request;
 	uint mtpM3uaAsTable_refs;
 	uint mtpM3uaAsTable_id;
 	ulong mtpSctpId;		/* NoAccess */

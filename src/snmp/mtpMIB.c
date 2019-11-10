@@ -1523,6 +1523,10 @@ deinit_mtpMIB(void)
 int
 term_mtpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "term_mtpMIB: terminating...  "));
 	deinit_mtpMIB();
 	DEBUGMSGTL(("mtpMIB", "done.\n"));
@@ -1583,6 +1587,7 @@ mtpMIB_duplicate(struct mtpMIB_data *thedata)
 {
 	struct mtpMIB_data *StorageNew = SNMP_MALLOC_STRUCT(mtpMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("mtpMIB", "mtpMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 		StorageNew->mtpDefaultSctpNoDelay = thedata->mtpDefaultSctpNoDelay;
@@ -1667,6 +1672,8 @@ mtpMIB_add(struct mtpMIB_data *thedata)
 void
 parse_mtpMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct mtpMIB_data *StorageTmp = mtpMIB_create();
 
@@ -1707,6 +1714,10 @@ store_mtpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct mtpMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpMIB: storing data...  "));
 	refresh_mtpMIB(1);
 	if ((StorageTmp = mtpMIBStorage) == NULL) {
@@ -1758,6 +1769,8 @@ store_mtpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_mtpMIB(struct mtpMIB_data *StorageTmp, struct mtpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1779,6 +1792,8 @@ check_mtpMIB(struct mtpMIB_data *StorageTmp, struct mtpMIB_data *StorageOld)
 int
 update_mtpMIB(struct mtpMIB_data *StorageTmp, struct mtpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1794,6 +1809,7 @@ update_mtpMIB(struct mtpMIB_data *StorageTmp, struct mtpMIB_data *StorageOld)
 void
 revert_mtpMIB(struct mtpMIB_data *StorageTmp, struct mtpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpMIB(StorageOld, NULL);
 }
@@ -2193,6 +2209,8 @@ parse_mtpSapTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSapTable_data *StorageTmp = mtpSapTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSapTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2255,6 +2273,10 @@ store_mtpSapTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSapTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSapTable: storing data...  "));
 	refresh_mtpSapTable(1);
 	(void) tmpsize;
@@ -2495,6 +2517,8 @@ parse_mtpNaTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpNaTable_data *StorageTmp = mtpNaTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpNaTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2554,6 +2578,10 @@ store_mtpNaTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpNaTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpNaTable: storing data...  "));
 	refresh_mtpNaTable(1);
 	(void) tmpsize;
@@ -2833,6 +2861,8 @@ parse_mtpMsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpMsTable_data *StorageTmp = mtpMsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpMsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2915,6 +2945,10 @@ store_mtpMsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpMsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpMsTable: storing data...  "));
 	refresh_mtpMsTable(1);
 	(void) tmpsize;
@@ -3189,6 +3223,8 @@ parse_mtpSpProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSpProfileTable_data *StorageTmp = mtpSpProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSpProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3265,6 +3301,10 @@ store_mtpSpProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpSpProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSpProfileTable: storing data...  "));
 	refresh_mtpSpProfileTable(1);
 	(void) tmpsize;
@@ -3576,6 +3616,8 @@ parse_mtpSpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSpTable_data *StorageTmp = mtpSpTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3666,6 +3708,10 @@ store_mtpSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSpTable: storing data...  "));
 	refresh_mtpSpTable(1);
 	(void) tmpsize;
@@ -3894,6 +3940,8 @@ parse_mtpL3Table(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpL3Table_data *StorageTmp = mtpL3Table_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpL3Table: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3943,6 +3991,10 @@ store_mtpL3Table(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpL3Table_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpL3Table: storing data...  "));
 	refresh_mtpL3Table(1);
 	(void) tmpsize;
@@ -4152,6 +4204,8 @@ parse_mtpGsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpGsTable_data *StorageTmp = mtpGsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpGsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4191,6 +4245,10 @@ store_mtpGsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpGsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpGsTable: storing data...  "));
 	refresh_mtpGsTable(1);
 	(void) tmpsize;
@@ -4393,6 +4451,8 @@ parse_mtpGsLineTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpGsLineTable_data *StorageTmp = mtpGsLineTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpGsLineTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4429,6 +4489,10 @@ store_mtpGsLineTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpGsLineTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpGsLineTable: storing data...  "));
 	refresh_mtpGsLineTable(1);
 	(void) tmpsize;
@@ -4665,6 +4729,8 @@ parse_mtpGsLineContentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpGsLineContentTable_data *StorageTmp = mtpGsLineContentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpGsLineContentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4720,6 +4786,10 @@ store_mtpGsLineContentTable(int majorID, int minorID, void *serverarg, void *cli
 	struct mtpGsLineContentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpGsLineContentTable: storing data...  "));
 	refresh_mtpGsLineContentTable(1);
 	(void) tmpsize;
@@ -4938,6 +5008,8 @@ parse_mtpRsProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpRsProfileTable_data *StorageTmp = mtpRsProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpRsProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4986,6 +5058,10 @@ store_mtpRsProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpRsProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpRsProfileTable: storing data...  "));
 	refresh_mtpRsProfileTable(1);
 	(void) tmpsize;
@@ -5270,6 +5346,8 @@ parse_mtpRsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpRsTable_data *StorageTmp = mtpRsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpRsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5356,6 +5434,10 @@ store_mtpRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpRsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpRsTable: storing data...  "));
 	refresh_mtpRsTable(1);
 	(void) tmpsize;
@@ -5553,6 +5635,8 @@ parse_mtpRtProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpRtProfileTable_data *StorageTmp = mtpRtProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpRtProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5586,6 +5670,10 @@ store_mtpRtProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpRtProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpRtProfileTable: storing data...  "));
 	refresh_mtpRtProfileTable(1);
 	(void) tmpsize;
@@ -5857,6 +5945,8 @@ parse_mtpRtTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpRtTable_data *StorageTmp = mtpRtTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpRtTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5936,6 +6026,10 @@ store_mtpRtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpRtTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpRtTable: storing data...  "));
 	refresh_mtpRtTable(1);
 	(void) tmpsize;
@@ -6152,6 +6246,8 @@ parse_mtpRtLsaTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpRtLsaTable_data *StorageTmp = mtpRtLsaTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpRtLsaTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6188,6 +6284,10 @@ store_mtpRtLsaTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpRtLsaTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpRtLsaTable: storing data...  "));
 	refresh_mtpRtLsaTable(1);
 	(void) tmpsize;
@@ -6416,6 +6516,8 @@ parse_mtpLsProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpLsProfileTable_data *StorageTmp = mtpLsProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpLsProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6471,6 +6573,10 @@ store_mtpLsProfileTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpLsProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpLsProfileTable: storing data...  "));
 	refresh_mtpLsProfileTable(1);
 	(void) tmpsize;
@@ -6762,6 +6868,8 @@ parse_mtpLsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpLsTable_data *StorageTmp = mtpLsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpLsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6847,6 +6955,10 @@ store_mtpLsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpLsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpLsTable: storing data...  "));
 	refresh_mtpLsTable(1);
 	(void) tmpsize;
@@ -7109,6 +7221,8 @@ parse_mtpSlL3ProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSlL3ProfileTable_data *StorageTmp = mtpSlL3ProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSlL3ProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7174,6 +7288,10 @@ store_mtpSlL3ProfileTable(int majorID, int minorID, void *serverarg, void *clien
 	struct mtpSlL3ProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSlL3ProfileTable: storing data...  "));
 	refresh_mtpSlL3ProfileTable(1);
 	(void) tmpsize;
@@ -7469,6 +7587,8 @@ parse_mtpSlL2ProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSlL2ProfileTable_data *StorageTmp = mtpSlL2ProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSlL2ProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7547,6 +7667,10 @@ store_mtpSlL2ProfileTable(int majorID, int minorID, void *serverarg, void *clien
 	struct mtpSlL2ProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSlL2ProfileTable: storing data...  "));
 	refresh_mtpSlL2ProfileTable(1);
 	(void) tmpsize;
@@ -7902,6 +8026,8 @@ parse_mtpSlTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSlTable_data *StorageTmp = mtpSlTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSlTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -8011,6 +8137,10 @@ store_mtpSlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSlTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSlTable: storing data...  "));
 	refresh_mtpSlTable(1);
 	(void) tmpsize;
@@ -8235,6 +8365,8 @@ parse_mtpSlSdlListTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSlSdlListTable_data *StorageTmp = mtpSlSdlListTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSlSdlListTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -8271,6 +8403,10 @@ store_mtpSlSdlListTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpSlSdlListTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSlSdlListTable: storing data...  "));
 	refresh_mtpSlSdlListTable(1);
 	(void) tmpsize;
@@ -8472,6 +8608,8 @@ parse_mtpSlSdtListTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSlSdtListTable_data *StorageTmp = mtpSlSdtListTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSlSdtListTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -8508,6 +8646,10 @@ store_mtpSlSdtListTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpSlSdtListTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSlSdtListTable: storing data...  "));
 	refresh_mtpSlSdtListTable(1);
 	(void) tmpsize;
@@ -8717,6 +8859,8 @@ parse_mtpNbTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpNbTable_data *StorageTmp = mtpNbTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpNbTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -8761,6 +8905,10 @@ store_mtpNbTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpNbTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpNbTable: storing data...  "));
 	refresh_mtpNbTable(1);
 	(void) tmpsize;
@@ -9006,6 +9154,8 @@ parse_mtpSaalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSaalTable_data *StorageTmp = mtpSaalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSaalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -9062,6 +9212,10 @@ store_mtpSaalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSaalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSaalTable: storing data...  "));
 	refresh_mtpSaalTable(1);
 	(void) tmpsize;
@@ -9315,6 +9469,8 @@ parse_mtpM2paTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpM2paTable_data *StorageTmp = mtpM2paTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpM2paTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -9369,6 +9525,10 @@ store_mtpM2paTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpM2paTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpM2paTable: storing data...  "));
 	refresh_mtpM2paTable(1);
 	(void) tmpsize;
@@ -9627,6 +9787,8 @@ parse_mtpSdtTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSdtTable_data *StorageTmp = mtpSdtTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSdtTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -9690,6 +9852,10 @@ store_mtpSdtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSdtTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSdtTable: storing data...  "));
 	refresh_mtpSdtTable(1);
 	(void) tmpsize;
@@ -9953,6 +10119,8 @@ parse_mtpSdlTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSdlTable_data *StorageTmp = mtpSdlTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSdlTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -10027,6 +10195,10 @@ store_mtpSdlTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSdlTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSdlTable: storing data...  "));
 	refresh_mtpSdlTable(1);
 	(void) tmpsize;
@@ -10252,6 +10424,8 @@ parse_mtpSctpProfileTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSctpProfileTable_data *StorageTmp = mtpSctpProfileTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSctpProfileTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -10300,6 +10474,10 @@ store_mtpSctpProfileTable(int majorID, int minorID, void *serverarg, void *clien
 	struct mtpSctpProfileTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSctpProfileTable: storing data...  "));
 	refresh_mtpSctpProfileTable(1);
 	(void) tmpsize;
@@ -10521,6 +10699,8 @@ parse_mtpSctpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSctpTable_data *StorageTmp = mtpSctpTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSctpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -10565,6 +10745,10 @@ store_mtpSctpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpSctpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSctpTable: storing data...  "));
 	refresh_mtpSctpTable(1);
 	(void) tmpsize;
@@ -10756,6 +10940,8 @@ parse_mtpSctpLocalTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSctpLocalTable_data *StorageTmp = mtpSctpLocalTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSctpLocalTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -10789,6 +10975,10 @@ store_mtpSctpLocalTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct mtpSctpLocalTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSctpLocalTable: storing data...  "));
 	refresh_mtpSctpLocalTable(1);
 	(void) tmpsize;
@@ -10974,6 +11164,8 @@ parse_mtpSctpRemoteTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpSctpRemoteTable_data *StorageTmp = mtpSctpRemoteTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpSctpRemoteTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -11007,6 +11199,10 @@ store_mtpSctpRemoteTable(int majorID, int minorID, void *serverarg, void *client
 	struct mtpSctpRemoteTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpSctpRemoteTable: storing data...  "));
 	refresh_mtpSctpRemoteTable(1);
 	(void) tmpsize;
@@ -11225,6 +11421,8 @@ parse_mtpM2uaAspTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpM2uaAspTable_data *StorageTmp = mtpM2uaAspTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpM2uaAspTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -11275,6 +11473,10 @@ store_mtpM2uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct mtpM2uaAspTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpM2uaAspTable: storing data...  "));
 	refresh_mtpM2uaAspTable(1);
 	(void) tmpsize;
@@ -11491,6 +11693,8 @@ parse_mtpM2uaAsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpM2uaAsTable_data *StorageTmp = mtpM2uaAsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpM2uaAsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -11534,6 +11738,10 @@ store_mtpM2uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpM2uaAsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpM2uaAsTable: storing data...  "));
 	refresh_mtpM2uaAsTable(1);
 	(void) tmpsize;
@@ -11759,6 +11967,8 @@ parse_mtpM3uaAspTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpM3uaAspTable_data *StorageTmp = mtpM3uaAspTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpM3uaAspTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -11810,6 +12020,10 @@ store_mtpM3uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct mtpM3uaAspTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpM3uaAspTable: storing data...  "));
 	refresh_mtpM3uaAspTable(1);
 	(void) tmpsize;
@@ -12021,6 +12235,8 @@ parse_mtpM3uaAsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpM3uaAsTable_data *StorageTmp = mtpM3uaAsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpMIB", "parse_mtpM3uaAsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -12063,6 +12279,10 @@ store_mtpM3uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mtpM3uaAsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpMIB", "store_mtpM3uaAsTable: storing data...  "));
 	refresh_mtpM3uaAsTable(1);
 	(void) tmpsize;
@@ -12103,6 +12323,7 @@ store_mtpM3uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 activate_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12120,6 +12341,7 @@ activate_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 int
 deactivate_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12137,6 +12359,7 @@ deactivate_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 int
 activate_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12154,6 +12377,7 @@ activate_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 int
 deactivate_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12171,6 +12395,7 @@ deactivate_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 int
 activate_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12188,6 +12413,7 @@ activate_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 int
 deactivate_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12205,6 +12431,7 @@ deactivate_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 int
 activate_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12222,6 +12449,7 @@ activate_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 int
 deactivate_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12239,6 +12467,7 @@ deactivate_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 int
 activate_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12256,6 +12485,7 @@ activate_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 int
 deactivate_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12273,6 +12503,7 @@ deactivate_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 int
 activate_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12290,6 +12521,7 @@ activate_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 int
 deactivate_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12307,6 +12539,7 @@ deactivate_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 int
 activate_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12324,6 +12557,7 @@ activate_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 int
 deactivate_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12341,6 +12575,7 @@ deactivate_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 int
 activate_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12358,6 +12593,7 @@ activate_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 int
 deactivate_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12375,6 +12611,7 @@ deactivate_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 int
 activate_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12392,6 +12629,7 @@ activate_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp
 int
 deactivate_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12409,6 +12647,7 @@ deactivate_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageT
 int
 activate_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12426,6 +12665,7 @@ activate_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 int
 deactivate_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12443,6 +12683,7 @@ deactivate_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 int
 activate_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12460,6 +12701,7 @@ activate_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 int
 deactivate_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12477,6 +12719,7 @@ deactivate_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 int
 activate_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12494,6 +12737,7 @@ activate_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 int
 deactivate_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12511,6 +12755,7 @@ deactivate_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 int
 activate_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12528,6 +12773,7 @@ activate_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 int
 deactivate_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12545,6 +12791,7 @@ deactivate_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 int
 activate_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12562,6 +12809,7 @@ activate_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 int
 deactivate_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12579,6 +12827,7 @@ deactivate_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 int
 activate_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12596,6 +12845,7 @@ activate_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 int
 deactivate_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12613,6 +12863,7 @@ deactivate_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 int
 activate_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12630,6 +12881,7 @@ activate_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 int
 deactivate_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12647,6 +12899,7 @@ deactivate_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 int
 activate_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12664,6 +12917,7 @@ activate_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 int
 deactivate_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12681,6 +12935,7 @@ deactivate_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 int
 activate_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12698,6 +12953,7 @@ activate_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 int
 deactivate_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12715,6 +12971,7 @@ deactivate_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 int
 activate_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12732,6 +12989,7 @@ activate_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 int
 deactivate_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12749,6 +13007,7 @@ deactivate_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 int
 activate_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12766,6 +13025,7 @@ activate_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 int
 deactivate_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12783,6 +13043,7 @@ deactivate_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 int
 activate_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12800,6 +13061,7 @@ activate_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 int
 deactivate_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12817,6 +13079,7 @@ deactivate_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 int
 activate_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12834,6 +13097,7 @@ activate_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 int
 deactivate_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12851,6 +13115,7 @@ deactivate_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 int
 activate_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12868,6 +13133,7 @@ activate_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 int
 deactivate_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12885,6 +13151,7 @@ deactivate_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 int
 activate_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12902,6 +13169,7 @@ activate_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 int
 deactivate_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12919,6 +13187,7 @@ deactivate_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 int
 activate_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12936,6 +13205,7 @@ activate_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 int
 deactivate_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12953,6 +13223,7 @@ deactivate_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 int
 activate_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12970,6 +13241,7 @@ activate_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 int
 deactivate_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -12987,6 +13259,7 @@ deactivate_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 int
 activate_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13004,6 +13277,7 @@ activate_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 int
 deactivate_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13021,6 +13295,7 @@ deactivate_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 int
 activate_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13038,6 +13313,7 @@ activate_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 int
 deactivate_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13055,6 +13331,7 @@ deactivate_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 int
 activate_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13072,6 +13349,7 @@ activate_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 int
 deactivate_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13089,6 +13367,7 @@ deactivate_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 int
 activate_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13106,6 +13385,7 @@ activate_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 int
 deactivate_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13123,6 +13403,7 @@ deactivate_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 int
 activate_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13140,6 +13421,7 @@ activate_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 int
 deactivate_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13157,6 +13439,7 @@ deactivate_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 int
 activate_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13174,6 +13457,7 @@ activate_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 int
 deactivate_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13191,6 +13475,7 @@ deactivate_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 int
 activate_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13208,6 +13493,7 @@ activate_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 int
 deactivate_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -13230,6 +13516,8 @@ deactivate_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 int
 check_mtpSapTable_row(struct mtpSapTable_data *StorageTmp, struct mtpSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -13252,6 +13540,8 @@ check_mtpSapTable_row(struct mtpSapTable_data *StorageTmp, struct mtpSapTable_da
 int
 update_mtpSapTable_row(struct mtpSapTable_data *StorageTmp, struct mtpSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSapTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -13266,6 +13556,7 @@ update_mtpSapTable_row(struct mtpSapTable_data *StorageTmp, struct mtpSapTable_d
 void
 revert_mtpSapTable_row(struct mtpSapTable_data *StorageTmp, struct mtpSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSapTable_row(StorageOld, NULL);
 }
@@ -13426,6 +13717,8 @@ var_mtpSapTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mtpNaTable_row(struct mtpNaTable_data *StorageTmp, struct mtpNaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -13448,6 +13741,8 @@ check_mtpNaTable_row(struct mtpNaTable_data *StorageTmp, struct mtpNaTable_data 
 int
 update_mtpNaTable_row(struct mtpNaTable_data *StorageTmp, struct mtpNaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpNaTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -13462,6 +13757,7 @@ update_mtpNaTable_row(struct mtpNaTable_data *StorageTmp, struct mtpNaTable_data
 void
 revert_mtpNaTable_row(struct mtpNaTable_data *StorageTmp, struct mtpNaTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpNaTable_row(StorageOld, NULL);
 }
@@ -13618,6 +13914,8 @@ var_mtpNaTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpMsTable_row(struct mtpMsTable_data *StorageTmp, struct mtpMsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -13640,6 +13938,8 @@ check_mtpMsTable_row(struct mtpMsTable_data *StorageTmp, struct mtpMsTable_data 
 int
 update_mtpMsTable_row(struct mtpMsTable_data *StorageTmp, struct mtpMsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpMsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -13654,6 +13954,7 @@ update_mtpMsTable_row(struct mtpMsTable_data *StorageTmp, struct mtpMsTable_data
 void
 revert_mtpMsTable_row(struct mtpMsTable_data *StorageTmp, struct mtpMsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpMsTable_row(StorageOld, NULL);
 }
@@ -13825,6 +14126,8 @@ var_mtpMsTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp, struct mtpSpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -13847,6 +14150,8 @@ check_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp, struct mt
 int
 update_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp, struct mtpSpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSpProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -13861,6 +14166,7 @@ update_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp, struct m
 void
 revert_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp, struct mtpSpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSpProfileTable_row(StorageOld, NULL);
 }
@@ -14171,6 +14477,8 @@ var_mtpSpProfileTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpSpTable_row(struct mtpSpTable_data *StorageTmp, struct mtpSpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -14193,6 +14501,8 @@ check_mtpSpTable_row(struct mtpSpTable_data *StorageTmp, struct mtpSpTable_data 
 int
 update_mtpSpTable_row(struct mtpSpTable_data *StorageTmp, struct mtpSpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSpTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -14207,6 +14517,7 @@ update_mtpSpTable_row(struct mtpSpTable_data *StorageTmp, struct mtpSpTable_data
 void
 revert_mtpSpTable_row(struct mtpSpTable_data *StorageTmp, struct mtpSpTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSpTable_row(StorageOld, NULL);
 }
@@ -14395,6 +14706,8 @@ var_mtpSpTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpL3Table_row(struct mtpL3Table_data *StorageTmp, struct mtpL3Table_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -14417,6 +14730,8 @@ check_mtpL3Table_row(struct mtpL3Table_data *StorageTmp, struct mtpL3Table_data 
 int
 update_mtpL3Table_row(struct mtpL3Table_data *StorageTmp, struct mtpL3Table_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpL3Table_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -14431,6 +14746,7 @@ update_mtpL3Table_row(struct mtpL3Table_data *StorageTmp, struct mtpL3Table_data
 void
 revert_mtpL3Table_row(struct mtpL3Table_data *StorageTmp, struct mtpL3Table_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpL3Table_row(StorageOld, NULL);
 }
@@ -14570,6 +14886,8 @@ var_mtpL3Table(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpGsTable_row(struct mtpGsTable_data *StorageTmp, struct mtpGsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -14592,6 +14910,8 @@ check_mtpGsTable_row(struct mtpGsTable_data *StorageTmp, struct mtpGsTable_data 
 int
 update_mtpGsTable_row(struct mtpGsTable_data *StorageTmp, struct mtpGsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpGsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -14606,6 +14926,7 @@ update_mtpGsTable_row(struct mtpGsTable_data *StorageTmp, struct mtpGsTable_data
 void
 revert_mtpGsTable_row(struct mtpGsTable_data *StorageTmp, struct mtpGsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpGsTable_row(StorageOld, NULL);
 }
@@ -14748,6 +15069,8 @@ var_mtpGsTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp, struct mtpGsLineTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -14770,6 +15093,8 @@ check_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp, struct mtpGsLin
 int
 update_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp, struct mtpGsLineTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpGsLineTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -14784,6 +15109,7 @@ update_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp, struct mtpGsLi
 void
 revert_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp, struct mtpGsLineTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpGsLineTable_row(StorageOld, NULL);
 }
@@ -14898,6 +15224,8 @@ var_mtpGsLineTable(struct variable *vp, oid * name, size_t *length, int exact, s
 int
 check_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp, struct mtpGsLineContentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -14920,6 +15248,8 @@ check_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp, s
 int
 update_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp, struct mtpGsLineContentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpGsLineContentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -14934,6 +15264,7 @@ update_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp, 
 void
 revert_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp, struct mtpGsLineContentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpGsLineContentTable_row(StorageOld, NULL);
 }
@@ -15069,6 +15400,8 @@ var_mtpGsLineContentTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp, struct mtpRsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -15091,6 +15424,8 @@ check_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp, struct mt
 int
 update_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp, struct mtpRsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpRsProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -15105,6 +15440,7 @@ update_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp, struct m
 void
 revert_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp, struct mtpRsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpRsProfileTable_row(StorageOld, NULL);
 }
@@ -15254,6 +15590,8 @@ var_mtpRsProfileTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpRsTable_row(struct mtpRsTable_data *StorageTmp, struct mtpRsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -15276,6 +15614,8 @@ check_mtpRsTable_row(struct mtpRsTable_data *StorageTmp, struct mtpRsTable_data 
 int
 update_mtpRsTable_row(struct mtpRsTable_data *StorageTmp, struct mtpRsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpRsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -15290,6 +15630,7 @@ update_mtpRsTable_row(struct mtpRsTable_data *StorageTmp, struct mtpRsTable_data
 void
 revert_mtpRsTable_row(struct mtpRsTable_data *StorageTmp, struct mtpRsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpRsTable_row(StorageOld, NULL);
 }
@@ -15478,6 +15819,8 @@ var_mtpRsTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp, struct mtpRtProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -15500,6 +15843,8 @@ check_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp, struct mt
 int
 update_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp, struct mtpRtProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpRtProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -15514,6 +15859,7 @@ update_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp, struct m
 void
 revert_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp, struct mtpRtProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpRtProfileTable_row(StorageOld, NULL);
 }
@@ -15628,6 +15974,8 @@ var_mtpRtProfileTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpRtTable_row(struct mtpRtTable_data *StorageTmp, struct mtpRtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -15650,6 +15998,8 @@ check_mtpRtTable_row(struct mtpRtTable_data *StorageTmp, struct mtpRtTable_data 
 int
 update_mtpRtTable_row(struct mtpRtTable_data *StorageTmp, struct mtpRtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpRtTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -15664,6 +16014,7 @@ update_mtpRtTable_row(struct mtpRtTable_data *StorageTmp, struct mtpRtTable_data
 void
 revert_mtpRtTable_row(struct mtpRtTable_data *StorageTmp, struct mtpRtTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpRtTable_row(StorageOld, NULL);
 }
@@ -15866,6 +16217,8 @@ var_mtpRtTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpRtLsaTable_row(struct mtpRtLsaTable_data *StorageTmp, struct mtpRtLsaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -15888,6 +16241,8 @@ check_mtpRtLsaTable_row(struct mtpRtLsaTable_data *StorageTmp, struct mtpRtLsaTa
 int
 update_mtpRtLsaTable_row(struct mtpRtLsaTable_data *StorageTmp, struct mtpRtLsaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpRtLsaTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -15902,6 +16257,7 @@ update_mtpRtLsaTable_row(struct mtpRtLsaTable_data *StorageTmp, struct mtpRtLsaT
 void
 revert_mtpRtLsaTable_row(struct mtpRtLsaTable_data *StorageTmp, struct mtpRtLsaTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpRtLsaTable_row(StorageOld, NULL);
 }
@@ -16009,6 +16365,8 @@ var_mtpRtLsaTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp, struct mtpLsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -16031,6 +16389,8 @@ check_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp, struct mt
 int
 update_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp, struct mtpLsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpLsProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -16045,6 +16405,7 @@ update_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp, struct m
 void
 revert_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp, struct mtpLsProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpLsProfileTable_row(StorageOld, NULL);
 }
@@ -16243,6 +16604,8 @@ var_mtpLsProfileTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpLsTable_row(struct mtpLsTable_data *StorageTmp, struct mtpLsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -16265,6 +16628,8 @@ check_mtpLsTable_row(struct mtpLsTable_data *StorageTmp, struct mtpLsTable_data 
 int
 update_mtpLsTable_row(struct mtpLsTable_data *StorageTmp, struct mtpLsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpLsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -16279,6 +16644,7 @@ update_mtpLsTable_row(struct mtpLsTable_data *StorageTmp, struct mtpLsTable_data
 void
 revert_mtpLsTable_row(struct mtpLsTable_data *StorageTmp, struct mtpLsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpLsTable_row(StorageOld, NULL);
 }
@@ -16494,6 +16860,8 @@ var_mtpLsTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp, struct mtpSlL3ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -16516,6 +16884,8 @@ check_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp, struc
 int
 update_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp, struct mtpSlL3ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSlL3ProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -16530,6 +16900,7 @@ update_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp, stru
 void
 revert_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp, struct mtpSlL3ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSlL3ProfileTable_row(StorageOld, NULL);
 }
@@ -16798,6 +17169,8 @@ var_mtpSlL3ProfileTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp, struct mtpSlL2ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -16820,6 +17193,8 @@ check_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp, struc
 int
 update_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp, struct mtpSlL2ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSlL2ProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -16834,6 +17209,7 @@ update_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp, stru
 void
 revert_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp, struct mtpSlL2ProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSlL2ProfileTable_row(StorageOld, NULL);
 }
@@ -17186,6 +17562,8 @@ var_mtpSlL2ProfileTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_mtpSlTable_row(struct mtpSlTable_data *StorageTmp, struct mtpSlTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -17208,6 +17586,8 @@ check_mtpSlTable_row(struct mtpSlTable_data *StorageTmp, struct mtpSlTable_data 
 int
 update_mtpSlTable_row(struct mtpSlTable_data *StorageTmp, struct mtpSlTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSlTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -17222,6 +17602,7 @@ update_mtpSlTable_row(struct mtpSlTable_data *StorageTmp, struct mtpSlTable_data
 void
 revert_mtpSlTable_row(struct mtpSlTable_data *StorageTmp, struct mtpSlTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSlTable_row(StorageOld, NULL);
 }
@@ -17482,6 +17863,8 @@ var_mtpSlTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp, struct mtpSlSdlListTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -17504,6 +17887,8 @@ check_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp, struct mt
 int
 update_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp, struct mtpSlSdlListTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSlSdlListTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -17518,6 +17903,7 @@ update_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp, struct m
 void
 revert_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp, struct mtpSlSdlListTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSlSdlListTable_row(StorageOld, NULL);
 }
@@ -17625,6 +18011,8 @@ var_mtpSlSdlListTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp, struct mtpSlSdtListTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -17647,6 +18035,8 @@ check_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp, struct mt
 int
 update_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp, struct mtpSlSdtListTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSlSdtListTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -17661,6 +18051,7 @@ update_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp, struct m
 void
 revert_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp, struct mtpSlSdtListTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSlSdtListTable_row(StorageOld, NULL);
 }
@@ -17768,6 +18159,8 @@ var_mtpSlSdtListTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpNbTable_row(struct mtpNbTable_data *StorageTmp, struct mtpNbTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -17790,6 +18183,8 @@ check_mtpNbTable_row(struct mtpNbTable_data *StorageTmp, struct mtpNbTable_data 
 int
 update_mtpNbTable_row(struct mtpNbTable_data *StorageTmp, struct mtpNbTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpNbTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -17804,6 +18199,7 @@ update_mtpNbTable_row(struct mtpNbTable_data *StorageTmp, struct mtpNbTable_data
 void
 revert_mtpNbTable_row(struct mtpNbTable_data *StorageTmp, struct mtpNbTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpNbTable_row(StorageOld, NULL);
 }
@@ -17984,6 +18380,8 @@ var_mtpNbTable(struct variable *vp, oid * name, size_t *length, int exact, size_
 int
 check_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp, struct mtpSaalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -18006,6 +18404,8 @@ check_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp, struct mtpSaalTable
 int
 update_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp, struct mtpSaalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSaalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -18020,6 +18420,7 @@ update_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp, struct mtpSaalTabl
 void
 revert_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp, struct mtpSaalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSaalTable_row(StorageOld, NULL);
 }
@@ -18295,6 +18696,8 @@ var_mtpSaalTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 int
 check_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp, struct mtpM2paTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -18317,6 +18720,8 @@ check_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp, struct mtpM2paTable
 int
 update_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp, struct mtpM2paTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpM2paTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -18331,6 +18736,7 @@ update_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp, struct mtpM2paTabl
 void
 revert_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp, struct mtpM2paTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpM2paTable_row(StorageOld, NULL);
 }
@@ -18592,6 +18998,8 @@ var_mtpM2paTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 int
 check_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp, struct mtpSdtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -18614,6 +19022,8 @@ check_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp, struct mtpSdtTable_da
 int
 update_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp, struct mtpSdtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSdtTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -18628,6 +19038,7 @@ update_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp, struct mtpSdtTable_d
 void
 revert_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp, struct mtpSdtTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSdtTable_row(StorageOld, NULL);
 }
@@ -18792,6 +19203,8 @@ var_mtpSdtTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp, struct mtpSdlTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -18814,6 +19227,8 @@ check_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp, struct mtpSdlTable_da
 int
 update_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp, struct mtpSdlTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSdlTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -18828,6 +19243,7 @@ update_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp, struct mtpSdlTable_d
 void
 revert_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp, struct mtpSdlTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSdlTable_row(StorageOld, NULL);
 }
@@ -19004,6 +19420,8 @@ var_mtpSdlTable(struct variable *vp, oid * name, size_t *length, int exact, size
 int
 check_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp, struct mtpSctpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19026,6 +19444,8 @@ check_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp, struc
 int
 update_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp, struct mtpSctpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSctpProfileTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19040,6 +19460,7 @@ update_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp, stru
 void
 revert_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp, struct mtpSctpProfileTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSctpProfileTable_row(StorageOld, NULL);
 }
@@ -19259,6 +19680,8 @@ var_mtpSctpProfileTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp, struct mtpSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19281,6 +19704,8 @@ check_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp, struct mtpSctpTable
 int
 update_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp, struct mtpSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSctpTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19295,6 +19720,7 @@ update_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp, struct mtpSctpTabl
 void
 revert_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp, struct mtpSctpTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSctpTable_row(StorageOld, NULL);
 }
@@ -19448,6 +19874,8 @@ var_mtpSctpTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 int
 check_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp, struct mtpSctpLocalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19470,6 +19898,8 @@ check_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp, struct mt
 int
 update_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp, struct mtpSctpLocalTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSctpLocalTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19484,6 +19914,7 @@ update_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp, struct m
 void
 revert_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp, struct mtpSctpLocalTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSctpLocalTable_row(StorageOld, NULL);
 }
@@ -19591,6 +20022,8 @@ var_mtpSctpLocalTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp, struct mtpSctpRemoteTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19613,6 +20046,8 @@ check_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp, struct 
 int
 update_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp, struct mtpSctpRemoteTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpSctpRemoteTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19627,6 +20062,7 @@ update_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp, struct
 void
 revert_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp, struct mtpSctpRemoteTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpSctpRemoteTable_row(StorageOld, NULL);
 }
@@ -19734,6 +20170,8 @@ var_mtpSctpRemoteTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 check_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp, struct mtpM2uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19756,6 +20194,8 @@ check_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp, struct mtpM2u
 int
 update_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp, struct mtpM2uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpM2uaAspTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19770,6 +20210,7 @@ update_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp, struct mtpM2
 void
 revert_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp, struct mtpM2uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpM2uaAspTable_row(StorageOld, NULL);
 }
@@ -19932,6 +20373,8 @@ var_mtpM2uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp, struct mtpM2uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -19954,6 +20397,8 @@ check_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp, struct mtpM2uaA
 int
 update_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp, struct mtpM2uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpM2uaAsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -19968,6 +20413,7 @@ update_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp, struct mtpM2ua
 void
 revert_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp, struct mtpM2uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpM2uaAsTable_row(StorageOld, NULL);
 }
@@ -20102,6 +20548,8 @@ var_mtpM2uaAsTable(struct variable *vp, oid * name, size_t *length, int exact, s
 int
 check_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp, struct mtpM3uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -20124,6 +20572,8 @@ check_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp, struct mtpM3u
 int
 update_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp, struct mtpM3uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpM3uaAspTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -20138,6 +20588,7 @@ update_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp, struct mtpM3
 void
 revert_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp, struct mtpM3uaAspTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpM3uaAspTable_row(StorageOld, NULL);
 }
@@ -20307,6 +20758,8 @@ var_mtpM3uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp, struct mtpM3uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -20329,6 +20782,8 @@ check_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp, struct mtpM3uaA
 int
 update_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp, struct mtpM3uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpM3uaAsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -20343,6 +20798,7 @@ update_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp, struct mtpM3ua
 void
 revert_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp, struct mtpM3uaAsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpM3uaAsTable_row(StorageOld, NULL);
 }
@@ -20478,6 +20934,10 @@ write_mtpSapUserPart(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapUserPart entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20606,6 +21066,10 @@ write_mtpSapUserPartStatus(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapUserPartStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20721,6 +21185,10 @@ write_mtpSapProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapProviderEntityNames entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20837,6 +21305,10 @@ write_mtpSapAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, 
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20954,6 +21426,10 @@ write_mtpSapName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21073,6 +21549,10 @@ write_mtpSapLongMessageSupported(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapLongMessageSupported entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21187,6 +21667,10 @@ write_mtpNaProtocolVariant(int action, u_char *var_val, u_char var_val_type, siz
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolVariant entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21304,6 +21788,10 @@ write_mtpNaProtocolYear(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolYear entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21426,6 +21914,10 @@ write_mtpNaProtocolOptions(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaProtocolOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21553,6 +22045,10 @@ write_mtpNaNetworkIndicator(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaNetworkIndicator entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21670,6 +22166,10 @@ write_mtpNaPointCodeFormat(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaPointCodeFormat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21790,6 +22290,10 @@ write_mtpNaSlsLength(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaSlsLength entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21906,6 +22410,10 @@ write_mtpNaSpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaSpDefault entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22026,6 +22534,10 @@ write_mtpNaName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22050,7 +22562,7 @@ write_mtpNaName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpNaName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22146,6 +22658,10 @@ write_mtpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22170,7 +22686,7 @@ write_mtpMsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpMsName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22265,6 +22781,10 @@ write_mtpMsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22391,6 +22911,10 @@ write_mtpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsUserLabel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22415,7 +22939,7 @@ write_mtpMsUserLabel(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpMsUserLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22510,6 +23034,10 @@ write_mtpMsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22627,6 +23155,10 @@ write_mtpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsNetworkElementAliases entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22651,7 +23183,7 @@ write_mtpMsNetworkElementAliases(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpMsNetworkElementAliases: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22746,6 +23278,10 @@ write_mtpSpProfileTimerT1R(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT1R entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22858,6 +23394,10 @@ write_mtpSpProfileTimerT2(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22970,6 +23510,10 @@ write_mtpSpProfileTimerT4(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT4 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23082,6 +23626,10 @@ write_mtpSpProfileTimerT5(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT5 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23194,6 +23742,10 @@ write_mtpSpProfileTimerT7(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT7 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23306,6 +23858,10 @@ write_mtpSpProfileTimerT11(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT11 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23418,6 +23974,10 @@ write_mtpSpProfileTimerT12(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT12 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23530,6 +24090,10 @@ write_mtpSpProfileTimerT13(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT13 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23642,6 +24206,10 @@ write_mtpSpProfileTimerT14(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT14 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23754,6 +24322,10 @@ write_mtpSpProfileTimerT15(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT15 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23866,6 +24438,10 @@ write_mtpSpProfileTimerT16(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT16 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23978,6 +24554,10 @@ write_mtpSpProfileTimerT18I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT18I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24090,6 +24670,10 @@ write_mtpSpProfileTimerT19I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT19I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24202,6 +24786,10 @@ write_mtpSpProfileTimerT20I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT20I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24314,6 +24902,10 @@ write_mtpSpProfileTimerT21I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT21I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24426,6 +25018,10 @@ write_mtpSpProfileTimerT22I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT22I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24538,6 +25134,10 @@ write_mtpSpProfileTimerT23I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT23I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24650,6 +25250,10 @@ write_mtpSpProfileTimerT20A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT20A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24762,6 +25366,10 @@ write_mtpSpProfileTimerT21A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT21A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24874,6 +25482,10 @@ write_mtpSpProfileTimerT22A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT22A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -24986,6 +25598,10 @@ write_mtpSpProfileTimerT23A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT23A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25098,6 +25714,10 @@ write_mtpSpProfileTimerT24A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT24A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25210,6 +25830,10 @@ write_mtpSpProfileTimerT26A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT26A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25322,6 +25946,10 @@ write_mtpSpProfileTimerT27A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT27A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25434,6 +26062,10 @@ write_mtpSpProfileTimerT1T(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT1T entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25546,6 +26178,10 @@ write_mtpSpProfileTimerT2T(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileTimerT2T entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25658,6 +26294,10 @@ write_mtpSpProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25777,6 +26417,10 @@ write_mtpSpProfileCircularRteDetect(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileCircularRteDetect entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -25894,6 +26538,10 @@ write_mtpSpRsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpRsDefault entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26014,6 +26662,10 @@ write_mtpSpLsDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpLsDefault entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26134,6 +26786,10 @@ write_mtpSpPointCode(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpPointCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26254,6 +26910,10 @@ write_mtpSpType(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26370,6 +27030,10 @@ write_mtpSpVersion(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26489,6 +27153,10 @@ write_mtpSpNetworkIndicator(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpNetworkIndicator entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26606,6 +27274,10 @@ write_mtpSpName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26725,6 +27397,10 @@ write_mtpSpProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26845,6 +27521,10 @@ write_mtpSpNaPointer(int action, u_char *var_val, u_char var_val_type, size_t va
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpNaPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -26961,6 +27641,10 @@ write_mtpSpOptions(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27088,6 +27772,10 @@ write_mtpSpUsers(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpUsers entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27215,6 +27903,10 @@ write_mtpSpAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27341,6 +28033,10 @@ write_mtpL3AdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3AdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27457,6 +28153,10 @@ write_mtpL3AsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3AsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27574,6 +28274,10 @@ write_mtpL3Name(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3Name entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27694,6 +28398,10 @@ write_mtpGsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27810,6 +28518,10 @@ write_mtpGsTreatmentOfOutsideRanges(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsTreatmentOfOutsideRanges entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -27929,6 +28641,10 @@ write_mtpGsListMode(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsListMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28044,6 +28760,10 @@ write_mtpGsScreeningByLinkSetOrByOpc(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsScreeningByLinkSetOrByOpc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28160,6 +28880,10 @@ write_mtpGsGetScreenedOpcsOrLinkSetsByDpc(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsGetScreenedOpcsOrLinkSetsByDpc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28281,6 +29005,10 @@ write_mtpGsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28400,6 +29128,10 @@ write_mtpGsLineObject(int action, u_char *var_val, u_char var_val_type, size_t v
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineObject entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28517,6 +29249,10 @@ write_mtpGsLineContent(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContent entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28623,6 +29359,10 @@ write_mtpGsLineContentDesignatedDPCFirst(int action, u_char *var_val, u_char var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentDesignatedDPCFirst entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28743,6 +29483,10 @@ write_mtpGsLineContentDesignatedDPCLast(int action, u_char *var_val, u_char var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentDesignatedDPCLast entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28863,6 +29607,10 @@ write_mtpGsLineContentSiMask(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentSiMask entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -28990,6 +29738,10 @@ write_mtpGsLineContentMessageTreatment(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentMessageTreatment entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29109,6 +29861,10 @@ write_mtpGsLineContentComment(int action, u_char *var_val, u_char var_val_type, 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentComment entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29133,7 +29889,7 @@ write_mtpGsLineContentComment(int action, u_char *var_val, u_char var_val_type, 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpGsLineContentComment: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -29228,6 +29984,10 @@ write_mtpRsProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29252,7 +30012,7 @@ write_mtpRsProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..255 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 255))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 255))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsProfileName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -29347,6 +30107,10 @@ write_mtpRsProfileTimerT8(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT8 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29459,6 +30223,10 @@ write_mtpRsProfileTimerT11(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT11 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29571,6 +30339,10 @@ write_mtpRsProfileTimerT15(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT15 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29683,6 +30455,10 @@ write_mtpRsProfileTimerT16(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT16 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29795,6 +30571,10 @@ write_mtpRsProfileTimerT18A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileTimerT18A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -29907,6 +30687,10 @@ write_mtpRsProfileRtDefault(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileRtDefault entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30027,6 +30811,10 @@ write_mtpRsDest(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsDest entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30147,6 +30935,10 @@ write_mtpRsOptions(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30274,6 +31066,10 @@ write_mtpRsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30390,6 +31186,10 @@ write_mtpRsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30507,6 +31307,10 @@ write_mtpRsLoadsharingInformation(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsLoadsharingInformation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30625,6 +31429,10 @@ write_mtpRsLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsLoadsharingObject entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30742,6 +31550,10 @@ write_mtpRsRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type,
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsRemoteExchangeLabel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30766,7 +31578,7 @@ write_mtpRsRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_type,
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRsRemoteExchangeLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -30861,6 +31673,10 @@ write_mtpRsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -30980,6 +31796,10 @@ write_mtpRsProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31100,6 +31920,10 @@ write_mtpRsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31226,6 +32050,10 @@ write_mtpRtProfileTimerT6(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileTimerT6 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31338,6 +32166,10 @@ write_mtpRtProfileTimerT10(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileTimerT10 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31450,6 +32282,10 @@ write_mtpRtLsPointer(int action, u_char *var_val, u_char var_val_type, size_t va
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31567,6 +32403,10 @@ write_mtpRtAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31683,6 +32523,10 @@ write_mtpRtInClsLoadsharingAlgorithm(int action, u_char *var_val, u_char var_val
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtInClsLoadsharingAlgorithm entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31795,6 +32639,10 @@ write_mtpRtFixedPriority(int action, u_char *var_val, u_char var_val_type, size_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtFixedPriority entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -31902,6 +32750,10 @@ write_mtpRtFlexiblePriority(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtFlexiblePriority entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32008,6 +32860,10 @@ write_mtpRtPriorityMode(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtPriorityMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32124,6 +32980,10 @@ write_mtpRtLoadsharingInformation(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLoadsharingInformation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32242,6 +33102,10 @@ write_mtpRtLoadsharingObject(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLoadsharingObject entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32359,6 +33223,10 @@ write_mtpRtName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32383,7 +33251,7 @@ write_mtpRtName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -32478,6 +33346,10 @@ write_mtpRtSlsList(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtSlsList entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32597,6 +33469,10 @@ write_mtpRtRlSlot(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtRlSlot entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32625,7 +33501,7 @@ write_mtpRtRlSlot(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..3 */
-		if ((0 > set_value || set_value > 3)) {
+		if ((set_value > 3)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtRlSlot: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -32708,6 +33584,10 @@ write_mtpRtProfile(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32828,6 +33708,10 @@ write_mtpRtLsaNormalSlCode(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsaNormalSlCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32926,6 +33810,10 @@ write_mtpRtLsaAlternativeSlCodeList(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtLsaAlternativeSlCodeList entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -32939,7 +33827,7 @@ write_mtpRtLsaAlternativeSlCodeList(int action, u_char *var_val, u_char var_val_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..15 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 15))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 15))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpRtLsaAlternativeSlCodeList: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -33032,6 +33920,10 @@ write_mtpLsProfileTimerT6(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT6 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33144,6 +34036,10 @@ write_mtpLsProfileTimerT8(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT8 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33256,6 +34152,10 @@ write_mtpLsProfileTimerT10(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT10 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33368,6 +34268,10 @@ write_mtpLsProfileTimerT7(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT7 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33480,6 +34384,10 @@ write_mtpLsProfileTimerT19I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT19I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33592,6 +34500,10 @@ write_mtpLsProfileTimerT21I(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT21I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33704,6 +34616,10 @@ write_mtpLsProfileTimerT25A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT25A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33816,6 +34732,10 @@ write_mtpLsProfileTimerT28A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT28A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -33928,6 +34848,10 @@ write_mtpLsProfileTimerT29A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT29A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34040,6 +34964,10 @@ write_mtpLsProfileTimerT30A(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileTimerT30A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34152,6 +35080,10 @@ write_mtpLsProfileParameterN(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileParameterN entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34264,6 +35196,10 @@ write_mtpLsProfileParameterM(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileParameterM entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34376,6 +35312,10 @@ write_mtpLsProfileName(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34495,6 +35435,10 @@ write_mtpLsProfileSlDefault(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileSlDefault entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34615,6 +35559,10 @@ write_mtpLsAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAdjPc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34735,6 +35683,10 @@ write_mtpLsRsId(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsRsId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34852,6 +35804,10 @@ write_mtpLsMaxCapacity(int action, u_char *var_val, u_char var_val_type, size_t 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsMaxCapacity entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -34880,7 +35836,7 @@ write_mtpLsMaxCapacity(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 0..128000 */
-		if ((0 > set_value || set_value > 128000)) {
+		if ((set_value > 128000)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsMaxCapacity: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -34963,6 +35919,10 @@ write_mtpLsCongestionControlMethod(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsCongestionControlMethod entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35081,6 +36041,10 @@ write_mtpLsPeriodicLinkTestFlag(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsPeriodicLinkTestFlag entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35196,6 +36160,10 @@ write_mtpLsPeriodicLinkTestFail(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsPeriodicLinkTestFail entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35311,6 +36279,10 @@ write_mtpLsAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35427,6 +36399,10 @@ write_mtpLsInLsLoadShareAlgorithm(int action, u_char *var_val, u_char var_val_ty
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsInLsLoadShareAlgorithm entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35544,6 +36520,10 @@ write_mtpLsProfilePointer(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35663,6 +36643,10 @@ write_mtpLsNumberOfNormallyActiveSignLinks(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsNumberOfNormallyActiveSignLinks entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35692,7 +36676,7 @@ write_mtpLsNumberOfNormallyActiveSignLinks(int action, u_char *var_val, u_char v
 		}
 		/* Note: default value 2 */
 		/* Note: ranges 0..32 */
-		if ((0 > set_value || set_value > 32)) {
+		if ((set_value > 32)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsNumberOfNormallyActiveSignLinks: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -35775,6 +36759,10 @@ write_mtpLsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -35799,7 +36787,7 @@ write_mtpLsName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpLsName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -35894,6 +36882,10 @@ write_mtpLsAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36011,6 +37003,10 @@ write_mtpLsAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36137,6 +37133,10 @@ write_mtpSlL3ProfileTimerT1(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36249,6 +37249,10 @@ write_mtpSlL3ProfileTimerT3(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36361,6 +37365,10 @@ write_mtpSlL3ProfileTimerT17(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT17 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36473,6 +37481,10 @@ write_mtpSlL3ProfileTimerT24I(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT24I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36585,6 +37597,10 @@ write_mtpSlL3ProfileName(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36704,6 +37720,10 @@ write_mtpSlL3ProfileTimerT2(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36816,6 +37836,10 @@ write_mtpSlL3ProfileTimerT4(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT4 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -36928,6 +37952,10 @@ write_mtpSlL3ProfileTimerT5(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT5 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37040,6 +38068,10 @@ write_mtpSlL3ProfileTimerT12(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT12 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37152,6 +38184,10 @@ write_mtpSlL3ProfileTimerT13(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT13 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37264,6 +38300,10 @@ write_mtpSlL3ProfileTimerT14(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT14 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37376,6 +38416,10 @@ write_mtpSlL3ProfileTimerT19A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT19A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37488,6 +38532,10 @@ write_mtpSlL3ProfileTimerT20A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT20A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37600,6 +38648,10 @@ write_mtpSlL3ProfileTimerT21A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT21A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37712,6 +38764,10 @@ write_mtpSlL3ProfileTimerT22I(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT22I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37824,6 +38880,10 @@ write_mtpSlL3ProfileTimerT23I(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT23I entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -37936,6 +38996,10 @@ write_mtpSlL3ProfileTimerT31A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT31A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38048,6 +39112,10 @@ write_mtpSlL3ProfileTimerT32A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT32A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38160,6 +39228,10 @@ write_mtpSlL3ProfileTimerT33A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT33A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38272,6 +39344,10 @@ write_mtpSlL3ProfileTimerT34A(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT34A entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38384,6 +39460,10 @@ write_mtpSlL3ProfileTimerT1T(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1T entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38496,6 +39576,10 @@ write_mtpSlL3ProfileTimerT2T(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT2T entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38608,6 +39692,10 @@ write_mtpSlL3ProfileTimerT1S(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileTimerT1S entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38720,6 +39808,10 @@ write_mtpSlL3ProfileL2Default(int action, u_char *var_val, u_char var_val_type, 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileL2Default entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38840,6 +39932,10 @@ write_mtpSlL2ProfileErrorCorrectionMethod(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileErrorCorrectionMethod entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -38955,6 +40051,10 @@ write_mtpSlL2ProfileProtocolVariant(int action, u_char *var_val, u_char var_val_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileProtocolVariant entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39072,6 +40172,10 @@ write_mtpSlL2ProfileTimerT1(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39184,6 +40288,10 @@ write_mtpSlL2ProfileTimerT2(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39296,6 +40404,10 @@ write_mtpSlL2ProfileTimerT2L(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2L entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39408,6 +40520,10 @@ write_mtpSlL2ProfileTimerT2H(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT2H entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39520,6 +40636,10 @@ write_mtpSlL2ProfileTimerT3(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39632,6 +40752,10 @@ write_mtpSlL2ProfileTimerT4N(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT4N entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39744,6 +40868,10 @@ write_mtpSlL2ProfileTimerT4E(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT4E entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39856,6 +40984,10 @@ write_mtpSlL2ProfileTimerT5(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT5 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -39968,6 +41100,10 @@ write_mtpSlL2ProfileTimerT6(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT6 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40080,6 +41216,10 @@ write_mtpSlL2ProfileTimerT7(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerT7 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40192,6 +41332,10 @@ write_mtpSlL2ProfileTbOnset1(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40299,6 +41443,10 @@ write_mtpSlL2ProfileTbAbate1(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40406,6 +41554,10 @@ write_mtpSlL2ProfileNumberOfThresholdLevels(int action, u_char *var_val, u_char 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileNumberOfThresholdLevels entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40513,6 +41665,10 @@ write_mtpSlL2ProfileCongestionCounting(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileCongestionCounting entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40628,6 +41784,10 @@ write_mtpSlL2ProfileCongestionReportingBaseObject(int action, u_char *var_val, u
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileCongestionReportingBaseObject entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40745,6 +41905,10 @@ write_mtpSlL2ProfileLoopDelay(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileLoopDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40851,6 +42015,10 @@ write_mtpSlL2ProfileName(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -40970,6 +42138,10 @@ write_mtpSlL2ProfileTbOnset2(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41077,6 +42249,10 @@ write_mtpSlL2ProfileTbAbate2(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41184,6 +42360,10 @@ write_mtpSlL2ProfileTbOnset3(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbOnset3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41291,6 +42471,10 @@ write_mtpSlL2ProfileTbAbate3(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbAbate3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41398,6 +42582,10 @@ write_mtpSlL2ProfileTbDiscard1(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41505,6 +42693,10 @@ write_mtpSlL2ProfileTbDiscard2(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41612,6 +42804,10 @@ write_mtpSlL2ProfileTbDiscard3(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTbDiscard3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41719,6 +42915,10 @@ write_mtpSlL2ProfileTimerTx(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerTx entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41831,6 +43031,10 @@ write_mtpSlL2ProfileTimerTy(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileTimerTy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -41943,6 +43147,10 @@ write_mtpSlL2ProfileNumberOfCongestionStates(int action, u_char *var_val, u_char
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileNumberOfCongestionStates entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42050,6 +43258,10 @@ write_mtpSlL2ProfileInitialLevelOfCongestion(int action, u_char *var_val, u_char
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileInitialLevelOfCongestion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42157,6 +43369,10 @@ write_mtpSlL2ProfileMaxMSUsRetransN1(int action, u_char *var_val, u_char var_val
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileMaxMSUsRetransN1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42186,7 +43402,7 @@ write_mtpSlL2ProfileMaxMSUsRetransN1(int action, u_char *var_val, u_char var_val
 		}
 		/* Note: default value 127 */
 		/* Note: ranges 0..16777215 */
-		if ((0 > set_value || set_value > 16777215)) {
+		if ((set_value > 16777215)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlL2ProfileMaxMSUsRetransN1: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -42269,6 +43485,10 @@ write_mtpSlL2ProfileMaxOctRetransN2(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileMaxOctRetransN2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42376,6 +43596,10 @@ write_mtpSlL2ProfileReceiveCongestionThresholdOnset(int action, u_char *var_val,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdOnset entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42483,6 +43707,10 @@ write_mtpSlL2ProfileReceiveCongestionThresholdAbate(int action, u_char *var_val,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdAbate entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42590,6 +43818,10 @@ write_mtpSlL2ProfileReceiveCongestionThresholdDiscard(int action, u_char *var_va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileReceiveCongestionThresholdDiscard entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42697,6 +43929,10 @@ write_mtpSlL2ProfileM(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileM entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42804,6 +44040,10 @@ write_mtpSlAdministrativeState(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -42920,6 +44160,10 @@ write_mtpSlMtpL2ProtocolProfilePointer(int action, u_char *var_val, u_char var_v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlMtpL2ProtocolProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43040,6 +44284,10 @@ write_mtpSlSignTermPointer(int action, u_char *var_val, u_char var_val_type, siz
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSignTermPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43157,6 +44405,10 @@ write_mtpSlSignDataLinkTpPointer(int action, u_char *var_val, u_char var_val_typ
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSignDataLinkTpPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43274,6 +44526,10 @@ write_mtpSlLocalInhibit(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlLocalInhibit entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43395,6 +44651,10 @@ write_mtpSlLocalUninhibit(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlLocalUninhibit entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43516,6 +44776,10 @@ write_mtpSlReplaceSt(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlReplaceSt entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43637,6 +44901,10 @@ write_mtpSlAsaProfilePointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43754,6 +45022,10 @@ write_mtpSlRelatedLinkGroupNumber(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlRelatedLinkGroupNumber entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43865,6 +45137,10 @@ write_mtpSlSdlList(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlList entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -43971,6 +45247,10 @@ write_mtpSlTest(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlTest entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44092,6 +45372,10 @@ write_mtpSlName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44116,7 +45400,7 @@ write_mtpSlName(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSlName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -44211,6 +45495,10 @@ write_mtpSlSdtList(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtList entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44317,6 +45605,10 @@ write_mtpSlSlsCodeNormalList(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSlsCodeNormalList entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44437,6 +45729,10 @@ write_mtpSlL3ProfilePointer(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44557,6 +45853,10 @@ write_mtpSlAlarmStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44683,6 +45983,10 @@ write_mtpSlSdlListPointer(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlListPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44800,6 +46104,10 @@ write_mtpSlSdtListPointer(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtListPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -44917,6 +46225,10 @@ write_mtpNbTransmissionRate(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbTransmissionRate entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45035,6 +46347,10 @@ write_mtpNbf(int action, u_char *var_val, u_char var_val_type, size_t var_val_le
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbf entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45155,6 +46471,10 @@ write_mtpSaalBufferRelease(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalBufferRelease entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45270,6 +46590,10 @@ write_mtpSaalMaxCc(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxCc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45377,6 +46701,10 @@ write_mtpSaalMaxNrp(int action, u_char *var_val, u_char var_val_type, size_t var
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxNrp entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45484,6 +46812,10 @@ write_mtpSaalMaxInformationFieldLength(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxInformationFieldLength entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45591,6 +46923,10 @@ write_mtpSaalMaxLengthSscopUuField(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxLengthSscopUuField entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45698,6 +47034,10 @@ write_mtpSaalMaxPd(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxPd entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45805,6 +47145,10 @@ write_mtpSaalMaxSscopCreditToPeer(int action, u_char *var_val, u_char var_val_ty
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxSscopCreditToPeer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -45912,6 +47256,10 @@ write_mtpSaalMaxStat(int action, u_char *var_val, u_char var_val_type, size_t va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalMaxStat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46019,6 +47367,10 @@ write_mtpSaalN1(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalN1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46126,6 +47478,10 @@ write_mtpSaalNniLayerManagementProvingState(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementProvingState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46242,6 +47598,10 @@ write_mtpSaalNniLayerManagementTimerNoCredit(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementTimerNoCredit entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46354,6 +47714,10 @@ write_mtpSaalNniLayerManagementTimerRepeatSrec(int action, u_char *var_val, u_ch
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniLayerManagementTimerRepeatSrec entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46465,6 +47829,10 @@ write_mtpSaalNniTimerT1(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46577,6 +47945,10 @@ write_mtpSaalNniTimerT2(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46689,6 +48061,10 @@ write_mtpSaalNniTimerT3(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalNniTimerT3 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46801,6 +48177,10 @@ write_mtpSaalSscopTimerCc(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerCc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -46913,6 +48293,10 @@ write_mtpSaalSscopTimerIdle(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerIdle entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47025,6 +48409,10 @@ write_mtpSaalSscopTimerKeepAlive(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerKeepAlive entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47137,6 +48525,10 @@ write_mtpSaalSscopTimerNoResponse(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerNoResponse entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47249,6 +48641,10 @@ write_mtpSaalSscopTimerPoll(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalSscopTimerPoll entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47361,6 +48757,10 @@ write_mtpSaalTransmissionRateIntervalLower(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalTransmissionRateIntervalLower entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47473,6 +48873,10 @@ write_mtpSaalTransmissionRateIntervalUpper(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalTransmissionRateIntervalUpper entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47585,6 +48989,10 @@ write_mtpSaalEgressTransmissionRateIntervalLower(int action, u_char *var_val, u_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalEgressTransmissionRateIntervalLower entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47697,6 +49105,10 @@ write_mtpSaalEgressTransmissionRateIntervalUpper(int action, u_char *var_val, u_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalEgressTransmissionRateIntervalUpper entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47809,6 +49221,10 @@ write_mtpSaalPollAfterRetransmission(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalPollAfterRetransmission entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -47924,6 +49340,10 @@ write_mtpM2paN1(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paN1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48031,6 +49451,10 @@ write_mtpM2paProving(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paProving entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48146,6 +49570,10 @@ write_mtpM2paManagementProvingState(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paManagementProvingState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48262,6 +49690,10 @@ write_mtpM2paProvingAttempts(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paProvingAttempts entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48369,6 +49801,10 @@ write_mtpM2paSctpNoDelay(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpNoDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48484,6 +49920,10 @@ write_mtpM2paSctpMaxseg(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxseg entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48596,6 +50036,10 @@ write_mtpM2paSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpHeartbeatItvl entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48703,6 +50147,10 @@ write_mtpM2paSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpHeartbeat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48818,6 +50266,10 @@ write_mtpM2paSctpRtoInitial(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoInitial entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -48925,6 +50377,10 @@ write_mtpM2paSctpRtoMin(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoMin entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49032,6 +50488,10 @@ write_mtpM2paSctpRtoMax(int action, u_char *var_val, u_char var_val_type, size_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpRtoMax entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49139,6 +50599,10 @@ write_mtpM2paSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpPathMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49246,6 +50710,10 @@ write_mtpM2paSctpCookieLife(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpCookieLife entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49353,6 +50821,10 @@ write_mtpM2paSctpCookieInc(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpCookieInc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49460,6 +50932,10 @@ write_mtpM2paSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxInitRetries entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49567,6 +51043,10 @@ write_mtpM2paSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, size
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpMaxBurst entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49674,6 +51154,10 @@ write_mtpM2paSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_typ
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpAssocMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49781,6 +51265,10 @@ write_mtpM2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpSackDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -49810,7 +51298,7 @@ write_mtpM2paSctpSackDelay(int action, u_char *var_val, u_char var_val_type, siz
 		}
 		/* Note: default value 200 */
 		/* Note: ranges 0..500 */
-		if ((0 > set_value || set_value > 500)) {
+		if ((set_value > 500)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2paSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -49893,6 +51381,10 @@ write_mtpM2paSctpLifetime(int action, u_char *var_val, u_char var_val_type, size
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paSctpLifetime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50000,6 +51492,10 @@ write_mtpM2paLoopDelayLower(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paLoopDelayLower entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50107,6 +51603,10 @@ write_mtpM2paLoopDelayUpper(int action, u_char *var_val, u_char var_val_type, si
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paLoopDelayUpper entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50214,6 +51714,10 @@ write_mtpM2paTransmissionRateIntervalLower(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paTransmissionRateIntervalLower entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50321,6 +51825,10 @@ write_mtpM2paTransmissionRateIntervalUpper(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paTransmissionRateIntervalUpper entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50428,6 +51936,10 @@ write_mtpSdtAdministrativeState(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50544,6 +52056,10 @@ write_mtpSdtEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtEquipmentPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50661,6 +52177,10 @@ write_mtpSdtName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50780,6 +52300,10 @@ write_mtpSdtProfilePointer(int action, u_char *var_val, u_char var_val_type, siz
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -50897,6 +52421,10 @@ write_mtpSdlType(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51012,6 +52540,10 @@ write_mtpSdlAdjPc(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlAdjPc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51132,6 +52664,10 @@ write_mtpSdlLoopDelay(int action, u_char *var_val, u_char var_val_type, size_t v
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlLoopDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51239,6 +52775,10 @@ write_mtpSdlEquipmentPointer(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlEquipmentPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51356,6 +52896,10 @@ write_mtpSdlCIC(int action, u_char *var_val, u_char var_val_type, size_t var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlCIC entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51468,6 +53012,10 @@ write_mtpSdlTransmissionRate(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlTransmissionRate entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51586,6 +53134,10 @@ write_mtpSdlStmChannel(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlStmChannel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51706,6 +53258,10 @@ write_mtpSdlVcTTpPointer(int action, u_char *var_val, u_char var_val_type, size_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlVcTTpPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51823,6 +53379,10 @@ write_mtpSdlSctpPointer(int action, u_char *var_val, u_char var_val_type, size_t
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlSctpPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -51940,6 +53500,10 @@ write_mtpSdlName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52059,6 +53623,10 @@ write_mtpSctpProfileNoDelay(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileNoDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52174,6 +53742,10 @@ write_mtpSctpProfileMaxseg(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxseg entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52286,6 +53858,10 @@ write_mtpSctpProfileHeartbeatItvl(int action, u_char *var_val, u_char var_val_ty
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileHeartbeatItvl entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52393,6 +53969,10 @@ write_mtpSctpProfileHeartbeat(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileHeartbeat entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52508,6 +54088,10 @@ write_mtpSctpProfileRtoInitial(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoInitial entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52615,6 +54199,10 @@ write_mtpSctpProfileRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoMin entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52722,6 +54310,10 @@ write_mtpSctpProfileRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRtoMax entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52829,6 +54421,10 @@ write_mtpSctpProfilePathMaxRetrans(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfilePathMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -52936,6 +54532,10 @@ write_mtpSctpProfileCookieLife(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileCookieLife entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53043,6 +54643,10 @@ write_mtpSctpProfileCookieInc(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileCookieInc entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53150,6 +54754,10 @@ write_mtpSctpProfileMaxInitRetries(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxInitRetries entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53257,6 +54865,10 @@ write_mtpSctpProfileMaxBurst(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxBurst entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53364,6 +54976,10 @@ write_mtpSctpProfileAssocMaxRetrans(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileAssocMaxRetrans entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53471,6 +55087,10 @@ write_mtpSctpProfileSackDelay(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileSackDelay entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53583,6 +55203,10 @@ write_mtpSctpProfileLifetime(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileLifetime entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53690,6 +55314,10 @@ write_mtpSctpProfileMinOstreams(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMinOstreams entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53802,6 +55430,10 @@ write_mtpSctpProfileMaxIstreams(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileMaxIstreams entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -53914,6 +55546,10 @@ write_mtpSctpAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54030,6 +55666,10 @@ write_mtpSctpLocalPort(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalPort entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54142,6 +55782,10 @@ write_mtpSctpRemotePort(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemotePort entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54253,6 +55897,10 @@ write_mtpSctpProfile(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfile entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54373,6 +56021,10 @@ write_mtpSctpProtocolPayloadId(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProtocolPayloadId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54480,6 +56132,10 @@ write_mtpSctpLocalAddress(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalAddress entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54598,6 +56254,10 @@ write_mtpSctpRemoteAddress(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemoteAddress entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54716,6 +56376,10 @@ write_mtpM2uaAspId(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54823,6 +56487,10 @@ write_mtpM2uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspCapabilities entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -54949,6 +56617,10 @@ write_mtpM2uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55066,6 +56738,10 @@ write_mtpM2uaAspSgOptions(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55192,6 +56868,10 @@ write_mtpM2uaAspSgRegistrationPolicy(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgRegistrationPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55308,6 +56988,10 @@ write_mtpM2uaAspSgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspSgAspIdPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55425,6 +57109,10 @@ write_mtpM2uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspAssociationPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55542,6 +57230,10 @@ write_mtpM2uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspProtocolPayloadId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55649,6 +57341,10 @@ write_mtpM2uaAsInterfaceIdentifier(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsInterfaceIdentifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55760,6 +57456,10 @@ write_mtpM2uaInterfaceIdentifierText(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaInterfaceIdentifierText entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55879,6 +57579,10 @@ write_mtpM2uaAsSDTI(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsSDTI entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -55985,6 +57689,10 @@ write_mtpM2uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsTrafficMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56102,6 +57810,10 @@ write_mtpM3uaAsType(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56218,6 +57930,10 @@ write_mtpM3uaAspId(int action, u_char *var_val, u_char var_val_type, size_t var_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56324,6 +58040,10 @@ write_mtpM3uaAspCapabilities(int action, u_char *var_val, u_char var_val_type, s
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspCapabilities entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56450,6 +58170,10 @@ write_mtpM3uaAspSgVersion(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56567,6 +58291,10 @@ write_mtpM3uaAspSgOptions(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56693,6 +58421,10 @@ write_mtpM3uaAspSgRegistrationPolicy(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgRegistrationPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56809,6 +58541,10 @@ write_mtpM3uaAspSgAspIdPolicy(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspSgAspIdPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -56926,6 +58662,10 @@ write_mtpM3uaAspAssociationPolicy(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspAssociationPolicy entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57043,6 +58783,10 @@ write_mtpM3uaAspProtocolPayloadId(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspProtocolPayloadId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57149,6 +58893,10 @@ write_mtpM3uaAsRoutingContext(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsRoutingContext entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57255,6 +59003,10 @@ write_mtpM3uaAsNetworkAppearance(int action, u_char *var_val, u_char var_val_typ
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsNetworkAppearance entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57361,6 +59113,10 @@ write_mtpM3uaAsNetworkPointCode(int action, u_char *var_val, u_char var_val_type
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsNetworkPointCode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57480,6 +59236,10 @@ write_mtpM3uaAsTrafficMode(int action, u_char *var_val, u_char var_val_type, siz
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsTrafficMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57595,6 +59355,10 @@ write_mtpDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, si
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpNoDelay entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57693,6 +59457,10 @@ write_mtpDefaultSctpMaxseg(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpMaxseg entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57788,6 +59556,10 @@ write_mtpDefaultSctpHeartbeatItvl(int action, u_char *var_val, u_char var_val_ty
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpHeartbeatItvl entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57878,6 +59650,10 @@ write_mtpDefaultSctpHeartbeat(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpHeartbeat entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -57976,6 +59752,10 @@ write_mtpDefaultSctpRtoInitial(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpRtoInitial entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58066,6 +59846,10 @@ write_mtpDefaultSctpRtoMin(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpRtoMin entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58156,6 +59940,10 @@ write_mtpDefaultSctpRtoMax(int action, u_char *var_val, u_char var_val_type, siz
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpRtoMax entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58246,6 +60034,10 @@ write_mtpDefaultSctpPathMaxRetrans(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpPathMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58336,6 +60128,10 @@ write_mtpDefaultSctpCookieLife(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpCookieLife entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58426,6 +60222,10 @@ write_mtpDefaultSctpCookieInc(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpCookieInc entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58516,6 +60316,10 @@ write_mtpDefaultSctpMaxInitRetries(int action, u_char *var_val, u_char var_val_t
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpMaxInitRetries entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58606,6 +60410,10 @@ write_mtpDefaultSctpMaxBurst(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpMaxBurst entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58696,6 +60504,10 @@ write_mtpDefaultSctpAssocMaxRetrans(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpAssocMaxRetrans entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58786,6 +60598,10 @@ write_mtpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpSackDelay entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58881,6 +60697,10 @@ write_mtpDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpDefaultSctpLifetime entering action=%d...  \n", action));
 	if ((StorageTmp = mtpMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -58966,6 +60786,7 @@ write_mtpDefaultSctpLifetime(int action, u_char *var_val, u_char var_val_type, s
 int
 can_act_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -58983,6 +60804,7 @@ can_act_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 int
 can_deact_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59000,6 +60822,7 @@ can_deact_mtpSapTable_row(struct mtpSapTable_data *StorageTmp)
 int
 can_act_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59017,6 +60840,7 @@ can_act_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 int
 can_deact_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59034,6 +60858,7 @@ can_deact_mtpNaTable_row(struct mtpNaTable_data *StorageTmp)
 int
 can_act_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59051,6 +60876,7 @@ can_act_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 int
 can_deact_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59068,6 +60894,7 @@ can_deact_mtpMsTable_row(struct mtpMsTable_data *StorageTmp)
 int
 can_act_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59085,6 +60912,7 @@ can_act_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 int
 can_deact_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59102,6 +60930,7 @@ can_deact_mtpSpProfileTable_row(struct mtpSpProfileTable_data *StorageTmp)
 int
 can_act_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59119,6 +60948,7 @@ can_act_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 int
 can_deact_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59136,6 +60966,7 @@ can_deact_mtpSpTable_row(struct mtpSpTable_data *StorageTmp)
 int
 can_act_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59153,6 +60984,7 @@ can_act_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 int
 can_deact_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59170,6 +61002,7 @@ can_deact_mtpL3Table_row(struct mtpL3Table_data *StorageTmp)
 int
 can_act_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59187,6 +61020,7 @@ can_act_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 int
 can_deact_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59204,6 +61038,7 @@ can_deact_mtpGsTable_row(struct mtpGsTable_data *StorageTmp)
 int
 can_act_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59221,6 +61056,7 @@ can_act_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 int
 can_deact_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59238,6 +61074,7 @@ can_deact_mtpGsLineTable_row(struct mtpGsLineTable_data *StorageTmp)
 int
 can_act_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59255,6 +61092,7 @@ can_act_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp)
 int
 can_deact_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59272,6 +61110,7 @@ can_deact_mtpGsLineContentTable_row(struct mtpGsLineContentTable_data *StorageTm
 int
 can_act_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59289,6 +61128,7 @@ can_act_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 int
 can_deact_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59306,6 +61146,7 @@ can_deact_mtpRsProfileTable_row(struct mtpRsProfileTable_data *StorageTmp)
 int
 can_act_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59323,6 +61164,7 @@ can_act_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 int
 can_deact_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59340,6 +61182,7 @@ can_deact_mtpRsTable_row(struct mtpRsTable_data *StorageTmp)
 int
 can_act_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59357,6 +61200,7 @@ can_act_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 int
 can_deact_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59374,6 +61218,7 @@ can_deact_mtpRtProfileTable_row(struct mtpRtProfileTable_data *StorageTmp)
 int
 can_act_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59391,6 +61236,7 @@ can_act_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 int
 can_deact_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59408,6 +61254,7 @@ can_deact_mtpRtTable_row(struct mtpRtTable_data *StorageTmp)
 int
 can_act_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59425,6 +61272,7 @@ can_act_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 int
 can_deact_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59442,6 +61290,7 @@ can_deact_mtpLsProfileTable_row(struct mtpLsProfileTable_data *StorageTmp)
 int
 can_act_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59459,6 +61308,7 @@ can_act_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 int
 can_deact_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59476,6 +61326,7 @@ can_deact_mtpLsTable_row(struct mtpLsTable_data *StorageTmp)
 int
 can_act_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59493,6 +61344,7 @@ can_act_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 int
 can_deact_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59510,6 +61362,7 @@ can_deact_mtpSlL3ProfileTable_row(struct mtpSlL3ProfileTable_data *StorageTmp)
 int
 can_act_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59527,6 +61380,7 @@ can_act_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 int
 can_deact_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59544,6 +61398,7 @@ can_deact_mtpSlL2ProfileTable_row(struct mtpSlL2ProfileTable_data *StorageTmp)
 int
 can_act_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59561,6 +61416,7 @@ can_act_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 int
 can_deact_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59578,6 +61434,7 @@ can_deact_mtpSlTable_row(struct mtpSlTable_data *StorageTmp)
 int
 can_act_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59595,6 +61452,7 @@ can_act_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 int
 can_deact_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59612,6 +61470,7 @@ can_deact_mtpSlSdlListTable_row(struct mtpSlSdlListTable_data *StorageTmp)
 int
 can_act_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59629,6 +61488,7 @@ can_act_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 int
 can_deact_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59646,6 +61506,7 @@ can_deact_mtpSlSdtListTable_row(struct mtpSlSdtListTable_data *StorageTmp)
 int
 can_act_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59663,6 +61524,7 @@ can_act_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 int
 can_deact_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59680,6 +61542,7 @@ can_deact_mtpNbTable_row(struct mtpNbTable_data *StorageTmp)
 int
 can_act_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59697,6 +61560,7 @@ can_act_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 int
 can_deact_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59714,6 +61578,7 @@ can_deact_mtpSaalTable_row(struct mtpSaalTable_data *StorageTmp)
 int
 can_act_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59731,6 +61596,7 @@ can_act_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 int
 can_deact_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59748,6 +61614,7 @@ can_deact_mtpM2paTable_row(struct mtpM2paTable_data *StorageTmp)
 int
 can_act_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59765,6 +61632,7 @@ can_act_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 int
 can_deact_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59782,6 +61650,7 @@ can_deact_mtpSdtTable_row(struct mtpSdtTable_data *StorageTmp)
 int
 can_act_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59799,6 +61668,7 @@ can_act_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 int
 can_deact_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59816,6 +61686,7 @@ can_deact_mtpSdlTable_row(struct mtpSdlTable_data *StorageTmp)
 int
 can_act_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59833,6 +61704,7 @@ can_act_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 int
 can_deact_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59850,6 +61722,7 @@ can_deact_mtpSctpProfileTable_row(struct mtpSctpProfileTable_data *StorageTmp)
 int
 can_act_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59867,6 +61740,7 @@ can_act_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 int
 can_deact_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59884,6 +61758,7 @@ can_deact_mtpSctpTable_row(struct mtpSctpTable_data *StorageTmp)
 int
 can_act_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59901,6 +61776,7 @@ can_act_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 int
 can_deact_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59918,6 +61794,7 @@ can_deact_mtpSctpLocalTable_row(struct mtpSctpLocalTable_data *StorageTmp)
 int
 can_act_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59935,6 +61812,7 @@ can_act_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 int
 can_deact_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59952,6 +61830,7 @@ can_deact_mtpSctpRemoteTable_row(struct mtpSctpRemoteTable_data *StorageTmp)
 int
 can_act_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59969,6 +61848,7 @@ can_act_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 int
 can_deact_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -59986,6 +61866,7 @@ can_deact_mtpM2uaAspTable_row(struct mtpM2uaAspTable_data *StorageTmp)
 int
 can_act_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60003,6 +61884,7 @@ can_act_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 int
 can_deact_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60020,6 +61902,7 @@ can_deact_mtpM2uaAsTable_row(struct mtpM2uaAsTable_data *StorageTmp)
 int
 can_act_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60037,6 +61920,7 @@ can_act_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 int
 can_deact_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60054,6 +61938,7 @@ can_deact_mtpM3uaAspTable_row(struct mtpM3uaAspTable_data *StorageTmp)
 int
 can_act_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60071,6 +61956,7 @@ can_act_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 int
 can_deact_mtpM3uaAsTable_row(struct mtpM3uaAsTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -60095,6 +61981,10 @@ write_mtpSapRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSapRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -60388,6 +62278,10 @@ write_mtpNaRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNaRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpNaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -60659,6 +62553,10 @@ write_mtpMsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpMsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpMsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -60924,6 +62822,10 @@ write_mtpSpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -61191,6 +63093,10 @@ write_mtpSpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSpRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -61470,6 +63376,10 @@ write_mtpL3RowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpL3RowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpL3TableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -61763,6 +63673,10 @@ write_mtpGsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpGsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -62056,6 +63970,10 @@ write_mtpGsLineRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpGsLineTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -62363,6 +64281,10 @@ write_mtpGsLineContentRowStatus(int action, u_char *var_val, u_char var_val_type
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpGsLineContentRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpGsLineContentTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -62684,6 +64606,10 @@ write_mtpRsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpRsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -62951,6 +64877,10 @@ write_mtpRsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpRsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -63244,6 +65174,10 @@ write_mtpRtProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpRtProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -63511,6 +65445,10 @@ write_mtpRtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpRtRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpRtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -63818,6 +65756,10 @@ write_mtpLsProfileRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpLsProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -64085,6 +66027,10 @@ write_mtpLsRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpLsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpLsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -64378,6 +66324,10 @@ write_mtpSlL3ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL3ProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSlL3ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -64645,6 +66595,10 @@ write_mtpSlL2ProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlL2ProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSlL2ProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -64938,6 +66892,10 @@ write_mtpSlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -65251,6 +67209,10 @@ write_mtpSlSdlListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdlListRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSlSdlListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -65578,6 +67540,10 @@ write_mtpSlSdtListRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSlSdtListRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSlSdtListTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -65905,6 +67871,10 @@ write_mtpNbRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpNbRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpNbTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -66172,6 +68142,10 @@ write_mtpSaalRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSaalRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSaalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -66439,6 +68413,10 @@ write_mtpM2paRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2paRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpM2paTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -66706,6 +68684,10 @@ write_mtpSdtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdtRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSdtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -66985,6 +68967,10 @@ write_mtpSdlRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSdlRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSdlTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -67280,6 +69266,10 @@ write_mtpSctpProfileRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpProfileRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSctpProfileTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -67547,6 +69537,10 @@ write_mtpSctpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSctpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -67812,6 +69806,10 @@ write_mtpSctpLocalRowStatus(int action, u_char *var_val, u_char var_val_type, si
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpLocalRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSctpLocalTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -68091,6 +70089,10 @@ write_mtpSctpRemoteRowStatus(int action, u_char *var_val, u_char var_val_type, s
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpSctpRemoteRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpSctpRemoteTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -68370,6 +70372,10 @@ write_mtpM2uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAspRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpM2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -68635,6 +70641,10 @@ write_mtpM2uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM2uaAsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpM2uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -68914,6 +70924,10 @@ write_mtpM3uaAspRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAspRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpM3uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -69179,6 +71193,10 @@ write_mtpM3uaAsRowStatus(int action, u_char *var_val, u_char var_val_type, size_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpMIB", "write_mtpM3uaAsRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpM3uaAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -70187,6 +72205,8 @@ mtpMIB_loop_handler(int sig)
 void
 mtpMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("mtpMIB", "mtpMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("mtpMIB", "done.\n"));

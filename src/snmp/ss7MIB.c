@@ -351,6 +351,10 @@ deinit_ss7MIB(void)
 int
 term_ss7MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ss7MIB", "term_ss7MIB: terminating...  "));
 	deinit_ss7MIB();
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
@@ -396,6 +400,7 @@ ss7MIB_duplicate(struct ss7MIB_data *thedata)
 {
 	struct ss7MIB_data *StorageNew = SNMP_MALLOC_STRUCT(ss7MIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("ss7MIB", "ss7MIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -465,6 +470,8 @@ ss7MIB_add(struct ss7MIB_data *thedata)
 void
 parse_ss7MIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct ss7MIB_data *StorageTmp = ss7MIB_create();
 
@@ -490,6 +497,10 @@ store_ss7MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct ss7MIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ss7MIB", "store_ss7MIB: storing data...  "));
 	refresh_ss7MIB(1);
 	if ((StorageTmp = ss7MIBStorage) == NULL) {
@@ -526,6 +537,8 @@ store_ss7MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -547,6 +560,8 @@ check_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
 int
 update_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	ss7MIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -562,6 +577,7 @@ update_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
 void
 revert_ss7MIB(struct ss7MIB_data *StorageTmp, struct ss7MIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_ss7MIB(StorageOld, NULL);
 }
@@ -818,6 +834,8 @@ parse_ss7NetworkTable(const char *token, char *line)
 	size_t tmpsize;
 	struct ss7NetworkTable_data *StorageTmp = ss7NetworkTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("ss7MIB", "parse_ss7NetworkTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -857,6 +875,10 @@ store_ss7NetworkTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct ss7NetworkTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("ss7MIB", "store_ss7NetworkTable: storing data...  "));
 	refresh_ss7NetworkTable(1);
 	(void) tmpsize;
@@ -894,6 +916,7 @@ store_ss7NetworkTable(int majorID, int minorID, void *serverarg, void *clientarg
 int
 activate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -911,6 +934,7 @@ activate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 int
 deactivate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -933,6 +957,8 @@ deactivate_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 int
 check_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -955,6 +981,8 @@ check_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7Net
 int
 update_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	ss7NetworkTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -969,6 +997,7 @@ update_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7Ne
 void
 revert_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp, struct ss7NetworkTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_ss7NetworkTable_row(StorageOld, NULL);
 }
@@ -1091,6 +1120,10 @@ write_ss7NetworkProtocolVariant(int action, u_char *var_val, u_char var_val_type
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolVariant entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1208,6 +1241,10 @@ write_ss7NetworkProtocolVersion(int action, u_char *var_val, u_char var_val_type
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1320,6 +1357,10 @@ write_ss7NetworkProtocolOptions(int action, u_char *var_val, u_char var_val_type
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkProtocolOptions entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -1432,6 +1473,7 @@ write_ss7NetworkProtocolOptions(int action, u_char *var_val, u_char var_val_type
 int
 can_act_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1449,6 +1491,7 @@ can_act_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 int
 can_deact_ss7NetworkTable_row(struct ss7NetworkTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -1473,6 +1516,10 @@ write_ss7NetworkRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("ss7MIB", "write_ss7NetworkRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(ss7NetworkTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -1776,6 +1823,8 @@ ss7MIB_loop_handler(int sig)
 void
 ss7MIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("ss7MIB", "ss7MIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("ss7MIB", "done.\n"));
