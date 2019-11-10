@@ -282,7 +282,7 @@ static int tries = 0;
 #define LONGER_WAIT	1000	// 10000 // 5000
 #define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
-#define INFINITE_WAIT	-1
+#define INFINITE_WAIT	-1UL
 
 static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
@@ -3635,7 +3635,7 @@ print_addr(char *add_ptr, size_t add_len)
 
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			fprintf(stdout, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -3661,7 +3661,7 @@ addr_string(char *add_ptr, size_t add_len)
 	size_t anum = add_len / sizeof(*a);
 
 	if (add_len > 0) {
-		int i;
+		unsigned i;
 
 		if (add_len != anum * sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %lu, anum = %lu, ", (ulong) add_len, (ulong) anum);
@@ -3700,7 +3700,7 @@ prot_string(char *pro_ptr, size_t pro_len)
 {
 	static char buf[128];
 	size_t len = 0;
-	int i;
+	unsigned i;
 
 	buf[0] = 0;
 	for (i = 0; i < pro_len; i++) {
@@ -4967,7 +4967,7 @@ print_triple_string(int child, const char *msgs[], const char *string)
 }
 
 void
-print_more(int child)
+print_more()
 {
 	show = 1;
 }
@@ -6841,6 +6841,8 @@ stream_start(int child, int index)
 		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 	}
+#else
+	(void) index;
 #endif				/* TEST_M2PA */
 	switch (child) {
 	case 1:
@@ -7015,6 +7017,7 @@ begin_tests(int index)
 static int
 end_tests(int index)
 {
+	(void) index;
 #if TEST_M2PA
 	qos_data.sid = 0;
 	qos_info.hmac = SCTP_HMAC_NONE;
@@ -8440,6 +8443,7 @@ do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 	int other = (child + 1) % 2;
 #endif				/* TEST_X400 || TEST_M2PA */
 
+	(void) ctrl;
 	if (data->len >= 0) {
 		switch (child) {
 		default:
@@ -8884,7 +8888,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 	int event = __RESULT_DECODE_ERROR;
 	union primitives *p = (union primitives *) ctrl->buf;
 
-	if (ctrl->len >= sizeof(p->prim)) {
+	if (ctrl->len >= (int) sizeof(p->prim)) {
 		switch ((last_prim = p->prim)) {
 #if TEST_M2PA
 		case N_CONN_REQ:
@@ -9357,7 +9361,7 @@ get_data(int child, int action)
 }
 
 int
-expect(int child, int wait, int want)
+expect(int child, long wait, int want)
 {
 	if ((last_event = wait_event(child, wait)) == want)
 		return (__RESULT_SUCCESS);
@@ -9375,78 +9379,91 @@ expect(int child, int wait, int want)
 static int
 preamble_none(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 static int
 postamble_none(int child)
 {
+	(void) child;
 	return (__RESULT_SUCCESS);
 }
 
 static int
 preamble_unbound(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 postamble_unbound(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_push(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 postamble_pop(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_config(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_attach(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 postamble_detach(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_enable(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 postamble_disable(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 preamble_link_power_on(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 static int
 postamble_link_out_of_service(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9531,6 +9548,7 @@ Checks that two Streams can be opened and closed."
 int
 test_0_2_1(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -9552,6 +9570,7 @@ Checks that two Streams can be opened, information obtained, and closed."
 int
 test_0_2_2(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -9574,6 +9593,7 @@ pushed, popped, and closed."
 int
 test_0_2_3(int child)
 {
+	(void) child;
 	return __RESULT_SUCCESS;
 }
 
@@ -9734,18 +9754,21 @@ and moves to inactive state on receiving and ASP Up Ack message."
 int
 test_1_1_1_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_1_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_1_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9779,18 +9802,21 @@ message and moves to the active state on receiving an ASP Active Ack message."
 int
 test_1_1_2_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_2_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_2_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9825,18 +9851,21 @@ message."
 int
 test_1_1_3_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_3_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_3_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9872,18 +9901,21 @@ both AS, when ASP Active Ack message is received with all parameters."
 int
 test_1_1_4_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_4_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_4_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9919,18 +9951,21 @@ message with IID as that of AS1."
 int
 test_1_1_5_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_5_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_5_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -9966,18 +10001,21 @@ received with all parameters."
 int
 test_1_1_6_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_6_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_6_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10008,18 +10046,21 @@ performing a restart operation) from SCTP, moves the state of the ASP to down."
 int
 test_1_1_7_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_7_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_7_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10051,18 +10092,21 @@ the same heartbeat data provided in the Heartbeat message."
 int
 test_1_1_8_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_8_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_8_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10093,18 +10137,21 @@ T(ack), when it receives no ASP Up Ack."
 int
 test_1_1_9_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_9_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_9_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10135,18 +10182,21 @@ timer T(ack), when it receives no ASP Down Ack."
 int
 test_1_1_10_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_10_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_10_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10177,18 +10227,21 @@ timer T(ack), when it receives no ASP Active Ack."
 int
 test_1_1_11_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_11_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_11_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10219,18 +10272,21 @@ timer T(ack), when it receives no ASP Inactive Ack."
 int
 test_1_1_12_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_12_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_1_12_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10268,18 +10324,21 @@ remains the ASP state in Inactive."
 int
 test_1_2_1_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_1_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_1_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10310,18 +10369,21 @@ state to Inactive."
 int
 test_1_2_2_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_2_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_2_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10352,18 +10414,21 @@ Down Ack message without having sent an ASP Down message."
 int
 test_1_2_3_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_3_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_3_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10394,18 +10459,21 @@ Down Ack messagew without having sent and ASP Down message."
 int
 test_1_2_4_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_4_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_1_2_4_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10451,18 +10519,21 @@ result as \"Successfully Registered\"."
 int
 test_2_1_1_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_1_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_1_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10498,18 +10569,21 @@ registrations with registration result as \"Successfully Registered\"."
 int
 test_2_1_2_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_2_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_2_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10545,18 +10619,21 @@ registration each with registration result as \"Successfully Registered\"."
 int
 test_2_1_3_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_3_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_3_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10591,18 +10668,21 @@ De-registered\"."
 int
 test_2_1_4_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_4_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_4_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10639,18 +10719,21 @@ result as \"Successfully De-registered\"."
 int
 test_2_1_5_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_5_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_2_1_5_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10691,18 +10774,21 @@ and accepts an Establish Confirm message in response."
 int
 test_3_1_1_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_1_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_1_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10732,18 +10818,21 @@ Ensure that IUT is able to send a Data message."
 int
 test_3_1_2_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_2_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_2_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10775,18 +10864,21 @@ Acknowledge message has the same Correlation ID."
 int
 test_3_1_3_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_3_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_3_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10817,18 +10909,21 @@ accepts a Release Confirm message in repsonse."
 int
 test_3_1_4_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_4_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_4_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10858,18 +10953,21 @@ Ensure that the IUT accepts State Indication messages and does not respond."
 int
 test_3_1_5_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_5_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_5_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10900,18 +10998,21 @@ Ensure that the IUT accepts Congestion indication messages with event as\n\
 int
 test_3_1_6_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_6_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_6_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10943,18 +11044,21 @@ result as \"RESULT_SUCCESS\" in response."
 int
 test_3_1_7_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_7_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_7_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -10987,18 +11091,21 @@ Confrim message with \"RESULT_SUCCESS\" in response."
 int
 test_3_1_8_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_8_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_8_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11030,18 +11137,21 @@ Retrieval Confirm message with result as \"RESULT_FAILURE\"."
 int
 test_3_1_9_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_9_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_9_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11073,18 +11183,21 @@ Confirm message in response."
 int
 test_3_1_10_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_10_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_10_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11116,18 +11229,21 @@ State Confirm message in response."
 int
 test_3_1_11_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_11_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_11_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11159,18 +11275,21 @@ response."
 int
 test_3_1_12_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_12_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_12_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11202,18 +11321,21 @@ message in response."
 int
 test_3_1_13_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_13_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_13_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11245,18 +11367,21 @@ in response."
 int
 test_3_1_14_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_14_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_14_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11286,18 +11411,21 @@ Ensure that the IUT accepts a Release Indication message for a link."
 int
 test_3_1_15_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_15_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_15_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11328,18 +11456,21 @@ of the timer, re-sends the Establish Request message."
 int
 test_3_1_16_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_16_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_3_1_16_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11386,18 +11517,21 @@ non-configured interface identifier."
 int
 test_4_1_1_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_1_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_1_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11435,18 +11569,21 @@ traffic handling mode."
 int
 test_4_1_2_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_2_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_2_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11483,18 +11620,21 @@ non-supported (e.g. text-based) interface identifier type."
 int
 test_4_1_3_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_3_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_3_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11527,18 +11667,21 @@ unsupported message class."
 int
 test_4_1_4_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_4_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_4_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11572,18 +11715,21 @@ parameter value."
 int
 test_4_1_5_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_5_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_5_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11616,18 +11762,21 @@ wrong length field."
 int
 test_4_1_6_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_6_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_6_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11659,18 +11808,21 @@ Parameter\", when it receives a message from peer with an invalid parameter."
 int
 test_4_1_7_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_7_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_7_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -11703,18 +11855,21 @@ missing."
 int
 test_4_1_8_ptu0(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_8_iut1(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
 int
 test_4_1_8_iut2(int child)
 {
+	(void) child;
 	return (__RESULT_FAILURE);
 }
 
@@ -12167,7 +12322,7 @@ print_header(void)
 int
 do_tests(int num_tests)
 {
-	int i;
+	unsigned i;
 	int result = __RESULT_INCONCLUSIVE;
 	int notapplicable = 0;
 	int inconclusive = 0;
@@ -12473,7 +12628,7 @@ do_tests(int num_tests)
 }
 
 void
-copying(int argc, char *argv[])
+copying()
 {
 	if (!verbose)
 		return;
@@ -12529,7 +12684,7 @@ regulations).\n\
 }
 
 void
-version(int argc, char *argv[])
+version(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12549,7 +12704,7 @@ version(int argc, char *argv[])
 }
 
 void
-usage(int argc, char *argv[])
+usage(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -12563,7 +12718,7 @@ Usage:\n\
 }
 
 void
-help(int argc, char *argv[])
+help(char *argv[])
 {
 	if (!verbose)
 		return;
@@ -13138,13 +13293,13 @@ main(int argc, char *argv[])
 			break;
 		case 'H':	/* -H */
 		case 'h':	/* -h, --help, -?, --? */
-			help(argc, argv);
+			help(argv);
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argc, argv);
+			version(argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argc, argv);
+			copying();
 			exit(0);
 		case '?':
 		default:
@@ -13160,7 +13315,7 @@ main(int argc, char *argv[])
 			}
 			goto bad_usage;
 		      bad_usage:
-			usage(argc, argv);
+			usage(argv);
 			exit(2);
 		}
 	}
@@ -13179,7 +13334,7 @@ main(int argc, char *argv[])
 	case 1:
 		break;
 	default:
-		copying(argc, argv);
+		copying();
 	}
 	if (client_exec == 0 && server_exec == 0) {
 		client_exec = 1;
