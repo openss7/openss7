@@ -972,6 +972,10 @@ deinit_tcapOmMIB(void)
 int
 term_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "term_tcapOmMIB: terminating...  "));
 	deinit_tcapOmMIB();
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));
@@ -1039,6 +1043,7 @@ tcapOmMIB_duplicate(struct tcapOmMIB_data *thedata)
 {
 	struct tcapOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(tcapOmMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 		if (!(StorageNew->tcapOm1stAndIntervalActivate = snmp_duplicate_objid(thedata->tcapOm1stAndIntervalActivate, thedata->tcapOm1stAndIntervalActivateLen / sizeof(oid))))
@@ -1142,6 +1147,8 @@ tcapOmMIB_add(struct tcapOmMIB_data *thedata)
 void
 parse_tcapOmMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct tcapOmMIB_data *StorageTmp = tcapOmMIB_create();
 
@@ -1207,6 +1214,10 @@ store_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct tcapOmMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmMIB: storing data...  "));
 	refresh_tcapOmMIB(1);
 	if ((StorageTmp = tcapOmMIBStorage) == NULL) {
@@ -1253,6 +1264,8 @@ store_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1274,6 +1287,8 @@ check_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *Storag
 int
 update_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1289,6 +1304,7 @@ update_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *Stora
 void
 revert_tcapOmMIB(struct tcapOmMIB_data *StorageTmp, struct tcapOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmMIB(StorageOld, NULL);
 }
@@ -1608,6 +1624,8 @@ parse_tcapOmNodeTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmNodeTable_data *StorageTmp = tcapOmNodeTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmNodeTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1644,6 +1662,10 @@ store_tcapOmNodeTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct tcapOmNodeTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmNodeTable: storing data...  "));
 	refresh_tcapOmNodeTable(1);
 	(void) tmpsize;
@@ -1836,6 +1858,8 @@ parse_tcapOmNodeCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmNodeCurrentTable_data *StorageTmp = tcapOmNodeCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmNodeCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1870,6 +1894,10 @@ store_tcapOmNodeCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 	struct tcapOmNodeCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmNodeCurrentTable: storing data...  "));
 	refresh_tcapOmNodeCurrentTable(1);
 	(void) tmpsize;
@@ -2063,6 +2091,8 @@ parse_tcapOmNode5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmNode5minIntTable_data *StorageTmp = tcapOmNode5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmNode5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2098,6 +2128,10 @@ store_tcapOmNode5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 	struct tcapOmNode5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmNode5minIntTable: storing data...  "));
 	refresh_tcapOmNode5minIntTable(1);
 	(void) tmpsize;
@@ -2293,6 +2327,8 @@ parse_tcapOmNode15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmNode15minIntTable_data *StorageTmp = tcapOmNode15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmNode15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2328,6 +2364,10 @@ store_tcapOmNode15minIntTable(int majorID, int minorID, void *serverarg, void *c
 	struct tcapOmNode15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmNode15minIntTable: storing data...  "));
 	refresh_tcapOmNode15minIntTable(1);
 	(void) tmpsize;
@@ -2522,6 +2562,8 @@ parse_tcapOmMsgsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmMsgsTable_data *StorageTmp = tcapOmMsgsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmMsgsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2557,6 +2599,10 @@ store_tcapOmMsgsTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct tcapOmMsgsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmMsgsTable: storing data...  "));
 	refresh_tcapOmMsgsTable(1);
 	(void) tmpsize;
@@ -2748,6 +2794,8 @@ parse_tcapOmMsgsCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmMsgsCurrentTable_data *StorageTmp = tcapOmMsgsCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmMsgsCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2781,6 +2829,10 @@ store_tcapOmMsgsCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 	struct tcapOmMsgsCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmMsgsCurrentTable: storing data...  "));
 	refresh_tcapOmMsgsCurrentTable(1);
 	(void) tmpsize;
@@ -2974,6 +3026,8 @@ parse_tcapOmMsgs5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmMsgs5minIntTable_data *StorageTmp = tcapOmMsgs5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmMsgs5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3008,6 +3062,10 @@ store_tcapOmMsgs5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 	struct tcapOmMsgs5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmMsgs5minIntTable: storing data...  "));
 	refresh_tcapOmMsgs5minIntTable(1);
 	(void) tmpsize;
@@ -3202,6 +3260,8 @@ parse_tcapOmMsgs15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmMsgs15minIntTable_data *StorageTmp = tcapOmMsgs15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmMsgs15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3236,6 +3296,10 @@ store_tcapOmMsgs15minIntTable(int majorID, int minorID, void *serverarg, void *c
 	struct tcapOmMsgs15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmMsgs15minIntTable: storing data...  "));
 	refresh_tcapOmMsgs15minIntTable(1);
 	(void) tmpsize;
@@ -3449,6 +3513,8 @@ parse_tcapOmAETable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmAETable_data *StorageTmp = tcapOmAETable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmAETable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3494,6 +3560,10 @@ store_tcapOmAETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct tcapOmAETable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmAETable: storing data...  "));
 	refresh_tcapOmAETable(1);
 	(void) tmpsize;
@@ -3709,6 +3779,8 @@ parse_tcapOmAECurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmAECurrentTable_data *StorageTmp = tcapOmAECurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmAECurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3752,6 +3824,10 @@ store_tcapOmAECurrentTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmAECurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmAECurrentTable: storing data...  "));
 	refresh_tcapOmAECurrentTable(1);
 	(void) tmpsize;
@@ -3969,6 +4045,8 @@ parse_tcapOmAE5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmAE5minIntTable_data *StorageTmp = tcapOmAE5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmAE5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4013,6 +4091,10 @@ store_tcapOmAE5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmAE5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmAE5minIntTable: storing data...  "));
 	refresh_tcapOmAE5minIntTable(1);
 	(void) tmpsize;
@@ -4231,6 +4313,8 @@ parse_tcapOmAE15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmAE15minIntTable_data *StorageTmp = tcapOmAE15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmAE15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4275,6 +4359,10 @@ store_tcapOmAE15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 	struct tcapOmAE15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmAE15minIntTable: storing data...  "));
 	refresh_tcapOmAE15minIntTable(1);
 	(void) tmpsize;
@@ -4503,6 +4591,8 @@ parse_tcapOmTcTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmTcTable_data *StorageTmp = tcapOmTcTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmTcTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4553,6 +4643,10 @@ store_tcapOmTcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct tcapOmTcTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmTcTable: storing data...  "));
 	refresh_tcapOmTcTable(1);
 	(void) tmpsize;
@@ -4783,6 +4877,8 @@ parse_tcapOmTcCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmTcCurrentTable_data *StorageTmp = tcapOmTcCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmTcCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4831,6 +4927,10 @@ store_tcapOmTcCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmTcCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmTcCurrentTable: storing data...  "));
 	refresh_tcapOmTcCurrentTable(1);
 	(void) tmpsize;
@@ -5063,6 +5163,8 @@ parse_tcapOmTc5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmTc5minIntTable_data *StorageTmp = tcapOmTc5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmTc5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5112,6 +5214,10 @@ store_tcapOmTc5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmTc5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmTc5minIntTable: storing data...  "));
 	refresh_tcapOmTc5minIntTable(1);
 	(void) tmpsize;
@@ -5345,6 +5451,8 @@ parse_tcapOmTc15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmTc15minIntTable_data *StorageTmp = tcapOmTc15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmTc15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5394,6 +5502,10 @@ store_tcapOmTc15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 	struct tcapOmTc15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmTc15minIntTable: storing data...  "));
 	refresh_tcapOmTc15minIntTable(1);
 	(void) tmpsize;
@@ -5645,6 +5757,8 @@ parse_tcapOmDevelRecvTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelRecvTable_data *StorageTmp = tcapOmDevelRecvTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelRecvTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5704,6 +5818,10 @@ store_tcapOmDevelRecvTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmDevelRecvTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelRecvTable: storing data...  "));
 	refresh_tcapOmDevelRecvTable(1);
 	(void) tmpsize;
@@ -5961,6 +6079,8 @@ parse_tcapOmDevelRecvCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelRecvCurrentTable_data *StorageTmp = tcapOmDevelRecvCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelRecvCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6018,6 +6138,10 @@ store_tcapOmDevelRecvCurrentTable(int majorID, int minorID, void *serverarg, voi
 	struct tcapOmDevelRecvCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelRecvCurrentTable: storing data...  "));
 	refresh_tcapOmDevelRecvCurrentTable(1);
 	(void) tmpsize;
@@ -6277,6 +6401,8 @@ parse_tcapOmDevelRecv5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelRecv5minIntTable_data *StorageTmp = tcapOmDevelRecv5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelRecv5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6335,6 +6461,10 @@ store_tcapOmDevelRecv5minIntTable(int majorID, int minorID, void *serverarg, voi
 	struct tcapOmDevelRecv5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelRecv5minIntTable: storing data...  "));
 	refresh_tcapOmDevelRecv5minIntTable(1);
 	(void) tmpsize;
@@ -6595,6 +6725,8 @@ parse_tcapOmDevelRecv15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelRecv15minIntTable_data *StorageTmp = tcapOmDevelRecv15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelRecv15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6653,6 +6785,10 @@ store_tcapOmDevelRecv15minIntTable(int majorID, int minorID, void *serverarg, vo
 	struct tcapOmDevelRecv15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelRecv15minIntTable: storing data...  "));
 	refresh_tcapOmDevelRecv15minIntTable(1);
 	(void) tmpsize;
@@ -6904,6 +7040,8 @@ parse_tcapOmDevelSentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelSentTable_data *StorageTmp = tcapOmDevelSentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelSentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6958,6 +7096,10 @@ store_tcapOmDevelSentTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapOmDevelSentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelSentTable: storing data...  "));
 	refresh_tcapOmDevelSentTable(1);
 	(void) tmpsize;
@@ -7206,6 +7348,8 @@ parse_tcapOmDevelSentCurrentTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelSentCurrentTable_data *StorageTmp = tcapOmDevelSentCurrentTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelSentCurrentTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7258,6 +7402,10 @@ store_tcapOmDevelSentCurrentTable(int majorID, int minorID, void *serverarg, voi
 	struct tcapOmDevelSentCurrentTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelSentCurrentTable: storing data...  "));
 	refresh_tcapOmDevelSentCurrentTable(1);
 	(void) tmpsize;
@@ -7508,6 +7656,8 @@ parse_tcapOmDevelSent5minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelSent5minIntTable_data *StorageTmp = tcapOmDevelSent5minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelSent5minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7561,6 +7711,10 @@ store_tcapOmDevelSent5minIntTable(int majorID, int minorID, void *serverarg, voi
 	struct tcapOmDevelSent5minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelSent5minIntTable: storing data...  "));
 	refresh_tcapOmDevelSent5minIntTable(1);
 	(void) tmpsize;
@@ -7812,6 +7966,8 @@ parse_tcapOmDevelSent15minIntTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapOmDevelSent15minIntTable_data *StorageTmp = tcapOmDevelSent15minIntTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapOmMIB", "parse_tcapOmDevelSent15minIntTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -7865,6 +8021,10 @@ store_tcapOmDevelSent15minIntTable(int majorID, int minorID, void *serverarg, vo
 	struct tcapOmDevelSent15minIntTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapOmMIB", "store_tcapOmDevelSent15minIntTable: storing data...  "));
 	refresh_tcapOmDevelSent15minIntTable(1);
 	(void) tmpsize;
@@ -7926,6 +8086,8 @@ store_tcapOmDevelSent15minIntTable(int majorID, int minorID, void *serverarg, vo
 int
 check_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7948,6 +8110,8 @@ check_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOm
 int
 update_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmNodeTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7962,6 +8126,7 @@ update_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapO
 void
 revert_tcapOmNodeTable_row(struct tcapOmNodeTable_data *StorageTmp, struct tcapOmNodeTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmNodeTable_row(StorageOld, NULL);
 }
@@ -8091,6 +8256,8 @@ var_tcapOmNodeTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8113,6 +8280,8 @@ check_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp,
 int
 update_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmNodeCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8127,6 +8296,7 @@ update_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp
 void
 revert_tcapOmNodeCurrentTable_row(struct tcapOmNodeCurrentTable_data *StorageTmp, struct tcapOmNodeCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmNodeCurrentTable_row(StorageOld, NULL);
 }
@@ -8244,6 +8414,8 @@ var_tcapOmNodeCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8266,6 +8438,8 @@ check_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp,
 int
 update_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmNode5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8280,6 +8454,7 @@ update_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp
 void
 revert_tcapOmNode5minIntTable_row(struct tcapOmNode5minIntTable_data *StorageTmp, struct tcapOmNode5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmNode5minIntTable_row(StorageOld, NULL);
 }
@@ -8397,6 +8572,8 @@ var_tcapOmNode5minIntTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8419,6 +8596,8 @@ check_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTm
 int
 update_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmNode15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8433,6 +8612,7 @@ update_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageT
 void
 revert_tcapOmNode15minIntTable_row(struct tcapOmNode15minIntTable_data *StorageTmp, struct tcapOmNode15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmNode15minIntTable_row(StorageOld, NULL);
 }
@@ -8550,6 +8730,8 @@ var_tcapOmNode15minIntTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8572,6 +8754,8 @@ check_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOm
 int
 update_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmMsgsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8586,6 +8770,7 @@ update_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapO
 void
 revert_tcapOmMsgsTable_row(struct tcapOmMsgsTable_data *StorageTmp, struct tcapOmMsgsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmMsgsTable_row(StorageOld, NULL);
 }
@@ -8703,6 +8888,8 @@ var_tcapOmMsgsTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8725,6 +8912,8 @@ check_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp,
 int
 update_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmMsgsCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8739,6 +8928,7 @@ update_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp
 void
 revert_tcapOmMsgsCurrentTable_row(struct tcapOmMsgsCurrentTable_data *StorageTmp, struct tcapOmMsgsCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmMsgsCurrentTable_row(StorageOld, NULL);
 }
@@ -8844,6 +9034,8 @@ var_tcapOmMsgsCurrentTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8866,6 +9058,8 @@ check_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp,
 int
 update_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmMsgs5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8880,6 +9074,7 @@ update_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp
 void
 revert_tcapOmMsgs5minIntTable_row(struct tcapOmMsgs5minIntTable_data *StorageTmp, struct tcapOmMsgs5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmMsgs5minIntTable_row(StorageOld, NULL);
 }
@@ -8985,6 +9180,8 @@ var_tcapOmMsgs5minIntTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9007,6 +9204,8 @@ check_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTm
 int
 update_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmMsgs15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9021,6 +9220,7 @@ update_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageT
 void
 revert_tcapOmMsgs15minIntTable_row(struct tcapOmMsgs15minIntTable_data *StorageTmp, struct tcapOmMsgs15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmMsgs15minIntTable_row(StorageOld, NULL);
 }
@@ -9126,6 +9326,8 @@ var_tcapOmMsgs15minIntTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9148,6 +9350,8 @@ check_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETa
 int
 update_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmAETable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9162,6 +9366,7 @@ update_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAET
 void
 revert_tcapOmAETable_row(struct tcapOmAETable_data *StorageTmp, struct tcapOmAETable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmAETable_row(StorageOld, NULL);
 }
@@ -9309,6 +9514,8 @@ var_tcapOmAETable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9331,6 +9538,8 @@ check_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, str
 int
 update_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmAECurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9345,6 +9554,7 @@ update_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, st
 void
 revert_tcapOmAECurrentTable_row(struct tcapOmAECurrentTable_data *StorageTmp, struct tcapOmAECurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmAECurrentTable_row(StorageOld, NULL);
 }
@@ -9480,6 +9690,8 @@ var_tcapOmAECurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9502,6 +9714,8 @@ check_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, str
 int
 update_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmAE5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9516,6 +9730,7 @@ update_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, st
 void
 revert_tcapOmAE5minIntTable_row(struct tcapOmAE5minIntTable_data *StorageTmp, struct tcapOmAE5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmAE5minIntTable_row(StorageOld, NULL);
 }
@@ -9651,6 +9866,8 @@ var_tcapOmAE5minIntTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9673,6 +9890,8 @@ check_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, s
 int
 update_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmAE15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9687,6 +9906,7 @@ update_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, 
 void
 revert_tcapOmAE15minIntTable_row(struct tcapOmAE15minIntTable_data *StorageTmp, struct tcapOmAE15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmAE15minIntTable_row(StorageOld, NULL);
 }
@@ -9822,6 +10042,8 @@ var_tcapOmAE15minIntTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9844,6 +10066,8 @@ check_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTa
 int
 update_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmTcTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9858,6 +10082,7 @@ update_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcT
 void
 revert_tcapOmTcTable_row(struct tcapOmTcTable_data *StorageTmp, struct tcapOmTcTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmTcTable_row(StorageOld, NULL);
 }
@@ -10035,6 +10260,8 @@ var_tcapOmTcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10057,6 +10284,8 @@ check_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, str
 int
 update_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmTcCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10071,6 +10300,7 @@ update_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, st
 void
 revert_tcapOmTcCurrentTable_row(struct tcapOmTcCurrentTable_data *StorageTmp, struct tcapOmTcCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmTcCurrentTable_row(StorageOld, NULL);
 }
@@ -10236,6 +10466,8 @@ var_tcapOmTcCurrentTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10258,6 +10490,8 @@ check_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, str
 int
 update_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmTc5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10272,6 +10506,7 @@ update_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, st
 void
 revert_tcapOmTc5minIntTable_row(struct tcapOmTc5minIntTable_data *StorageTmp, struct tcapOmTc5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmTc5minIntTable_row(StorageOld, NULL);
 }
@@ -10437,6 +10672,8 @@ var_tcapOmTc5minIntTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10459,6 +10696,8 @@ check_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, s
 int
 update_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmTc15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10473,6 +10712,7 @@ update_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, 
 void
 revert_tcapOmTc15minIntTable_row(struct tcapOmTc15minIntTable_data *StorageTmp, struct tcapOmTc15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmTc15minIntTable_row(StorageOld, NULL);
 }
@@ -10638,6 +10878,8 @@ var_tcapOmTc15minIntTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10660,6 +10902,8 @@ check_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, str
 int
 update_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelRecvTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10674,6 +10918,7 @@ update_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, st
 void
 revert_tcapOmDevelRecvTable_row(struct tcapOmDevelRecvTable_data *StorageTmp, struct tcapOmDevelRecvTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelRecvTable_row(StorageOld, NULL);
 }
@@ -10905,6 +11150,8 @@ var_tcapOmDevelRecvTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10927,6 +11174,8 @@ check_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *S
 int
 update_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelRecvCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10941,6 +11190,7 @@ update_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *
 void
 revert_tcapOmDevelRecvCurrentTable_row(struct tcapOmDevelRecvCurrentTable_data *StorageTmp, struct tcapOmDevelRecvCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelRecvCurrentTable_row(StorageOld, NULL);
 }
@@ -11160,6 +11410,8 @@ var_tcapOmDevelRecvCurrentTable(struct variable *vp, oid * name, size_t *length,
 int
 check_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -11182,6 +11434,8 @@ check_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *S
 int
 update_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelRecv5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -11196,6 +11450,7 @@ update_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *
 void
 revert_tcapOmDevelRecv5minIntTable_row(struct tcapOmDevelRecv5minIntTable_data *StorageTmp, struct tcapOmDevelRecv5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelRecv5minIntTable_row(StorageOld, NULL);
 }
@@ -11415,6 +11670,8 @@ var_tcapOmDevelRecv5minIntTable(struct variable *vp, oid * name, size_t *length,
 int
 check_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -11437,6 +11694,8 @@ check_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data 
 int
 update_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelRecv15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -11451,6 +11710,7 @@ update_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data
 void
 revert_tcapOmDevelRecv15minIntTable_row(struct tcapOmDevelRecv15minIntTable_data *StorageTmp, struct tcapOmDevelRecv15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelRecv15minIntTable_row(StorageOld, NULL);
 }
@@ -11670,6 +11930,8 @@ var_tcapOmDevelRecv15minIntTable(struct variable *vp, oid * name, size_t *length
 int
 check_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -11692,6 +11954,8 @@ check_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, str
 int
 update_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelSentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -11706,6 +11970,7 @@ update_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, st
 void
 revert_tcapOmDevelSentTable_row(struct tcapOmDevelSentTable_data *StorageTmp, struct tcapOmDevelSentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelSentTable_row(StorageOld, NULL);
 }
@@ -11937,6 +12202,8 @@ var_tcapOmDevelSentTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -11959,6 +12226,8 @@ check_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *S
 int
 update_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelSentCurrentTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -11973,6 +12242,7 @@ update_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *
 void
 revert_tcapOmDevelSentCurrentTable_row(struct tcapOmDevelSentCurrentTable_data *StorageTmp, struct tcapOmDevelSentCurrentTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelSentCurrentTable_row(StorageOld, NULL);
 }
@@ -12192,6 +12462,8 @@ var_tcapOmDevelSentCurrentTable(struct variable *vp, oid * name, size_t *length,
 int
 check_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -12214,6 +12486,8 @@ check_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *S
 int
 update_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelSent5minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -12228,6 +12502,7 @@ update_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *
 void
 revert_tcapOmDevelSent5minIntTable_row(struct tcapOmDevelSent5minIntTable_data *StorageTmp, struct tcapOmDevelSent5minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelSent5minIntTable_row(StorageOld, NULL);
 }
@@ -12447,6 +12722,8 @@ var_tcapOmDevelSent5minIntTable(struct variable *vp, oid * name, size_t *length,
 int
 check_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -12469,6 +12746,8 @@ check_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data 
 int
 update_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapOmDevelSent15minIntTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -12483,6 +12762,7 @@ update_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data
 void
 revert_tcapOmDevelSent15minIntTable_row(struct tcapOmDevelSent15minIntTable_data *StorageTmp, struct tcapOmDevelSent15minIntTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapOmDevelSent15minIntTable_row(StorageOld, NULL);
 }
@@ -12702,6 +12982,10 @@ write_tcapOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm1stAndIntervalActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12801,6 +13085,10 @@ write_tcapOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm1stAndIntervalDeactivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12900,6 +13188,10 @@ write_tcapOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12999,6 +13291,10 @@ write_tcapOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13098,6 +13394,10 @@ write_tcapOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13197,6 +13497,10 @@ write_tcapOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13296,6 +13600,10 @@ write_tcapOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm5MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13311,7 +13619,7 @@ write_tcapOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 		}
 		/* Note: default value 96 */
 		/* Note: ranges 0..288 */
-		if ((0 > set_value || set_value > 288)) {
+		if ((set_value > 288)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm5MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -13391,6 +13699,10 @@ write_tcapOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapOmMIB", "write_tcapOm15MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = tcapOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13406,7 +13718,7 @@ write_tcapOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 		}
 		/* Note: default value 96 */
 		/* Note: ranges 0..672 */
-		if ((0 > set_value || set_value > 672)) {
+		if ((set_value > 672)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapOm15MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -13520,6 +13832,8 @@ tcapOmMIB_loop_handler(int sig)
 void
 tcapOmMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("tcapOmMIB", "done.\n"));

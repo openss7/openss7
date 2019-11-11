@@ -67,14 +67,14 @@ struct mtpOmMIB_data {
 	uint mtpOmMIB_rsvs;
 	uint mtpOmMIB_tsts;
 	uint mtpOmMIB_sets;
-	uint mtpOmMIB_request;
+	int mtpOmMIB_request;
 };
 struct mtpOmHandledMSUsOpcDpcSioTable_data {
 	struct mtpOmHandledMSUsOpcDpcSioTable_data *mtpOmHandledMSUsOpcDpcSioTable_old;
 	uint mtpOmHandledMSUsOpcDpcSioTable_rsvs;
 	uint mtpOmHandledMSUsOpcDpcSioTable_tsts;
 	uint mtpOmHandledMSUsOpcDpcSioTable_sets;
-	uint mtpOmHandledMSUsOpcDpcSioTable_request;
+	int mtpOmHandledMSUsOpcDpcSioTable_request;
 	uint mtpOmHandledMSUsOpcDpcSioTable_refs;
 	uint mtpOmHandledMSUsOpcDpcSioTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -92,7 +92,7 @@ struct mtpOmHandledOctetsOpcDpcSioTable_data {
 	uint mtpOmHandledOctetsOpcDpcSioTable_rsvs;
 	uint mtpOmHandledOctetsOpcDpcSioTable_tsts;
 	uint mtpOmHandledOctetsOpcDpcSioTable_sets;
-	uint mtpOmHandledOctetsOpcDpcSioTable_request;
+	int mtpOmHandledOctetsOpcDpcSioTable_request;
 	uint mtpOmHandledOctetsOpcDpcSioTable_refs;
 	uint mtpOmHandledOctetsOpcDpcSioTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -111,7 +111,7 @@ struct mtpOmHandledOctetsSIOTable_data {
 	uint mtpOmHandledOctetsSIOTable_rsvs;
 	uint mtpOmHandledOctetsSIOTable_tsts;
 	uint mtpOmHandledOctetsSIOTable_sets;
-	uint mtpOmHandledOctetsSIOTable_request;
+	int mtpOmHandledOctetsSIOTable_request;
 	uint mtpOmHandledOctetsSIOTable_refs;
 	uint mtpOmHandledOctetsSIOTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -124,7 +124,7 @@ struct mtpOmOblSpUtilizationTable_data {
 	uint mtpOmOblSpUtilizationTable_rsvs;
 	uint mtpOmOblSpUtilizationTable_tsts;
 	uint mtpOmOblSpUtilizationTable_sets;
-	uint mtpOmOblSpUtilizationTable_request;
+	int mtpOmOblSpUtilizationTable_request;
 	uint mtpOmOblSpUtilizationTable_refs;
 	uint mtpOmOblSpUtilizationTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -135,7 +135,7 @@ struct mtpOmAllSpUtilizationTable_data {
 	uint mtpOmAllSpUtilizationTable_rsvs;
 	uint mtpOmAllSpUtilizationTable_tsts;
 	uint mtpOmAllSpUtilizationTable_sets;
-	uint mtpOmAllSpUtilizationTable_request;
+	int mtpOmAllSpUtilizationTable_request;
 	uint mtpOmAllSpUtilizationTable_refs;
 	uint mtpOmAllSpUtilizationTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -147,7 +147,7 @@ struct mtpOmReceivedOctetsOPCTable_data {
 	uint mtpOmReceivedOctetsOPCTable_rsvs;
 	uint mtpOmReceivedOctetsOPCTable_tsts;
 	uint mtpOmReceivedOctetsOPCTable_sets;
-	uint mtpOmReceivedOctetsOPCTable_request;
+	int mtpOmReceivedOctetsOPCTable_request;
 	uint mtpOmReceivedOctetsOPCTable_refs;
 	uint mtpOmReceivedOctetsOPCTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -162,7 +162,7 @@ struct mtpOmReceivedOctetsOpcSioTable_data {
 	uint mtpOmReceivedOctetsOpcSioTable_rsvs;
 	uint mtpOmReceivedOctetsOpcSioTable_tsts;
 	uint mtpOmReceivedOctetsOpcSioTable_sets;
-	uint mtpOmReceivedOctetsOpcSioTable_request;
+	int mtpOmReceivedOctetsOpcSioTable_request;
 	uint mtpOmReceivedOctetsOpcSioTable_refs;
 	uint mtpOmReceivedOctetsOpcSioTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -179,7 +179,7 @@ struct mtpOmSpDataTable_data {
 	uint mtpOmSpDataTable_rsvs;
 	uint mtpOmSpDataTable_tsts;
 	uint mtpOmSpDataTable_sets;
-	uint mtpOmSpDataTable_request;
+	int mtpOmSpDataTable_request;
 	uint mtpOmSpDataTable_refs;
 	uint mtpOmSpDataTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -199,7 +199,7 @@ struct mtpOmTransmittedOctetsDPCTable_data {
 	uint mtpOmTransmittedOctetsDPCTable_rsvs;
 	uint mtpOmTransmittedOctetsDPCTable_tsts;
 	uint mtpOmTransmittedOctetsDPCTable_sets;
-	uint mtpOmTransmittedOctetsDPCTable_request;
+	int mtpOmTransmittedOctetsDPCTable_request;
 	uint mtpOmTransmittedOctetsDPCTable_refs;
 	uint mtpOmTransmittedOctetsDPCTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -213,7 +213,7 @@ struct mtpOmTransmittedOctetsDpcSioTable_data {
 	uint mtpOmTransmittedOctetsDpcSioTable_rsvs;
 	uint mtpOmTransmittedOctetsDpcSioTable_tsts;
 	uint mtpOmTransmittedOctetsDpcSioTable_sets;
-	uint mtpOmTransmittedOctetsDpcSioTable_request;
+	int mtpOmTransmittedOctetsDpcSioTable_request;
 	uint mtpOmTransmittedOctetsDpcSioTable_refs;
 	uint mtpOmTransmittedOctetsDpcSioTable_id;
 	ulong mtpSpId;			/* NoAccess */
@@ -229,7 +229,7 @@ struct mtpOmSignRsInformationTable_data {
 	uint mtpOmSignRsInformationTable_rsvs;
 	uint mtpOmSignRsInformationTable_tsts;
 	uint mtpOmSignRsInformationTable_sets;
-	uint mtpOmSignRsInformationTable_request;
+	int mtpOmSignRsInformationTable_request;
 	uint mtpOmSignRsInformationTable_refs;
 	uint mtpOmSignRsInformationTable_id;
 	ulong mtpRsId;			/* NoAccess */
@@ -241,7 +241,7 @@ struct mtpOmSlsDurationTable_data {
 	uint mtpOmSlsDurationTable_rsvs;
 	uint mtpOmSlsDurationTable_tsts;
 	uint mtpOmSlsDurationTable_sets;
-	uint mtpOmSlsDurationTable_request;
+	int mtpOmSlsDurationTable_request;
 	uint mtpOmSlsDurationTable_refs;
 	uint mtpOmSlsDurationTable_id;
 	ulong mtpLsId;			/* NoAccess */
@@ -252,7 +252,7 @@ struct mtpOmAll5And30MinSlDurationTable_data {
 	uint mtpOmAll5And30MinSlDurationTable_rsvs;
 	uint mtpOmAll5And30MinSlDurationTable_tsts;
 	uint mtpOmAll5And30MinSlDurationTable_sets;
-	uint mtpOmAll5And30MinSlDurationTable_request;
+	int mtpOmAll5And30MinSlDurationTable_request;
 	uint mtpOmAll5And30MinSlDurationTable_refs;
 	uint mtpOmAll5And30MinSlDurationTable_id;
 	ulong mtpSlId;			/* NoAccess */
@@ -267,7 +267,7 @@ struct mtpOmOblSlDurationTable_data {
 	uint mtpOmOblSlDurationTable_rsvs;
 	uint mtpOmOblSlDurationTable_tsts;
 	uint mtpOmOblSlDurationTable_sets;
-	uint mtpOmOblSlDurationTable_request;
+	int mtpOmOblSlDurationTable_request;
 	uint mtpOmOblSlDurationTable_refs;
 	uint mtpOmOblSlDurationTable_id;
 	ulong mtpSlId;			/* NoAccess */
@@ -279,7 +279,7 @@ struct mtpOmAll30MinSlDurationTable_data {
 	uint mtpOmAll30MinSlDurationTable_rsvs;
 	uint mtpOmAll30MinSlDurationTable_tsts;
 	uint mtpOmAll30MinSlDurationTable_sets;
-	uint mtpOmAll30MinSlDurationTable_request;
+	int mtpOmAll30MinSlDurationTable_request;
 	uint mtpOmAll30MinSlDurationTable_refs;
 	uint mtpOmAll30MinSlDurationTable_id;
 	ulong mtpSlId;			/* NoAccess */
@@ -295,7 +295,7 @@ struct mtpOmOblSlUtilizationTable_data {
 	uint mtpOmOblSlUtilizationTable_rsvs;
 	uint mtpOmOblSlUtilizationTable_tsts;
 	uint mtpOmOblSlUtilizationTable_sets;
-	uint mtpOmOblSlUtilizationTable_request;
+	int mtpOmOblSlUtilizationTable_request;
 	uint mtpOmOblSlUtilizationTable_refs;
 	uint mtpOmOblSlUtilizationTable_id;
 	ulong mtpSlId;			/* NoAccess */
@@ -309,7 +309,7 @@ struct mtpOmAllSlUtilizationTable_data {
 	uint mtpOmAllSlUtilizationTable_rsvs;
 	uint mtpOmAllSlUtilizationTable_tsts;
 	uint mtpOmAllSlUtilizationTable_sets;
-	uint mtpOmAllSlUtilizationTable_request;
+	int mtpOmAllSlUtilizationTable_request;
 	uint mtpOmAllSlUtilizationTable_refs;
 	uint mtpOmAllSlUtilizationTable_id;
 	ulong mtpSlId;			/* NoAccess */
@@ -325,7 +325,7 @@ struct mtpOmSlCongestionTable_data {
 	uint mtpOmSlCongestionTable_rsvs;
 	uint mtpOmSlCongestionTable_tsts;
 	uint mtpOmSlCongestionTable_sets;
-	uint mtpOmSlCongestionTable_request;
+	int mtpOmSlCongestionTable_request;
 	uint mtpOmSlCongestionTable_refs;
 	uint mtpOmSlCongestionTable_id;
 	ulong mtpSlId;			/* NoAccess */

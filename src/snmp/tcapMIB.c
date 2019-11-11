@@ -406,6 +406,10 @@ deinit_tcapMIB(void)
 int
 term_tcapMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "term_tcapMIB: terminating...  "));
 	deinit_tcapMIB();
 	DEBUGMSGTL(("tcapMIB", "done.\n"));
@@ -451,6 +455,7 @@ tcapMIB_duplicate(struct tcapMIB_data *thedata)
 {
 	struct tcapMIB_data *StorageNew = SNMP_MALLOC_STRUCT(tcapMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("tcapMIB", "tcapMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -520,6 +525,8 @@ tcapMIB_add(struct tcapMIB_data *thedata)
 void
 parse_tcapMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct tcapMIB_data *StorageTmp = tcapMIB_create();
 
@@ -545,6 +552,10 @@ store_tcapMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct tcapMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapMIB: storing data...  "));
 	refresh_tcapMIB(1);
 	if ((StorageTmp = tcapMIBStorage) == NULL) {
@@ -581,6 +592,8 @@ store_tcapMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -602,6 +615,8 @@ check_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
 int
 update_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -617,6 +632,7 @@ update_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
 void
 revert_tcapMIB(struct tcapMIB_data *StorageTmp, struct tcapMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapMIB(StorageOld, NULL);
 }
@@ -858,6 +874,8 @@ parse_tcapApplicationSubsystemTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapApplicationSubsystemTable_data *StorageTmp = tcapApplicationSubsystemTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapApplicationSubsystemTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -890,6 +908,10 @@ store_tcapApplicationSubsystemTable(int majorID, int minorID, void *serverarg, v
 	struct tcapApplicationSubsystemTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapApplicationSubsystemTable: storing data...  "));
 	refresh_tcapApplicationSubsystemTable(1);
 	(void) tmpsize;
@@ -1065,6 +1087,8 @@ parse_tcapTransactionCopmTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapTransactionCopmTable_data *StorageTmp = tcapTransactionCopmTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapTransactionCopmTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1092,6 +1116,10 @@ store_tcapTransactionCopmTable(int majorID, int minorID, void *serverarg, void *
 	struct tcapTransactionCopmTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapTransactionCopmTable: storing data...  "));
 	refresh_tcapTransactionCopmTable(1);
 	(void) tmpsize;
@@ -1323,6 +1351,8 @@ parse_tcapTransactionTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapTransactionTable_data *StorageTmp = tcapTransactionTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapTransactionTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1386,6 +1416,10 @@ store_tcapTransactionTable(int majorID, int minorID, void *serverarg, void *clie
 	struct tcapTransactionTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapTransactionTable: storing data...  "));
 	refresh_tcapTransactionTable(1);
 	(void) tmpsize;
@@ -1626,6 +1660,8 @@ parse_tcapDialogueTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapDialogueTable_data *StorageTmp = tcapDialogueTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapDialogueTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1689,6 +1725,10 @@ store_tcapDialogueTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct tcapDialogueTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapDialogueTable: storing data...  "));
 	refresh_tcapDialogueTable(1);
 	(void) tmpsize;
@@ -1890,6 +1930,8 @@ parse_tcapTcUserTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapTcUserTable_data *StorageTmp = tcapTcUserTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapTcUserTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1928,6 +1970,10 @@ store_tcapTcUserTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct tcapTcUserTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapTcUserTable: storing data...  "));
 	refresh_tcapTcUserTable(1);
 	(void) tmpsize;
@@ -2137,6 +2183,8 @@ parse_tcapApplicationProcessTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapApplicationProcessTable_data *StorageTmp = tcapApplicationProcessTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapApplicationProcessTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2183,6 +2231,10 @@ store_tcapApplicationProcessTable(int majorID, int minorID, void *serverarg, voi
 	struct tcapApplicationProcessTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapApplicationProcessTable: storing data...  "));
 	refresh_tcapApplicationProcessTable(1);
 	(void) tmpsize;
@@ -2398,6 +2450,8 @@ parse_tcapSupportEntityNameTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapSupportEntityNameTable_data *StorageTmp = tcapSupportEntityNameTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapSupportEntityNameTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2443,6 +2497,10 @@ store_tcapSupportEntityNameTable(int majorID, int minorID, void *serverarg, void
 	struct tcapSupportEntityNameTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapSupportEntityNameTable: storing data...  "));
 	refresh_tcapSupportEntityNameTable(1);
 	(void) tmpsize;
@@ -2742,6 +2800,8 @@ parse_tcapApplicationEntityTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapApplicationEntityTable_data *StorageTmp = tcapApplicationEntityTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapApplicationEntityTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2842,6 +2902,10 @@ store_tcapApplicationEntityTable(int majorID, int minorID, void *serverarg, void
 	struct tcapApplicationEntityTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapApplicationEntityTable: storing data...  "));
 	refresh_tcapApplicationEntityTable(1);
 	(void) tmpsize;
@@ -3062,6 +3126,8 @@ parse_tcapLocalSapNameTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapLocalSapNameTable_data *StorageTmp = tcapLocalSapNameTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapLocalSapNameTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3106,6 +3172,10 @@ store_tcapLocalSapNameTable(int majorID, int minorID, void *serverarg, void *cli
 	struct tcapLocalSapNameTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapLocalSapNameTable: storing data...  "));
 	refresh_tcapLocalSapNameTable(1);
 	(void) tmpsize;
@@ -3317,6 +3387,8 @@ parse_tcapApplicationContextNameTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapApplicationContextNameTable_data *StorageTmp = tcapApplicationContextNameTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapApplicationContextNameTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3362,6 +3434,10 @@ store_tcapApplicationContextNameTable(int majorID, int minorID, void *serverarg,
 	struct tcapApplicationContextNameTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapApplicationContextNameTable: storing data...  "));
 	refresh_tcapApplicationContextNameTable(1);
 	(void) tmpsize;
@@ -3562,6 +3638,8 @@ parse_tcapAbstractSyntaxTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapAbstractSyntaxTable_data *StorageTmp = tcapAbstractSyntaxTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapAbstractSyntaxTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3600,6 +3678,10 @@ store_tcapAbstractSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 	struct tcapAbstractSyntaxTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapAbstractSyntaxTable: storing data...  "));
 	refresh_tcapAbstractSyntaxTable(1);
 	(void) tmpsize;
@@ -3802,6 +3884,8 @@ parse_tcapTransferSyntaxTable(const char *token, char *line)
 	size_t tmpsize;
 	struct tcapTransferSyntaxTable_data *StorageTmp = tcapTransferSyntaxTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("tcapMIB", "parse_tcapTransferSyntaxTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3845,6 +3929,10 @@ store_tcapTransferSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 	struct tcapTransferSyntaxTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("tcapMIB", "store_tcapTransferSyntaxTable: storing data...  "));
 	refresh_tcapTransferSyntaxTable(1);
 	(void) tmpsize;
@@ -3881,6 +3969,7 @@ store_tcapTransferSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 int
 activate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3898,6 +3987,7 @@ activate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_
 int
 deactivate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3915,6 +4005,7 @@ deactivate_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTabl
 int
 activate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3932,6 +4023,7 @@ activate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *Stor
 int
 deactivate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3949,6 +4041,7 @@ deactivate_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *St
 int
 activate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3966,6 +4059,7 @@ activate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data
 int
 deactivate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -3983,6 +4077,7 @@ deactivate_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_da
 int
 activate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4000,6 +4095,7 @@ activate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *
 int
 deactivate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4017,6 +4113,7 @@ deactivate_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data
 int
 activate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4034,6 +4131,7 @@ activate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *
 int
 deactivate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4051,6 +4149,7 @@ deactivate_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data
 int
 activate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4068,6 +4167,7 @@ activate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp
 int
 deactivate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4085,6 +4185,7 @@ deactivate_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageT
 int
 activate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4102,6 +4203,7 @@ activate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTa
 int
 deactivate_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4119,6 +4221,7 @@ deactivate_tcapApplicationContextNameTable_row(struct tcapApplicationContextName
 int
 activate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4136,6 +4239,7 @@ activate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *Storag
 int
 deactivate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4153,6 +4257,7 @@ deactivate_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *Stor
 int
 activate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4170,6 +4275,7 @@ activate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *Storag
 int
 deactivate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4192,6 +4298,8 @@ deactivate_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *Stor
 int
 check_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4214,6 +4322,8 @@ check_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_dat
 int
 update_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapApplicationSubsystemTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4228,6 +4338,7 @@ update_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_da
 void
 revert_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp, struct tcapApplicationSubsystemTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapApplicationSubsystemTable_row(StorageOld, NULL);
 }
@@ -4328,6 +4439,8 @@ var_tcapApplicationSubsystemTable(struct variable *vp, oid * name, size_t *lengt
 int
 check_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4350,6 +4463,8 @@ check_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *Storage
 int
 update_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapTransactionCopmTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4364,6 +4479,7 @@ update_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *Storag
 void
 revert_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp, struct tcapTransactionCopmTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapTransactionCopmTable_row(StorageOld, NULL);
 }
@@ -4464,6 +4580,8 @@ var_tcapTransactionCopmTable(struct variable *vp, oid * name, size_t *length, in
 int
 check_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4486,6 +4604,8 @@ check_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, str
 int
 update_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapTransactionTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4500,6 +4620,7 @@ update_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, st
 void
 revert_tcapTransactionTable_row(struct tcapTransactionTable_data *StorageTmp, struct tcapTransactionTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapTransactionTable_row(StorageOld, NULL);
 }
@@ -4635,6 +4756,8 @@ var_tcapTransactionTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4657,6 +4780,8 @@ check_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tc
 int
 update_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapDialogueTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4671,6 +4796,7 @@ update_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct t
 void
 revert_tcapDialogueTable_row(struct tcapDialogueTable_data *StorageTmp, struct tcapDialogueTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapDialogueTable_row(StorageOld, NULL);
 }
@@ -4800,6 +4926,8 @@ var_tcapDialogueTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4822,6 +4950,8 @@ check_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTc
 int
 update_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapTcUserTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4836,6 +4966,7 @@ update_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapT
 void
 revert_tcapTcUserTable_row(struct tcapTcUserTable_data *StorageTmp, struct tcapTcUserTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapTcUserTable_row(StorageOld, NULL);
 }
@@ -4936,6 +5067,8 @@ var_tcapTcUserTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4958,6 +5091,8 @@ check_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *S
 int
 update_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapApplicationProcessTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4972,6 +5107,7 @@ update_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *
 void
 revert_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp, struct tcapApplicationProcessTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapApplicationProcessTable_row(StorageOld, NULL);
 }
@@ -5091,6 +5227,8 @@ var_tcapApplicationProcessTable(struct variable *vp, oid * name, size_t *length,
 int
 check_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5113,6 +5251,8 @@ check_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *Sto
 int
 update_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapSupportEntityNameTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5127,6 +5267,7 @@ update_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *St
 void
 revert_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp, struct tcapSupportEntityNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapSupportEntityNameTable_row(StorageOld, NULL);
 }
@@ -5234,6 +5375,8 @@ var_tcapSupportEntityNameTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5256,6 +5399,8 @@ check_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *Sto
 int
 update_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapApplicationEntityTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5270,6 +5415,7 @@ update_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *St
 void
 revert_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp, struct tcapApplicationEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapApplicationEntityTable_row(StorageOld, NULL);
 }
@@ -5458,6 +5604,8 @@ var_tcapApplicationEntityTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5480,6 +5628,8 @@ check_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, s
 int
 update_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapLocalSapNameTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5494,6 +5644,7 @@ update_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, 
 void
 revert_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp, struct tcapLocalSapNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapLocalSapNameTable_row(StorageOld, NULL);
 }
@@ -5601,6 +5752,8 @@ var_tcapLocalSapNameTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5623,6 +5776,8 @@ check_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable
 int
 update_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapApplicationContextNameTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5637,6 +5792,7 @@ update_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTabl
 void
 revert_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp, struct tcapApplicationContextNameTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapApplicationContextNameTable_row(StorageOld, NULL);
 }
@@ -5751,6 +5907,8 @@ var_tcapApplicationContextNameTable(struct variable *vp, oid * name, size_t *len
 int
 check_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5773,6 +5931,8 @@ check_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTm
 int
 update_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapAbstractSyntaxTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5787,6 +5947,7 @@ update_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageT
 void
 revert_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp, struct tcapAbstractSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapAbstractSyntaxTable_row(StorageOld, NULL);
 }
@@ -5894,6 +6055,8 @@ var_tcapAbstractSyntaxTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5916,6 +6079,8 @@ check_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTm
 int
 update_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	tcapTransferSyntaxTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5930,6 +6095,7 @@ update_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageT
 void
 revert_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp, struct tcapTransferSyntaxTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_tcapTransferSyntaxTable_row(StorageOld, NULL);
 }
@@ -6038,6 +6204,10 @@ write_tcapTcUserInvocationOfPointer(int action, u_char *var_val, u_char var_val_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapTcUserInvocationOfPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6141,6 +6311,10 @@ write_tcapApplicationProcessTitle(int action, u_char *var_val, u_char var_val_ty
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationProcessTitle entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6257,6 +6431,10 @@ write_tcapSupportEntityNamePointer(int action, u_char *var_val, u_char var_val_t
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapSupportEntityNamePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6373,6 +6551,10 @@ write_tcapApplicationEntityAsoTitle(int action, u_char *var_val, u_char var_val_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAsoTitle entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6490,6 +6672,10 @@ write_tcapApplicationEntityAsoQualifier(int action, u_char *var_val, u_char var_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAsoQualifier entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6607,6 +6793,10 @@ write_tcapApplicationEntityPresFUsupport(int action, u_char *var_val, u_char var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityPresFUsupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6733,6 +6923,10 @@ write_tcapApplicationEntityAbstrSyntaxSupport(int action, u_char *var_val, u_cha
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityAbstrSyntaxSupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6849,6 +7043,10 @@ write_tcapApplicationEntityTransfSynstaxSupport(int action, u_char *var_val, u_c
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityTransfSynstaxSupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6965,6 +7163,10 @@ write_tcapApplicationEntityPresSelectorValue(int action, u_char *var_val, u_char
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityPresSelectorValue entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7083,6 +7285,10 @@ write_tcapApplicationEntitySessProtVerSupport(int action, u_char *var_val, u_cha
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessProtVerSupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7209,6 +7415,10 @@ write_tcapApplicationEntitySessFUsupport(int action, u_char *var_val, u_char var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessFUsupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7335,6 +7545,10 @@ write_tcapApplicationEntitySessOptSupport(int action, u_char *var_val, u_char va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessOptSupport entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7461,6 +7675,10 @@ write_tcapApplicationEntitySessionSelectorValue(int action, u_char *var_val, u_c
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntitySessionSelectorValue entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7485,7 +7703,7 @@ write_tcapApplicationEntitySessionSelectorValue(int action, u_char *var_val, u_c
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..16 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 16))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 16))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to tcapApplicationEntitySessionSelectorValue: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -7580,6 +7798,10 @@ write_tcapLocalSapNamePointer(int action, u_char *var_val, u_char var_val_type, 
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapLocalSapNamePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7696,6 +7918,10 @@ write_tcapApplicationContextName(int action, u_char *var_val, u_char var_val_typ
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationContextName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7813,6 +8039,10 @@ write_tcapApplicationContextNumber(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationContextNumber entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7919,6 +8149,10 @@ write_tcapAbstractSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapAbstractSyntaxName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8036,6 +8270,10 @@ write_tcapTransferSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapTransferSyntaxName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8147,6 +8385,7 @@ write_tcapTransferSyntaxName(int action, u_char *var_val, u_char var_val_type, s
 int
 can_act_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8164,6 +8403,7 @@ can_act_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_d
 int
 can_deact_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8181,6 +8421,7 @@ can_deact_tcapApplicationSubsystemTable_row(struct tcapApplicationSubsystemTable
 int
 can_act_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8198,6 +8439,7 @@ can_act_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *Stora
 int
 can_deact_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8215,6 +8457,7 @@ can_deact_tcapTransactionCopmTable_row(struct tcapTransactionCopmTable_data *Sto
 int
 can_act_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8232,6 +8475,7 @@ can_act_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data 
 int
 can_deact_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8249,6 +8493,7 @@ can_deact_tcapApplicationProcessTable_row(struct tcapApplicationProcessTable_dat
 int
 can_act_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8266,6 +8511,7 @@ can_act_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *S
 int
 can_deact_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8283,6 +8529,7 @@ can_deact_tcapSupportEntityNameTable_row(struct tcapSupportEntityNameTable_data 
 int
 can_act_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8300,6 +8547,7 @@ can_act_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *S
 int
 can_deact_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8317,6 +8565,7 @@ can_deact_tcapApplicationEntityTable_row(struct tcapApplicationEntityTable_data 
 int
 can_act_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8334,6 +8583,7 @@ can_act_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 int
 can_deact_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8351,6 +8601,7 @@ can_deact_tcapLocalSapNameTable_row(struct tcapLocalSapNameTable_data *StorageTm
 int
 can_act_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8368,6 +8619,7 @@ can_act_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTab
 int
 can_deact_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8385,6 +8637,7 @@ can_deact_tcapApplicationContextNameTable_row(struct tcapApplicationContextNameT
 int
 can_act_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8402,6 +8655,7 @@ can_act_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *Storage
 int
 can_deact_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8419,6 +8673,7 @@ can_deact_tcapAbstractSyntaxTable_row(struct tcapAbstractSyntaxTable_data *Stora
 int
 can_act_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8436,6 +8691,7 @@ can_act_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *Storage
 int
 can_deact_tcapTransferSyntaxTable_row(struct tcapTransferSyntaxTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8460,6 +8716,10 @@ write_tcapApplicationSubsystemRowStatus(int action, u_char *var_val, u_char var_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationSubsystemRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapApplicationSubsystemTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -8747,6 +9007,10 @@ write_tcapTransactionCopmRowStatus(int action, u_char *var_val, u_char var_val_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapTransactionCopmRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapTransactionCopmTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9012,6 +9276,10 @@ write_tcapApplicationProcessRowStatus(int action, u_char *var_val, u_char var_va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationProcessRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapApplicationProcessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9315,6 +9583,10 @@ write_tcapSupportEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapSupportEntityRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapSupportEntityNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9632,6 +9904,10 @@ write_tcapApplicationEntityRowStatus(int action, u_char *var_val, u_char var_val
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationEntityRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapApplicationEntityTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9915,6 +10191,10 @@ write_tcapLocalSapNameRowStatus(int action, u_char *var_val, u_char var_val_type
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapLocalSapNameRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapLocalSapNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10212,6 +10492,10 @@ write_tcapApplicationContextRowStatus(int action, u_char *var_val, u_char var_va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapApplicationContextRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapApplicationContextNameTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10509,6 +10793,10 @@ write_tcapAbstractSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapAbstractSyntaxRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapAbstractSyntaxTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10790,6 +11078,10 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("tcapMIB", "write_tcapTransferSyntaxRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(tcapTransferSyntaxTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -11104,6 +11396,8 @@ tcapMIB_loop_handler(int sig)
 void
 tcapMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("tcapMIB", "tcapMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("tcapMIB", "done.\n"));

@@ -466,6 +466,10 @@ deinit_mtpOmMIB(void)
 int
 term_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "term_mtpOmMIB: terminating...  "));
 	deinit_mtpOmMIB();
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));
@@ -511,6 +515,7 @@ mtpOmMIB_duplicate(struct mtpOmMIB_data *thedata)
 {
 	struct mtpOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(mtpOmMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -580,6 +585,8 @@ mtpOmMIB_add(struct mtpOmMIB_data *thedata)
 void
 parse_mtpOmMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct mtpOmMIB_data *StorageTmp = mtpOmMIB_create();
 
@@ -605,6 +612,10 @@ store_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct mtpOmMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmMIB: storing data...  "));
 	refresh_mtpOmMIB(1);
 	if ((StorageTmp = mtpOmMIBStorage) == NULL) {
@@ -641,6 +652,8 @@ store_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -662,6 +675,8 @@ check_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOl
 int
 update_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -677,6 +692,7 @@ update_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageO
 void
 revert_mtpOmMIB(struct mtpOmMIB_data *StorageTmp, struct mtpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmMIB(StorageOld, NULL);
 }
@@ -939,6 +955,8 @@ parse_mtpOmHandledMSUsOpcDpcSioTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp = mtpOmHandledMSUsOpcDpcSioTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmHandledMSUsOpcDpcSioTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -984,6 +1002,10 @@ store_mtpOmHandledMSUsOpcDpcSioTable(int majorID, int minorID, void *serverarg, 
 	struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmHandledMSUsOpcDpcSioTable: storing data...  "));
 	refresh_mtpOmHandledMSUsOpcDpcSioTable(1);
 	(void) tmpsize;
@@ -1204,6 +1226,8 @@ parse_mtpOmHandledOctetsOpcDpcSioTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp = mtpOmHandledOctetsOpcDpcSioTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmHandledOctetsOpcDpcSioTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1250,6 +1274,10 @@ store_mtpOmHandledOctetsOpcDpcSioTable(int majorID, int minorID, void *serverarg
 	struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmHandledOctetsOpcDpcSioTable: storing data...  "));
 	refresh_mtpOmHandledOctetsOpcDpcSioTable(1);
 	(void) tmpsize;
@@ -1440,6 +1468,8 @@ parse_mtpOmHandledOctetsSIOTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmHandledOctetsSIOTable_data *StorageTmp = mtpOmHandledOctetsSIOTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmHandledOctetsSIOTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1472,6 +1502,10 @@ store_mtpOmHandledOctetsSIOTable(int majorID, int minorID, void *serverarg, void
 	struct mtpOmHandledOctetsSIOTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmHandledOctetsSIOTable: storing data...  "));
 	refresh_mtpOmHandledOctetsSIOTable(1);
 	(void) tmpsize;
@@ -1645,6 +1679,8 @@ parse_mtpOmOblSpUtilizationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmOblSpUtilizationTable_data *StorageTmp = mtpOmOblSpUtilizationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmOblSpUtilizationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1671,6 +1707,10 @@ store_mtpOmOblSpUtilizationTable(int majorID, int minorID, void *serverarg, void
 	struct mtpOmOblSpUtilizationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmOblSpUtilizationTable: storing data...  "));
 	refresh_mtpOmOblSpUtilizationTable(1);
 	(void) tmpsize;
@@ -1846,6 +1886,8 @@ parse_mtpOmAllSpUtilizationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmAllSpUtilizationTable_data *StorageTmp = mtpOmAllSpUtilizationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmAllSpUtilizationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1873,6 +1915,10 @@ store_mtpOmAllSpUtilizationTable(int majorID, int minorID, void *serverarg, void
 	struct mtpOmAllSpUtilizationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmAllSpUtilizationTable: storing data...  "));
 	refresh_mtpOmAllSpUtilizationTable(1);
 	(void) tmpsize;
@@ -2064,6 +2110,8 @@ parse_mtpOmReceivedOctetsOPCTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmReceivedOctetsOPCTable_data *StorageTmp = mtpOmReceivedOctetsOPCTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmReceivedOctetsOPCTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2098,6 +2146,10 @@ store_mtpOmReceivedOctetsOPCTable(int majorID, int minorID, void *serverarg, voi
 	struct mtpOmReceivedOctetsOPCTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmReceivedOctetsOPCTable: storing data...  "));
 	refresh_mtpOmReceivedOctetsOPCTable(1);
 	(void) tmpsize;
@@ -2304,6 +2356,8 @@ parse_mtpOmReceivedOctetsOpcSioTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp = mtpOmReceivedOctetsOpcSioTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmReceivedOctetsOpcSioTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2344,6 +2398,10 @@ store_mtpOmReceivedOctetsOpcSioTable(int majorID, int minorID, void *serverarg, 
 	struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmReceivedOctetsOpcSioTable: storing data...  "));
 	refresh_mtpOmReceivedOctetsOpcSioTable(1);
 	(void) tmpsize;
@@ -2540,6 +2598,8 @@ parse_mtpOmSpDataTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmSpDataTable_data *StorageTmp = mtpOmSpDataTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmSpDataTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2575,6 +2635,10 @@ store_mtpOmSpDataTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct mtpOmSpDataTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmSpDataTable: storing data...  "));
 	refresh_mtpOmSpDataTable(1);
 	(void) tmpsize;
@@ -2772,6 +2836,8 @@ parse_mtpOmTransmittedOctetsDPCTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp = mtpOmTransmittedOctetsDPCTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmTransmittedOctetsDPCTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2805,6 +2871,10 @@ store_mtpOmTransmittedOctetsDPCTable(int majorID, int minorID, void *serverarg, 
 	struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmTransmittedOctetsDPCTable: storing data...  "));
 	refresh_mtpOmTransmittedOctetsDPCTable(1);
 	(void) tmpsize;
@@ -3008,6 +3078,8 @@ parse_mtpOmTransmittedOctetsDpcSioTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp = mtpOmTransmittedOctetsDpcSioTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmTransmittedOctetsDpcSioTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3047,6 +3119,10 @@ store_mtpOmTransmittedOctetsDpcSioTable(int majorID, int minorID, void *serverar
 	struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmTransmittedOctetsDpcSioTable: storing data...  "));
 	refresh_mtpOmTransmittedOctetsDpcSioTable(1);
 	(void) tmpsize;
@@ -3224,6 +3300,8 @@ parse_mtpOmSignRsInformationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmSignRsInformationTable_data *StorageTmp = mtpOmSignRsInformationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmSignRsInformationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3251,6 +3329,10 @@ store_mtpOmSignRsInformationTable(int majorID, int minorID, void *serverarg, voi
 	struct mtpOmSignRsInformationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmSignRsInformationTable: storing data...  "));
 	refresh_mtpOmSignRsInformationTable(1);
 	(void) tmpsize;
@@ -3424,6 +3506,8 @@ parse_mtpOmSlsDurationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmSlsDurationTable_data *StorageTmp = mtpOmSlsDurationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmSlsDurationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3450,6 +3534,10 @@ store_mtpOmSlsDurationTable(int majorID, int minorID, void *serverarg, void *cli
 	struct mtpOmSlsDurationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmSlsDurationTable: storing data...  "));
 	refresh_mtpOmSlsDurationTable(1);
 	(void) tmpsize;
@@ -3631,6 +3719,8 @@ parse_mtpOmAll5And30MinSlDurationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp = mtpOmAll5And30MinSlDurationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmAll5And30MinSlDurationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3661,6 +3751,10 @@ store_mtpOmAll5And30MinSlDurationTable(int majorID, int minorID, void *serverarg
 	struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmAll5And30MinSlDurationTable: storing data...  "));
 	refresh_mtpOmAll5And30MinSlDurationTable(1);
 	(void) tmpsize;
@@ -3839,6 +3933,8 @@ parse_mtpOmOblSlDurationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmOblSlDurationTable_data *StorageTmp = mtpOmOblSlDurationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmOblSlDurationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3866,6 +3962,10 @@ store_mtpOmOblSlDurationTable(int majorID, int minorID, void *serverarg, void *c
 	struct mtpOmOblSlDurationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmOblSlDurationTable: storing data...  "));
 	refresh_mtpOmOblSlDurationTable(1);
 	(void) tmpsize;
@@ -4050,6 +4150,8 @@ parse_mtpOmAll30MinSlDurationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmAll30MinSlDurationTable_data *StorageTmp = mtpOmAll30MinSlDurationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmAll30MinSlDurationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4081,6 +4183,10 @@ store_mtpOmAll30MinSlDurationTable(int majorID, int minorID, void *serverarg, vo
 	struct mtpOmAll30MinSlDurationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmAll30MinSlDurationTable: storing data...  "));
 	refresh_mtpOmAll30MinSlDurationTable(1);
 	(void) tmpsize;
@@ -4264,6 +4370,8 @@ parse_mtpOmOblSlUtilizationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmOblSlUtilizationTable_data *StorageTmp = mtpOmOblSlUtilizationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmOblSlUtilizationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4293,6 +4401,10 @@ store_mtpOmOblSlUtilizationTable(int majorID, int minorID, void *serverarg, void
 	struct mtpOmOblSlUtilizationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmOblSlUtilizationTable: storing data...  "));
 	refresh_mtpOmOblSlUtilizationTable(1);
 	(void) tmpsize;
@@ -4479,6 +4591,8 @@ parse_mtpOmAllSlUtilizationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmAllSlUtilizationTable_data *StorageTmp = mtpOmAllSlUtilizationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmAllSlUtilizationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4510,6 +4624,10 @@ store_mtpOmAllSlUtilizationTable(int majorID, int minorID, void *serverarg, void
 	struct mtpOmAllSlUtilizationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmAllSlUtilizationTable: storing data...  "));
 	refresh_mtpOmAllSlUtilizationTable(1);
 	(void) tmpsize;
@@ -4702,6 +4820,8 @@ parse_mtpOmSlCongestionTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mtpOmSlCongestionTable_data *StorageTmp = mtpOmSlCongestionTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("mtpOmMIB", "parse_mtpOmSlCongestionTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4734,6 +4854,10 @@ store_mtpOmSlCongestionTable(int majorID, int minorID, void *serverarg, void *cl
 	struct mtpOmSlCongestionTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("mtpOmMIB", "store_mtpOmSlCongestionTable: storing data...  "));
 	refresh_mtpOmSlCongestionTable(1);
 	(void) tmpsize;
@@ -4774,6 +4898,7 @@ store_mtpOmSlCongestionTable(int majorID, int minorID, void *serverarg, void *cl
 int
 activate_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4791,6 +4916,7 @@ activate_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTabl
 int
 deactivate_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4808,6 +4934,7 @@ deactivate_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTa
 int
 activate_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4825,6 +4952,7 @@ activate_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSio
 int
 deactivate_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4842,6 +4970,7 @@ deactivate_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcS
 int
 activate_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4859,6 +4988,7 @@ activate_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *
 int
 deactivate_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4876,6 +5006,7 @@ deactivate_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data
 int
 activate_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4893,6 +5024,7 @@ activate_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data
 int
 deactivate_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4910,6 +5042,7 @@ deactivate_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_da
 int
 activate_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4927,6 +5060,7 @@ activate_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTabl
 int
 deactivate_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4944,6 +5078,7 @@ deactivate_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTa
 int
 activate_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4961,6 +5096,7 @@ activate_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTabl
 int
 deactivate_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4978,6 +5114,7 @@ deactivate_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTa
 int
 activate_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -4995,6 +5132,7 @@ activate_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcS
 int
 deactivate_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5012,6 +5150,7 @@ deactivate_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDp
 int
 activate_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5029,6 +5168,7 @@ activate_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDuration
 int
 deactivate_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5046,6 +5186,7 @@ deactivate_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurati
 int
 activate_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5063,6 +5204,7 @@ activate_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_da
 int
 deactivate_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5080,6 +5222,7 @@ deactivate_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_
 int
 activate_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5097,6 +5240,7 @@ activate_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *
 int
 deactivate_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5114,6 +5258,7 @@ deactivate_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data
 int
 activate_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5131,6 +5276,7 @@ activate_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageT
 int
 deactivate_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -5153,6 +5299,8 @@ deactivate_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *Storag
 int
 check_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5175,6 +5323,8 @@ check_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_d
 int
 update_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmHandledMSUsOpcDpcSioTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5189,6 +5339,7 @@ update_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_
 void
 revert_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmHandledMSUsOpcDpcSioTable_row(StorageOld, NULL);
 }
@@ -5295,6 +5446,8 @@ var_mtpOmHandledMSUsOpcDpcSioTable(struct variable *vp, oid * name, size_t *leng
 int
 check_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5317,6 +5470,8 @@ check_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTab
 int
 update_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmHandledOctetsOpcDpcSioTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5331,6 +5486,7 @@ update_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTa
 void
 revert_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp, struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmHandledOctetsOpcDpcSioTable_row(StorageOld, NULL);
 }
@@ -5444,6 +5600,8 @@ var_mtpOmHandledOctetsOpcDpcSioTable(struct variable *vp, oid * name, size_t *le
 int
 check_mtpOmHandledOctetsSIOTable_row(struct mtpOmHandledOctetsSIOTable_data *StorageTmp, struct mtpOmHandledOctetsSIOTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5466,6 +5624,8 @@ check_mtpOmHandledOctetsSIOTable_row(struct mtpOmHandledOctetsSIOTable_data *Sto
 int
 update_mtpOmHandledOctetsSIOTable_row(struct mtpOmHandledOctetsSIOTable_data *StorageTmp, struct mtpOmHandledOctetsSIOTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmHandledOctetsSIOTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5480,6 +5640,7 @@ update_mtpOmHandledOctetsSIOTable_row(struct mtpOmHandledOctetsSIOTable_data *St
 void
 revert_mtpOmHandledOctetsSIOTable_row(struct mtpOmHandledOctetsSIOTable_data *StorageTmp, struct mtpOmHandledOctetsSIOTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmHandledOctetsSIOTable_row(StorageOld, NULL);
 }
@@ -5579,6 +5740,8 @@ var_mtpOmHandledOctetsSIOTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_mtpOmOblSpUtilizationTable_row(struct mtpOmOblSpUtilizationTable_data *StorageTmp, struct mtpOmOblSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5601,6 +5764,8 @@ check_mtpOmOblSpUtilizationTable_row(struct mtpOmOblSpUtilizationTable_data *Sto
 int
 update_mtpOmOblSpUtilizationTable_row(struct mtpOmOblSpUtilizationTable_data *StorageTmp, struct mtpOmOblSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmOblSpUtilizationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5615,6 +5780,7 @@ update_mtpOmOblSpUtilizationTable_row(struct mtpOmOblSpUtilizationTable_data *St
 void
 revert_mtpOmOblSpUtilizationTable_row(struct mtpOmOblSpUtilizationTable_data *StorageTmp, struct mtpOmOblSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmOblSpUtilizationTable_row(StorageOld, NULL);
 }
@@ -5714,6 +5880,8 @@ var_mtpOmOblSpUtilizationTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp, struct mtpOmAllSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5736,6 +5904,8 @@ check_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *Sto
 int
 update_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp, struct mtpOmAllSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmAllSpUtilizationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5750,6 +5920,7 @@ update_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *St
 void
 revert_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp, struct mtpOmAllSpUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmAllSpUtilizationTable_row(StorageOld, NULL);
 }
@@ -5856,6 +6027,8 @@ var_mtpOmAllSpUtilizationTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp, struct mtpOmReceivedOctetsOPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5878,6 +6051,8 @@ check_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *S
 int
 update_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp, struct mtpOmReceivedOctetsOPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmReceivedOctetsOPCTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5892,6 +6067,7 @@ update_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *
 void
 revert_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp, struct mtpOmReceivedOctetsOPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmReceivedOctetsOPCTable_row(StorageOld, NULL);
 }
@@ -6005,6 +6181,8 @@ var_mtpOmReceivedOctetsOPCTable(struct variable *vp, oid * name, size_t *length,
 int
 check_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp, struct mtpOmReceivedOctetsOpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6027,6 +6205,8 @@ check_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_d
 int
 update_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp, struct mtpOmReceivedOctetsOpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmReceivedOctetsOpcSioTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6041,6 +6221,7 @@ update_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_
 void
 revert_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp, struct mtpOmReceivedOctetsOpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmReceivedOctetsOpcSioTable_row(StorageOld, NULL);
 }
@@ -6154,6 +6335,8 @@ var_mtpOmReceivedOctetsOpcSioTable(struct variable *vp, oid * name, size_t *leng
 int
 check_mtpOmSpDataTable_row(struct mtpOmSpDataTable_data *StorageTmp, struct mtpOmSpDataTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6176,6 +6359,8 @@ check_mtpOmSpDataTable_row(struct mtpOmSpDataTable_data *StorageTmp, struct mtpO
 int
 update_mtpOmSpDataTable_row(struct mtpOmSpDataTable_data *StorageTmp, struct mtpOmSpDataTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmSpDataTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6190,6 +6375,7 @@ update_mtpOmSpDataTable_row(struct mtpOmSpDataTable_data *StorageTmp, struct mtp
 void
 revert_mtpOmSpDataTable_row(struct mtpOmSpDataTable_data *StorageTmp, struct mtpOmSpDataTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmSpDataTable_row(StorageOld, NULL);
 }
@@ -6331,6 +6517,8 @@ var_mtpOmSpDataTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp, struct mtpOmTransmittedOctetsDPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6353,6 +6541,8 @@ check_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_d
 int
 update_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp, struct mtpOmTransmittedOctetsDPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmTransmittedOctetsDPCTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6367,6 +6557,7 @@ update_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_
 void
 revert_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp, struct mtpOmTransmittedOctetsDPCTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmTransmittedOctetsDPCTable_row(StorageOld, NULL);
 }
@@ -6473,6 +6664,8 @@ var_mtpOmTransmittedOctetsDPCTable(struct variable *vp, oid * name, size_t *leng
 int
 check_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp, struct mtpOmTransmittedOctetsDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6495,6 +6688,8 @@ check_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioT
 int
 update_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp, struct mtpOmTransmittedOctetsDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmTransmittedOctetsDpcSioTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6509,6 +6704,7 @@ update_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSio
 void
 revert_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp, struct mtpOmTransmittedOctetsDpcSioTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmTransmittedOctetsDpcSioTable_row(StorageOld, NULL);
 }
@@ -6615,6 +6811,8 @@ var_mtpOmTransmittedOctetsDpcSioTable(struct variable *vp, oid * name, size_t *l
 int
 check_mtpOmSignRsInformationTable_row(struct mtpOmSignRsInformationTable_data *StorageTmp, struct mtpOmSignRsInformationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6637,6 +6835,8 @@ check_mtpOmSignRsInformationTable_row(struct mtpOmSignRsInformationTable_data *S
 int
 update_mtpOmSignRsInformationTable_row(struct mtpOmSignRsInformationTable_data *StorageTmp, struct mtpOmSignRsInformationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmSignRsInformationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6651,6 +6851,7 @@ update_mtpOmSignRsInformationTable_row(struct mtpOmSignRsInformationTable_data *
 void
 revert_mtpOmSignRsInformationTable_row(struct mtpOmSignRsInformationTable_data *StorageTmp, struct mtpOmSignRsInformationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmSignRsInformationTable_row(StorageOld, NULL);
 }
@@ -6756,6 +6957,8 @@ var_mtpOmSignRsInformationTable(struct variable *vp, oid * name, size_t *length,
 int
 check_mtpOmSlsDurationTable_row(struct mtpOmSlsDurationTable_data *StorageTmp, struct mtpOmSlsDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6778,6 +6981,8 @@ check_mtpOmSlsDurationTable_row(struct mtpOmSlsDurationTable_data *StorageTmp, s
 int
 update_mtpOmSlsDurationTable_row(struct mtpOmSlsDurationTable_data *StorageTmp, struct mtpOmSlsDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmSlsDurationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6792,6 +6997,7 @@ update_mtpOmSlsDurationTable_row(struct mtpOmSlsDurationTable_data *StorageTmp, 
 void
 revert_mtpOmSlsDurationTable_row(struct mtpOmSlsDurationTable_data *StorageTmp, struct mtpOmSlsDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmSlsDurationTable_row(StorageOld, NULL);
 }
@@ -6891,6 +7097,8 @@ var_mtpOmSlsDurationTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp, struct mtpOmAll5And30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -6913,6 +7121,8 @@ check_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTab
 int
 update_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp, struct mtpOmAll5And30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmAll5And30MinSlDurationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -6927,6 +7137,7 @@ update_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTa
 void
 revert_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp, struct mtpOmAll5And30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmAll5And30MinSlDurationTable_row(StorageOld, NULL);
 }
@@ -7052,6 +7263,8 @@ var_mtpOmAll5And30MinSlDurationTable(struct variable *vp, oid * name, size_t *le
 int
 check_mtpOmOblSlDurationTable_row(struct mtpOmOblSlDurationTable_data *StorageTmp, struct mtpOmOblSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7074,6 +7287,8 @@ check_mtpOmOblSlDurationTable_row(struct mtpOmOblSlDurationTable_data *StorageTm
 int
 update_mtpOmOblSlDurationTable_row(struct mtpOmOblSlDurationTable_data *StorageTmp, struct mtpOmOblSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmOblSlDurationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7088,6 +7303,7 @@ update_mtpOmOblSlDurationTable_row(struct mtpOmOblSlDurationTable_data *StorageT
 void
 revert_mtpOmOblSlDurationTable_row(struct mtpOmOblSlDurationTable_data *StorageTmp, struct mtpOmOblSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmOblSlDurationTable_row(StorageOld, NULL);
 }
@@ -7193,6 +7409,8 @@ var_mtpOmOblSlDurationTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp, struct mtpOmAll30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7215,6 +7433,8 @@ check_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data 
 int
 update_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp, struct mtpOmAll30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmAll30MinSlDurationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7229,6 +7449,7 @@ update_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data
 void
 revert_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp, struct mtpOmAll30MinSlDurationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmAll30MinSlDurationTable_row(StorageOld, NULL);
 }
@@ -7360,6 +7581,8 @@ var_mtpOmAll30MinSlDurationTable(struct variable *vp, oid * name, size_t *length
 int
 check_mtpOmOblSlUtilizationTable_row(struct mtpOmOblSlUtilizationTable_data *StorageTmp, struct mtpOmOblSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7382,6 +7605,8 @@ check_mtpOmOblSlUtilizationTable_row(struct mtpOmOblSlUtilizationTable_data *Sto
 int
 update_mtpOmOblSlUtilizationTable_row(struct mtpOmOblSlUtilizationTable_data *StorageTmp, struct mtpOmOblSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmOblSlUtilizationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7396,6 +7621,7 @@ update_mtpOmOblSlUtilizationTable_row(struct mtpOmOblSlUtilizationTable_data *St
 void
 revert_mtpOmOblSlUtilizationTable_row(struct mtpOmOblSlUtilizationTable_data *StorageTmp, struct mtpOmOblSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmOblSlUtilizationTable_row(StorageOld, NULL);
 }
@@ -7513,6 +7739,8 @@ var_mtpOmOblSlUtilizationTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp, struct mtpOmAllSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7535,6 +7763,8 @@ check_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *Sto
 int
 update_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp, struct mtpOmAllSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmAllSlUtilizationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7549,6 +7779,7 @@ update_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *St
 void
 revert_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp, struct mtpOmAllSlUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmAllSlUtilizationTable_row(StorageOld, NULL);
 }
@@ -7679,6 +7910,8 @@ var_mtpOmAllSlUtilizationTable(struct variable *vp, oid * name, size_t *length, 
 int
 check_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp, struct mtpOmSlCongestionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7701,6 +7934,8 @@ check_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp,
 int
 update_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp, struct mtpOmSlCongestionTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	mtpOmSlCongestionTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7715,6 +7950,7 @@ update_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp
 void
 revert_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp, struct mtpOmSlCongestionTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_mtpOmSlCongestionTable_row(StorageOld, NULL);
 }
@@ -7848,6 +8084,10 @@ write_mtpOmHandledOctetsOpcDpcSioInterval(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmHandledOctetsOpcDpcSioInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -7960,6 +8200,10 @@ write_mtpOmReceivedOctetsOPCInterval(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmReceivedOctetsOPCInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8071,6 +8315,10 @@ write_mtpOmReceivedOctetsOpcSioInterval(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmReceivedOctetsOpcSioInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8183,6 +8431,10 @@ write_mtpOmAll5And30MinSlDurationInterval(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAll5And30MinSlDurationInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8294,6 +8546,10 @@ write_mtpOmAll30MinSlDurationInterval(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAll30MinSlDurationInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8406,6 +8662,10 @@ write_mtpOmSlCongestionFirst(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmSlCongestionFirst entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8433,8 +8693,7 @@ write_mtpOmSlCongestionFirst(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpOmSlCongestionFirst: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value false */
-		switch (set_value) {
+		/* Note: default value false */ switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
 			break;
@@ -8521,6 +8780,10 @@ write_mtpOmSlCongestionInterval(int action, u_char *var_val, u_char var_val_type
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmSlCongestionInterval entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -8627,6 +8890,7 @@ write_mtpOmSlCongestionInterval(int action, u_char *var_val, u_char var_val_type
 int
 can_act_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8644,6 +8908,7 @@ can_act_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable
 int
 can_deact_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8661,6 +8926,7 @@ can_deact_mtpOmHandledMSUsOpcDpcSioTable_row(struct mtpOmHandledMSUsOpcDpcSioTab
 int
 can_act_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8678,6 +8944,7 @@ can_act_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioT
 int
 can_deact_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8695,6 +8962,7 @@ can_deact_mtpOmHandledOctetsOpcDpcSioTable_row(struct mtpOmHandledOctetsOpcDpcSi
 int
 can_act_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8712,6 +8980,7 @@ can_act_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *S
 int
 can_deact_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8729,6 +8998,7 @@ can_deact_mtpOmAllSpUtilizationTable_row(struct mtpOmAllSpUtilizationTable_data 
 int
 can_act_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8746,6 +9016,7 @@ can_act_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data 
 int
 can_deact_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8763,6 +9034,7 @@ can_deact_mtpOmReceivedOctetsOPCTable_row(struct mtpOmReceivedOctetsOPCTable_dat
 int
 can_act_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8780,6 +9052,7 @@ can_act_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable
 int
 can_deact_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8797,6 +9070,7 @@ can_deact_mtpOmReceivedOctetsOpcSioTable_row(struct mtpOmReceivedOctetsOpcSioTab
 int
 can_act_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8814,6 +9088,7 @@ can_act_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable
 int
 can_deact_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8831,6 +9106,7 @@ can_deact_mtpOmTransmittedOctetsDPCTable_row(struct mtpOmTransmittedOctetsDPCTab
 int
 can_act_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8848,6 +9124,7 @@ can_act_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSi
 int
 can_deact_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpcSioTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8865,6 +9142,7 @@ can_deact_mtpOmTransmittedOctetsDpcSioTable_row(struct mtpOmTransmittedOctetsDpc
 int
 can_act_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8882,6 +9160,7 @@ can_act_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationT
 int
 can_deact_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8899,6 +9178,7 @@ can_deact_mtpOmAll5And30MinSlDurationTable_row(struct mtpOmAll5And30MinSlDuratio
 int
 can_act_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8916,6 +9196,7 @@ can_act_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_dat
 int
 can_deact_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8933,6 +9214,7 @@ can_deact_mtpOmAll30MinSlDurationTable_row(struct mtpOmAll30MinSlDurationTable_d
 int
 can_act_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8950,6 +9232,7 @@ can_act_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *S
 int
 can_deact_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8967,6 +9250,7 @@ can_deact_mtpOmAllSlUtilizationTable_row(struct mtpOmAllSlUtilizationTable_data 
 int
 can_act_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -8984,6 +9268,7 @@ can_act_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTm
 int
 can_deact_mtpOmSlCongestionTable_row(struct mtpOmSlCongestionTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -9008,6 +9293,10 @@ write_mtpOmHandledMSUsOpcDpcSioRowStatus(int action, u_char *var_val, u_char var
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmHandledMSUsOpcDpcSioRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmHandledMSUsOpcDpcSioTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9321,6 +9610,10 @@ write_mtpOmHandledOctetsOpcDpcSioRowStatus(int action, u_char *var_val, u_char v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmHandledOctetsOpcDpcSioRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmHandledOctetsOpcDpcSioTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9634,6 +9927,10 @@ write_mtpOmAllSpUtilizationRowStatus(int action, u_char *var_val, u_char var_val
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAllSpUtilizationRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmAllSpUtilizationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -9899,6 +10196,10 @@ write_mtpOmReceivedOctetsOPCRowStatus(int action, u_char *var_val, u_char var_va
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmReceivedOctetsOPCRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmReceivedOctetsOPCTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10180,6 +10481,10 @@ write_mtpOmReceivedOctetsOpcSioRowStatus(int action, u_char *var_val, u_char var
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmReceivedOctetsOpcSioRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmReceivedOctetsOpcSioTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10477,6 +10782,10 @@ write_mtpOmTransmittedOctetsDPCRowStatus(int action, u_char *var_val, u_char var
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmTransmittedOctetsDPCRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmTransmittedOctetsDPCTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -10758,6 +11067,10 @@ write_mtpOmTransmittedOctetsDpcSioRowStatus(int action, u_char *var_val, u_char 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmTransmittedOctetsDpcSioRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmTransmittedOctetsDpcSioTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -11055,6 +11368,10 @@ write_mtpOmAll5And30MinSlDurationRowStatus(int action, u_char *var_val, u_char v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAll5And30MinSlDurationRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmAll5And30MinSlDurationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -11326,6 +11643,10 @@ write_mtpOmAll30MinSlDurationRowStatus(int action, u_char *var_val, u_char var_v
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAll30MinSlDurationRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmAll30MinSlDurationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -11597,6 +11918,10 @@ write_mtpOmAllSlUtilizationRowStatus(int action, u_char *var_val, u_char var_val
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmAllSlUtilizationRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmAllSlUtilizationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -11868,6 +12193,10 @@ write_mtpOmSlCongestionRowStatus(int action, u_char *var_val, u_char var_val_typ
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("mtpOmMIB", "write_mtpOmSlCongestionRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mtpOmSlCongestionTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -12196,6 +12525,8 @@ mtpOmMIB_loop_handler(int sig)
 void
 mtpOmMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("mtpOmMIB", "mtpOmMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("mtpOmMIB", "done.\n"));

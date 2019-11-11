@@ -695,6 +695,10 @@ deinit_sccpMIB(void)
 int
 term_sccpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "term_sccpMIB: terminating...  "));
 	deinit_sccpMIB();
 	DEBUGMSGTL(("sccpMIB", "done.\n"));
@@ -740,6 +744,7 @@ sccpMIB_duplicate(struct sccpMIB_data *thedata)
 {
 	struct sccpMIB_data *StorageNew = SNMP_MALLOC_STRUCT(sccpMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("sccpMIB", "sccpMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 	}
@@ -809,6 +814,8 @@ sccpMIB_add(struct sccpMIB_data *thedata)
 void
 parse_sccpMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct sccpMIB_data *StorageTmp = sccpMIB_create();
 
@@ -834,6 +841,10 @@ store_sccpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct sccpMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpMIB: storing data...  "));
 	refresh_sccpMIB(1);
 	if ((StorageTmp = sccpMIBStorage) == NULL) {
@@ -870,6 +881,8 @@ store_sccpMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_sccpMIB(struct sccpMIB_data *StorageTmp, struct sccpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -891,6 +904,8 @@ check_sccpMIB(struct sccpMIB_data *StorageTmp, struct sccpMIB_data *StorageOld)
 int
 update_sccpMIB(struct sccpMIB_data *StorageTmp, struct sccpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -906,6 +921,7 @@ update_sccpMIB(struct sccpMIB_data *StorageTmp, struct sccpMIB_data *StorageOld)
 void
 revert_sccpMIB(struct sccpMIB_data *StorageTmp, struct sccpMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpMIB(StorageOld, NULL);
 }
@@ -1227,6 +1243,8 @@ parse_sccpNetworkEntityTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpNetworkEntityTable_data *StorageTmp = sccpNetworkEntityTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpNetworkEntityTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1306,6 +1324,10 @@ store_sccpNetworkEntityTable(int majorID, int minorID, void *serverarg, void *cl
 	struct sccpNetworkEntityTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpNetworkEntityTable: storing data...  "));
 	refresh_sccpNetworkEntityTable(1);
 	(void) tmpsize;
@@ -1510,6 +1532,8 @@ parse_sccpLocalSapNamesTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpLocalSapNamesTable_data *StorageTmp = sccpLocalSapNamesTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpLocalSapNamesTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1544,6 +1568,10 @@ store_sccpLocalSapNamesTable(int majorID, int minorID, void *serverarg, void *cl
 	struct sccpLocalSapNamesTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpLocalSapNamesTable: storing data...  "));
 	refresh_sccpLocalSapNamesTable(1);
 	(void) tmpsize;
@@ -1814,6 +1842,8 @@ parse_sccpAccessPointTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpAccessPointTable_data *StorageTmp = sccpAccessPointTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpAccessPointTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1892,6 +1922,10 @@ store_sccpAccessPointTable(int majorID, int minorID, void *serverarg, void *clie
 	struct sccpAccessPointTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpAccessPointTable: storing data...  "));
 	refresh_sccpAccessPointTable(1);
 	(void) tmpsize;
@@ -2346,6 +2380,8 @@ parse_sccpLinkageTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpLinkageTable_data *StorageTmp = sccpLinkageTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpLinkageTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2529,6 +2565,10 @@ store_sccpLinkageTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct sccpLinkageTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpLinkageTable: storing data...  "));
 	refresh_sccpLinkageTable(1);
 	(void) tmpsize;
@@ -2818,6 +2858,8 @@ parse_sccpMtpTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpMtpTable_data *StorageTmp = sccpMtpTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpMtpTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2888,6 +2930,10 @@ store_sccpMtpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct sccpMtpTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpMtpTable: storing data...  "));
 	refresh_sccpMtpTable(1);
 	(void) tmpsize;
@@ -3148,6 +3194,8 @@ parse_sccpSclcTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpSclcTable_data *StorageTmp = sccpSclcTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpSclcTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3215,6 +3263,10 @@ store_sccpSclcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct sccpSclcTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpSclcTable: storing data...  "));
 	refresh_sccpSclcTable(1);
 	(void) tmpsize;
@@ -3449,6 +3501,8 @@ parse_sccpScocTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpScocTable_data *StorageTmp = sccpScocTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpScocTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3502,6 +3556,10 @@ store_sccpScocTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct sccpScocTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpScocTable: storing data...  "));
 	refresh_sccpScocTable(1);
 	(void) tmpsize;
@@ -3733,6 +3791,8 @@ parse_sccpScrcTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpScrcTable_data *StorageTmp = sccpScrcTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpScrcTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3789,6 +3849,10 @@ store_sccpScrcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct sccpScrcTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpScrcTable: storing data...  "));
 	refresh_sccpScrcTable(1);
 	(void) tmpsize;
@@ -4021,6 +4085,8 @@ parse_sccpEntitySetTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpEntitySetTable_data *StorageTmp = sccpEntitySetTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpEntitySetTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4079,6 +4145,10 @@ store_sccpEntitySetTable(int majorID, int minorID, void *serverarg, void *client
 	struct sccpEntitySetTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpEntitySetTable: storing data...  "));
 	refresh_sccpEntitySetTable(1);
 	(void) tmpsize;
@@ -4304,6 +4374,8 @@ parse_sccpEntitySetSapTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpEntitySetSapTable_data *StorageTmp = sccpEntitySetSapTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpEntitySetSapTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4355,6 +4427,10 @@ store_sccpEntitySetSapTable(int majorID, int minorID, void *serverarg, void *cli
 	struct sccpEntitySetSapTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpEntitySetSapTable: storing data...  "));
 	refresh_sccpEntitySetSapTable(1);
 	(void) tmpsize;
@@ -4557,6 +4633,8 @@ parse_sccpConcernedAreaTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpConcernedAreaTable_data *StorageTmp = sccpConcernedAreaTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpConcernedAreaTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4596,6 +4674,10 @@ store_sccpConcernedAreaTable(int majorID, int minorID, void *serverarg, void *cl
 	struct sccpConcernedAreaTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpConcernedAreaTable: storing data...  "));
 	refresh_sccpConcernedAreaTable(1);
 	(void) tmpsize;
@@ -4826,6 +4908,8 @@ parse_sccpRemoteSCCPTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpRemoteSCCPTable_data *StorageTmp = sccpRemoteSCCPTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpRemoteSCCPTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -4882,6 +4966,10 @@ store_sccpRemoteSCCPTable(int majorID, int minorID, void *serverarg, void *clien
 	struct sccpRemoteSCCPTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpRemoteSCCPTable: storing data...  "));
 	refresh_sccpRemoteSCCPTable(1);
 	(void) tmpsize;
@@ -5100,6 +5188,8 @@ parse_sccpGtConversionRuleTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpGtConversionRuleTable_data *StorageTmp = sccpGtConversionRuleTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpGtConversionRuleTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5148,6 +5238,10 @@ store_sccpGtConversionRuleTable(int majorID, int minorID, void *serverarg, void 
 	struct sccpGtConversionRuleTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpGtConversionRuleTable: storing data...  "));
 	refresh_sccpGtConversionRuleTable(1);
 	(void) tmpsize;
@@ -5369,6 +5463,8 @@ parse_sccpAddressInfoTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpAddressInfoTable_data *StorageTmp = sccpAddressInfoTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpAddressInfoTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5416,6 +5512,10 @@ store_sccpAddressInfoTable(int majorID, int minorID, void *serverarg, void *clie
 	struct sccpAddressInfoTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpAddressInfoTable: storing data...  "));
 	refresh_sccpAddressInfoTable(1);
 	(void) tmpsize;
@@ -5637,6 +5737,8 @@ parse_sccpGtTranslatorTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpGtTranslatorTable_data *StorageTmp = sccpGtTranslatorTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpGtTranslatorTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -5686,6 +5788,10 @@ store_sccpGtTranslatorTable(int majorID, int minorID, void *serverarg, void *cli
 	struct sccpGtTranslatorTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpGtTranslatorTable: storing data...  "));
 	refresh_sccpGtTranslatorTable(1);
 	(void) tmpsize;
@@ -5949,6 +6055,8 @@ parse_sccpGtRuleTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpGtRuleTable_data *StorageTmp = sccpGtRuleTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpGtRuleTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6019,6 +6127,10 @@ store_sccpGtRuleTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct sccpGtRuleTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpGtRuleTable: storing data...  "));
 	refresh_sccpGtRuleTable(1);
 	(void) tmpsize;
@@ -6287,6 +6399,8 @@ parse_sccpSrvtTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpSrvtTable_data *StorageTmp = sccpSrvtTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpMIB", "parse_sccpSrvtTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -6362,6 +6476,10 @@ store_sccpSrvtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct sccpSrvtTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpMIB", "store_sccpSrvtTable: storing data...  "));
 	refresh_sccpSrvtTable(1);
 	(void) tmpsize;
@@ -6410,6 +6528,7 @@ store_sccpSrvtTable(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 activate_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6427,6 +6546,7 @@ activate_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageT
 int
 deactivate_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6444,6 +6564,7 @@ deactivate_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *Storag
 int
 activate_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6461,6 +6582,7 @@ activate_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageT
 int
 deactivate_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6478,6 +6600,7 @@ deactivate_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *Storag
 int
 activate_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6495,6 +6618,7 @@ activate_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 int
 deactivate_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6512,6 +6636,7 @@ deactivate_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp
 int
 activate_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6529,6 +6654,7 @@ activate_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 int
 deactivate_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6546,6 +6672,7 @@ deactivate_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 int
 activate_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6563,6 +6690,7 @@ activate_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 int
 deactivate_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6580,6 +6708,7 @@ deactivate_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 int
 activate_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6597,6 +6726,7 @@ activate_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 int
 deactivate_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6614,6 +6744,7 @@ deactivate_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 int
 activate_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6631,6 +6762,7 @@ activate_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 int
 deactivate_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6648,6 +6780,7 @@ deactivate_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 int
 activate_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6665,6 +6798,7 @@ activate_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 int
 deactivate_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6682,6 +6816,7 @@ deactivate_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 int
 activate_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6699,6 +6834,7 @@ activate_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 int
 deactivate_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6716,6 +6852,7 @@ deactivate_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 int
 activate_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6733,6 +6870,7 @@ activate_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp
 int
 deactivate_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6750,6 +6888,7 @@ deactivate_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageT
 int
 activate_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6767,6 +6906,7 @@ activate_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageT
 int
 deactivate_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6784,6 +6924,7 @@ deactivate_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *Storag
 int
 activate_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6801,6 +6942,7 @@ activate_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 int
 deactivate_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6818,6 +6960,7 @@ deactivate_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 int
 activate_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6835,6 +6978,7 @@ activate_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *St
 int
 deactivate_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6852,6 +6996,7 @@ deactivate_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *
 int
 activate_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6869,6 +7014,7 @@ activate_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 int
 deactivate_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6886,6 +7032,7 @@ deactivate_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp
 int
 activate_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6903,6 +7050,7 @@ activate_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp
 int
 deactivate_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6920,6 +7068,7 @@ deactivate_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageT
 int
 activate_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6937,6 +7086,7 @@ activate_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 int
 deactivate_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6954,6 +7104,7 @@ deactivate_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 int
 activate_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to activate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6971,6 +7122,7 @@ activate_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 int
 deactivate_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to deactivate the row with the underlying device */
 	return SNMP_ERR_NOERROR;
 }
@@ -6993,6 +7145,8 @@ deactivate_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 int
 check_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp, struct sccpNetworkEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7015,6 +7169,8 @@ check_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp,
 int
 update_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp, struct sccpNetworkEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpNetworkEntityTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7029,6 +7185,7 @@ update_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp
 void
 revert_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp, struct sccpNetworkEntityTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpNetworkEntityTable_row(StorageOld, NULL);
 }
@@ -7197,6 +7354,8 @@ var_sccpNetworkEntityTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp, struct sccpLocalSapNamesTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7219,6 +7378,8 @@ check_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp,
 int
 update_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp, struct sccpLocalSapNamesTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpLocalSapNamesTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7233,6 +7394,7 @@ update_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp
 void
 revert_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp, struct sccpLocalSapNamesTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpLocalSapNamesTable_row(StorageOld, NULL);
 }
@@ -7340,6 +7502,8 @@ var_sccpLocalSapNamesTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp, struct sccpAccessPointTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7362,6 +7526,8 @@ check_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp, str
 int
 update_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp, struct sccpAccessPointTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpAccessPointTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7376,6 +7542,7 @@ update_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp, st
 void
 revert_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp, struct sccpAccessPointTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpAccessPointTable_row(StorageOld, NULL);
 }
@@ -7545,6 +7712,8 @@ var_sccpAccessPointTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp, struct sccpLinkageTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7567,6 +7736,8 @@ check_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp, struct sccp
 int
 update_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp, struct sccpLinkageTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpLinkageTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7581,6 +7752,7 @@ update_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp, struct scc
 void
 revert_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp, struct sccpLinkageTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpLinkageTable_row(StorageOld, NULL);
 }
@@ -7924,6 +8096,8 @@ var_sccpLinkageTable(struct variable *vp, oid * name, size_t *length, int exact,
 int
 check_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, struct sccpMtpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -7946,6 +8120,8 @@ check_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, struct sccpMtpTable
 int
 update_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, struct sccpMtpTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpMtpTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -7960,6 +8136,7 @@ update_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, struct sccpMtpTabl
 void
 revert_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp, struct sccpMtpTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpMtpTable_row(StorageOld, NULL);
 }
@@ -8139,6 +8316,8 @@ var_sccpMtpTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 int
 check_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp, struct sccpSclcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8161,6 +8340,8 @@ check_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp, struct sccpSclcTa
 int
 update_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp, struct sccpSclcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpSclcTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8175,6 +8356,7 @@ update_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp, struct sccpSclcT
 void
 revert_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp, struct sccpSclcTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpSclcTable_row(StorageOld, NULL);
 }
@@ -8342,6 +8524,8 @@ var_sccpSclcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_sccpScocTable_row(struct sccpScocTable_data *StorageTmp, struct sccpScocTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8364,6 +8548,8 @@ check_sccpScocTable_row(struct sccpScocTable_data *StorageTmp, struct sccpScocTa
 int
 update_sccpScocTable_row(struct sccpScocTable_data *StorageTmp, struct sccpScocTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpScocTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8378,6 +8564,7 @@ update_sccpScocTable_row(struct sccpScocTable_data *StorageTmp, struct sccpScocT
 void
 revert_sccpScocTable_row(struct sccpScocTable_data *StorageTmp, struct sccpScocTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpScocTable_row(StorageOld, NULL);
 }
@@ -8518,6 +8705,8 @@ var_sccpScocTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp, struct sccpScrcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8540,6 +8729,8 @@ check_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp, struct sccpScrcTa
 int
 update_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp, struct sccpScrcTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpScrcTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8554,6 +8745,7 @@ update_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp, struct sccpScrcT
 void
 revert_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp, struct sccpScrcTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpScrcTable_row(StorageOld, NULL);
 }
@@ -8682,6 +8874,8 @@ var_sccpScrcTable(struct variable *vp, oid * name, size_t *length, int exact, si
 int
 check_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp, struct sccpEntitySetTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8704,6 +8898,8 @@ check_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp, struct 
 int
 update_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp, struct sccpEntitySetTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpEntitySetTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8718,6 +8914,7 @@ update_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp, struct
 void
 revert_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp, struct sccpEntitySetTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpEntitySetTable_row(StorageOld, NULL);
 }
@@ -8853,6 +9050,8 @@ var_sccpEntitySetTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 check_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp, struct sccpEntitySetSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -8875,6 +9074,8 @@ check_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp, s
 int
 update_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp, struct sccpEntitySetSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpEntitySetSapTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -8889,6 +9090,7 @@ update_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp, 
 void
 revert_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp, struct sccpEntitySetSapTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpEntitySetSapTable_row(StorageOld, NULL);
 }
@@ -9003,6 +9205,8 @@ var_sccpEntitySetSapTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp, struct sccpConcernedAreaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9025,6 +9229,8 @@ check_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp,
 int
 update_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp, struct sccpConcernedAreaTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpConcernedAreaTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9039,6 +9245,7 @@ update_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp
 void
 revert_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp, struct sccpConcernedAreaTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpConcernedAreaTable_row(StorageOld, NULL);
 }
@@ -9145,6 +9352,8 @@ var_sccpConcernedAreaTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp, struct sccpRemoteSCCPTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9167,6 +9376,8 @@ check_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp, struc
 int
 update_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp, struct sccpRemoteSCCPTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpRemoteSCCPTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9181,6 +9392,7 @@ update_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp, stru
 void
 revert_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp, struct sccpRemoteSCCPTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpRemoteSCCPTable_row(StorageOld, NULL);
 }
@@ -9295,6 +9507,8 @@ var_sccpRemoteSCCPTable(struct variable *vp, oid * name, size_t *length, int exa
 int
 check_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp, struct sccpGtConversionRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9317,6 +9531,8 @@ check_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *Stora
 int
 update_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp, struct sccpGtConversionRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpGtConversionRuleTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9331,6 +9547,7 @@ update_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *Stor
 void
 revert_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp, struct sccpGtConversionRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpGtConversionRuleTable_row(StorageOld, NULL);
 }
@@ -9466,6 +9683,8 @@ var_sccpGtConversionRuleTable(struct variable *vp, oid * name, size_t *length, i
 int
 check_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp, struct sccpAddressInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9488,6 +9707,8 @@ check_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp, str
 int
 update_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp, struct sccpAddressInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpAddressInfoTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9502,6 +9723,7 @@ update_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp, st
 void
 revert_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp, struct sccpAddressInfoTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpAddressInfoTable_row(StorageOld, NULL);
 }
@@ -9623,6 +9845,8 @@ var_sccpAddressInfoTable(struct variable *vp, oid * name, size_t *length, int ex
 int
 check_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp, struct sccpGtTranslatorTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9645,6 +9869,8 @@ check_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp, s
 int
 update_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp, struct sccpGtTranslatorTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpGtTranslatorTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9659,6 +9885,7 @@ update_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp, 
 void
 revert_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp, struct sccpGtTranslatorTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpGtTranslatorTable_row(StorageOld, NULL);
 }
@@ -9801,6 +10028,8 @@ var_sccpGtTranslatorTable(struct variable *vp, oid * name, size_t *length, int e
 int
 check_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp, struct sccpGtRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -9823,6 +10052,8 @@ check_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp, struct sccpGt
 int
 update_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp, struct sccpGtRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpGtRuleTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -9837,6 +10068,7 @@ update_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp, struct sccpG
 void
 revert_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp, struct sccpGtRuleTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpGtRuleTable_row(StorageOld, NULL);
 }
@@ -9979,6 +10211,8 @@ var_sccpGtRuleTable(struct variable *vp, oid * name, size_t *length, int exact, 
 int
 check_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp, struct sccpSrvtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -10001,6 +10235,8 @@ check_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp, struct sccpSrvtTa
 int
 update_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp, struct sccpSrvtTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpSrvtTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -10015,6 +10251,7 @@ update_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp, struct sccpSrvtT
 void
 revert_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp, struct sccpSrvtTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpSrvtTable_row(StorageOld, NULL);
 }
@@ -10198,6 +10435,10 @@ write_sccpNetworkEntityAlarmStatus(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10324,6 +10565,10 @@ write_sccpNetworkEntityVersion(int action, u_char *var_val, u_char var_val_type,
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityVersion entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10440,6 +10685,10 @@ write_sccpNetworkEntityLUDTandLUDTSSupported(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityLUDTandLUDTSSupported entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10555,6 +10804,10 @@ write_sccpNetworkEntityCoordChangeTimer(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityCoordChangeTimer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10667,6 +10920,10 @@ write_sccpNetworkEntityIgnoreSSTTimer(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityIgnoreSSTTimer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10779,6 +11036,10 @@ write_sccpNetworkEntityMaxStatInfoTimer(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityMaxStatInfoTimer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -10891,6 +11152,10 @@ write_sccpNetworkEntityAsaProfilePointer(int action, u_char *var_val, u_char var
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11008,6 +11273,10 @@ write_sccpNetworkEntityName(int action, u_char *var_val, u_char var_val_type, si
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11032,7 +11301,7 @@ write_sccpNetworkEntityName(int action, u_char *var_val, u_char var_val_type, si
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpNetworkEntityName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -11127,6 +11396,10 @@ write_sccpLocalSapNamesPointer(int action, u_char *var_val, u_char var_val_type,
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLocalSapNamesPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11234,6 +11507,10 @@ write_sccpAccessPointAlarmStatus(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11360,6 +11637,10 @@ write_sccpAccessPointSap2Address(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointSap2Address entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11384,7 +11665,7 @@ write_sccpAccessPointSap2Address(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..1 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 1))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 1))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointSap2Address: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -11479,6 +11760,10 @@ write_sccpAccessPointUserEntityNames(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointUserEntityNames entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11597,6 +11882,10 @@ write_sccpAccessPointProviderEntityNames(int action, u_char *var_val, u_char var
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointProviderEntityNames entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11715,6 +12004,10 @@ write_sccpAccessPointConcernedAreaPointer(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointConcernedAreaPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11822,6 +12115,10 @@ write_sccpAccessPointLinkagePointer(int action, u_char *var_val, u_char var_val_
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointLinkagePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -11928,6 +12225,10 @@ write_sccpAccessPointSsAvailableAfterSpRestart(int action, u_char *var_val, u_ch
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointSsAvailableAfterSpRestart entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12043,6 +12344,10 @@ write_sccpAccessPointAsaProfilePointer(int action, u_char *var_val, u_char var_v
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12160,6 +12465,10 @@ write_sccpAccessPointName(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12184,7 +12493,7 @@ write_sccpAccessPointName(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpAccessPointName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -12279,6 +12588,10 @@ write_sccpLinkageOperationalProtocols(int action, u_char *var_val, u_char var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageOperationalProtocols entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12406,6 +12719,10 @@ write_sccpLinkageSnSAP(int action, u_char *var_val, u_char var_val_type, size_t 
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageSnSAP entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12522,6 +12839,10 @@ write_sccpLinkageAttackTimerValue(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageAttackTimerValue entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12634,6 +12955,10 @@ write_sccpLinkageDecayTimerValue(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageDecayTimerValue entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12746,6 +13071,10 @@ write_sccpLinkageNrOfRestrictionLevels(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageNrOfRestrictionLevels entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12853,6 +13182,10 @@ write_sccpLinkageNrOfSubLevels(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageNrOfSubLevels entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -12960,6 +13293,10 @@ write_sccpLinkageCLS(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageCLS entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13067,6 +13404,10 @@ write_sccpLinkageCongestionTimerValue(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageCongestionTimerValue entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13179,6 +13520,10 @@ write_sccpLinkageP(int action, u_char *var_val, u_char var_val_type, size_t var_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageP entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13286,6 +13631,10 @@ write_sccpLinkageImportanceLevelCR(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCR entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13406,6 +13755,10 @@ write_sccpLinkageImportanceLevelCC(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCC entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13526,6 +13879,10 @@ write_sccpLinkageImportanceLevelCREF(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelCREF entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13646,6 +14003,10 @@ write_sccpLinkageImportanceLevelDT1(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelDT1 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13766,6 +14127,10 @@ write_sccpLinkageImportanceLevelDT2(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelDT2 entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -13886,6 +14251,10 @@ write_sccpLinkageImportanceLevelAK(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelAK entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14006,6 +14375,10 @@ write_sccpLinkageImportanceLevelIT(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelIT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14126,6 +14499,10 @@ write_sccpLinkageImportanceLevelED(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelED entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14246,6 +14623,10 @@ write_sccpLinkageImportanceLevelEA(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelEA entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14366,6 +14747,10 @@ write_sccpLinkageImportanceLevelRSR(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRSR entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14486,6 +14871,10 @@ write_sccpLinkageImportanceLevelRSC(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRSC entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14606,6 +14995,10 @@ write_sccpLinkageImportanceLevelERR(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelERR entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14726,6 +15119,10 @@ write_sccpLinkageImportanceLevelRLC(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRLC entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14846,6 +15243,10 @@ write_sccpLinkageImportanceLevelRLSD(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelRLSD entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -14966,6 +15367,10 @@ write_sccpLinkageImportanceLevelUDT(int action, u_char *var_val, u_char var_val_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelUDT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15086,6 +15491,10 @@ write_sccpLinkageImportanceLevelUDTS(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelUDTS entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15206,6 +15615,10 @@ write_sccpLinkageImportanceLevelXUDT(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelXUDT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15326,6 +15739,10 @@ write_sccpLinkageImportanceLevelXUDTS(int action, u_char *var_val, u_char var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelXUDTS entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15446,6 +15863,10 @@ write_sccpLinkageImportanceLevelLUDT(int action, u_char *var_val, u_char var_val
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelLUDT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15566,6 +15987,10 @@ write_sccpLinkageImportanceLevelLUDTS(int action, u_char *var_val, u_char var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageImportanceLevelLUDTS entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15686,6 +16111,10 @@ write_sccpLinkageConcernedAreaPointer(int action, u_char *var_val, u_char var_va
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageConcernedAreaPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15792,6 +16221,10 @@ write_sccpLinkageLowerLimitForSegmentation(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageLowerLimitForSegmentation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -15903,6 +16336,10 @@ write_sccpLinkageUpperLimitForSegmentation(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageUpperLimitForSegmentation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16014,6 +16451,10 @@ write_sccpLinkageName(int action, u_char *var_val, u_char var_val_type, size_t v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16038,7 +16479,7 @@ write_sccpLinkageName(int action, u_char *var_val, u_char var_val_type, size_t v
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpLinkageName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -16133,6 +16574,10 @@ write_sccpMtpSap2Address(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpSap2Address entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16252,6 +16697,10 @@ write_sccpMtpUserPart(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpUserPart entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16380,6 +16829,10 @@ write_sccpMtpUserEntityNames(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpUserEntityNames entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16496,6 +16949,10 @@ write_sccpMtpProviderEntityNames(int action, u_char *var_val, u_char var_val_typ
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpProviderEntityNames entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16612,6 +17069,10 @@ write_sccpMtpAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16727,6 +17188,10 @@ write_sccpMtpRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpRemoteExchangeLabel entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16751,7 +17216,7 @@ write_sccpMtpRemoteExchangeLabel(int action, u_char *var_val, u_char var_val_typ
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpMtpRemoteExchangeLabel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -16846,6 +17311,10 @@ write_sccpMtpName(int action, u_char *var_val, u_char var_val_type, size_t var_v
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -16965,6 +17434,10 @@ write_sccpSclcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17091,6 +17564,10 @@ write_sccpSclcClProtocolMachineId(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcClProtocolMachineId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17210,6 +17687,10 @@ write_sccpSclcAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17326,6 +17807,10 @@ write_sccpSclcOperationalSystemType(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcOperationalSystemType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17440,6 +17925,10 @@ write_sccpSclcInitialValueReassTimer(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcInitialValueReassTimer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17551,6 +18040,10 @@ write_sccpSclcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17668,6 +18161,10 @@ write_sccpSclcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17692,7 +18189,7 @@ write_sccpSclcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSclcName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -17787,6 +18284,10 @@ write_sccpScocCoProtocolMachineId(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScocCoProtocolMachineId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -17906,6 +18407,10 @@ write_sccpScocAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScocAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18022,6 +18527,10 @@ write_sccpScocOperationalSystemType(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScocOperationalSystemType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18136,6 +18645,10 @@ write_sccpScocName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScocName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18160,7 +18673,7 @@ write_sccpScocName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScocName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -18256,6 +18769,10 @@ write_sccpScrcId(int action, u_char *var_val, u_char var_val_type, size_t var_va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScrcId entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18376,6 +18893,10 @@ write_sccpScrcAlarmStatus(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScrcAlarmStatus entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18503,6 +19024,10 @@ write_sccpScrcAsaProfilePointer(int action, u_char *var_val, u_char var_val_type
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScrcAsaProfilePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18620,6 +19145,10 @@ write_sccpScrcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScrcName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18644,7 +19173,7 @@ write_sccpScrcName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpScrcName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -18740,6 +19269,10 @@ write_sccpEntitySetSharingMode(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSharingMode entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18856,6 +19389,10 @@ write_sccpEntitySetLoadSharingAlgPointer(int action, u_char *var_val, u_char var
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetLoadSharingAlgPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18972,6 +19509,10 @@ write_sccpEntitySetName(int action, u_char *var_val, u_char var_val_type, size_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -18996,7 +19537,7 @@ write_sccpEntitySetName(int action, u_char *var_val, u_char var_val_type, size_t
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -19092,6 +19633,10 @@ write_sccpEntitySetType(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19207,6 +19752,10 @@ write_sccpEntitySetSsn(int action, u_char *var_val, u_char var_val_type, size_t 
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSsn entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19231,7 +19780,7 @@ write_sccpEntitySetSsn(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..1 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 1))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 1))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpEntitySetSsn: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -19327,6 +19876,10 @@ write_sccpEntitySetSapType(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSapType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19442,6 +19995,10 @@ write_sccpEntitySetSapPointer(int action, u_char *var_val, u_char var_val_type, 
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSapPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19558,6 +20115,10 @@ write_sccpRemoteSCCPMTPAccessPoint(int action, u_char *var_val, u_char var_val_t
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpRemoteSCCPMTPAccessPoint entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19674,6 +20235,10 @@ write_sccpRemoteSCCPName(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpRemoteSCCPName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19698,7 +20263,7 @@ write_sccpRemoteSCCPName(int action, u_char *var_val, u_char var_val_type, size_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpRemoteSCCPName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -19793,6 +20358,10 @@ write_sccpGtConversionRuleNewEncodingScheme(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewEncodingScheme entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -19911,6 +20480,10 @@ write_sccpGtConversionRuleNewNatureOfAddress(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewNatureOfAddress entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20034,6 +20607,10 @@ write_sccpGtConversionRuleNewNumberingPlan(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewNumberingPlan entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20152,6 +20729,10 @@ write_sccpGtConversionRuleNewTranslationType(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleNewTranslationType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20270,6 +20851,10 @@ write_sccpGtConversionRuleName(int action, u_char *var_val, u_char var_val_type,
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20294,7 +20879,7 @@ write_sccpGtConversionRuleName(int action, u_char *var_val, u_char var_val_type,
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtConversionRuleName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -20390,6 +20975,10 @@ write_sccpAddressInfoOperation(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAddressInfoOperation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20508,6 +21097,10 @@ write_sccpAddressInfoAddressElement(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAddressInfoAddressElement entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20619,6 +21212,10 @@ write_sccpAddressInfoNrOfAddressElements(int action, u_char *var_val, u_char var
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAddressInfoNrOfAddressElements entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20725,6 +21322,10 @@ write_sccpGtTranslatorGtIndicator(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorGtIndicator entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20842,6 +21443,10 @@ write_sccpGtTranslatorNatureOfAddress(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorNatureOfAddress entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -20964,6 +21569,10 @@ write_sccpGtTranslatorNumberingPlan(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorNumberingPlan entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21081,6 +21690,10 @@ write_sccpGtTranslatorTranslationType(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorTranslationType entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21198,6 +21811,10 @@ write_sccpGtTranslatorAdministrativeState(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21314,6 +21931,10 @@ write_sccpGtTranslatorName(int action, u_char *var_val, u_char var_val_type, siz
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21338,7 +21959,7 @@ write_sccpGtTranslatorName(int action, u_char *var_val, u_char var_val_type, siz
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtTranslatorName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -21434,6 +22055,10 @@ write_sccpGtRuleAdministrativeState(int action, u_char *var_val, u_char var_val_
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21550,6 +22175,10 @@ write_sccpGtRuleAddressInformation(int action, u_char *var_val, u_char var_val_t
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleAddressInformation entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21668,6 +22297,10 @@ write_sccpGtRuleGtConversionRulePointer(int action, u_char *var_val, u_char var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleGtConversionRulePointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21787,6 +22420,10 @@ write_sccpGtRuleEncodingScheme(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleEncodingScheme entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -21904,6 +22541,10 @@ write_sccpGtRuleEntitySetPointer(int action, u_char *var_val, u_char var_val_typ
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleEntitySetPointer entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22023,6 +22664,10 @@ write_sccpGtRuleName(int action, u_char *var_val, u_char var_val_type, size_t va
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22047,7 +22692,7 @@ write_sccpGtRuleName(int action, u_char *var_val, u_char var_val_type, size_t va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpGtRuleName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22143,6 +22788,10 @@ write_sccpSrvtDSRVT(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtDSRVT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22254,6 +22903,10 @@ write_sccpSrvtNSRVT(int action, u_char *var_val, u_char var_val_type, size_t var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtNSRVT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22360,6 +23013,10 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtName entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22384,7 +23041,7 @@ write_sccpSrvtName(int action, u_char *var_val, u_char var_val_type, size_t var_
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpSrvtName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -22480,6 +23137,10 @@ write_sccpSrvtAdministrativeState(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtAdministrativeState entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22596,6 +23257,10 @@ write_sccpSrvtTraceRequested(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtTraceRequested entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22710,6 +23375,10 @@ write_sccpSrvtThreshold(int action, u_char *var_val, u_char var_val_type, size_t
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtThreshold entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22816,6 +23485,10 @@ write_sccpSrvtMtpBackwardRoutingRequested(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtMtpBackwardRoutingRequested entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -22931,6 +23604,10 @@ write_sccpSrvtOriginalGT(int action, u_char *var_val, u_char var_val_type, size_
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtOriginalGT entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23050,6 +23727,10 @@ write_sccpSrvtInfoRequest(int action, u_char *var_val, u_char var_val_type, size
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtInfoRequest entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23177,6 +23858,10 @@ write_sccpSrvtReturnUnknownParams(int action, u_char *var_val, u_char var_val_ty
 	uint8_t *string = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtReturnUnknownParams entering action=%d...  \n", action));
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -23298,6 +23983,7 @@ write_sccpSrvtReturnUnknownParams(int action, u_char *var_val, u_char var_val_ty
 int
 can_act_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23315,6 +24001,7 @@ can_act_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTm
 int
 can_deact_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23332,6 +24019,7 @@ can_deact_sccpNetworkEntityTable_row(struct sccpNetworkEntityTable_data *Storage
 int
 can_act_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23349,6 +24037,7 @@ can_act_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTm
 int
 can_deact_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23366,6 +24055,7 @@ can_deact_sccpLocalSapNamesTable_row(struct sccpLocalSapNamesTable_data *Storage
 int
 can_act_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23383,6 +24073,7 @@ can_act_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 int
 can_deact_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23400,6 +24091,7 @@ can_deact_sccpAccessPointTable_row(struct sccpAccessPointTable_data *StorageTmp)
 int
 can_act_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23417,6 +24109,7 @@ can_act_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 int
 can_deact_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23434,6 +24127,7 @@ can_deact_sccpLinkageTable_row(struct sccpLinkageTable_data *StorageTmp)
 int
 can_act_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23451,6 +24145,7 @@ can_act_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 int
 can_deact_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23468,6 +24163,7 @@ can_deact_sccpMtpTable_row(struct sccpMtpTable_data *StorageTmp)
 int
 can_act_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23485,6 +24181,7 @@ can_act_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 int
 can_deact_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23502,6 +24199,7 @@ can_deact_sccpSclcTable_row(struct sccpSclcTable_data *StorageTmp)
 int
 can_act_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23519,6 +24217,7 @@ can_act_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 int
 can_deact_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23536,6 +24235,7 @@ can_deact_sccpScocTable_row(struct sccpScocTable_data *StorageTmp)
 int
 can_act_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23553,6 +24253,7 @@ can_act_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 int
 can_deact_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23570,6 +24271,7 @@ can_deact_sccpScrcTable_row(struct sccpScrcTable_data *StorageTmp)
 int
 can_act_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23587,6 +24289,7 @@ can_act_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 int
 can_deact_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23604,6 +24307,7 @@ can_deact_sccpEntitySetTable_row(struct sccpEntitySetTable_data *StorageTmp)
 int
 can_act_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23621,6 +24325,7 @@ can_act_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp)
 int
 can_deact_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23638,6 +24343,7 @@ can_deact_sccpEntitySetSapTable_row(struct sccpEntitySetSapTable_data *StorageTm
 int
 can_act_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23655,6 +24361,7 @@ can_act_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTm
 int
 can_deact_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23672,6 +24379,7 @@ can_deact_sccpConcernedAreaTable_row(struct sccpConcernedAreaTable_data *Storage
 int
 can_act_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23689,6 +24397,7 @@ can_act_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 int
 can_deact_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23706,6 +24415,7 @@ can_deact_sccpRemoteSCCPTable_row(struct sccpRemoteSCCPTable_data *StorageTmp)
 int
 can_act_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23723,6 +24433,7 @@ can_act_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *Sto
 int
 can_deact_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23740,6 +24451,7 @@ can_deact_sccpGtConversionRuleTable_row(struct sccpGtConversionRuleTable_data *S
 int
 can_act_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23757,6 +24469,7 @@ can_act_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 int
 can_deact_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23774,6 +24487,7 @@ can_deact_sccpAddressInfoTable_row(struct sccpAddressInfoTable_data *StorageTmp)
 int
 can_act_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23791,6 +24505,7 @@ can_act_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp)
 int
 can_deact_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23808,6 +24523,7 @@ can_deact_sccpGtTranslatorTable_row(struct sccpGtTranslatorTable_data *StorageTm
 int
 can_act_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23825,6 +24541,7 @@ can_act_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 int
 can_deact_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23842,6 +24559,7 @@ can_deact_sccpGtRuleTable_row(struct sccpGtRuleTable_data *StorageTmp)
 int
 can_act_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the new or inactive table row can be activated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23859,6 +24577,7 @@ can_act_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 int
 can_deact_sccpSrvtTable_row(struct sccpSrvtTable_data *StorageTmp)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to check whether the active table row can be deactivated */
 	return SNMP_ERR_NOERROR;
 }
@@ -23883,6 +24602,10 @@ write_sccpNetworkEntityRowStatus(int action, u_char *var_val, u_char var_val_typ
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpNetworkEntityRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpNetworkEntityTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -24164,6 +24887,10 @@ write_sccpLocalSapNamesRowStatus(int action, u_char *var_val, u_char var_val_typ
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLocalSapNamesRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLocalSapNamesTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -24459,6 +25186,10 @@ write_sccpAccessPointRowStatus(int action, u_char *var_val, u_char var_val_type,
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAccessPointRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAccessPointTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -24754,6 +25485,10 @@ write_sccpLinkageRowStatus(int action, u_char *var_val, u_char var_val_type, siz
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpLinkageRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpLinkageTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -25049,6 +25784,10 @@ write_sccpMtpRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpMtpRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpMtpTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -25344,6 +26083,10 @@ write_sccpSclcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSclcRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSclcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -25625,6 +26368,10 @@ write_sccpScocRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScocRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpScocTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -25906,6 +26653,10 @@ write_sccpScrcRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpScrcRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpScrcTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -26187,6 +26938,10 @@ write_sccpEntitySetRowStatus(int action, u_char *var_val, u_char var_val_type, s
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpEntitySetTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -26484,6 +27239,10 @@ write_sccpEntitySetSapRowStatus(int action, u_char *var_val, u_char var_val_type
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpEntitySetSapRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpEntitySetSapTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -26797,6 +27556,10 @@ write_sccpConcernedAreaRowStatus(int action, u_char *var_val, u_char var_val_typ
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpConcernedAreaRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpConcernedAreaTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -27094,6 +27857,10 @@ write_sccpRemoteSCCPRowStatus(int action, u_char *var_val, u_char var_val_type, 
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpRemoteSCCPRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpRemoteSCCPTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -27407,6 +28174,10 @@ write_sccpGtConversionRuleRowStatus(int action, u_char *var_val, u_char var_val_
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtConversionRuleRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtConversionRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -27704,6 +28475,10 @@ write_sccpAddressInfoRowStatus(int action, u_char *var_val, u_char var_val_type,
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpAddressInfoRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpAddressInfoTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28017,6 +28792,10 @@ write_sccpGtTranslatorRowStatus(int action, u_char *var_val, u_char var_val_type
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtTranslatorRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtTranslatorTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28314,6 +29093,10 @@ write_sccpGtRuleRowStatus(int action, u_char *var_val, u_char var_val_type, size
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpGtRuleRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpGtRuleTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28627,6 +29410,10 @@ write_sccpSrvtRowStatus(int action, u_char *var_val, u_char var_val_type, size_t
 	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpMIB", "write_sccpSrvtRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(sccpSrvtTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
@@ -28973,6 +29760,8 @@ sccpMIB_loop_handler(int sig)
 void
 sccpMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("sccpMIB", "sccpMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("sccpMIB", "done.\n"));

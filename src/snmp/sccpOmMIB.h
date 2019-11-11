@@ -67,7 +67,7 @@ struct sccpOmMIB_data {
 	uint sccpOmMIB_rsvs;
 	uint sccpOmMIB_tsts;
 	uint sccpOmMIB_sets;
-	uint sccpOmMIB_request;
+	int sccpOmMIB_request;
 	oid *sccpOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t sccpOm1stAndIntervalActivateLen;
 	oid *sccpOm1stAndIntervalDeactivate;	/* ReadWrite */
@@ -93,7 +93,7 @@ struct sccpOmErrorsTable_data {
 	uint sccpOmErrorsTable_rsvs;
 	uint sccpOmErrorsTable_tsts;
 	uint sccpOmErrorsTable_sets;
-	uint sccpOmErrorsTable_request;
+	int sccpOmErrorsTable_request;
 	uint sccpOmErrorsTable_refs;
 	uint sccpOmErrorsTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -127,7 +127,7 @@ struct sccpOmMessageTable_data {
 	uint sccpOmMessageTable_rsvs;
 	uint sccpOmMessageTable_tsts;
 	uint sccpOmMessageTable_sets;
-	uint sccpOmMessageTable_request;
+	int sccpOmMessageTable_request;
 	uint sccpOmMessageTable_refs;
 	uint sccpOmMessageTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -163,7 +163,7 @@ struct sccpOmAccessibilityTable_data {
 	uint sccpOmAccessibilityTable_rsvs;
 	uint sccpOmAccessibilityTable_tsts;
 	uint sccpOmAccessibilityTable_sets;
-	uint sccpOmAccessibilityTable_request;
+	int sccpOmAccessibilityTable_request;
 	uint sccpOmAccessibilityTable_refs;
 	uint sccpOmAccessibilityTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -179,7 +179,7 @@ struct sccpOmUtilizationTable_data {
 	uint sccpOmUtilizationTable_rsvs;
 	uint sccpOmUtilizationTable_tsts;
 	uint sccpOmUtilizationTable_sets;
-	uint sccpOmUtilizationTable_request;
+	int sccpOmUtilizationTable_request;
 	uint sccpOmUtilizationTable_refs;
 	uint sccpOmUtilizationTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -204,7 +204,7 @@ struct sccpOm5MinHistoryTable_data {
 	uint sccpOm5MinHistoryTable_rsvs;
 	uint sccpOm5MinHistoryTable_tsts;
 	uint sccpOm5MinHistoryTable_sets;
-	uint sccpOm5MinHistoryTable_request;
+	int sccpOm5MinHistoryTable_request;
 	uint sccpOm5MinHistoryTable_refs;
 	uint sccpOm5MinHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -262,7 +262,7 @@ struct sccpOm15MinHistoryTable_data {
 	uint sccpOm15MinHistoryTable_rsvs;
 	uint sccpOm15MinHistoryTable_tsts;
 	uint sccpOm15MinHistoryTable_sets;
-	uint sccpOm15MinHistoryTable_request;
+	int sccpOm15MinHistoryTable_request;
 	uint sccpOm15MinHistoryTable_refs;
 	uint sccpOm15MinHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -319,7 +319,7 @@ struct sccpOm5MinSsnHistoryTable_data {
 	uint sccpOm5MinSsnHistoryTable_rsvs;
 	uint sccpOm5MinSsnHistoryTable_tsts;
 	uint sccpOm5MinSsnHistoryTable_sets;
-	uint sccpOm5MinSsnHistoryTable_request;
+	int sccpOm5MinSsnHistoryTable_request;
 	uint sccpOm5MinSsnHistoryTable_refs;
 	uint sccpOm5MinSsnHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -343,7 +343,7 @@ struct sccpOm15MinSsnHistoryTable_data {
 	uint sccpOm15MinSsnHistoryTable_rsvs;
 	uint sccpOm15MinSsnHistoryTable_tsts;
 	uint sccpOm15MinSsnHistoryTable_sets;
-	uint sccpOm15MinSsnHistoryTable_request;
+	int sccpOm15MinSsnHistoryTable_request;
 	uint sccpOm15MinSsnHistoryTable_refs;
 	uint sccpOm15MinSsnHistoryTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */

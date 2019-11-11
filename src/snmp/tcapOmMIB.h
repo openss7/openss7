@@ -67,7 +67,7 @@ struct tcapOmMIB_data {
 	uint tcapOmMIB_rsvs;
 	uint tcapOmMIB_tsts;
 	uint tcapOmMIB_sets;
-	uint tcapOmMIB_request;
+	int tcapOmMIB_request;
 	oid *tcapOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t tcapOm1stAndIntervalActivateLen;
 	oid *tcapOm1stAndIntervalDeactivate;	/* ReadWrite */
@@ -90,7 +90,7 @@ struct tcapOmNodeTable_data {
 	uint tcapOmNodeTable_rsvs;
 	uint tcapOmNodeTable_tsts;
 	uint tcapOmNodeTable_sets;
-	uint tcapOmNodeTable_request;
+	int tcapOmNodeTable_request;
 	uint tcapOmNodeTable_refs;
 	uint tcapOmNodeTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -107,7 +107,7 @@ struct tcapOmNodeCurrentTable_data {
 	uint tcapOmNodeCurrentTable_rsvs;
 	uint tcapOmNodeCurrentTable_tsts;
 	uint tcapOmNodeCurrentTable_sets;
-	uint tcapOmNodeCurrentTable_request;
+	int tcapOmNodeCurrentTable_request;
 	uint tcapOmNodeCurrentTable_refs;
 	uint tcapOmNodeCurrentTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -122,7 +122,7 @@ struct tcapOmNode5minIntTable_data {
 	uint tcapOmNode5minIntTable_rsvs;
 	uint tcapOmNode5minIntTable_tsts;
 	uint tcapOmNode5minIntTable_sets;
-	uint tcapOmNode5minIntTable_request;
+	int tcapOmNode5minIntTable_request;
 	uint tcapOmNode5minIntTable_refs;
 	uint tcapOmNode5minIntTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -138,7 +138,7 @@ struct tcapOmNode15minIntTable_data {
 	uint tcapOmNode15minIntTable_rsvs;
 	uint tcapOmNode15minIntTable_tsts;
 	uint tcapOmNode15minIntTable_sets;
-	uint tcapOmNode15minIntTable_request;
+	int tcapOmNode15minIntTable_request;
 	uint tcapOmNode15minIntTable_refs;
 	uint tcapOmNode15minIntTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -154,7 +154,7 @@ struct tcapOmMsgsTable_data {
 	uint tcapOmMsgsTable_rsvs;
 	uint tcapOmMsgsTable_tsts;
 	uint tcapOmMsgsTable_sets;
-	uint tcapOmMsgsTable_request;
+	int tcapOmMsgsTable_request;
 	uint tcapOmMsgsTable_refs;
 	uint tcapOmMsgsTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -170,7 +170,7 @@ struct tcapOmMsgsCurrentTable_data {
 	uint tcapOmMsgsCurrentTable_rsvs;
 	uint tcapOmMsgsCurrentTable_tsts;
 	uint tcapOmMsgsCurrentTable_sets;
-	uint tcapOmMsgsCurrentTable_request;
+	int tcapOmMsgsCurrentTable_request;
 	uint tcapOmMsgsCurrentTable_refs;
 	uint tcapOmMsgsCurrentTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -184,7 +184,7 @@ struct tcapOmMsgs5minIntTable_data {
 	uint tcapOmMsgs5minIntTable_rsvs;
 	uint tcapOmMsgs5minIntTable_tsts;
 	uint tcapOmMsgs5minIntTable_sets;
-	uint tcapOmMsgs5minIntTable_request;
+	int tcapOmMsgs5minIntTable_request;
 	uint tcapOmMsgs5minIntTable_refs;
 	uint tcapOmMsgs5minIntTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -199,7 +199,7 @@ struct tcapOmMsgs15minIntTable_data {
 	uint tcapOmMsgs15minIntTable_rsvs;
 	uint tcapOmMsgs15minIntTable_tsts;
 	uint tcapOmMsgs15minIntTable_sets;
-	uint tcapOmMsgs15minIntTable_request;
+	int tcapOmMsgs15minIntTable_request;
 	uint tcapOmMsgs15minIntTable_refs;
 	uint tcapOmMsgs15minIntTable_id;
 	uint8_t *sccpNetworkEntityId;	/* Notify */
@@ -214,7 +214,7 @@ struct tcapOmAETable_data {
 	uint tcapOmAETable_rsvs;
 	uint tcapOmAETable_tsts;
 	uint tcapOmAETable_sets;
-	uint tcapOmAETable_request;
+	int tcapOmAETable_request;
 	uint tcapOmAETable_refs;
 	uint tcapOmAETable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -236,7 +236,7 @@ struct tcapOmAECurrentTable_data {
 	uint tcapOmAECurrentTable_rsvs;
 	uint tcapOmAECurrentTable_tsts;
 	uint tcapOmAECurrentTable_sets;
-	uint tcapOmAECurrentTable_request;
+	int tcapOmAECurrentTable_request;
 	uint tcapOmAECurrentTable_refs;
 	uint tcapOmAECurrentTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -256,7 +256,7 @@ struct tcapOmAE5minIntTable_data {
 	uint tcapOmAE5minIntTable_rsvs;
 	uint tcapOmAE5minIntTable_tsts;
 	uint tcapOmAE5minIntTable_sets;
-	uint tcapOmAE5minIntTable_request;
+	int tcapOmAE5minIntTable_request;
 	uint tcapOmAE5minIntTable_refs;
 	uint tcapOmAE5minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -277,7 +277,7 @@ struct tcapOmAE15minIntTable_data {
 	uint tcapOmAE15minIntTable_rsvs;
 	uint tcapOmAE15minIntTable_tsts;
 	uint tcapOmAE15minIntTable_sets;
-	uint tcapOmAE15minIntTable_request;
+	int tcapOmAE15minIntTable_request;
 	uint tcapOmAE15minIntTable_refs;
 	uint tcapOmAE15minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -298,7 +298,7 @@ struct tcapOmTcTable_data {
 	uint tcapOmTcTable_rsvs;
 	uint tcapOmTcTable_tsts;
 	uint tcapOmTcTable_sets;
-	uint tcapOmTcTable_request;
+	int tcapOmTcTable_request;
 	uint tcapOmTcTable_refs;
 	uint tcapOmTcTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -325,7 +325,7 @@ struct tcapOmTcCurrentTable_data {
 	uint tcapOmTcCurrentTable_rsvs;
 	uint tcapOmTcCurrentTable_tsts;
 	uint tcapOmTcCurrentTable_sets;
-	uint tcapOmTcCurrentTable_request;
+	int tcapOmTcCurrentTable_request;
 	uint tcapOmTcCurrentTable_refs;
 	uint tcapOmTcCurrentTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -350,7 +350,7 @@ struct tcapOmTc5minIntTable_data {
 	uint tcapOmTc5minIntTable_rsvs;
 	uint tcapOmTc5minIntTable_tsts;
 	uint tcapOmTc5minIntTable_sets;
-	uint tcapOmTc5minIntTable_request;
+	int tcapOmTc5minIntTable_request;
 	uint tcapOmTc5minIntTable_refs;
 	uint tcapOmTc5minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -376,7 +376,7 @@ struct tcapOmTc15minIntTable_data {
 	uint tcapOmTc15minIntTable_rsvs;
 	uint tcapOmTc15minIntTable_tsts;
 	uint tcapOmTc15minIntTable_sets;
-	uint tcapOmTc15minIntTable_request;
+	int tcapOmTc15minIntTable_request;
 	uint tcapOmTc15minIntTable_refs;
 	uint tcapOmTc15minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -402,7 +402,7 @@ struct tcapOmDevelRecvTable_data {
 	uint tcapOmDevelRecvTable_rsvs;
 	uint tcapOmDevelRecvTable_tsts;
 	uint tcapOmDevelRecvTable_sets;
-	uint tcapOmDevelRecvTable_request;
+	int tcapOmDevelRecvTable_request;
 	uint tcapOmDevelRecvTable_refs;
 	uint tcapOmDevelRecvTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -438,7 +438,7 @@ struct tcapOmDevelRecvCurrentTable_data {
 	uint tcapOmDevelRecvCurrentTable_rsvs;
 	uint tcapOmDevelRecvCurrentTable_tsts;
 	uint tcapOmDevelRecvCurrentTable_sets;
-	uint tcapOmDevelRecvCurrentTable_request;
+	int tcapOmDevelRecvCurrentTable_request;
 	uint tcapOmDevelRecvCurrentTable_refs;
 	uint tcapOmDevelRecvCurrentTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -472,7 +472,7 @@ struct tcapOmDevelRecv5minIntTable_data {
 	uint tcapOmDevelRecv5minIntTable_rsvs;
 	uint tcapOmDevelRecv5minIntTable_tsts;
 	uint tcapOmDevelRecv5minIntTable_sets;
-	uint tcapOmDevelRecv5minIntTable_request;
+	int tcapOmDevelRecv5minIntTable_request;
 	uint tcapOmDevelRecv5minIntTable_refs;
 	uint tcapOmDevelRecv5minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -507,7 +507,7 @@ struct tcapOmDevelRecv15minIntTable_data {
 	uint tcapOmDevelRecv15minIntTable_rsvs;
 	uint tcapOmDevelRecv15minIntTable_tsts;
 	uint tcapOmDevelRecv15minIntTable_sets;
-	uint tcapOmDevelRecv15minIntTable_request;
+	int tcapOmDevelRecv15minIntTable_request;
 	uint tcapOmDevelRecv15minIntTable_refs;
 	uint tcapOmDevelRecv15minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -542,7 +542,7 @@ struct tcapOmDevelSentTable_data {
 	uint tcapOmDevelSentTable_rsvs;
 	uint tcapOmDevelSentTable_tsts;
 	uint tcapOmDevelSentTable_sets;
-	uint tcapOmDevelSentTable_request;
+	int tcapOmDevelSentTable_request;
 	uint tcapOmDevelSentTable_refs;
 	uint tcapOmDevelSentTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -577,7 +577,7 @@ struct tcapOmDevelSentCurrentTable_data {
 	uint tcapOmDevelSentCurrentTable_rsvs;
 	uint tcapOmDevelSentCurrentTable_tsts;
 	uint tcapOmDevelSentCurrentTable_sets;
-	uint tcapOmDevelSentCurrentTable_request;
+	int tcapOmDevelSentCurrentTable_request;
 	uint tcapOmDevelSentCurrentTable_refs;
 	uint tcapOmDevelSentCurrentTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -610,7 +610,7 @@ struct tcapOmDevelSent5minIntTable_data {
 	uint tcapOmDevelSent5minIntTable_rsvs;
 	uint tcapOmDevelSent5minIntTable_tsts;
 	uint tcapOmDevelSent5minIntTable_sets;
-	uint tcapOmDevelSent5minIntTable_request;
+	int tcapOmDevelSent5minIntTable_request;
 	uint tcapOmDevelSent5minIntTable_refs;
 	uint tcapOmDevelSent5minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -644,7 +644,7 @@ struct tcapOmDevelSent15minIntTable_data {
 	uint tcapOmDevelSent15minIntTable_rsvs;
 	uint tcapOmDevelSent15minIntTable_tsts;
 	uint tcapOmDevelSent15minIntTable_sets;
-	uint tcapOmDevelSent15minIntTable_request;
+	int tcapOmDevelSent15minIntTable_request;
 	uint tcapOmDevelSent15minIntTable_refs;
 	uint tcapOmDevelSent15minIntTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */

@@ -67,14 +67,14 @@ struct tcapMIB_data {
 	uint tcapMIB_rsvs;
 	uint tcapMIB_tsts;
 	uint tcapMIB_sets;
-	uint tcapMIB_request;
+	int tcapMIB_request;
 };
 struct tcapApplicationSubsystemTable_data {
 	struct tcapApplicationSubsystemTable_data *tcapApplicationSubsystemTable_old;
 	uint tcapApplicationSubsystemTable_rsvs;
 	uint tcapApplicationSubsystemTable_tsts;
 	uint tcapApplicationSubsystemTable_sets;
-	uint tcapApplicationSubsystemTable_request;
+	int tcapApplicationSubsystemTable_request;
 	uint tcapApplicationSubsystemTable_refs;
 	uint tcapApplicationSubsystemTable_id;
 	long tcapSystemId;		/* NoAccess */
@@ -87,7 +87,7 @@ struct tcapTransactionCopmTable_data {
 	uint tcapTransactionCopmTable_rsvs;
 	uint tcapTransactionCopmTable_tsts;
 	uint tcapTransactionCopmTable_sets;
-	uint tcapTransactionCopmTable_request;
+	int tcapTransactionCopmTable_request;
 	uint tcapTransactionCopmTable_refs;
 	uint tcapTransactionCopmTable_id;
 	ulong tcapTransactionCopmId;	/* NoAccess */
@@ -99,7 +99,7 @@ struct tcapTransactionTable_data {
 	uint tcapTransactionTable_rsvs;
 	uint tcapTransactionTable_tsts;
 	uint tcapTransactionTable_sets;
-	uint tcapTransactionTable_request;
+	int tcapTransactionTable_request;
 	uint tcapTransactionTable_refs;
 	uint tcapTransactionTable_id;
 	long tcapApInvocationId;	/* NoAccess */
@@ -123,7 +123,7 @@ struct tcapDialogueTable_data {
 	uint tcapDialogueTable_rsvs;
 	uint tcapDialogueTable_tsts;
 	uint tcapDialogueTable_sets;
-	uint tcapDialogueTable_request;
+	int tcapDialogueTable_request;
 	uint tcapDialogueTable_refs;
 	uint tcapDialogueTable_id;
 	long tcapApInvocationId;	/* NoAccess */
@@ -147,7 +147,7 @@ struct tcapTcUserTable_data {
 	uint tcapTcUserTable_rsvs;
 	uint tcapTcUserTable_tsts;
 	uint tcapTcUserTable_sets;
-	uint tcapTcUserTable_request;
+	int tcapTcUserTable_request;
 	uint tcapTcUserTable_refs;
 	uint tcapTcUserTable_id;
 	long tcapSystemId;		/* NoAccess */
@@ -162,7 +162,7 @@ struct tcapApplicationProcessTable_data {
 	uint tcapApplicationProcessTable_rsvs;
 	uint tcapApplicationProcessTable_tsts;
 	uint tcapApplicationProcessTable_sets;
-	uint tcapApplicationProcessTable_request;
+	int tcapApplicationProcessTable_request;
 	uint tcapApplicationProcessTable_refs;
 	uint tcapApplicationProcessTable_id;
 	long tcapSystemId;		/* NoAccess */
@@ -181,7 +181,7 @@ struct tcapSupportEntityNameTable_data {
 	uint tcapSupportEntityNameTable_rsvs;
 	uint tcapSupportEntityNameTable_tsts;
 	uint tcapSupportEntityNameTable_sets;
-	uint tcapSupportEntityNameTable_request;
+	int tcapSupportEntityNameTable_request;
 	uint tcapSupportEntityNameTable_refs;
 	uint tcapSupportEntityNameTable_id;
 	long tcapSystemId;		/* NoAccess */
@@ -199,7 +199,7 @@ struct tcapApplicationEntityTable_data {
 	uint tcapApplicationEntityTable_rsvs;
 	uint tcapApplicationEntityTable_tsts;
 	uint tcapApplicationEntityTable_sets;
-	uint tcapApplicationEntityTable_request;
+	int tcapApplicationEntityTable_request;
 	uint tcapApplicationEntityTable_refs;
 	uint tcapApplicationEntityTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -236,7 +236,7 @@ struct tcapLocalSapNameTable_data {
 	uint tcapLocalSapNameTable_rsvs;
 	uint tcapLocalSapNameTable_tsts;
 	uint tcapLocalSapNameTable_sets;
-	uint tcapLocalSapNameTable_request;
+	int tcapLocalSapNameTable_request;
 	uint tcapLocalSapNameTable_refs;
 	uint tcapLocalSapNameTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -253,7 +253,7 @@ struct tcapApplicationContextNameTable_data {
 	uint tcapApplicationContextNameTable_rsvs;
 	uint tcapApplicationContextNameTable_tsts;
 	uint tcapApplicationContextNameTable_sets;
-	uint tcapApplicationContextNameTable_request;
+	int tcapApplicationContextNameTable_request;
 	uint tcapApplicationContextNameTable_refs;
 	uint tcapApplicationContextNameTable_id;
 	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
@@ -271,7 +271,7 @@ struct tcapAbstractSyntaxTable_data {
 	uint tcapAbstractSyntaxTable_rsvs;
 	uint tcapAbstractSyntaxTable_tsts;
 	uint tcapAbstractSyntaxTable_sets;
-	uint tcapAbstractSyntaxTable_request;
+	int tcapAbstractSyntaxTable_request;
 	uint tcapAbstractSyntaxTable_refs;
 	uint tcapAbstractSyntaxTable_id;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */
@@ -286,7 +286,7 @@ struct tcapTransferSyntaxTable_data {
 	uint tcapTransferSyntaxTable_rsvs;
 	uint tcapTransferSyntaxTable_tsts;
 	uint tcapTransferSyntaxTable_sets;
-	uint tcapTransferSyntaxTable_request;
+	int tcapTransferSyntaxTable_request;
 	uint tcapTransferSyntaxTable_refs;
 	uint tcapTransferSyntaxTable_id;
 	uint8_t *tcapApplicationEntityId;	/* NoAccess */

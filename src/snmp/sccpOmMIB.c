@@ -693,6 +693,10 @@ deinit_sccpOmMIB(void)
 int
 term_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "term_sccpOmMIB: terminating...  "));
 	deinit_sccpOmMIB();
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));
@@ -763,6 +767,7 @@ sccpOmMIB_duplicate(struct sccpOmMIB_data *thedata)
 {
 	struct sccpOmMIB_data *StorageNew = SNMP_MALLOC_STRUCT(sccpOmMIB_data);
 
+	(void) thedata;
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmMIB_duplicate: duplicating mib... "));
 	if (StorageNew != NULL) {
 		if (!(StorageNew->sccpOm1stAndIntervalActivate = snmp_duplicate_objid(thedata->sccpOm1stAndIntervalActivate, thedata->sccpOm1stAndIntervalActivateLen / sizeof(oid))))
@@ -869,6 +874,8 @@ sccpOmMIB_add(struct sccpOmMIB_data *thedata)
 void
 parse_sccpOmMIB(const char *token, char *line)
 {
+	(void) token;
+	(void) line;
 	size_t tmpsize;
 	struct sccpOmMIB_data *StorageTmp = sccpOmMIB_create();
 
@@ -937,6 +944,10 @@ store_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct sccpOmMIB_data *StorageTmp;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOmMIB: storing data...  "));
 	refresh_sccpOmMIB(1);
 	if ((StorageTmp = sccpOmMIBStorage) == NULL) {
@@ -986,6 +997,8 @@ store_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 int
 check_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the scalars for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -1007,6 +1020,8 @@ check_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *Storag
 int
 update_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOmMIB_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -1022,6 +1037,7 @@ update_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *Stora
 void
 revert_sccpOmMIB(struct sccpOmMIB_data *StorageTmp, struct sccpOmMIB_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOmMIB(StorageOld, NULL);
 }
@@ -1396,6 +1412,8 @@ parse_sccpOmErrorsTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOmErrorsTable_data *StorageTmp = sccpOmErrorsTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOmErrorsTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1449,6 +1467,10 @@ store_sccpOmErrorsTable(int majorID, int minorID, void *serverarg, void *clienta
 	struct sccpOmErrorsTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOmErrorsTable: storing data...  "));
 	refresh_sccpOmErrorsTable(1);
 	(void) tmpsize;
@@ -1700,6 +1722,8 @@ parse_sccpOmMessageTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOmMessageTable_data *StorageTmp = sccpOmMessageTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOmMessageTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -1755,6 +1779,10 @@ store_sccpOmMessageTable(int majorID, int minorID, void *serverarg, void *client
 	struct sccpOmMessageTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOmMessageTable: storing data...  "));
 	refresh_sccpOmMessageTable(1);
 	(void) tmpsize;
@@ -1968,6 +1996,8 @@ parse_sccpOmAccessibilityTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOmAccessibilityTable_data *StorageTmp = sccpOmAccessibilityTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOmAccessibilityTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2003,6 +2033,10 @@ store_sccpOmAccessibilityTable(int majorID, int minorID, void *serverarg, void *
 	struct sccpOmAccessibilityTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOmAccessibilityTable: storing data...  "));
 	refresh_sccpOmAccessibilityTable(1);
 	(void) tmpsize;
@@ -2215,6 +2249,8 @@ parse_sccpOmUtilizationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOmUtilizationTable_data *StorageTmp = sccpOmUtilizationTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOmUtilizationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2259,6 +2295,10 @@ store_sccpOmUtilizationTable(int majorID, int minorID, void *serverarg, void *cl
 	struct sccpOmUtilizationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOmUtilizationTable: storing data...  "));
 	refresh_sccpOmUtilizationTable(1);
 	(void) tmpsize;
@@ -2546,6 +2586,8 @@ parse_sccpOm5MinHistoryTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOm5MinHistoryTable_data *StorageTmp = sccpOm5MinHistoryTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOm5MinHistoryTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -2623,6 +2665,10 @@ store_sccpOm5MinHistoryTable(int majorID, int minorID, void *serverarg, void *cl
 	struct sccpOm5MinHistoryTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOm5MinHistoryTable: storing data...  "));
 	refresh_sccpOm5MinHistoryTable(1);
 	(void) tmpsize;
@@ -2942,6 +2988,8 @@ parse_sccpOm15MinHistoryTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOm15MinHistoryTable_data *StorageTmp = sccpOm15MinHistoryTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOm15MinHistoryTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3018,6 +3066,10 @@ store_sccpOm15MinHistoryTable(int majorID, int minorID, void *serverarg, void *c
 	struct sccpOm15MinHistoryTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOm15MinHistoryTable: storing data...  "));
 	refresh_sccpOm15MinHistoryTable(1);
 	(void) tmpsize;
@@ -3272,6 +3324,8 @@ parse_sccpOm5MinSsnHistoryTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOm5MinSsnHistoryTable_data *StorageTmp = sccpOm5MinSsnHistoryTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOm5MinSsnHistoryTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3315,6 +3369,10 @@ store_sccpOm5MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void 
 	struct sccpOm5MinSsnHistoryTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOm5MinSsnHistoryTable: storing data...  "));
 	refresh_sccpOm5MinSsnHistoryTable(1);
 	(void) tmpsize;
@@ -3536,6 +3594,8 @@ parse_sccpOm15MinSsnHistoryTable(const char *token, char *line)
 	size_t tmpsize;
 	struct sccpOm15MinSsnHistoryTable_data *StorageTmp = sccpOm15MinSsnHistoryTable_create();
 
+	(void) token;
+	(void) line;
 	DEBUGMSGTL(("sccpOmMIB", "parse_sccpOm15MinSsnHistoryTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
@@ -3579,6 +3639,10 @@ store_sccpOm15MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void
 	struct sccpOm15MinSsnHistoryTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
+	(void) majorID;
+	(void) minorID;
+	(void) serverarg;
+	(void) clientarg;
 	DEBUGMSGTL(("sccpOmMIB", "store_sccpOm15MinSsnHistoryTable: storing data...  "));
 	refresh_sccpOm15MinSsnHistoryTable(1);
 	(void) tmpsize;
@@ -3630,6 +3694,8 @@ store_sccpOm15MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void
 int
 check_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3652,6 +3718,8 @@ check_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sc
 int
 update_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOmErrorsTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3666,6 +3734,7 @@ update_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct s
 void
 revert_sccpOmErrorsTable_row(struct sccpOmErrorsTable_data *StorageTmp, struct sccpOmErrorsTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOmErrorsTable_row(StorageOld, NULL);
 }
@@ -3897,6 +3966,8 @@ var_sccpOmErrorsTable(struct variable *vp, oid * name, size_t *length, int exact
 int
 check_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -3919,6 +3990,8 @@ check_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct 
 int
 update_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOmMessageTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -3933,6 +4006,7 @@ update_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct
 void
 revert_sccpOmMessageTable_row(struct sccpOmMessageTable_data *StorageTmp, struct sccpOmMessageTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOmMessageTable_row(StorageOld, NULL);
 }
@@ -4176,6 +4250,8 @@ var_sccpOmMessageTable(struct variable *vp, oid * name, size_t *length, int exac
 int
 check_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4198,6 +4274,8 @@ check_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *Storage
 int
 update_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOmAccessibilityTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4212,6 +4290,7 @@ update_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *Storag
 void
 revert_sccpOmAccessibilityTable_row(struct sccpOmAccessibilityTable_data *StorageTmp, struct sccpOmAccessibilityTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOmAccessibilityTable_row(StorageOld, NULL);
 }
@@ -4335,6 +4414,8 @@ var_sccpOmAccessibilityTable(struct variable *vp, oid * name, size_t *length, in
 int
 check_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4357,6 +4438,8 @@ check_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp,
 int
 update_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOmUtilizationTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4371,6 +4454,7 @@ update_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp
 void
 revert_sccpOmUtilizationTable_row(struct sccpOmUtilizationTable_data *StorageTmp, struct sccpOmUtilizationTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOmUtilizationTable_row(StorageOld, NULL);
 }
@@ -4542,6 +4626,8 @@ var_sccpOmUtilizationTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4564,6 +4650,8 @@ check_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp,
 int
 update_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOm5MinHistoryTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4578,6 +4666,7 @@ update_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp
 void
 revert_sccpOm5MinHistoryTable_row(struct sccpOm5MinHistoryTable_data *StorageTmp, struct sccpOm5MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOm5MinHistoryTable_row(StorageOld, NULL);
 }
@@ -4947,6 +5036,8 @@ var_sccpOm5MinHistoryTable(struct variable *vp, oid * name, size_t *length, int 
 int
 check_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -4969,6 +5060,8 @@ check_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTm
 int
 update_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOm15MinHistoryTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -4983,6 +5076,7 @@ update_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageT
 void
 revert_sccpOm15MinHistoryTable_row(struct sccpOm15MinHistoryTable_data *StorageTmp, struct sccpOm15MinHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOm15MinHistoryTable_row(StorageOld, NULL);
 }
@@ -5346,6 +5440,8 @@ var_sccpOm15MinHistoryTable(struct variable *vp, oid * name, size_t *length, int
 int
 check_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5368,6 +5464,8 @@ check_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *Stora
 int
 update_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOm5MinSsnHistoryTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5382,6 +5480,7 @@ update_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *Stor
 void
 revert_sccpOm5MinSsnHistoryTable_row(struct sccpOm5MinSsnHistoryTable_data *StorageTmp, struct sccpOm5MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOm5MinSsnHistoryTable_row(StorageOld, NULL);
 }
@@ -5541,6 +5640,8 @@ var_sccpOm5MinSsnHistoryTable(struct variable *vp, oid * name, size_t *length, i
 int
 check_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to check the row for consistency */
 	return SNMP_ERR_NOERROR;
 }
@@ -5563,6 +5664,8 @@ check_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *Sto
 int
 update_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
+	(void) StorageOld;
 	/* XXX: provide code to update the row with the underlying device */
 	sccpOm15MinSsnHistoryTable_refresh = 1;
 	return SNMP_ERR_NOERROR;
@@ -5577,6 +5680,7 @@ update_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *St
 void
 revert_sccpOm15MinSsnHistoryTable_row(struct sccpOm15MinSsnHistoryTable_data *StorageTmp, struct sccpOm15MinSsnHistoryTable_data *StorageOld)
 {
+	(void) StorageTmp;
 	/* XXX: provide code to revert the row with the underlying device */
 	update_sccpOm15MinSsnHistoryTable_row(StorageOld, NULL);
 }
@@ -5736,6 +5840,10 @@ write_sccpOm1stAndIntervalActivate(int action, u_char *var_val, u_char var_val_t
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm1stAndIntervalActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5835,6 +5943,10 @@ write_sccpOm1stAndIntervalDeactivate(int action, u_char *var_val, u_char var_val
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm1stAndIntervalDeactivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -5934,6 +6046,10 @@ write_sccpOm5MinActivate(int action, u_char *var_val, u_char var_val_type, size_
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6033,6 +6149,10 @@ write_sccpOm5MinDeaActivate(int action, u_char *var_val, u_char var_val_type, si
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6132,6 +6252,10 @@ write_sccpOm15MinActivate(int action, u_char *var_val, u_char var_val_type, size
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6231,6 +6355,10 @@ write_sccpOm15MinDeaActivate(int action, u_char *var_val, u_char var_val_type, s
 	oid *objid = NULL;
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinDeaActivate entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6330,6 +6458,10 @@ write_sccpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm5MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6345,7 +6477,7 @@ write_sccpOm5MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, s
 		}
 		/* Note: default value 96 */
 		/* Note: ranges 0..288 */
-		if ((0 > set_value || set_value > 288)) {
+		if ((set_value > 288)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm5MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -6425,6 +6557,10 @@ write_sccpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOm15MinMaxIntervals entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6440,7 +6576,7 @@ write_sccpOm15MinMaxIntervals(int action, u_char *var_val, u_char var_val_type, 
 		}
 		/* Note: default value 96 */
 		/* Note: ranges 0..672 */
-		if ((0 > set_value || set_value > 672)) {
+		if ((set_value > 672)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to sccpOm15MinMaxIntervals: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -6520,6 +6656,10 @@ write_sccpOmpDefault(int action, u_char *var_val, u_char var_val_type, size_t va
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmpDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6610,6 +6750,10 @@ write_sccpOmNrOfSubLevelsDefault(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmNrOfSubLevelsDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6700,6 +6844,10 @@ write_sccpOmNrOfRestrictionLevelsDefault(int action, u_char *var_val, u_char var
 	long set_value = *((long *) var_val);
 	int ret = SNMP_ERR_NOERROR;
 
+	(void) var_val_len;	/* not always used */
+	(void) statP;
+	(void) name;
+	(void) name_len;
 	DEBUGMSGTL(("sccpOmMIB", "write_sccpOmNrOfRestrictionLevelsDefault entering action=%d...  \n", action));
 	if ((StorageTmp = sccpOmMIBStorage) == NULL)
 		return SNMP_ERR_NOSUCHNAME;
@@ -6892,6 +7040,8 @@ sccpOmMIB_loop_handler(int sig)
 void
 sccpOmMIB_fd_handler(int fd, void *dummy)
 {
+	(void) fd;
+	(void) dummy;
 	DEBUGMSGTL(("sccpOmMIB", "sccpOmMIB_fd_handler: executing fd handler...  "));
 	/* XXX: place actions to handle my_fd here... */
 	DEBUGMSGTL(("sccpOmMIB", "done.\n"));

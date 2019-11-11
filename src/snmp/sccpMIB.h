@@ -67,14 +67,14 @@ struct sccpMIB_data {
 	uint sccpMIB_rsvs;
 	uint sccpMIB_tsts;
 	uint sccpMIB_sets;
-	uint sccpMIB_request;
+	int sccpMIB_request;
 };
 struct sccpNetworkEntityTable_data {
 	struct sccpNetworkEntityTable_data *sccpNetworkEntityTable_old;
 	uint sccpNetworkEntityTable_rsvs;
 	uint sccpNetworkEntityTable_tsts;
 	uint sccpNetworkEntityTable_sets;
-	uint sccpNetworkEntityTable_request;
+	int sccpNetworkEntityTable_request;
 	uint sccpNetworkEntityTable_refs;
 	uint sccpNetworkEntityTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -106,7 +106,7 @@ struct sccpLocalSapNamesTable_data {
 	uint sccpLocalSapNamesTable_rsvs;
 	uint sccpLocalSapNamesTable_tsts;
 	uint sccpLocalSapNamesTable_sets;
-	uint sccpLocalSapNamesTable_request;
+	int sccpLocalSapNamesTable_request;
 	uint sccpLocalSapNamesTable_refs;
 	uint sccpLocalSapNamesTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -121,7 +121,7 @@ struct sccpAccessPointTable_data {
 	uint sccpAccessPointTable_rsvs;
 	uint sccpAccessPointTable_tsts;
 	uint sccpAccessPointTable_sets;
-	uint sccpAccessPointTable_request;
+	int sccpAccessPointTable_request;
 	uint sccpAccessPointTable_refs;
 	uint sccpAccessPointTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -152,7 +152,7 @@ struct sccpLinkageTable_data {
 	uint sccpLinkageTable_rsvs;
 	uint sccpLinkageTable_tsts;
 	uint sccpLinkageTable_sets;
-	uint sccpLinkageTable_request;
+	int sccpLinkageTable_request;
 	uint sccpLinkageTable_refs;
 	uint sccpLinkageTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -224,7 +224,7 @@ struct sccpMtpTable_data {
 	uint sccpMtpTable_rsvs;
 	uint sccpMtpTable_tsts;
 	uint sccpMtpTable_sets;
-	uint sccpMtpTable_request;
+	int sccpMtpTable_request;
 	uint sccpMtpTable_refs;
 	uint sccpMtpTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -255,7 +255,7 @@ struct sccpSclcTable_data {
 	uint sccpSclcTable_rsvs;
 	uint sccpSclcTable_tsts;
 	uint sccpSclcTable_sets;
-	uint sccpSclcTable_request;
+	int sccpSclcTable_request;
 	uint sccpSclcTable_refs;
 	uint sccpSclcTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -283,7 +283,7 @@ struct sccpScocTable_data {
 	uint sccpScocTable_rsvs;
 	uint sccpScocTable_tsts;
 	uint sccpScocTable_sets;
-	uint sccpScocTable_request;
+	int sccpScocTable_request;
 	uint sccpScocTable_refs;
 	uint sccpScocTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -305,7 +305,7 @@ struct sccpScrcTable_data {
 	uint sccpScrcTable_rsvs;
 	uint sccpScrcTable_tsts;
 	uint sccpScrcTable_sets;
-	uint sccpScrcTable_request;
+	int sccpScrcTable_request;
 	uint sccpScrcTable_refs;
 	uint sccpScrcTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -326,7 +326,7 @@ struct sccpEntitySetTable_data {
 	uint sccpEntitySetTable_rsvs;
 	uint sccpEntitySetTable_tsts;
 	uint sccpEntitySetTable_sets;
-	uint sccpEntitySetTable_request;
+	int sccpEntitySetTable_request;
 	uint sccpEntitySetTable_refs;
 	uint sccpEntitySetTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -349,7 +349,7 @@ struct sccpEntitySetSapTable_data {
 	uint sccpEntitySetSapTable_rsvs;
 	uint sccpEntitySetSapTable_tsts;
 	uint sccpEntitySetSapTable_sets;
-	uint sccpEntitySetSapTable_request;
+	int sccpEntitySetSapTable_request;
 	uint sccpEntitySetSapTable_refs;
 	uint sccpEntitySetSapTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -369,7 +369,7 @@ struct sccpConcernedAreaTable_data {
 	uint sccpConcernedAreaTable_rsvs;
 	uint sccpConcernedAreaTable_tsts;
 	uint sccpConcernedAreaTable_sets;
-	uint sccpConcernedAreaTable_request;
+	int sccpConcernedAreaTable_request;
 	uint sccpConcernedAreaTable_refs;
 	uint sccpConcernedAreaTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -385,7 +385,7 @@ struct sccpRemoteSCCPTable_data {
 	uint sccpRemoteSCCPTable_rsvs;
 	uint sccpRemoteSCCPTable_tsts;
 	uint sccpRemoteSCCPTable_sets;
-	uint sccpRemoteSCCPTable_request;
+	int sccpRemoteSCCPTable_request;
 	uint sccpRemoteSCCPTable_refs;
 	uint sccpRemoteSCCPTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -406,7 +406,7 @@ struct sccpGtConversionRuleTable_data {
 	uint sccpGtConversionRuleTable_rsvs;
 	uint sccpGtConversionRuleTable_tsts;
 	uint sccpGtConversionRuleTable_sets;
-	uint sccpGtConversionRuleTable_request;
+	int sccpGtConversionRuleTable_request;
 	uint sccpGtConversionRuleTable_refs;
 	uint sccpGtConversionRuleTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -427,7 +427,7 @@ struct sccpAddressInfoTable_data {
 	uint sccpAddressInfoTable_rsvs;
 	uint sccpAddressInfoTable_tsts;
 	uint sccpAddressInfoTable_sets;
-	uint sccpAddressInfoTable_request;
+	int sccpAddressInfoTable_request;
 	uint sccpAddressInfoTable_refs;
 	uint sccpAddressInfoTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -447,7 +447,7 @@ struct sccpGtTranslatorTable_data {
 	uint sccpGtTranslatorTable_rsvs;
 	uint sccpGtTranslatorTable_tsts;
 	uint sccpGtTranslatorTable_sets;
-	uint sccpGtTranslatorTable_request;
+	int sccpGtTranslatorTable_request;
 	uint sccpGtTranslatorTable_refs;
 	uint sccpGtTranslatorTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -469,7 +469,7 @@ struct sccpGtRuleTable_data {
 	uint sccpGtRuleTable_rsvs;
 	uint sccpGtRuleTable_tsts;
 	uint sccpGtRuleTable_sets;
-	uint sccpGtRuleTable_request;
+	int sccpGtRuleTable_request;
 	uint sccpGtRuleTable_refs;
 	uint sccpGtRuleTable_id;
 	ulong mtpMsId;			/* NoAccess */
@@ -496,7 +496,7 @@ struct sccpSrvtTable_data {
 	uint sccpSrvtTable_rsvs;
 	uint sccpSrvtTable_tsts;
 	uint sccpSrvtTable_sets;
-	uint sccpSrvtTable_request;
+	int sccpSrvtTable_request;
 	uint sccpSrvtTable_refs;
 	uint sccpSrvtTable_id;
 	ulong mtpMsId;			/* NoAccess */
