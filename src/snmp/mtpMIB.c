@@ -52205,7 +52205,7 @@ write_mtpSdtName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdtName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -53528,7 +53528,7 @@ write_mtpSdlName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			return SNMP_ERR_WRONGTYPE;
 		}
 		/* Note: ranges 0..32 */
-		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
+		if (var_val_len > SPRINT_MAX_LEN || ((var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSdlName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -55120,7 +55120,7 @@ write_mtpSctpProfileSackDelay(int action, u_char *var_val, u_char var_val_type, 
 		}
 		/* Note: default value 200 */
 		/* Note: ranges 0..500 */
-		if ((0 > set_value || set_value > 500)) {
+		if ((set_value > 500)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpSctpProfileSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -57373,7 +57373,7 @@ write_mtpM2uaAsInterfaceIdentifier(int action, u_char *var_val, u_char var_val_t
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: ranges 1..-1 */
-		if ((1 > set_value || set_value > -1)) {
+		if ((1 > set_value || set_value > -1UL)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpM2uaAsInterfaceIdentifier: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -60617,7 +60617,7 @@ write_mtpDefaultSctpSackDelay(int action, u_char *var_val, u_char var_val_type, 
 		}
 		/* Note: default value 200 */
 		/* Note: ranges 0..500 */
-		if ((0 > set_value || set_value > 500)) {
+		if ((set_value > 500)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to mtpDefaultSctpSackDelay: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
