@@ -31,8 +31,8 @@ case "`uname -m`" in
 	;;
 esac
 
-_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
-KCC="gcc"
+#_kvr="$(pacman -Qi linux-lts316|awk '/^Version/{print$3}')-lts316"
+#KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts44|awk '/^Version/{print$3}')-lts44"
 #KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts49|awk '/^Version/{print$3}')-lts49"
@@ -41,8 +41,8 @@ KCC="gcc"
 #KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
 #KCC="gcc"
-#_kvr="$(pacman -Qi linux|awk '/^Version/{print$3}')-ARCH"
-#KCC="gcc"
+_kvr="$(pacman -Qi linux|awk '/^Version/{print$3}'|sed 's,\.arch,-arch,')"
+KCC="gcc"
 
 ./configure \
 	KCC="$KCC" \
