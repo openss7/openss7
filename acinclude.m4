@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2009-2017  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2019  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1276,6 +1276,7 @@ dnl----------------------------------------------------------------------------
 	struct sk_buff.h.sh,
 	struct sk_buff.transport_header,
 	struct skb_frag_struct.page.p,
+	skb_frag_t.bv_page,
 	struct smp_hotplug_thread.pre_unpark,
 	struct sock.protinfo.af_inet.ttl,
 	struct sock.protinfo.af_inet.uc_ttl,
@@ -5570,7 +5571,7 @@ AC_DEFUN([_OS7_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2009-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2019  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
