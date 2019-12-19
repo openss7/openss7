@@ -194,7 +194,7 @@ str_install_HPUX(struct stream_inst *inst)
 			/* Note that the default level for HPUX is queue pair instead of module
 			   like other implementations. */
 			cdev->d_sqlvl = SQLVL_QUEUEPAIR;
-			__attribute__((fallthrough));
+			/* fall through */
 		case SQLVL_QUEUEPAIR:
 			cdev->d_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;
@@ -254,7 +254,7 @@ str_install_HPUX(struct stream_inst *inst)
 			/* Note that the default level for HPUX is queue pair instead of module
 			   like other implementations. */
 			fmod->f_sqlvl = SQLVL_QUEUEPAIR;
-			__attribute__((fallthrough));
+			/* fall through */
 		case SQLVL_QUEUEPAIR:
 			fmod->f_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;

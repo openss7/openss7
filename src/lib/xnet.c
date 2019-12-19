@@ -1643,14 +1643,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(bind->addr.buf = (char *) malloc(len))) {
 					free(bind);
 					goto badalloc;
 				}
 				bind->addr.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1676,14 +1676,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(opts->opt.buf = (char *) malloc(len))) {
 					free(opts);
 					goto badalloc;
 				}
 				opts->opt.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1713,14 +1713,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(call->addr.buf = (char *) malloc(len))) {
 					free(call);
 					goto badalloc;
 				}
 				call->addr.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1737,7 +1737,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(call->opt.buf = (char *) malloc(len))) {
 					if (call->addr.buf)
@@ -1746,7 +1746,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				call->opt.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1765,7 +1765,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.connect)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_CONNLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(call->udata.buf = (char *) malloc(len))) {
 					if (call->addr.buf)
@@ -1776,7 +1776,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				call->udata.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1810,14 +1810,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.discon)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_DISCLEN;;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(discon->udata.buf = (char *) malloc(len))) {
 					free(discon);
 					goto badalloc;
 				}
 				discon->udata.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1847,14 +1847,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(udata->addr.buf = (char *) malloc(len))) {
 					free(udata);
 					goto badalloc;
 				}
 				udata->addr.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1871,7 +1871,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(udata->opt.buf = (char *) malloc(len))) {
 					if (udata->addr.buf)
@@ -1880,7 +1880,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				udata->opt.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1900,7 +1900,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			case T_INFINITE:
 			case 0:
 				len = _T_DEFAULT_DATALEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(udata->udata.buf = (char *) malloc(len))) {
 					if (udata->addr.buf)
@@ -1943,14 +1943,14 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.addr)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_ADDRLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(uderr->addr.buf = (char *) malloc(len))) {
 					free(uderr);
 					goto badalloc;
 				}
 				uderr->addr.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -1967,7 +1967,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 			switch ((len = user->info.options)) {
 			case T_INFINITE:
 				len = _T_DEFAULT_OPTLEN;
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				if (!(uderr->opt.buf = (char *) malloc(len))) {
 					if (uderr->addr.buf)
@@ -1976,7 +1976,7 @@ __xnet_t_alloc(int fd, int type, int fields)
 					goto badalloc;
 				}
 				uderr->opt.maxlen = len;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 0:
 				break;
 			case T_INVALID:
@@ -2778,7 +2778,7 @@ __xnet_t_look(int fd)
 				break;
 			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
 				break;
-			__attribute__((fallthrough));
+			/* fall through */
 		case 0:
 			return (0);	/* nothing to report */
 		case -1:

@@ -7291,7 +7291,7 @@ preamble_aspup(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7319,7 +7319,7 @@ preamble_aspup(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7346,7 +7346,7 @@ postamble_aspdn(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7366,7 +7366,7 @@ postamble_aspdn(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
-						__attribute__((fallthrough));
+						/* fall through */
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 						state++;
@@ -7401,7 +7401,7 @@ preamble_reg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7423,7 +7423,7 @@ preamble_reg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 					state++;
@@ -7451,7 +7451,7 @@ postamble_dereg(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 					state++;
 					continue;
@@ -7473,7 +7473,7 @@ postamble_dereg(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
-						__attribute__((fallthrough));
+						/* fall through */
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 						state++;
@@ -7531,7 +7531,7 @@ preamble_active(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 				case __TEST_DAVA_MSG:
@@ -7565,7 +7565,7 @@ postamble_inactive(int child)
 				switch (last_event) {
 				case __TEST_HBEAT_REQ:
 					do_signal(child, __TEST_HBEAT_ACK);
-					__attribute__((fallthrough));
+					/* fall through */
 				case __TEST_HBEAT_ACK:
 				case __TEST_NTFY_MSG:
 				case __TEST_DAVA_MSG:
@@ -7592,7 +7592,7 @@ postamble_inactive(int child)
 					switch (last_event) {
 					case __TEST_HBEAT_REQ:
 						do_signal(child, __TEST_HBEAT_ACK);
-						__attribute__((fallthrough));
+						/* fall through */
 					case __TEST_HBEAT_ACK:
 					case __TEST_NTFY_MSG:
 					case __TEST_DAVA_MSG:
@@ -7987,7 +7987,7 @@ test_2_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8106,7 +8106,7 @@ test_2_3_1_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_NTFY_MSG:
 				state++;
 				continue;
@@ -8158,7 +8158,7 @@ test_2_3_3_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8183,7 +8183,7 @@ test_2_3_3_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8225,7 +8225,7 @@ test_3_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_ERR_MSG:
 				state++;
@@ -8276,7 +8276,7 @@ test_3_1_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8307,7 +8307,7 @@ test_3_1_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8354,7 +8354,7 @@ test_3_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8405,7 +8405,7 @@ test_3_2_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8436,7 +8436,7 @@ test_3_2_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				state++;
@@ -8485,7 +8485,7 @@ test_4_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8535,7 +8535,7 @@ test_4_1_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 				state++;
 				continue;
@@ -8564,7 +8564,7 @@ test_4_1_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				/* it is permitted for the SG to send SNMM between ASPAC and ASPAC Ack, and DATA might
@@ -8614,7 +8614,7 @@ test_4_2_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_DAUD_MSG:
 			case __TEST_SCON_MSG:
@@ -8666,7 +8666,7 @@ test_4_2_2_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_DAUD_MSG:
 			case __TEST_SCON_MSG:
@@ -8698,7 +8698,7 @@ test_4_2_2_iut(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_NTFY_MSG:
 				/* it is permitted for the SG to send SNMM between ASPAC and ASPAC Ack, and DATA might
@@ -8748,7 +8748,7 @@ test_5_1_1_ptu(int child)
 			switch (last_event) {
 			case __TEST_HBEAT_REQ:
 				do_signal(child, __TEST_HBEAT_ACK);
-				__attribute__((fallthrough));
+				/* fall through */
 			case __TEST_HBEAT_ACK:
 			case __TEST_XFER_DATA:
 				state++;

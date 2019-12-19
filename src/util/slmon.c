@@ -2043,14 +2043,14 @@ mon_start(void)
 		if (mon_open() != (0))
 			return (-1);
 		link_state = 1;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "attaching link");
 		if (mon_attach() != (0))
 			return (-1);
 		link_state = 2;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "getting configuration");
@@ -2069,14 +2069,14 @@ mon_stop(void)
 	switch (link_state) {
 	case 3:
 		link_state = 2;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "detaching link");
 		if (mon_detach() != (0))
 			return (-1);
 		link_state = 1;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "closing link");

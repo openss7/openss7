@@ -700,7 +700,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -722,7 +722,7 @@ send(int msg)
 			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -735,7 +735,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;

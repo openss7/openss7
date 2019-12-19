@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -692,7 +692,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -714,7 +714,7 @@ send(int msg)
 			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -727,7 +727,7 @@ send(int msg)
 			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -1040,7 +1040,7 @@ signal(int action)
 			printf("                                  :msu\n");
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
@@ -2068,7 +2068,7 @@ test_1_8a(void)
 				break;
 			case SIO:
 				send(SIO);
-				__attribute__((fallthrough));
+				/* fall through */
 			case SIN:
 				send(SIN);
 				break;
@@ -6510,7 +6510,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x80))
 					return FAILURE;
 				state = 2;
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = pt_bib = 0x80;
@@ -6546,7 +6546,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x00))
 					return FAILURE;
 				state = 4;
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
@@ -6616,7 +6616,7 @@ test_8_3(void)
 					break;
 				}
 				count++;
-				__attribute__((fallthrough));
+				/* fall through */
 			case TIMEOUT:
 				signal(COUNT);
 				count = 0;
@@ -7274,7 +7274,7 @@ test_8_13(void)
 			switch ((event = wait_event(0))) {
 			case FISU:
 				send(FISU);
-				__attribute__((fallthrough));
+				/* fall through */
 			case NO_MSG:
 				signal(STOP);
 				start_tt(1000);
@@ -8220,7 +8220,7 @@ test_10_2(void)
 					break;
 				}
 				start_tt(iutconf.sl.t5 * 10);
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -8300,7 +8300,7 @@ test_10_3(void)
 					return FAILURE;
 				}
 				start_tt(iutconf.sl.t5 * 10);
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -10092,7 +10092,7 @@ copying()
 	fprintf(stdout, "\
 ITU-T RECOMMENDATAION Q.781 - Conformance Test Suite\n\
 \n\
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -10148,7 +10148,7 @@ version()
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009, 2010, 2011, 2015  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011, 2015, 2017, 2019  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

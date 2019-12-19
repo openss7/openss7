@@ -5391,7 +5391,7 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_cont)
 			if (unlikely(putq(q, mp->b_cont) == 0))
 				freemsg(mp->b_cont);
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_TRIMMED:
 		freeb(mp);
 		break;
@@ -5400,14 +5400,14 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			break;
 		}
 		rtn = -EOPNOTSUPP;
-		__attribute__((fallthrough));
+		/* fall through */
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
 		freemsg(mp);
@@ -5421,7 +5421,7 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case -ENOBUFS:
 	case -EBUSY:
 	case -ENOMEM:
@@ -5440,14 +5440,14 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 	switch (rtn) {
 	case QR_DONE:
 		freemsg(mp);
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_ABSORBED:
 		return (1);
 	case QR_STRIP:
 		if (mp->b_cont)
 			if (!putbq(q, mp->b_cont))
 				freemsg(mp->b_cont);
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_TRIMMED:
 		freeb(mp);
 		return (1);
@@ -5456,14 +5456,14 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			return (1);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			return (1);
 		}
 		rtn = -EOPNOTSUPP;
-		__attribute__((fallthrough));
+		/* fall through */
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
 		freemsg(mp);
@@ -5480,7 +5480,7 @@ np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			return (1);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case -ENOBUFS:		/* proc must have scheduled bufcall */
 	case -EBUSY:		/* proc must have failed canput */
 	case -ENOMEM:		/* proc must have scheduled bufcall */

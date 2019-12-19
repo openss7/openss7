@@ -1208,43 +1208,36 @@ __sl_timer_stop(struct sl *sl, const uint t)
 	case tall:
 		single = 0;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t1:
 		sl_stop_timer_t1(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t2:
 		sl_stop_timer_t2(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t3:
 		sl_stop_timer_t3(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t4:
 		sl_stop_timer_t4(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t5:
 		sl_stop_timer_t5(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t6:
 		sl_stop_timer_t6(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t7:
 		sl_stop_timer_t7(sl);
 		if (single)
@@ -2206,7 +2199,7 @@ sl_lsc_sios(queue_t *q, struct sl *sl)
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
 		sl_timer_stop(sl, t1);	/* ok to stop if not running */
-		__attribute__((fallthrough));
+		/* fall through */
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
 		sl_out_of_service_ind(q, sl, SL_FAIL_RECEIVED_SIOS);
@@ -3495,8 +3488,7 @@ sl_rx_wakeup(queue_t *q)
 			if (sl->statem.local_processor_outage)
 				/* we can't deliver */
 				break;
-			/* fall thru */
-			__attribute__((fallthrough));
+			/* fall through */
 		case SL_STATE_IN_SERVICE:
 			/* when in service we deliver as many buffers as we can */
 			do {

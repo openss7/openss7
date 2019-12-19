@@ -2719,7 +2719,7 @@ sl_lsc_sios(queue_t *q, struct xp *xp)
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
 		xp_timer_stop(xp, t1);	/* ok to stop if not running */
-		__attribute__((fallthrough));
+		/* fall through */
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
 		sl_out_of_service_ind(q, xp, SL_FAIL_RECEIVED_SIOS);

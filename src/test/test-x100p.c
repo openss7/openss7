@@ -704,7 +704,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -728,7 +728,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case LSSU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -742,7 +742,7 @@ send(int msg)
 			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case FISU_CORRUPT_S:
 		pt_buf[0] = pt_bib | pt_bsn;
 		pt_buf[1] = pt_fib | pt_fsn;
@@ -1062,7 +1062,7 @@ signal(int action)
 			printf("                                  :msu\n");
 			FFLUSH(stdout);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case SEND_MSU_S:
 		if (msu_len > BUFSIZE - 10)
 			msu_len = BUFSIZE - 10;
@@ -2096,7 +2096,7 @@ test_1_8a(void)
 				break;
 			case SIO:
 				send(SIO);
-				__attribute__((fallthrough));
+				/* fall through */
 			case SIN:
 				send(SIN);
 				break;
@@ -6545,7 +6545,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x80))
 					return FAILURE;
 				state = 2;
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = pt_bib = 0x80;
@@ -6581,7 +6581,7 @@ test_8_2(void)
 				if (check_snibs(0xff, 0x00))
 					return FAILURE;
 				state = 4;
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_fsn = pt_bsn = 0x7f;
 				pt_fib = 0x80;
@@ -6650,7 +6650,7 @@ test_8_3(void)
 					break;
 				}
 				count++;
-				__attribute__((fallthrough));
+				/* fall through */
 			case TIMEOUT:
 				signal(COUNT);
 				count = 0;
@@ -7309,7 +7309,7 @@ test_8_13(void)
 			switch ((event = wait_event(0))) {
 			case FISU:
 				send(FISU);
-				__attribute__((fallthrough));
+				/* fall through */
 			case NO_MSG:
 				signal(STOP);
 				start_tt(1000);
@@ -8250,7 +8250,7 @@ test_10_2(void)
 					break;
 				}
 				start_tt(iutconf.sl.t5 * 10);
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);
@@ -8329,7 +8329,7 @@ test_10_3(void)
 					return FAILURE;
 				}
 				start_tt(iutconf.sl.t5 * 10);
-				__attribute__((fallthrough));
+				/* fall through */
 			case FISU:
 				pt_bsn = pt_fsn = 0x7f;
 				send(FISU_S);

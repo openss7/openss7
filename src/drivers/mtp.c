@@ -9677,9 +9677,8 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		bufq_purge(&sl->rbuf);
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
-		/* fall through */
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case SLS_PROC_OUTG:
 	case SLS_IS:
 		/* T31(ANSI) is a false congesiton detection timer */
@@ -9699,7 +9698,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 			sl->flags &= ~SLF_TRAFFIC;
 			return (0);
 		}
-		__attribute__((fallthrough));	/* XXX */
+		/* fall through */	/* XXX */
 	case SLS_WACK_SLTM:
 		if ((err = sl_stop_req(q, sl)))
 			goto error;
@@ -15118,7 +15117,6 @@ m_conn_req(queue_t *q, mblk_t *mp)
 		}
 		mtp_set_state(mtp, MTPS_WACK_CREQ);
 		/* fall through */
-		__attribute__((fallthrough));
 	case MTPS_WACK_CREQ:
 		/* There is another thing to do once the connection has been established: that is
 		   to deliver MTP restart begins indication or to deliver MTP resume or MTP pause

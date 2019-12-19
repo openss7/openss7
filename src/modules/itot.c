@@ -223,8 +223,8 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		} else
 			length = sizeof(n.prim);
 		(void) length;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_CONN_CON:
 	{
 		/* Transform into N_CONN_CON. */
@@ -233,8 +233,8 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 		(void) n;
 		(void) t;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_DISCON_IND:
 	{
 		/* Transform into N_DISCON_IND. */
@@ -243,88 +243,88 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 		(void) n;
 		(void) t;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_DATA_IND:
 	{
 		/* Transform into N_DATA_IND. */
 		N_data_ind_t n = { N_DATA_IND, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_EXDATA_IND:
 	{
 		/* Transform into N_EXDATA_IND. */
 		N_exdata_ind_t n = { N_EXDATA_IND, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_INFO_ACK:
 	{
 		/* Transform into N_INFO_ACK. */
 		N_info_ack_t n = { N_INFO_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_BIND_ACK:
 	{
 		/* Transform into N_BIND_ACK. */
 		N_bind_ack_t n = { N_BIND_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_ERROR_ACK:
 	{
 		/* Transform into N_ERROR_ACK. */
 		N_error_ack_t n = { N_ERROR_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_OK_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_UNITDATA_IND:
 	{
 		/* Transform into N_UNITDATA_IND. */
 		N_unitdata_ind_t n = { N_UNITDATA_IND, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_UDERROR_IND:
 	{
 		/* Transform into N_UDERROR_IND. */
 		N_uderror_ind_t n = { N_UDERROR_IND, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_OPTMGMT_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_ORDREL_IND:
 	{
 		/* Transform into N_DISCON_IND. */
 		N_discon_ind_t n = { N_DISCON_IND, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case T_OPTDATA_IND:
 	{
 		/* Transform into N_QOSDATA_IND, N_DATA_IND or N_EXDATA_IND. */
@@ -344,10 +344,9 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 
 			(void) n;
 		}
-		__attribute__((fallthrough));
 #endif
-
 	}
+		/* fall through */
 	case T_ADDR_ACK:
 	{
 		/* Transform into N_INFO_ACK (well, maybe just store the addresses for later
@@ -359,8 +358,8 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		N_info_ack_t n = { N_INFO_ACK, };
 
 		(void) n;
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 
 /*
  *  None of the following messages should appear at the read-side put procedure.  Only upward defined
@@ -381,7 +380,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	case T_ADDR_REQ:
 	case T_CAPABILITY_REQ:
 		__swerr();
-		__attribute__((fallthrough));
+		/* fall through */
 	default:
 		freemsg(mp);
 		return (0);

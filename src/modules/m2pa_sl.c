@@ -701,7 +701,7 @@ lmi_error_reply(struct sl *sl, queue_t *q, lmi_long prim, lmi_long err)
 	case QR_PASSFLOW:
 	case QR_DISABLE:
 		m2paloger(sl, "Shouldn't pass Q returns to m_error_reply");
-		__attribute__((fallthrough));
+		/* fall through */
 	case -EBUSY:
 	case -EAGAIN:
 	case -ENOMEM:
@@ -2264,59 +2264,50 @@ sl_timer_stop(struct sl *sl, const uint t)
 	case tall:
 		single = 0;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t1:
 		sl_stop_timer_t1(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t2:
 		sl_stop_timer_t2(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t3:
 		sl_stop_timer_t3(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t4:
 		sl_stop_timer_t4(sl);
 		if (single)
 			break;
-		/* fall through */
-		__attribute__((fallthrough));
 #if 0
+		/* fall through */
 	case t5:
 		sl_stop_timer_t5(sl);
 		if (single)
 			break;
-		/* fall through */
-		__attribute__((fallthrough));
 #endif
+		/* fall through */
 	case t6:
 		sl_stop_timer_t6(sl);
 		if (single)
 			break;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t7:
 		sl_stop_timer_t7(sl);
 		if (single)
 			break;
-		/* fall through */
-		__attribute__((fallthrough));
 #if 0
+		/* fall through */
 	case t8:
 		sl_stop_timer_t8(sl);
 		if (single)
 			break;
-		/* fall through */
-		__attribute__((fallthrough));
 #endif
+		/* fall through */
 	case t9:
 		sl_stop_timer_t9(sl);
 		if (single)
@@ -2833,7 +2824,7 @@ sl_lsc_status_alignment(struct sl *sl, queue_t *q)
 			sl_set_state(sl, MS_ALIGNED);
 			return (QR_DONE);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case MS_ALIGNED:
 		if (proving)
 			return (QR_DONE);
@@ -2922,7 +2913,7 @@ sl_lsc_status_proving_normal(struct sl *sl, queue_t *q)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/* fall thru */
+		/* fall through */
 	case MS_ALIGNED:
 		sl->flags &= ~MF_REM_EMERG;
 		if (proving) {
@@ -2969,7 +2960,7 @@ sl_lsc_status_proving_emergency(struct sl *sl, queue_t *q)
 			sl_timer_start(sl, t3);
 			sl_set_state(sl, MS_ALIGNED);
 		}
-		/* fall thru */
+		/* fall through */
 	case MS_ALIGNED:
 		if (proving) {
 			sl->flags |= MF_REM_EMERG;
@@ -3109,7 +3100,7 @@ sl_lsc_status_in_service(struct sl *sl, queue_t *q, mblk_t *mp)
 				sl_tx_wakeup(q);
 			}
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
 		m2paloger(sl, "Received status IN_SERVICE in unusual state %d",
@@ -3786,7 +3777,7 @@ sl_lsc_status_busy_ended(struct sl *sl, queue_t *q)
 	default:
 		m2paloger(sl, "Received status BUSY_ENDED in unexpected state %d",
 			  (int) sl_get_state(sl));
-		__attribute__((fallthrough));
+		/* fall through */
 	case MS_IN_SERVICE:
 		sl->flags &= ~MF_REM_BUSY;
 		sl_timer_stop(sl, t6);
@@ -5345,7 +5336,7 @@ m_error_reply(struct sl *sl, queue_t *q, int err)
 	case QR_PASSFLOW:
 	case QR_DISABLE:
 		m2paloger(sl, "Shouldn't pass Q returns to m_error_reply");
-		__attribute__((fallthrough));
+		/* fall through */
 	case -EBUSY:
 	case -EAGAIN:
 	case -ENOMEM:

@@ -368,9 +368,10 @@ tcpns_rput(queue_t *q, mblk_t *mp)
 		default:
 		{
 		}
+		/* fall through */
 		}
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case M_DATA:
 	{
 	}

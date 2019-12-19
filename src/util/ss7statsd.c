@@ -1618,11 +1618,11 @@ main(int argc, char *argv[])
 			exit(0);
 		case ':':	/* required argument */
 			option_error(argc, argv, optind - 1, "required argument", 2);
-			__attribute__((fallthrough));
+			/* fall through */
 		case '0':
 		case '?':	/* unrecognized option */
 			option_error(argc, argv, optind - 1, "unrecognized option", 2);
-			__attribute__((fallthrough));
+			/* fall through */
 		default:	/* unrecognized switch */
 			option_error(argc, argv, optind - 1, "syntax error", 2);
 		}

@@ -500,7 +500,7 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 				break;
 			case 'X':
 				flags |= FLAG_LARGE;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 'x':
 				base = 16;
 				break;

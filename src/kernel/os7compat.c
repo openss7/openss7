@@ -428,7 +428,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	switch (rtn) {
 	case QR_DONE:
 		freemsg(mp);
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_ABSORBED:
 		break;
 	case QR_STRIP:
@@ -437,7 +437,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 				mp->b_cont->b_band = 0;
 				putq(q, mp->b_cont);	/* must succeed */
 			}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_TRIMMED:
 		freeb(mp);
 		break;
@@ -446,14 +446,14 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			break;
 		}
 		rtn = -EOPNOTSUPP;
-		__attribute__((fallthrough));
+		/* fall through */
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 			q->q_ptr, rtn));
@@ -470,7 +470,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case -ENOBUFS:
 	case -EBUSY:
 	case -ENOMEM:
@@ -562,7 +562,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 	switch (rtn) {
 	case QR_DONE:
 		freemsg(mp);
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_ABSORBED:
 		return (1);
 	case QR_STRIP:
@@ -571,7 +571,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 				mp->b_cont->b_band = 0;
 				putbq(q, mp->b_cont);	/* must succeed */
 			}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_TRIMMED:
 		freeb(mp);
 		return (1);
@@ -580,14 +580,14 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			qreply(q, mp);
 			return (1);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case QR_PASSALONG:
 		if (q->q_next) {
 			putnext(q, mp);
 			return (1);
 		}
 		rtn = -EOPNOTSUPP;
-		__attribute__((fallthrough));
+		/* fall through */
 	default:
 		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 			q->q_ptr, rtn));
@@ -608,7 +608,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			putnext(q, mp);
 			return (1);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case -ENOBUFS:		/* proc must have scheduled bufcall */
 	case -EBUSY:		/* proc must have failed canput */
 	case -ENOMEM:		/* proc must have scheduled bufcall */

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -152,7 +152,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define	TP_DESCRIP	"OSI Transport Provider for Subnetworks (TPSN) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Ltd.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Ltd.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport for Subnetworks Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2457,7 +2457,7 @@ t_build_conn_opts(struct tp *tp, struct tp_options *rem, struct tp_options *rsp,
 			*((t_uscalar_t *) T_OPT_DATA(oh)) = rem->udp.udp_checksum;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
-		/* fall thru */
+		/* fall through */
 	case TP_CMINOR_COTS_IP:
 	case TP_CMINOR_CLTS_IP:
 		if (t_tst_bit(_T_BIT_IP_OPTIONS, flags)) {

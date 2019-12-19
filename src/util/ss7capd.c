@@ -750,7 +750,7 @@ cap_attach(void)
 			syslog(LOG_ERR, "%s: error, unexpected response to LMI_ATTACH_REQ %d",
 			       __FUNCTION__, ret);
 			cap_exit(1);
-			__attribute__((fallthrough));
+			/* fall through */
 		case CAP_FAILURE:
 			return CAP_FAILURE;
 		}
@@ -791,7 +791,7 @@ cap_enable(void)
 			syslog(LOG_ERR, "%s: error, unexpected response to LMI_ENABLE_REQ %d",
 			       __FUNCTION__, ret);
 			cap_exit(1);
-			__attribute__((fallthrough));
+			/* fall through */
 		case CAP_FAILURE:
 			return CAP_FAILURE;
 		}
@@ -1300,28 +1300,28 @@ cap_start(void)
 		if (cap_open() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 1;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "attaching link");
 		if (cap_attach() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 2;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "configuring link");
 		if (cap_config() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 3;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 3:
 		if (output > 2)
 			syslog(LOG_NOTICE, "enabling link");
 		if (cap_enable() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 4;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 4:
 		if (output > 2)
 			syslog(LOG_NOTICE, "monitoring on link");
@@ -1345,17 +1345,17 @@ cap_stop(void)
 		if (cap_disable() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 3;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 3:
 		link_state = 2;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 2:
 		if (output > 2)
 			syslog(LOG_NOTICE, "detaching link");
 		if (cap_detach() != CAP_SUCCESS)
 			return CAP_FAILURE;
 		link_state = 1;
-		__attribute__((fallthrough));
+		/* fall through */
 	case 1:
 		if (output > 2)
 			syslog(LOG_NOTICE, "closing link");

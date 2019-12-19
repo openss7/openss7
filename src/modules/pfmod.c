@@ -1292,7 +1292,7 @@ pfmod_rsrv(queue_t *q)
 			/* find the M_DATA */
 			if (b == NULL)
 				break;
-			__attribute__((fallthrough));
+			/* fall through */
 		case M_DATA:
 			/* I hate to say it, but Solaris pulls up the wrong message (as though
 			   message pullup is necessary anyway). */

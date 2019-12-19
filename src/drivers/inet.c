@@ -5033,7 +5033,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -5044,27 +5044,27 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				olen += _T_SPACE_SIZEOF(t_defaults.xti.sndlowat);
 				if (ih->name != T_ALLOPT)
@@ -5072,7 +5072,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				switch (ih->name) {
@@ -5085,32 +5085,32 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TOS:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.tos);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					olen += _T_SPACE_SIZEOF(t_defaults.ip.addr);
 					if (ih->name != T_ALLOPT)
@@ -5122,7 +5122,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -5141,7 +5141,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				switch (ih->name) {
@@ -5153,63 +5153,63 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.keepalive);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.keepidle);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.keepitvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.keepcnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.syncnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.linger2);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.defer_accept);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.window_clamp);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					/* read only, can't get default */
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					olen += _T_SPACE_SIZEOF(t_defaults.tcp.quickack);
 					if (ih->name != T_ALLOPT)
@@ -5222,7 +5222,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				switch (ih->name) {
@@ -5234,122 +5234,122 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.ppi);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.sid);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					/* read only, can't get default */
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					/* read only, can't get default */
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.recvopt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.cookie_life);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.sack_delay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.path_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.assoc_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.max_init_retries);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.heartbeat_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.rto_initial);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.rto_min);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.rto_max);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.ostreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.istreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.cookie_inc);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.throttle_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.mac_type);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.cksum_type);
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.ecn);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.ali);
 					if (ih->name != T_ALLOPT)
@@ -5357,79 +5357,79 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.add);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.set);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.add_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.del_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.set_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.pr);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.lifetime);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.disposition);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.max_burst);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.hb);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.rto);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* read-only, no default */
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					olen += _T_SPACE_SIZEOF(t_defaults.sctp.debug);
 					if (ih->name != T_ALLOPT)
@@ -5492,7 +5492,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -5503,27 +5503,27 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				olen += _T_SPACE_SIZEOF(t->options.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndlowat);
 				if (ih->name != T_ALLOPT)
@@ -5531,7 +5531,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				switch (ih->name) {
@@ -5544,32 +5544,32 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(0);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TOS:
 					olen += _T_SPACE_SIZEOF(t->options.ip.tos);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					olen += _T_SPACE_SIZEOF(t->options.ip.ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					olen += _T_SPACE_SIZEOF(t->options.ip.reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					olen += _T_SPACE_SIZEOF(t->options.ip.dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					olen += _T_SPACE_SIZEOF(t->options.ip.broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					olen += _T_SPACE_SIZEOF(t->options.ip.addr);
 					if (ih->name != T_ALLOPT)
@@ -5581,7 +5581,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -5600,7 +5600,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				switch (ih->name) {
@@ -5612,62 +5612,62 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepalive);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepidle);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepitvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepcnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.syncnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.linger2);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.defer_accept);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.window_clamp);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.info);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					olen += _T_SPACE_SIZEOF(t->options.tcp.quickack);
 					if (ih->name != T_ALLOPT)
@@ -5680,7 +5680,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				switch (ih->name) {
@@ -5692,120 +5692,120 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ppi);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.sid);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ssn);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.tsn);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.recvopt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cookie_life);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.sack_delay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.path_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.assoc_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.max_init_retries);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.heartbeat_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_initial);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_min);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_max);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ostreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.istreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cookie_inc);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.throttle_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.mac_type);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cksum_type);
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ecn);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ali);
 					if (ih->name != T_ALLOPT)
@@ -5813,78 +5813,78 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.add);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.set);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.add_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.del_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.set_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.pr);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.lifetime);
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.disposition);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.max_burst);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.hb);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.status);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					olen += _T_SPACE_SIZEOF(t->options.sctp.debug);
 					if (ih->name != T_ALLOPT)
@@ -5946,7 +5946,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -5962,35 +5962,35 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				if (optlen && optlen != sizeof(t->options.xti.linger))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				if (optlen && optlen != sizeof(t->options.xti.rcvbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				if (optlen && optlen != sizeof(t->options.xti.rcvlowat))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				if (optlen && optlen != sizeof(t->options.xti.sndbuf))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				if (optlen && optlen != sizeof(t->options.xti.sndlowat))
 					goto einval;
@@ -6000,7 +6000,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				switch (ih->name) {
@@ -6014,42 +6014,42 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TOS:
 					if (optlen && optlen != sizeof(t->options.ip.tos))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					if (optlen && optlen != sizeof(t->options.ip.ttl))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					if (optlen && optlen != sizeof(t->options.ip.reuseaddr))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					if (optlen && optlen != sizeof(t->options.ip.dontroute))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					if (optlen && optlen != sizeof(t->options.ip.broadcast))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					if (optlen && optlen != sizeof(t->options.ip.addr))
 						goto einval;
@@ -6063,7 +6063,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -6084,7 +6084,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				switch (ih->name) {
@@ -6098,84 +6098,84 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					if (optlen && optlen != sizeof(t->options.tcp.maxseg))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					if (optlen && optlen != sizeof(t->options.tcp.keepalive))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					if (optlen && optlen != sizeof(t->options.tcp.cork))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					if (optlen && optlen != sizeof(t->options.tcp.keepidle))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					if (optlen && optlen != sizeof(t->options.tcp.keepitvl))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					if (optlen && optlen != sizeof(t->options.tcp.keepcnt))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					if (optlen && optlen != sizeof(t->options.tcp.syncnt))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					if (optlen && optlen != sizeof(t->options.tcp.linger2))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					if (optlen && optlen != sizeof(t->options.tcp.defer_accept))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					if (optlen && optlen != sizeof(t->options.tcp.window_clamp))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					if (optlen && optlen != sizeof(t->options.tcp.info))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					if (optlen && optlen != sizeof(t->options.tcp.quickack))
 						goto einval;
@@ -6190,7 +6190,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				switch (ih->name) {
@@ -6204,63 +6204,63 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					if (optlen && optlen != sizeof(t->options.sctp.cork))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					if (optlen && optlen != sizeof(t->options.sctp.ppi))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					if (optlen && optlen != sizeof(t->options.sctp.sid))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					if (optlen && optlen != sizeof(t->options.sctp.ssn))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					if (optlen && optlen != sizeof(t->options.sctp.tsn))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					if (optlen && optlen != sizeof(t->options.sctp.recvopt))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					if (optlen && optlen != sizeof(t->options.sctp.cookie_life))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					if (optlen && optlen != sizeof(t->options.sctp.sack_delay))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					if (optlen
 					    && optlen != sizeof(t->options.sctp.path_max_retrans))
@@ -6268,7 +6268,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					if (optlen
 					    && optlen != sizeof(t->options.sctp.assoc_max_retrans))
@@ -6276,7 +6276,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					if (optlen
 					    && optlen != sizeof(t->options.sctp.max_init_retries))
@@ -6284,7 +6284,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					if (optlen
 					    && optlen != sizeof(t->options.sctp.heartbeat_itvl))
@@ -6292,49 +6292,49 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					if (optlen && optlen != sizeof(t->options.sctp.rto_initial))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					if (optlen && optlen != sizeof(t->options.sctp.rto_min))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					if (optlen && optlen != sizeof(t->options.sctp.rto_max))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					if (optlen && optlen != sizeof(t->options.sctp.ostreams))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					if (optlen && optlen != sizeof(t->options.sctp.istreams))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					if (optlen && optlen != sizeof(t->options.sctp.cookie_inc))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					if (optlen
 					    && optlen != sizeof(t->options.sctp.throttle_itvl))
@@ -6342,14 +6342,14 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					if (optlen && optlen != sizeof(t->options.sctp.mac_type))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					if (optlen && optlen != sizeof(t->options.sctp.cksum_type))
 						goto einval;
@@ -6357,7 +6357,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					if (optlen && optlen != sizeof(t->options.sctp.ecn))
 						goto einval;
@@ -6366,7 +6366,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					if (optlen && optlen != sizeof(t->options.sctp.ali))
 						goto einval;
@@ -6376,35 +6376,35 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					if (optlen && optlen != sizeof(t->options.sctp.add))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					if (optlen && optlen != sizeof(t->options.sctp.set))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					if (optlen && optlen != sizeof(t->options.sctp.add_ip))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					if (optlen && optlen != sizeof(t->options.sctp.del_ip))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					if (optlen && optlen != sizeof(t->options.sctp.set_ip))
 						goto einval;
@@ -6413,7 +6413,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					if (optlen && optlen != sizeof(t->options.sctp.pr))
 						goto einval;
@@ -6422,7 +6422,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					if (optlen && optlen != sizeof(t->options.sctp.lifetime))
 						goto einval;
@@ -6431,48 +6431,48 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					if (optlen && optlen != sizeof(t->options.sctp.disposition))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					if (optlen && optlen != sizeof(t->options.sctp.max_burst))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					if (optlen && optlen != sizeof(t->options.sctp.hb))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					if (optlen && optlen != sizeof(t->options.sctp.rto))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					if (optlen && optlen != sizeof(t->options.sctp.maxseg))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* read-only */
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					if (optlen && optlen != sizeof(t->options.sctp.debug))
 						goto einval;
@@ -6536,7 +6536,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -6551,21 +6551,21 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.linger))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.rcvbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.xti.rcvlowat))
@@ -6573,14 +6573,14 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				olen += _T_SPACE_SIZEOF(t->options.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.xti.sndbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				if (ih->name != T_ALLOPT
 				    && optlen != sizeof(t->options.xti.sndlowat))
@@ -6591,7 +6591,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 			}
 			if (ih->level != T_ALLLEVELS)
 				continue;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				switch (ih->name) {
@@ -6606,7 +6606,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TOS:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.tos))
@@ -6614,7 +6614,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.ip.tos);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.ttl))
@@ -6622,7 +6622,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.ip.ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.reuseaddr))
@@ -6630,7 +6630,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.ip.reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.dontroute))
@@ -6638,7 +6638,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.ip.dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.broadcast))
@@ -6646,7 +6646,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.ip.broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.ip.addr))
@@ -6661,7 +6661,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -6683,7 +6683,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				switch (ih->name) {
@@ -6698,7 +6698,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.maxseg))
@@ -6706,7 +6706,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.keepalive))
@@ -6714,7 +6714,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepalive);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.cork))
@@ -6722,7 +6722,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.keepidle))
@@ -6730,7 +6730,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepidle);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.keepitvl))
@@ -6738,7 +6738,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepitvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.keepcnt))
@@ -6746,7 +6746,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.keepcnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.syncnt))
@@ -6754,7 +6754,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.syncnt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.linger2))
@@ -6762,7 +6762,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.linger2);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.defer_accept))
@@ -6770,7 +6770,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.defer_accept);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.window_clamp))
@@ -6778,7 +6778,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.tcp.window_clamp);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					/* If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
 					   T_READONLY, the returned option value is the same as the 
@@ -6786,7 +6786,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.tcp.quickack))
@@ -6802,7 +6802,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				switch (ih->name) {
@@ -6817,7 +6817,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.cork))
@@ -6825,7 +6825,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.ppi))
@@ -6833,7 +6833,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ppi);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.sid))
@@ -6841,7 +6841,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.sid);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					/* If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
 					   T_READONLY, the returned option value is the same as the 
@@ -6849,7 +6849,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					/* If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
 					   T_READONLY, the returned option value is the same as the 
@@ -6857,7 +6857,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.recvopt))
@@ -6865,7 +6865,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.recvopt);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.cookie_life))
@@ -6873,7 +6873,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cookie_life);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.sack_delay))
@@ -6881,7 +6881,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.sack_delay);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.path_max_retrans))
@@ -6889,7 +6889,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.path_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.assoc_max_retrans))
@@ -6897,7 +6897,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.assoc_max_retrans);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.max_init_retries))
@@ -6905,7 +6905,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.max_init_retries);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.heartbeat_itvl))
@@ -6913,7 +6913,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.heartbeat_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.rto_initial))
@@ -6921,7 +6921,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_initial);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.rto_min))
@@ -6929,7 +6929,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_min);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.rto_max))
@@ -6937,7 +6937,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto_max);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.ostreams))
@@ -6945,7 +6945,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.ostreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.istreams))
@@ -6953,7 +6953,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.istreams);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.cookie_inc))
@@ -6961,7 +6961,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.cookie_inc);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.throttle_itvl))
@@ -6969,7 +6969,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.throttle_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.mac_type))
@@ -6977,7 +6977,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.mac_type);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.cksum_type))
@@ -6986,7 +6986,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.ecn))
@@ -6996,7 +6996,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.ali))
@@ -7007,7 +7007,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.add))
@@ -7015,7 +7015,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.add);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.set))
@@ -7023,7 +7023,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.set);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.add_ip))
@@ -7031,7 +7031,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.add_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.del_ip))
@@ -7039,7 +7039,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.del_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.set_ip))
@@ -7049,7 +7049,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.pr))
@@ -7059,7 +7059,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.lifetime))
@@ -7069,7 +7069,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.disposition))
@@ -7077,7 +7077,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.disposition);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.max_burst))
@@ -7085,7 +7085,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.max_burst);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.hb))
@@ -7093,7 +7093,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.hb);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.rto))
@@ -7101,7 +7101,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.rto);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.maxseg))
@@ -7109,7 +7109,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += _T_SPACE_SIZEOF(t->options.sctp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
 					   T_READONLY, the returned option value is the same as the 
@@ -7117,7 +7117,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					if (ih->name != T_ALLOPT
 					    && optlen != sizeof(t->options.sctp.debug))
@@ -7224,7 +7224,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -7245,7 +7245,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.linger);
 				oh->level = XTI_GENERIC;
@@ -7256,7 +7256,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvbuf);
 				oh->level = XTI_GENERIC;
@@ -7267,7 +7267,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.rcvlowat);
 				oh->level = XTI_GENERIC;
@@ -7278,7 +7278,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndbuf);
 				oh->level = XTI_GENERIC;
@@ -7289,7 +7289,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t_defaults.xti.sndlowat);
 				oh->level = XTI_GENERIC;
@@ -7304,7 +7304,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 			if (ss->p.prot.family == PF_INET)
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
 				struct inet_opt *np = inet_sk(sk);
@@ -7319,7 +7319,6 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-				{
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -7329,8 +7328,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
-				}
+					/* fall through */
 				case T_IP_TOS:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.tos);
 					oh->level = T_INET_IP;
@@ -7341,7 +7339,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.ttl);
 					oh->level = T_INET_IP;
@@ -7352,7 +7350,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.reuseaddr);
 					oh->level = T_INET_IP;
@@ -7364,7 +7362,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.dontroute);
 					oh->level = T_INET_IP;
@@ -7376,7 +7374,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.broadcast);
 					oh->level = T_INET_IP;
@@ -7388,7 +7386,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.ip.addr);
 					oh->level = T_INET_IP;
@@ -7409,7 +7407,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -7435,7 +7433,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
 				struct tcp_opt *tp = tcp_sk(sk);
@@ -7459,7 +7457,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.maxseg);
 					oh->level = T_INET_TCP;
@@ -7470,7 +7468,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.keepalive);
 					oh->level = T_INET_TCP;
@@ -7482,7 +7480,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.cork);
 					oh->level = T_INET_TCP;
@@ -7493,7 +7491,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.keepidle);
 					oh->level = T_INET_TCP;
@@ -7504,7 +7502,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.keepitvl);
 					oh->level = T_INET_TCP;
@@ -7515,7 +7513,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.keepcnt);
 					oh->level = T_INET_TCP;
@@ -7526,7 +7524,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.syncnt);
 					oh->level = T_INET_TCP;
@@ -7537,7 +7535,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.linger2);
 					oh->level = T_INET_TCP;
@@ -7548,7 +7546,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.defer_accept);
 					oh->level = T_INET_TCP;
@@ -7560,7 +7558,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.window_clamp);
 					oh->level = T_INET_TCP;
@@ -7572,7 +7570,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					/* read only, can't get default */
 					oh->len = sizeof(*oh);
@@ -7583,7 +7581,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.tcp.quickack);
 					oh->level = T_INET_TCP;
@@ -7600,7 +7598,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
 				struct sctp_opt *sp = sctp_sk(sk);
@@ -7624,7 +7622,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.maxseg);
 					oh->level = T_INET_SCTP;
@@ -7635,7 +7633,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.cork);
 					oh->level = T_INET_SCTP;
@@ -7646,7 +7644,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.ppi);
 					oh->level = T_INET_SCTP;
@@ -7657,7 +7655,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.sid);
 					oh->level = T_INET_SCTP;
@@ -7668,7 +7666,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_SCTP;
@@ -7678,7 +7676,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_SCTP;
@@ -7688,7 +7686,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.recvopt);
 					oh->level = T_INET_SCTP;
@@ -7699,7 +7697,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.cookie_life);
 					oh->level = T_INET_SCTP;
@@ -7711,7 +7709,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.sack_delay);
 					oh->level = T_INET_SCTP;
@@ -7723,7 +7721,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t_defaults.sctp.path_max_retrans);
@@ -7736,7 +7734,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t_defaults.sctp.assoc_max_retrans);
@@ -7749,7 +7747,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t_defaults.sctp.max_init_retries);
@@ -7762,7 +7760,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.heartbeat_itvl);
 					oh->level = T_INET_SCTP;
@@ -7774,7 +7772,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.rto_initial);
 					oh->level = T_INET_SCTP;
@@ -7786,7 +7784,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.rto_min);
 					oh->level = T_INET_SCTP;
@@ -7797,7 +7795,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.rto_max);
 					oh->level = T_INET_SCTP;
@@ -7808,7 +7806,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.ostreams);
 					oh->level = T_INET_SCTP;
@@ -7820,7 +7818,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.istreams);
 					oh->level = T_INET_SCTP;
@@ -7832,7 +7830,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.cookie_inc);
 					oh->level = T_INET_SCTP;
@@ -7844,7 +7842,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.throttle_itvl);
 					oh->level = T_INET_SCTP;
@@ -7856,7 +7854,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.mac_type);
 					oh->level = T_INET_SCTP;
@@ -7868,7 +7866,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.cksum_type);
 					oh->level = T_INET_SCTP;
@@ -7880,7 +7878,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.hb);
 					oh->level = T_INET_SCTP;
@@ -7891,7 +7889,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.rto);
 					oh->level = T_INET_SCTP;
@@ -7903,7 +7901,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* read-only */
 					oh->len = sizeof(*oh);
@@ -7914,7 +7912,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					oh->len = _T_LENGTH_SIZEOF(t_defaults.sctp.debug);
 					oh->level = T_INET_SCTP;
@@ -7926,7 +7924,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 #if defined CONFIG_SCTP_ECN
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ECN;
@@ -7939,7 +7937,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ALI;
@@ -7953,7 +7951,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 #if defined CONFIG_SCTP_ADD_IP
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ADD;
@@ -7964,7 +7962,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SET;
@@ -7975,7 +7973,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ADD_IP;
@@ -7987,7 +7985,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEL_IP;
@@ -7999,7 +7997,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SET_IP;
@@ -8013,7 +8011,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PR;
@@ -8026,7 +8024,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_LIFETIME;
@@ -8040,7 +8038,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DISPOSITION;
@@ -8052,7 +8050,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_BURST;
@@ -8129,7 +8127,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -8150,7 +8148,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.linger);
 				oh->level = XTI_GENERIC;
@@ -8162,7 +8160,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvbuf);
 				oh->level = XTI_GENERIC;
@@ -8174,7 +8172,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.rcvlowat);
 				oh->level = XTI_GENERIC;
@@ -8186,7 +8184,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndbuf);
 				oh->level = XTI_GENERIC;
@@ -8198,7 +8196,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				oh->len = _T_LENGTH_SIZEOF(t->options.xti.sndlowat);
 				oh->level = XTI_GENERIC;
@@ -8214,7 +8212,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 			if (t->p.prot.family == PF_INET)
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				struct inet_opt *np = inet_sk(sk);
@@ -8229,7 +8227,6 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-				{
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -8239,8 +8236,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
-				}
+					/* fall through */
 				case T_IP_TOS:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.tos);
 					oh->level = T_INET_IP;
@@ -8252,7 +8248,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.ttl);
 					oh->level = T_INET_IP;
@@ -8264,7 +8260,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.reuseaddr);
 					oh->level = T_INET_IP;
@@ -8277,7 +8273,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.dontroute);
 					oh->level = T_INET_IP;
@@ -8290,7 +8286,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.broadcast);
 					oh->level = T_INET_IP;
@@ -8303,7 +8299,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					oh->len = _T_LENGTH_SIZEOF(t->options.ip.addr);
 					oh->level = T_INET_IP;
@@ -8325,7 +8321,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -8352,7 +8348,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				struct tcp_opt *tp = tcp_sk(sk);
@@ -8377,7 +8373,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.maxseg);
 					oh->level = T_INET_TCP;
@@ -8389,7 +8385,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.keepalive);
 					oh->level = T_INET_TCP;
@@ -8402,7 +8398,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.cork);
 					oh->level = T_INET_TCP;
@@ -8414,7 +8410,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.keepidle);
 					oh->level = T_INET_TCP;
@@ -8426,7 +8422,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.keepitvl);
 					oh->level = T_INET_TCP;
@@ -8438,7 +8434,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.keepcnt);
 					oh->level = T_INET_TCP;
@@ -8450,7 +8446,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.syncnt);
 					oh->level = T_INET_TCP;
@@ -8462,7 +8458,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.linger2);
 					oh->level = T_INET_TCP;
@@ -8474,7 +8470,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.defer_accept);
 					oh->level = T_INET_TCP;
@@ -8487,7 +8483,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.window_clamp);
 					oh->level = T_INET_TCP;
@@ -8500,7 +8496,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.info);
 					oh->level = T_INET_TCP;
@@ -8513,7 +8509,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					oh->len = _T_LENGTH_SIZEOF(t->options.tcp.quickack);
 					oh->level = T_INET_TCP;
@@ -8531,7 +8527,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				struct sctp_opt *sp = sctp_sk(sk);
@@ -8556,7 +8552,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.maxseg);
 					oh->level = T_INET_SCTP;
@@ -8568,7 +8564,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.cork);
 					oh->level = T_INET_SCTP;
@@ -8580,7 +8576,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.ppi);
 					oh->level = T_INET_SCTP;
@@ -8592,7 +8588,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.sid);
 					oh->level = T_INET_SCTP;
@@ -8604,7 +8600,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					/* read only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.ssn);
@@ -8617,7 +8613,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					/* read only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.tsn);
@@ -8630,7 +8626,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.recvopt);
 					oh->level = T_INET_SCTP;
@@ -8642,7 +8638,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.cookie_life);
 					oh->level = T_INET_SCTP;
@@ -8655,7 +8651,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.sack_delay);
 					oh->level = T_INET_SCTP;
@@ -8668,7 +8664,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t->options.sctp.path_max_retrans);
@@ -8682,7 +8678,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t->options.sctp.assoc_max_retrans);
@@ -8696,7 +8692,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					oh->len =
 					    _T_LENGTH_SIZEOF(t->options.sctp.max_init_retries);
@@ -8710,7 +8706,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.heartbeat_itvl);
 					oh->level = T_INET_SCTP;
@@ -8723,7 +8719,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.rto_initial);
 					oh->level = T_INET_SCTP;
@@ -8736,7 +8732,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.rto_min);
 					oh->level = T_INET_SCTP;
@@ -8748,7 +8744,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.rto_max);
 					oh->level = T_INET_SCTP;
@@ -8760,7 +8756,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.ostreams);
 					oh->level = T_INET_SCTP;
@@ -8773,7 +8769,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.istreams);
 					oh->level = T_INET_SCTP;
@@ -8786,7 +8782,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.cookie_inc);
 					oh->level = T_INET_SCTP;
@@ -8799,7 +8795,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.throttle_itvl);
 					oh->level = T_INET_SCTP;
@@ -8812,7 +8808,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.mac_type);
 					oh->level = T_INET_SCTP;
@@ -8825,7 +8821,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.cksum_type);
 					oh->level = T_INET_SCTP;
@@ -8838,7 +8834,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.hb);
 					oh->level = T_INET_SCTP;
@@ -8850,7 +8846,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.rto);
 					oh->level = T_INET_SCTP;
@@ -8863,7 +8859,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* read-only */
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.status);
@@ -8878,7 +8874,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					oh->len = _T_LENGTH_SIZEOF(t->options.sctp.debug);
 					oh->level = T_INET_SCTP;
@@ -8891,7 +8887,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 #if defined CONFIG_SCTP_ECN
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ECN;
@@ -8905,7 +8901,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ALI;
@@ -8920,7 +8916,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 #if defined CONFIG_SCTP_ADD_IP
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ADD;
@@ -8932,7 +8928,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SET;
@@ -8944,7 +8940,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ADD_IP;
@@ -8957,7 +8953,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEL_IP;
@@ -8970,7 +8966,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SET_IP;
@@ -8985,7 +8981,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PR;
@@ -8999,7 +8995,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_LIFETIME;
@@ -9014,7 +9010,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DISPOSITION;
@@ -9027,7 +9023,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_BURST;
@@ -9104,7 +9100,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -9136,7 +9132,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_LINGER:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -9172,7 +9168,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVBUF:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -9198,7 +9194,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_RCVLOWAT:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -9224,7 +9220,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDBUF:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -9251,7 +9247,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
+				/* fall through */
 			case XTI_SNDLOWAT:
 				oh->len = ih->len;
 				oh->level = XTI_GENERIC;
@@ -9282,7 +9278,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 			if (ss->p.prot.family == PF_INET)
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
 				struct inet_opt *np = inet_sk(sk);
@@ -9310,7 +9306,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TOS:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9338,7 +9334,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_TTL:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9367,7 +9363,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_REUSEADDR:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9386,7 +9382,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_DONTROUTE:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9405,7 +9401,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_BROADCAST:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9424,7 +9420,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_IP_ADDR:
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -9446,7 +9442,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -9482,7 +9478,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_TCP) {
 				struct tcp_opt *tp = tcp_sk(sk);
@@ -9516,7 +9512,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_MAXSEG:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9545,7 +9541,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9585,7 +9581,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_CORK:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9604,7 +9600,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9633,7 +9629,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9662,7 +9658,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_KEEPCNT:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9691,7 +9687,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_SYNCNT:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9720,7 +9716,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_LINGER2:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9741,7 +9737,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9780,7 +9776,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9803,7 +9799,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_INFO:
 					/* read-only */
 					oh->len = ih->len;
@@ -9816,7 +9812,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_TCP_QUICKACK:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -9841,7 +9837,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_SCTP) {
 				struct sctp_opt *sp = sctp_sk(sk);
@@ -9875,7 +9871,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAXSEG:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -9904,7 +9900,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CORK:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -9923,7 +9919,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PPI:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -9940,7 +9936,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SID:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -9959,7 +9955,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SSN:
 					/* read-only */
 					oh->len = ih->len;
@@ -9972,7 +9968,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_TSN:
 					/* read-only */
 					oh->len = ih->len;
@@ -9985,7 +9981,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RECVOPT:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10004,7 +10000,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_LIFE:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10039,7 +10035,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SACK_DELAY:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10074,7 +10070,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PATH_MAX_RETRANS:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10091,7 +10087,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ASSOC_MAX_RETRANS:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10108,7 +10104,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_INIT_RETRIES:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10125,7 +10121,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HEARTBEAT_ITVL:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10142,7 +10138,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_INITIAL:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10177,7 +10173,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MIN:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10212,7 +10208,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO_MAX:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10247,7 +10243,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_OSTREAMS:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10276,7 +10272,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ISTREAMS:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10305,7 +10301,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_COOKIE_INC:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10340,7 +10336,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_THROTTLE_ITVL:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10375,7 +10371,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAC_TYPE:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10392,7 +10388,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_CKSUM_TYPE:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10409,7 +10405,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_HB:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10448,7 +10444,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_RTO:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10511,7 +10507,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_STATUS:
 					/* read-only */
 					oh->len = ih->len;
@@ -10524,7 +10520,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEBUG:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10541,7 +10537,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ECN:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10560,7 +10556,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ALI:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10577,7 +10573,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10596,7 +10592,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10615,7 +10611,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_ADD_IP:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10633,7 +10629,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DEL_IP:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10651,7 +10647,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_SET_IP:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10669,7 +10665,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_PR:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10688,7 +10684,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_LIFETIME:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10707,7 +10703,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_DISPOSITION:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10735,7 +10731,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				case T_SCTP_MAX_BURST:
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
@@ -10828,7 +10824,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 		case T_ALLLEVELS:
 			if (ih->name != T_ALLOPT)
 				goto einval;
-			__attribute__((fallthrough));
+			/* fall through */
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
@@ -10875,8 +10871,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
 			}
+				/* fall through */
 			case XTI_LINGER:
 			{
 				struct t_linger *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -10929,8 +10925,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
 			}
+				/* fall through */
 			case XTI_RCVBUF:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -10966,8 +10962,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
 			}
+				/* fall through */
 			case XTI_RCVLOWAT:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11003,8 +10999,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
 			}
+				/* fall through */
 			case XTI_SNDBUF:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11040,8 +11036,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-				__attribute__((fallthrough));
 			}
+				/* fall through */
 			case XTI_SNDLOWAT:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11081,7 +11077,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 			if (t->p.prot.family == PF_INET)
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 					goto efault;
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_IP:
 			if (t->p.prot.family == PF_INET) {
 				struct inet_opt *np = inet_sk(sk);
@@ -11096,7 +11092,6 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-				{
 					/* not supported yet */
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
@@ -11107,8 +11102,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
-				}
+					/* fall through */
 				case T_IP_TOS:
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11155,8 +11149,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_IP_TTL:
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11199,8 +11193,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_IP_REUSEADDR:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11227,8 +11221,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_IP_DONTROUTE:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11258,8 +11252,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_IP_BROADCAST:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11289,8 +11283,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_IP_ADDR:
 				{
 					uint32_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11326,7 +11320,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_UDP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
@@ -11378,7 +11372,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 				if (ih->level != T_ALLLEVELS)
 					goto einval;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_TCP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_TCP) {
 				struct tcp_opt *tp = tcp_sk(sk);
@@ -11427,8 +11421,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_MAXSEG:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11465,8 +11459,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_KEEPALIVE:
 				{
 					struct t_kpalive *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11527,8 +11521,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_CORK:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11554,8 +11548,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_KEEPIDLE:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11581,8 +11575,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_KEEPINTVL:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11608,8 +11602,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_KEEPCNT:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11635,8 +11629,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_SYNCNT:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11662,8 +11656,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_LINGER2:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11689,8 +11683,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_DEFER_ACCEPT:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11716,8 +11710,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_WINDOW_CLAMP:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11743,8 +11737,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_INFO:
 				{
 					struct t_tcp_info *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11759,8 +11753,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
 				}
+					/* fall through */
 				case T_TCP_QUICKACK:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -11793,7 +11787,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 					goto einval;
 			}
 #if defined HAVE_OPENSS7_SCTP
-			__attribute__((fallthrough));
+			/* fall through */
 		case T_INET_SCTP:
 			if (t->p.prot.family == PF_INET && t->p.prot.protocol == T_INET_SCTP) {
 				struct sctp_opt *sp = sctp_sk(sk);
@@ -11833,7 +11827,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_MAXSEG:
 				{
@@ -11860,7 +11854,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_CORK:
 				{
@@ -11887,7 +11881,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_PPI:
 				{
@@ -11914,7 +11908,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_SID:
 				{
@@ -11941,7 +11935,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_SSN:
 				{
@@ -11957,7 +11951,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_TSN:
 				{
@@ -11973,7 +11967,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_RECVOPT:
 				{
@@ -12000,7 +11994,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_COOKIE_LIFE:
 				{
@@ -12027,7 +12021,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_SACK_DELAY:
 				{
@@ -12054,7 +12048,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_PATH_MAX_RETRANS:
 				{
@@ -12081,7 +12075,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ASSOC_MAX_RETRANS:
 				{
@@ -12108,7 +12102,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_MAX_INIT_RETRIES:
 				{
@@ -12135,7 +12129,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_HEARTBEAT_ITVL:
 				{
@@ -12162,7 +12156,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_RTO_INITIAL:
 				{
@@ -12189,7 +12183,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_RTO_MIN:
 				{
@@ -12216,7 +12210,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_RTO_MAX:
 				{
@@ -12243,7 +12237,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_OSTREAMS:
 				{
@@ -12270,7 +12264,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ISTREAMS:
 				{
@@ -12297,7 +12291,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_COOKIE_INC:
 				{
@@ -12324,7 +12318,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_THROTTLE_ITVL:
 				{
@@ -12351,7 +12345,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_MAC_TYPE:
 				{
@@ -12378,7 +12372,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_CKSUM_TYPE:
 				{
@@ -12405,7 +12399,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_HB:
 				{
@@ -12432,7 +12426,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_RTO:
 				{
@@ -12459,7 +12453,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_STATUS:
 				{
@@ -12478,7 +12472,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_DEBUG:
 				{
@@ -12506,7 +12500,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 #if defined CONFIG_SCTP_ECN
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ECN:
 				{
@@ -12531,7 +12525,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ALI:
 				{
@@ -12557,7 +12551,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 #if defined CONFIG_SCTP_ADD_IP
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ADD:
 				{
@@ -12580,7 +12574,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_SET:
 				{
@@ -12603,7 +12597,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_ADD_IP:
 				{
@@ -12627,7 +12621,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_DEL_IP:
 				{
@@ -12651,7 +12645,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_SET_IP:
 				{
@@ -12677,7 +12671,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_PR:
 				{
@@ -12702,7 +12696,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_LIFETIME:
 				{
@@ -12727,7 +12721,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_DISPOSITION:
 				{
@@ -12750,7 +12744,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
-					__attribute__((fallthrough));
+					/* fall through */
 				}
 				case T_SCTP_MAX_BURST:
 				{
@@ -14894,7 +14888,7 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 		return (err);
 	case EPIPE:
 		err = -ECONNRESET;
-		__attribute__((fallthrough));
+		/* fall through */
 	case ENETDOWN:
 	case EHOSTUNREACH:
 	case ECONNRESET:
@@ -16935,7 +16929,7 @@ ss_w_proto_return(mblk_t *mp, int rtn)
 		return (rtn);
 	default:
 		freemsg(mp);
-		__attribute__((fallthrough));
+		/* fall through */
 	case 0:
 		return (0);
 	}

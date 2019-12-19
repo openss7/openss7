@@ -265,7 +265,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case CLONEOPEN:
 		if (cminor < 1)
 			cminor = 1;
-		__attribute__((fallthrough));
+		/* fall through */
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;

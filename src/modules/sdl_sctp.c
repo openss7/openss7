@@ -1967,7 +1967,7 @@ sdl_wsrv(queue_t *q)
 					ss7_unlockq(q);
 					return (0);
 				}
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				rare();
 				ptrace(("Error = %d\n", rtn));
@@ -2108,7 +2108,7 @@ sdl_rsrv(queue_t *q)
 					ss7_unlockq(q);
 					return (0);
 				}
-				__attribute__((fallthrough));
+				/* fall through */
 			default:
 				rare();
 				ptrace(("Error = %d\n", rtn));

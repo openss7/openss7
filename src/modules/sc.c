@@ -690,7 +690,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		switch (ioc->iocblk.ioc_cmd) {
 		case SC_IOC_RESET:
 			reset = 1;
-			__attribute__((fallthrough));
+			/* fall through */
 		case SC_IOC_LIST:
 #ifdef __LP64__
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
@@ -794,7 +794,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 		switch (ioc->copyresp.cp_cmd) {
 		case SC_IOC_RESET:
 			reset = 1;
-			__attribute__((fallthrough));
+			/* fall through */
 		case SC_IOC_LIST:
 			_trace();
 			if (ioc->copyresp.cp_rval != 0) {

@@ -653,7 +653,6 @@ __sdl_timer_stop(struct sdl *s, const uint t)
 	case tall:
 		single = 0;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t9:
 		sdl_stop_timer_t9(s);
 		if (single)

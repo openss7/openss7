@@ -986,7 +986,6 @@ __sdt_timer_stop(struct sdt *s, const uint t)
 	case tall:
 		single = 0;
 		/* fall through */
-		__attribute__((fallthrough));
 	case t8:
 		sdt_stop_timer_t8(s);
 		if (single)

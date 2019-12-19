@@ -1961,7 +1961,7 @@ mi_timer_cancel(mblk_t *mp)
 			rval = (0);
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case TB_IDLE:
 		/* Idle, not on queue */
 		tb->tb_state = TB_IDLE;
@@ -2060,7 +2060,7 @@ mi_timer_ticks(mblk_t *mp, clock_t ticks)
 			tb->tb_state = TB_RESCHEDULED;
 			break;
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case TB_IDLE:
 		/* Timer is idle (not running), can be rescheduled and is not on queue. */
 		if (ticks <= 0)
@@ -2788,14 +2788,14 @@ mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
 				break;
 			case 'X':
 				flags |= _MI_FLAG_LARGE;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 'x':
 				base = 16;
 				break;
 			case 'd':
 			case 'i':
 				flags |= _MI_FLAG_SIGN;
-				__attribute__((fallthrough));
+				/* fall through */
 			case 'u':
 				base = 10;
 				break;

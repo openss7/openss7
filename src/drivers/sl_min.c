@@ -742,7 +742,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(I_LINK):
 			ptrace(("%s: %p: I_LINK\n", DRV_NAME, sl));
 			MOD_INC_USE_COUNT;	/* keep module from unloading */
@@ -774,7 +774,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 				ret = -EPERM;
 				break;
 			}
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(I_UNLINK):
 			ptrace(("%s: %p: I_UNLINK\n", DRV_NAME, sl));
 			spin_lock_irqsave(&master.lock, flags);

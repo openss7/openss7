@@ -709,8 +709,8 @@ ttcompat_r_iocack(queue_t *q, mblk_t *mp)
 			sg->sg_flags |= TAB3;
 			break;
 		}
-		__attribute__((fallthrough));
 	}
+		/* fall through */
 	case TIOCGETC:		/* struct tchars * (output) */
 	{
 		struct tchars *t;

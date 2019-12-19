@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -4714,7 +4714,7 @@ sctp_recv_shutdown(sp, mp)
 				return (err);
 		}
 		sp->s_state = SCTP_SHUTDOWN_RECEIVED;
-		/* fall thru */
+		/* fall through */
 	case SCTP_SHUTDOWN_RECEIVED:
 		sctp_cumm_ack(sp, ack);
 		sctp_dest_calc(sp);
@@ -4727,7 +4727,7 @@ sctp_recv_shutdown(sp, mp)
 		if ((err = sp->ops->sctp_ordrel_ind(sp)))
 			return (err);
 		sp->s_state = SCTP_SHUTDOWN_RECVWAIT;
-		/* fall thru */
+		/* fall through */
 	case SCTP_SHUTDOWN_RECVWAIT:
 		sctp_cumm_ack(sp, ack);
 		sctp_dest_calc(sp);
@@ -4773,7 +4773,7 @@ sctp_recv_shutdown_ack(sp, mp)
 		if (sp->ops->sctp_ordrel_ind)
 			if ((err = sp->ops->sctp_ordrel_ind(sp)))
 				return (err);
-		/* fall thru */
+		/* fall through */
 	case SCTP_SHUTDOWN_ACK_SENT:
 		// sctp_ack_calc(sp, &sp->timer_shutdown); /* WHY? */
 		sctp_send_shutdown_complete(sp);

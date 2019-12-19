@@ -9799,7 +9799,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
 			access |= FEXCL;
 			/* FIXME: These gets need to have an ic_len of zero.  */
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
 			length = sizeof(struct termios);
@@ -9809,7 +9809,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
 			access |= FEXCL;
 			/* FIXME: These gets need to have an ic_len of zero.  */
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
 			length = sizeof(struct termio);
 			break;
@@ -9910,7 +9910,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 #endif
 		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
 			length = sizeof(struct winsize);
 			break;
@@ -9927,13 +9927,14 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
 #if 0
+			/* fall through */
 			/* conflicts with TCSETSW on ppc */
 		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
 			/* conflicts with TCSETAW on ppc */
 		case _IOC_NR(TIOCGSOFTCAR):	/* int * *//* XXX */
 #endif
+			/* fall through */
 		case _IOC_NR(TIOCGETD):	/* int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCGPTN):	/* unsigned int * *//* Get Pty Number (of pty-mux device) *//* XXX */
 		case _IOC_NR(TIOCSERGWILD):	/* int * *//* XXX */
@@ -10298,7 +10299,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETSF):	/* const struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCSLCKTRMIOS):	/* const struct termios * *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TCGETS):	/* struct termios * *//* SVID *//* XXX */
 		case _IOC_NR(TIOCGLCKTRMIOS):	/* struct termios * *//* XXX */
 			length = sizeof(struct termios);
@@ -10307,7 +10308,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TCSETAW):	/* const struct termio * *//* SVID *//* XXX */
 		case _IOC_NR(TCSETAF):	/* const struct termio * *//* SVID *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TCGETA):	/* struct termio * *//* SVID *//* XXX */
 			length = sizeof(struct termio);
 			break;
@@ -10408,7 +10409,7 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 #endif
 		case _IOC_NR(TIOCSWINSZ):	/* const struct winsize * *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
+			/* fall through */
 		case _IOC_NR(TIOCGWINSZ):	/* struct winsize * *//* BSD *//* XXX */
 			length = sizeof(struct winsize);
 			break;
@@ -10425,13 +10426,14 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(TIOCSETD):	/* const int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCSERSWILD):	/* const int * *//* XXX */
 			access |= FEXCL;
-			__attribute__((fallthrough));
 #if 0
+			/* fall through */
 			/* conflicts with TCSETSW on ppc */
 		case _IOC_NR(TIOCMGET):	/* int * *//* SVID *//* XXX */
 			/* conflicts with TCSETAW on ppc */
 		case _IOC_NR(TIOCGSOFTCAR):	/* int * *//* XXX */
 #endif
+			/* fall through */
 		case _IOC_NR(TIOCGETD):	/* int * *//* BSD *//* XXX */
 		case _IOC_NR(TIOCGPTN):	/* unsigned int * *//* Get Pty Number (of pty-mux device) *//* XXX */
 		case _IOC_NR(TIOCSERGWILD):	/* int * *//* XXX */
@@ -11104,7 +11106,7 @@ strwput(queue_t *q, mblk_t *mp)
 			putq(q, mp);
 			return (0);
 		}
-		__attribute__((fallthrough));
+		/* fall through */
 	case M_PROTO:
 		if (likely((b = getq(q)) != NULL)) {
 			/* delayed one has to go - can't delay the other */
