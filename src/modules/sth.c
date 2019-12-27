@@ -64,6 +64,9 @@ static char const ident[] = "src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #include <linux/kernel.h>	/* for FASTCALL(), fastcall */
 #include <linux/sched.h>	/* for send_sig_info() */
+#ifdef HAVE_KINC_LINUX_SCHED_SIGNAL_H
+#include <linux/sched/signal.h>
+#endif
 #include <linux/spinlock.h>
 #include <linux/fs.h>		/* for file */
 #include <linux/file.h>		/* for fget() */
