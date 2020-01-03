@@ -481,18 +481,21 @@ STATIC ulong mtp_get_id(ulong);
  *  =========================================================================
  */
 STATIC INLINE ulong
+__attribute__((unused))
 cc_set(struct cc *cc, const ulong flags)
 {
 	cc->flags |= flags;
 	return (cc->flags);
 }
 STATIC INLINE ulong
+__attribute__((unused))
 cc_clr(struct cc *cc, const ulong flags)
 {
 	cc->flags &= ~flags;
 	return (cc->flags);
 }
 STATIC INLINE ulong
+__attribute__((unused))
 cc_tst(struct cc *cc, const ulong flags)
 {
 	return (cc->flags & flags);
@@ -786,6 +789,7 @@ cs_set_state(struct cc *cc, const long newstate)
 	cc->state = newstate;
 }
 STATIC INLINE void
+__attribute__((unused))
 ct_set_state(struct ct *ct, const long newstate)
 {
 	long oldstate = ct_get_state(ct);
@@ -796,6 +800,7 @@ ct_set_state(struct ct *ct, const long newstate)
 	ct->state = newstate;
 }
 STATIC INLINE void
+__attribute__((unused))
 cg_set_state(struct cg *cg, const long newstate)
 {
 	long oldstate = cg_get_state(cg);
@@ -1216,18 +1221,21 @@ cg_tst(struct cg *cg, const ulong flags)
 }
 
 STATIC INLINE ulong
+__attribute__((unused))
 tg_set(struct tg *tg, const ulong flags)
 {
 	tg->flags |= flags;
 	return (tg->flags);
 }
 STATIC INLINE ulong
+__attribute__((unused))
 tg_clr(struct tg *tg, const ulong flags)
 {
 	tg->flags &= ~flags;
 	return (tg->flags);
 }
 STATIC INLINE ulong
+__attribute__((unused))
 tg_tst(struct tg *tg, const ulong flags)
 {
 	return (tg->flags & flags);
@@ -2063,6 +2071,7 @@ cc_error_ack(queue_t *q, struct cc *cc, struct ct *ct, long prim, long error)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 cc_info_ack(queue_t *q, struct cc *cc)
 {
 	mblk_t *mp;
@@ -2121,6 +2130,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, uchar *add_ptr, size_t add_len, ulong set
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 cc_optmgmt_ack(queue_t *q, struct cc *cc, uchar *opt_ptr, size_t opt_len, ulong flags, ulong cref)
 {
 	mblk_t *mp;
@@ -3734,6 +3744,7 @@ cc_sr_maint_ind(queue_t *q, struct sr *sr, ulong reason)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_bind_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 {
 	mblk_t *mp;
@@ -3765,6 +3776,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_unbind_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -3788,6 +3800,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_conn_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 {
 	mblk_t *mp;
@@ -3819,6 +3832,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_discon_req(queue_t *q, struct mtp *mtp)
 {
 	if (canput(mtp->oq)) {
@@ -3846,6 +3860,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_addr_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -3869,6 +3884,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_info_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -3892,6 +3908,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_optmgmt_req(queue_t *q, struct mtp *mtp, ulong flags, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -3922,6 +3939,7 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, ulong flags, uchar *opt_ptr, size_t
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 mtp_transfer_req(queue_t *q, struct mtp *mtp, mtp_addr_t * add, ulong prior, ulong sls, mblk_t *dp)
 {
 	if (canput(mtp->oq)) {
@@ -4006,11 +4024,13 @@ pack_mt(uint pvar, uchar **p, ulong mt)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_eop(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_eop(uint pvar, uchar **p)
 {
 	*(*p)++ = 0;
@@ -4034,11 +4054,13 @@ unpack_eop(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_clrf(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_clrf(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4090,11 +4112,13 @@ unpack_tmr(uint pvar, uchar *p, uchar *e, ulong *tmr)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_atp(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_atp(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4357,11 +4381,13 @@ unpack_fci(uint pvar, uchar *p, uchar *e, ulong *fci)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_ofci(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_ofci(uint pvar, uchar **p, ulong ofci)
 {
 	*(*p)++ = ofci;
@@ -4411,11 +4437,13 @@ unpack_cpc(uint pvar, uchar *p, uchar *e, ulong *cpc)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_cgpn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_cgpn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4441,11 +4469,13 @@ unpack_cgpn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rdgn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rdgn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4473,11 +4503,13 @@ unpack_rdgn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rdnn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rdnn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4505,11 +4537,13 @@ unpack_rdnn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_conr(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_conr(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4675,11 +4709,13 @@ unpack_caus(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rdi(uint pvar)
 {
 	return (2);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rdi(uint pvar, uchar **p, ulong rdi)
 {
 	*(*p)++ = rdi;
@@ -4866,11 +4902,13 @@ unpack_faii(uint pvar, uchar *p, uchar *e, ulong *faii)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_cugi(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_cugi(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -4896,12 +4934,14 @@ unpack_cugi(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_index(uint pvar)
 {
 	fixme(("Correct format for this paramter\n"));
 	return (4);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_index(uint pvar, uchar **p, ulong index)
 {
 	*(*p)++ = index >> 0;
@@ -4966,6 +5006,7 @@ unpack_usi(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_spc(uint pvar)
 {
 	switch (pvar & SS7_PVAR_MASK) {
@@ -4976,6 +5017,7 @@ size_spc(uint pvar)
 	}
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_spc(uint pvar, uchar **p, ulong spc)
 {
 	switch (pvar & SS7_PVAR_MASK) {
@@ -5078,11 +5120,13 @@ unpack_uui(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_conn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_conn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5134,11 +5178,13 @@ unpack_sris(uint pvar, uchar *p, uchar *e, ulong *sris)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_tns(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_tns(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5246,11 +5292,13 @@ unpack_csi(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_acl(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_acl(uint pvar, uchar **p, ulong acl)
 {
 	*(*p)++ = acl;
@@ -5272,11 +5320,13 @@ unpack_acl(uint pvar, uchar *p, uchar *e, ulong *acl)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_ocdn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_ocdn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5302,11 +5352,13 @@ unpack_ocdn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_obci(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_obci(uint pvar, uchar **p, ulong obci)
 {
 	*(*p)++ = 1;
@@ -5331,11 +5383,13 @@ unpack_obci(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_uuind(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_uuind(uint pvar, uchar **p, ulong uuind)
 {
 	*(*p)++ = uuind;
@@ -5357,6 +5411,7 @@ unpack_uuind(uint pvar, uchar *p, uchar *e, ulong *uuind)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_ispc(uint pvar)
 {
 	switch (pvar & SS7_PVAR_MASK) {
@@ -5367,6 +5422,7 @@ size_ispc(uint pvar)
 	}
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_ispc(uint pvar, uchar **p, ulong ispc)
 {
 	switch (pvar & SS7_PVAR_MASK) {
@@ -5412,11 +5468,13 @@ unpack_ispc(uint pvar, uchar *p, uchar *e, ulong *ispc)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_gnot(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_gnot(uint pvar, uchar **p, ulong gnot)
 {
 	*(*p)++ = gnot;
@@ -5438,11 +5496,13 @@ unpack_gnot(uint pvar, uchar *p, uchar *e, ulong *gnot)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_chi(uint pvar)
 {
 	return (2);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_chi(uint pvar, uchar **p, ulong chi)
 {
 	*(*p)++ = chi >> 0;
@@ -5467,11 +5527,13 @@ unpack_chi(uint pvar, uchar *p, uchar *e, ulong *chi)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_adi(uint pvar, ulong adi)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_adi(uint pvar, uchar **p, ulong adi)
 {
 	*(*p)++ = adi;
@@ -5493,11 +5555,13 @@ unpack_adi(uint pvar, uchar *p, uchar *e, ulong *adi)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_nsf(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_nsf(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5525,11 +5589,13 @@ unpack_nsf(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_usip(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_usip(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5555,11 +5621,13 @@ unpack_usip(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_prop(uint pvar)
 {
 	return (2);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_prop(uint pvar, uchar **p, ulong prop)
 {
 	*(*p)++ = prop >> 0;
@@ -5584,11 +5652,13 @@ unpack_prop(uint pvar, uchar *p, uchar *e, ulong *prop)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rops(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rops(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5614,11 +5684,13 @@ unpack_rops(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_sa(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_sa(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5644,11 +5716,13 @@ unpack_sa(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_uti(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_uti(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5673,11 +5747,13 @@ unpack_uti(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_tmu(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_tmu(uint pvar, uchar **p, ulong tmu)
 {
 	*(*p)++ = tmu;
@@ -5699,11 +5775,13 @@ unpack_tmu(uint pvar, uchar *p, uchar *e, ulong *tmu)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_cdi(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_cdi(uint pvar, uchar **p, ulong cdi)
 {
 	*(*p)++ = cdi;
@@ -5725,11 +5803,13 @@ unpack_cdi(uint pvar, uchar *p, uchar *e, ulong *cdi)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_eci(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_eci(uint pvar, uchar **p, ulong eci)
 {
 	*(*p)++ = eci;
@@ -5751,11 +5831,13 @@ unpack_eci(uint pvar, uchar *p, uchar *e, ulong *eci)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_mci(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_mci(uint pvar, uchar **p, ulong mci)
 {
 	*(*p)++ = mci;
@@ -5777,11 +5859,13 @@ unpack_mci(uint pvar, uchar *p, uchar *e, ulong *mci)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_pci(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_pci(uint pvar, uchar **p, ulong pci)
 {
 	*(*p)++ = pci;
@@ -5803,11 +5887,13 @@ unpack_pci(uint pvar, uchar *p, uchar *e, ulong *pci)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_mlpp(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_mlpp(uint pvar, uchar **p, ulong mlpp)
 {
 	*(*p)++ = mlpp;
@@ -5829,11 +5915,13 @@ unpack_mlpp(uint pvar, uchar *p, uchar *e, ulong *mlpp)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_mciq(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_mciq(uint pvar, uchar **p, ulong mciq)
 {
 	*(*p)++ = mciq;
@@ -5855,11 +5943,13 @@ unpack_mciq(uint pvar, uchar *p, uchar *e, ulong *mciq)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_mcir(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_mcir(uint pvar, uchar **p, ulong mcir)
 {
 	*(*p)++ = mcir;
@@ -5881,11 +5971,13 @@ unpack_mcir(uint pvar, uchar *p, uchar *e, ulong *mcir)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_hopc(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_hopc(uint pvar, uchar **p, ulong hopc)
 {
 	*(*p)++ = hopc;
@@ -5907,11 +5999,13 @@ unpack_hopc(uint pvar, uchar *p, uchar *e, ulong *hopc)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_tmrp(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_tmrp(uint pvar, uchar **p, ulong tmrp)
 {
 	*(*p)++ = tmrp;
@@ -5933,11 +6027,13 @@ unpack_tmrp(uint pvar, uchar *p, uchar *e, ulong *tmrp)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_ln(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_ln(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -5963,11 +6059,13 @@ unpack_ln(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rdnr(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rdnr(uint pvar, uchar **p, ulong rdnr)
 {
 	*(*p)++ = rdnr;
@@ -5989,11 +6087,13 @@ unpack_rdnr(uint pvar, uchar *p, uchar *e, ulong *rdnr)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_freep(uint pvar)
 {
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_freep(uint pvar, uchar **p, ulong freep)
 {
 	*(*p)++ = freep;
@@ -6015,11 +6115,13 @@ unpack_freep(uint pvar, uchar *p, uchar *e, ulong *freep)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_gref(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_gref(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	return (len + 1);
@@ -6042,11 +6144,13 @@ unpack_gref(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_gnum(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_gnum(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6072,11 +6176,13 @@ unpack_gnum(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_gdig(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_gdig(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6102,12 +6208,14 @@ unpack_gdig(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_egress(uint pvar)
 {
 	fixme(("Correct format for this paramter\n"));
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_egress(uint pvar, uchar **p, ulong egress)
 {
 	fixme(("Correct format for this paramter\n"));
@@ -6131,11 +6239,13 @@ unpack_egress(uint pvar, uchar *p, uchar *e, ulong *egress)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_jur(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_jur(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6161,11 +6271,13 @@ unpack_jur(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_cidc(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_cidc(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6191,11 +6303,13 @@ unpack_cidc(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_bgroup(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_bgroup(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6221,12 +6335,14 @@ unpack_bgroup(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_noti(uint pvar)
 {
 	fixme(("Correct format for this paramter\n"));
 	return (1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_noti(uint pvar, uchar **p, ulong noti)
 {
 	fixme(("Correct format for this paramter\n"));
@@ -6250,11 +6366,13 @@ unpack_noti(uint pvar, uchar *p, uchar *e, ulong *noti)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_svact(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_svact(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6280,11 +6398,13 @@ unpack_svact(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_trnsrq(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_trnsrq(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6310,11 +6430,13 @@ unpack_trnsrq(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_spr(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_spr(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6398,11 +6520,13 @@ unpack_cvri(uint pvar, uchar *p, uchar *e, ulong *cvri)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_otgn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_otgn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6428,11 +6552,13 @@ unpack_otgn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_cin(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_cin(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6458,11 +6584,13 @@ unpack_cin(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_clli(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_clli(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6488,11 +6616,13 @@ unpack_clli(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_oli(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_oli(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6546,11 +6676,13 @@ unpack_oli(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_chgn(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_chgn(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6604,11 +6736,13 @@ unpack_chgn(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_svcd(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_svcd(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6662,11 +6796,13 @@ unpack_svcd(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_csel(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_csel(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6720,11 +6856,13 @@ unpack_csel(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_ori(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_ori(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6774,11 +6912,13 @@ unpack_ori(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_iri(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_iri(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6828,11 +6968,13 @@ unpack_iri(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_rate(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_rate(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6882,11 +7024,13 @@ unpack_rate(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_iic(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_iic(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -6936,11 +7080,13 @@ unpack_iic(uint pvar, uchar *p, uchar *e, isup_var_t * v)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 size_toi(uint pvar, size_t len)
 {
 	return (len + 1);
 }
 STATIC INLINE int
+__attribute__((unused))
 pack_toi(uint pvar, uchar **p, uchar *ptr, size_t len)
 {
 	*(*p)++ = len;
@@ -7083,6 +7229,7 @@ pack_opt(uint pvar, uchar **p, uchar *ptr, size_t len)
 	*p += len;
 	return (len);
 }
+#if 0
 STATIC INLINE int
 unpack_opt(uint pvar, uchar *p, uchar *e, isup_var_t * v, size_t len)
 {
@@ -7095,6 +7242,7 @@ unpack_opt(uint pvar, uchar *p, uchar *e, isup_var_t * v, size_t len)
 	trace();
 	return (-EMSGSIZE);
 }
+#endif
 
 STATIC INLINE int
 isup_check_opt(uchar *p, size_t len)
@@ -7649,6 +7797,7 @@ isup_send_sam(queue_t *q, struct ct *ct, uchar *subn_ptr, size_t subn_len, uchar
  *  ITUT: F(INRI) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_inr(queue_t *q, struct ct *ct, ulong inri, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -7685,6 +7834,7 @@ isup_send_inr(queue_t *q, struct ct *ct, ulong inri, uchar *opt_ptr, size_t opt_
  *  ITUT: F(INFI) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_inf(queue_t *q, struct ct *ct, ulong infi, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8369,6 +8519,7 @@ isup_send_cgua(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_le
  *  ITUT: CMI O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cmr(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8405,6 +8556,7 @@ isup_send_cmr(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_l
  *  ITUT: CMI O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cmc(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8441,6 +8593,7 @@ isup_send_cmc(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_l
  *  ITUT: CMI O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cmrj(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8477,6 +8630,7 @@ isup_send_cmrj(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_
  *  ITUT: F(FACI) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_far(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8513,6 +8667,7 @@ isup_send_far(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
  *  ITUT: F(FACI) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_faa(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8549,6 +8704,7 @@ isup_send_faa(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
  *  ITUT: F(FACI) V(CAUS) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_frj(queue_t *q, struct ct *ct, ulong faci, uchar *caus_ptr, size_t caus_len,
 	      uchar *opt_ptr, size_t opt_len)
 {
@@ -8589,6 +8745,7 @@ isup_send_frj(queue_t *q, struct ct *ct, ulong faci, uchar *caus_ptr, size_t cau
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_fad(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8625,6 +8782,7 @@ isup_send_fad(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_fai(queue_t *q, struct ct *ct, ulong faci, ulong faii, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8688,6 +8846,7 @@ isup_send_lpa(queue_t *q, struct ct *ct)
  *  ITUT: O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_drs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -8722,6 +8881,7 @@ isup_send_drs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: (encapsultated ISUP message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_pam(queue_t *q, struct ct *ct, uchar *msg_ptr, size_t msg_len)
 {
 	mblk_t *mp;
@@ -8889,6 +9049,7 @@ isup_send_cpg(queue_t *q, struct ct *ct, ulong evnt, uchar *opt_ptr, size_t opt_
  *  ITUT: V(UUI) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_usr(queue_t *q, struct ct *ct, uchar *uui_ptr, size_t uui_len, uchar *opt_ptr,
 	      size_t opt_len)
 {
@@ -8953,6 +9114,7 @@ isup_send_ucic(queue_t *q, struct sr *sr, ulong cic)
  *  ITUT: V(CAUS) O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cfn(queue_t *q, struct ct *ct, uchar *caus_ptr, size_t caus_len, uchar *opt_ptr,
 	      size_t opt_len)
 {
@@ -8992,6 +9154,7 @@ isup_send_cfn(queue_t *q, struct ct *ct, uchar *caus_ptr, size_t caus_len, uchar
  *  ITUT: (none)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_olm(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -9020,6 +9183,7 @@ isup_send_olm(queue_t *q, struct ct *ct)
  *  SPAN: O()
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar *opt_ptr,
 	      size_t opt_len)
 {
@@ -9076,6 +9240,7 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
  *  ITUT: O(MCI PCI ECI TMU)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_nrm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9110,6 +9275,7 @@ isup_send_nrm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: O(MCI PCI ROPS SA)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_fac(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9212,6 +9378,7 @@ isup_send_upa(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: O(MCIQ MCI PCI)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_idr(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9246,6 +9413,7 @@ isup_send_idr(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: O(MCIR MCI PCI CGPN ATP GNUM*)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_irs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9280,6 +9448,7 @@ isup_send_irs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: O(ATP UUI MCI GDIG* GNOT* GNUM*)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_sgm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9314,6 +9483,7 @@ isup_send_sgm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cra(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -9340,6 +9510,7 @@ isup_send_cra(queue_t *q, struct ct *ct)
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_crm(queue_t *q, struct ct *ct, ulong nci)
 {
 	mblk_t *mp;
@@ -9367,6 +9538,7 @@ isup_send_crm(queue_t *q, struct ct *ct, ulong nci)
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cvr(queue_t *q, struct ct *ct, ulong cvri, ulong cgvi, ulong cgci, uchar *opt_ptr,
 	      size_t opt_len)
 {
@@ -9405,6 +9577,7 @@ isup_send_cvr(queue_t *q, struct ct *ct, ulong cvri, ulong cgvi, ulong cgci, uch
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cvt(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -9431,6 +9604,7 @@ isup_send_cvt(queue_t *q, struct ct *ct)
  *  ITUT: (no such message)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_exm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -9466,6 +9640,7 @@ isup_send_exm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
  *  SPAN: TON
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_non(queue_t *q, struct ct *ct, ulong ton)
 {
 	mblk_t *mp;
@@ -9495,6 +9670,7 @@ isup_send_non(queue_t *q, struct ct *ct, ulong ton)
  *  SPAN: (none)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_llm(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -9522,6 +9698,7 @@ isup_send_llm(queue_t *q, struct ct *ct)
  *  SING: (none)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_cak(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -9549,6 +9726,7 @@ isup_send_cak(queue_t *q, struct ct *ct)
  *  SING: CRI
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_tcm(queue_t *q, struct ct *ct, ulong cri)
 {
 	mblk_t *mp;
@@ -9578,6 +9756,7 @@ isup_send_tcm(queue_t *q, struct ct *ct, ulong cri)
  *  SING: (none)
  */
 STATIC INLINE int
+__attribute__((unused))
 isup_send_mcp(queue_t *q, struct ct *ct)
 {
 	mblk_t *mp;
@@ -18568,7 +18747,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
+#ifndef _OPTIMIZE_SPEED
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -18673,7 +18852,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
+#ifndef _OPTIMIZE_SPEED
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -19953,7 +20132,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
       failbusy:
 	return cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_CIRCUIT_BUSY,
 				   CC_CAUS_NO_CCT_AVAILABLE);
-#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
+#ifndef _OPTIMIZE_SPEED
       null_bind:
 	pswerr(("%s: %p: SWERR: null bind pointer in bound state\n", DRV_NAME, cc));
 	goto efault;

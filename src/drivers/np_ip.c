@@ -788,11 +788,13 @@ np_not_state(const struct np *np, const np_ulong mask)
 	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
 }
 
+#if 0
 STATIC INLINE fastcall __unlikely long
 np_get_statef(const struct np *np)
 {
 	return (1 << np_get_state(np));
 }
+#endif
 
 /*
  *  =========================================================================
@@ -3426,6 +3428,7 @@ ne_data_ind(queue_t *q, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
+#if 0
 /**
  * ne_exdata_ind - generate a N_EXDATA_IND message
  * @q: active queue in queue pair (read queue)
@@ -3459,6 +3462,7 @@ ne_exdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
 }
+#endif
 
 /**
  * ne_unitdata_ind - generate a N_UNITDATA_IND message
@@ -3874,6 +3878,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	return (-ENOBUFS);
 }
 
+#if 0
 /**
  * ne_datack_ind - NE_DATACK_IND event
  * @q: active queue in pair (read queue)
@@ -3904,6 +3909,7 @@ ne_datack_ind(queue_t *q)
       enobufs:
 	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  ===================================================================

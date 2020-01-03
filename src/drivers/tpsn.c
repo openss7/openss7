@@ -1397,6 +1397,7 @@ tp_priv_init(struct tp *tp)
  *  IP subsystem management
  */
 #ifdef LINUX
+#if 0
 /**
  * tp_v4_steal - steal a socket buffer
  * @skb: socket buffer to steal
@@ -1420,6 +1421,7 @@ tp_v4_steal(struct sk_buff *skb)
 	skb->protocol = 255;
 #endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 }
+#endif
 
 #if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #define mynet_protocol net_protocol
@@ -1564,6 +1566,7 @@ tp_v4_err_next(struct mynet_protocol *next, struct sk_buff *skb, __u32 info)
 	return;
 }
 
+#if 0
 /**
  * tp_init_nproto - initialize network protocol override
  * @proto: the protocol to register or override
@@ -1674,7 +1677,9 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 #endif
 	return (NULL);
 }
+#endif
 
+#if 0
 /**
  * tp_term_nproto - terminate network protocol override
  * @proto: network protocol to terminate
@@ -1738,8 +1743,10 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 	write_unlock_bh(&tp_prot_lock);
 #endif
 }
+#endif
 #endif				/* LINUX */
 
+#if 0
 /**
  *  tp_bind_prot -  bind a protocol
  *  @proto:	    protocol number to bind
@@ -1767,7 +1774,9 @@ tp_bind_prot(unsigned char proto, unsigned int type)
 		return (0);
 	return (-ENOMEM);
 }
+#endif
 
+#if 0
 /**
  *  tp_unbind_prot - unbind a protocol
  *  @proto:	    protocol number to unbind
@@ -1777,6 +1786,7 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
 {
 	tp_term_nproto(proto, type);
 }
+#endif
 
 /*
  *  =========================================================================
@@ -8576,6 +8586,7 @@ tp_pack_er(struct tp *tp, queue_t *q, mblk_t *dp, uint32_t cause, struct netbuf 
 	return (bp);
 }
 
+#if 0
 /**
  * tp_pack_ud - Create a Unit Data (UD) TPDU
  * @tp: sending transport endpoint
@@ -8622,6 +8633,7 @@ tp_pack_ud(struct tp *tp, queue_t *q, mblk_t *dp)
       enobufs:
 	return (bp);
 }
+#endif
 
 static int
 tp_send_ud(struct tp *tp, queue_t *q, mblk_t *dp, unsigned char *dst, t_uscalar_t dst_len)
@@ -9183,6 +9195,7 @@ m_error_reply(struct tp *tp, queue_t *q, mblk_t *msg, int err)
 		break;
 	case EFAULT:
 		LOGERR(tp, "%s() fault", __FUNCTION__);
+		/* fall thru */
 	default:
 	case EPROTO:
 		err = (err < 0) ? -err : err;

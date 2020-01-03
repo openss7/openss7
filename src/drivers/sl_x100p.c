@@ -522,6 +522,7 @@ m_error(queue_t *q, struct xp *xp, int err)
  *  We don't actually use SL_PDU_INDs, we pass along M_DATA messages.
  */
 STATIC INLINE int
+__attribute__((unused))
 sl_pdu_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -786,6 +787,7 @@ sl_rtb_cleared_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sl_retrieval_not_possible_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -807,6 +809,7 @@ sl_retrieval_not_possible_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sl_bsnt_not_retrievable_ind(queue_t *q, struct xp *xp, ulong bsnt)
 {
 	mblk_t *mp;
@@ -953,6 +956,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct xp *xp, mblk_t *dp, ulong count)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_rc_congestion_accept_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -974,6 +978,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_rc_congestion_discard_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -995,6 +1000,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_rc_no_congestion_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -1016,6 +1022,7 @@ sdt_rc_no_congestion_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_iac_correct_su_ind(queue_t *q, struct xp *xp)
 {
 	if (canput(xp->oq)) {
@@ -1041,6 +1048,7 @@ sdt_iac_correct_su_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_iac_abort_proving_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -1062,6 +1070,7 @@ sdt_iac_abort_proving_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_lsc_link_failure_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -1083,6 +1092,7 @@ sdt_lsc_link_failure_ind(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdt_txc_transmission_request_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -1122,6 +1132,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 sdl_disconnect_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
@@ -1236,6 +1247,7 @@ lmi_disable_con(queue_t *q, struct xp *xp)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -1260,6 +1272,7 @@ lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t 
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
 {
 	mblk_t *mp;
@@ -1284,6 +1297,7 @@ lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
 {
 	if (canput(xp->oq)) {
@@ -1311,6 +1325,7 @@ lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
  *  -----------------------------------
  */
 STATIC INLINE int
+__attribute__((unused))
 lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 {
 	if (canput(xp->oq)) {
@@ -3499,6 +3514,7 @@ sl_lsc_clear_buffers(queue_t *q, struct xp *xp)
 }
 
 STATIC INLINE void
+__attribute__((unused))
 sl_lsc_continue(queue_t *q, struct xp *xp, mblk_t *mp)
 {
 	if (xp->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
@@ -4470,14 +4486,17 @@ printt(tx_entry_t * t)
 }
 #else
 STATIC INLINE void
+__attribute__((unused))
 printb(uint8_t byte)
 {
 }
 STATIC INLINE void
+__attribute__((unused))
 printr(rx_entry_t * r)
 {
 }
 STATIC INLINE void
+__attribute__((unused))
 printt(tx_entry_t * t)
 {
 }

@@ -566,18 +566,21 @@ np_get_state(const struct np *np)
 }
 
 STATIC INLINE streams_fastcall __unlikely np_ulong
+__attribute__((unused))
 np_chk_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) != 0);
 }
 
 STATIC INLINE streams_fastcall __unlikely np_ulong
+__attribute__((unused))
 np_not_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
 }
 
 STATIC INLINE streams_fastcall __unlikely np_ulong
+__attribute__((unused))
 np_get_statef(const struct np *np)
 {
 	return (1 << np_get_state(np));
@@ -653,18 +656,21 @@ dl_get_state(const struct dl *dl)
 }
 
 STATIC INLINE streams_fastcall __unlikely dl_ulong
+__attribute__((unused))
 dl_chk_state(const struct dl *dl, const dl_ulong mask)
 {
 	return (((1 << dl->info.dl_current_state) & (mask)) != 0);
 }
 
 STATIC INLINE streams_fastcall __unlikely dl_ulong
+__attribute__((unused))
 dl_not_state(const struct dl *dl, const dl_ulong mask)
 {
 	return (((1 << dl->info.dl_current_state) & (mask)) == 0);
 }
 
 STATIC INLINE streams_fastcall __unlikely dl_ulong
+__attribute__((unused))
 dl_get_statef(const struct dl *dl)
 {
 	return (1 << dl_get_state(dl));

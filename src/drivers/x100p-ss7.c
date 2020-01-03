@@ -4478,14 +4478,17 @@ printt(tx_entry_t * t)
 #endif
 #else
 STATIC INLINE void
+__attribute__((unused))
 printb(uint8_t byte)
 {
 }
 STATIC INLINE void
+__attribute__((unused))
 printr(rx_entry_t * r)
 {
 }
 STATIC INLINE void
+__attribute__((unused))
 printt(tx_entry_t * t)
 {
 }

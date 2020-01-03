@@ -13273,7 +13273,7 @@ mtp_addr_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "MTP_ADDR_ACK: MTP provider stream already linked");
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
-#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
+#ifndef _OPTIMIZE_SPEED
       ebusy:
 	noenable(mt->iq);
 	noenable(mt->oq);
@@ -13377,7 +13377,7 @@ mtp_info_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "MTP_INFO_ACK: MTP provider stream already linked");
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
-#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
+#ifndef _OPTIMIZE_SPEED
       ebusy:
 	noenable(mt->iq);
 	noenable(mt->oq);

@@ -13868,6 +13868,7 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 		break;
 	case EFAULT:
 		LOGERR(ss, "%s() fault", __FUNCTION__);
+		/* fall thru */
 	default:
 	case EPROTO:
 		err = (err < 0) ? -err : err;

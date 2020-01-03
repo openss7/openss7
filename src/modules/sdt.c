@@ -1317,6 +1317,7 @@ printt(tx_entry_t * t)
 }
 #endif
 #else
+#if 0
 STATIC INLINE void
 printb(uint8_t byte)
 {
@@ -1329,6 +1330,7 @@ STATIC INLINE void
 printt(tx_entry_t * t)
 {
 }
+#endif
 #endif
 
 /*

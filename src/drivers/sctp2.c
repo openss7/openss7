@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) Driver"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SCTP_REVISION	"OpenSS7 src/drivers/sctp2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"
@@ -2478,6 +2478,7 @@ sctp_dget(void)
 	return (sd);
 }
 STATIC INLINE void
+__attribute__((unused))
 sctp_dhold(struct sctp_daddr *sd)
 {
 	if (sd)
@@ -15319,6 +15320,7 @@ m_error_reply(struct sctp *sp, mblk_t *msg, int err)
 		break;
 	case -EFAULT:
 		LOGERR(sp, "%s() fault", __FUNCTION__);
+		/* fall through */
 	default:
 	case -EPROTO:
 		error = (err < 0) ? -err : err;
