@@ -9031,12 +9031,10 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_SING:
 		mlen += size_icci(pvar, icci_len);
-		/* 
-		   fall thru */
+		/* fall thru */
 	case SS7_PVAR_SPAN:
 		mlen += size_opt(pvar, opt_len) + 1;
-		/* 
-		   fall thru */
+		/* fall thru */
 	default:
 	case SS7_PVAR_ITUT:
 		break;
@@ -9050,8 +9048,7 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 		switch (pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_SING:
 			pack_icci(pvar, pp, icci_ptr, icci_len);
-			/* 
-			   fall thru */
+			/* fall thru */
 		case SS7_PVAR_SPAN:
 			p = *pp;
 			*pp += 1;
@@ -9061,8 +9058,7 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 				pack_opt(pvar, pp, opt_ptr, opt_len);
 			} else
 				*p++ = 0;
-			/* 
-			   fall thru */
+			/* fall thru */
 		default:
 		case SS7_PVAR_ITUT:
 			break;
@@ -20313,6 +20309,7 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 	case CTS_OGC_WAIT_CCR:
 		if (ct_tst(ct, CCTF_COR_PENDING))
 			break;
+		/* fall thru */
 	default:
 		trace();
 		goto outstate;
