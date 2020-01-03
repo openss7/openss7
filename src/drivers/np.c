@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/drivers/np.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define NP_DESCRIP	"Network Provider Interface (NP) STREAMS Driver"
 #define NP_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 src/drivers/np.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -419,7 +419,7 @@ np_alloc(void)
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \

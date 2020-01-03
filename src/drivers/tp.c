@@ -765,7 +765,7 @@ np_alloc(void)
 	return (np);
 }
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 #if 1
 
 #define spin_lock_str(__lkp, __flags) \

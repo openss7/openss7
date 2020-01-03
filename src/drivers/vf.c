@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -77,7 +77,7 @@ static char const ident[] = "src/drivers/vf.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define VF_DESCRIP	"SVR 4.2 STREAMS Verification (VF) Driver"
 #define VF_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define VF_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define VF_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define VF_REVISION	"OpenSS7 src/drivers/vf.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define VF_DEVICE	"SVR 4.2 MP STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -188,7 +188,7 @@ STATIC struct vf *vf_links = NULL;
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

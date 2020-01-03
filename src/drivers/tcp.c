@@ -6600,7 +6600,7 @@ tpi_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	}
 	if (rtn < 0) {
-#ifndef _TEST
+#ifndef CONFIG_STREAMS_TEST
 		/* not so rare() during conformance suite testing */
 		rare();
 #endif

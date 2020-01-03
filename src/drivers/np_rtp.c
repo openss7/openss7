@@ -1435,7 +1435,7 @@ nc_alloc(struct np *np, void *tag, np_ulong SERV_type, np_ulong CONIND_number, n
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \
@@ -8096,7 +8096,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
 	}
       error:
 	if (err < 0) {
-#ifndef _TEST
+#ifndef CONFIG_STREAMS_TEST
 		/* not so seldom() during conformance suite testing */
 		seldom();
 #endif

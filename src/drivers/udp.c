@@ -606,7 +606,7 @@ tp_alloc(void)
 /* Must always be bottom-half versions to avoid lock badness.  But give these
  * different names to avoid conflict with generic definitions.  */
 
-//#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+//#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 #if 1
 
 #define spin_lock_str2(__lkp, __flags) \
@@ -8159,7 +8159,7 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 		}
 	}
 	if (rtn < 0) {
-#ifndef _TEST
+#ifndef CONFIG_STREAMS_TEST
 		/* not so seldom() during conformance suite testing */
 		seldom();
 #endif

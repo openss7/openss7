@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -92,7 +92,7 @@ static char const ident[] = "src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define LOG_DESCRIP	"SVR 4.2 STREAMS Log (STRLOG) Driver"
 #define LOG_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOG_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define LOG_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define LOG_REVISION	"OpenSS7 src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define LOG_DEVICE	"SVR 4.2 MP STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -196,7 +196,7 @@ static struct module_stat log_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)
 /*
  *  Locking
  */
-#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
