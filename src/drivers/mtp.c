@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "src/drivers/mtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MTP_DESCRIP	"SS7 Message Transfer Part (MTP) STREAMS Multiplexing Driver"
 #define MTP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define MTP_REVISION	"OpenSS7 src/drivers/mtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MTP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define MTP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_LICENSE	"GPL"
@@ -5440,6 +5440,7 @@ mtp_cong_status_ind(queue_t *q, struct mtp *mtp, struct rs *rs, uint newstatus)
 	switch (rs->rs_type) {
 	default:
 		swerr();
+		/* fall through */
 	case RT_TYPE_MEMBER:
 		error |= T_MTP_M_MEMBER;
 		break;
@@ -5471,6 +5472,7 @@ mtp_restr_status_ind(queue_t *q, struct mtp *mtp, struct rs *rs)
 	switch (rs->rs_type) {
 	default:
 		swerr();
+		/* fall through */
 	case RT_TYPE_MEMBER:
 		error |= T_MTP_M_MEMBER;
 		break;
@@ -5507,6 +5509,7 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, struct rs *rs)
 	switch (rs->rs_type) {
 	default:
 		swerr();
+		/* fall through */
 	case RT_TYPE_MEMBER:
 		error |= T_MTP_M_MEMBER;
 		break;
@@ -5543,6 +5546,7 @@ mtp_resume_ind(queue_t *q, struct mtp *mtp, struct rs *rs)
 	switch (rs->rs_type) {
 	default:
 		swerr();
+		/* fall through */
 	case RT_TYPE_MEMBER:
 		error |= T_MTP_M_MEMBER;
 		break;
@@ -12478,6 +12482,7 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
 							continue;
 						default:
 							swerr();
+							/* fall through */
 						case MTP_RESTART:
 						case MTP_PROHIBITED:
 						case MTP_INHIBITED:
@@ -12679,6 +12684,7 @@ mtp_recv_trw(queue_t *q, struct mtp_msg *m)
 						continue;
 					default:
 						swerr();
+						/* fall through */
 					case MTP_RESTART:
 					case MTP_PROHIBITED:
 					case MTP_INHIBITED:

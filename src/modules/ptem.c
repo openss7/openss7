@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -103,8 +103,8 @@ References
 
 #define PTEM_DESCRIP		"Pseudo-Terminal Emulation Module (PTEM) STREAMS Module"
 #define PTEM_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTEM_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
-#define PTEM_REVISION	"OpenSS7 src/modules/ptem.c (" PACKAGE_ENVR ") " PACKAGE_DATE
+#define PTEM_COPYRIGHT		"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
+#define PTEM_REVISION		"OpenSS7 src/modules/ptem.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define PTEM_DEVICE		"SVR 4.2 MP STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"
@@ -844,6 +844,7 @@ ptem_rput(queue_t *q, mblk_t *mp)
 	case M_IOCACK:
 		/* should not happen */
 		swerr();
+		/* fall through */
 	case M_READ:
 	case M_DELAY:
 	case M_IOCNAK:
@@ -851,6 +852,7 @@ ptem_rput(queue_t *q, mblk_t *mp)
 		break;
 	default:
 		swerr();
+		/* fall through */
 	case M_HANGUP:
 	case M_FLUSH:		/* we do not queue on the read side */
 		putnext(q, mp);

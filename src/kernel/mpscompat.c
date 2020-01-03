@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -72,7 +72,7 @@ static char const ident[] = "src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define MPSCOMP_DESCRIP		"Mentat Portable STREAMS Compatibility for Linux Fast-STREAMS"
 #define MPSCOMP_EXTRA		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define MPSCOMP_REVISION	"OpenSS7 src/kernel/mpscompat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1943,6 +1943,7 @@ mi_timer_cancel(mblk_t *mp)
 	switch (__builtin_expect(tb->tb_state, TB_ACTIVE)) {
 	default:
 		swerr();
+		/* fall through */
 	case TB_EXPIRED:
 		/* Expired, could be on queue. */
 	case TB_TRANSIENT:
@@ -2156,8 +2157,9 @@ mi_timer_move(queue_t *q, mblk_t *mp)
 	if ((oldq = XCHG(&tb->tb_q, q)) != q) {
 		switch (tb->tb_state) {
 		default:
-			/* Do no know, illegal state. */
+			/* Do not know, illegal state. */
 			swerr();
+			/* fall through */
 		case TB_TRANSIENT:
 			/* Timer is transient, could be on a queue. */
 		case TB_EXPIRED:
@@ -2363,6 +2365,7 @@ mi_timer_cond(mblk_t *mp, clock_t ticks)
 		break;
 	default:
 		swerr();
+		/* fall through */
 	case TB_ZOMBIE:
 		/* Timer is a zombie, waiting to be freed */
 		rtn = (0);

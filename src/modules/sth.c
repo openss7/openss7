@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -159,7 +159,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"SVR 4.2 Stream Head (STH) STREAMS Module"
 #define STH_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STH_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define STH_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define STH_REVISION	"OpenSS7 src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2435,6 +2435,7 @@ strgetfp(struct stdata *sd, queue_t *q)
 				break;
 			default:
 				swerr();
+				/* fall through */
 			case M_DATA:
 			case M_PROTO:
 			case M_PCPROTO:
@@ -5137,6 +5138,7 @@ strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 				break;
 			default:
 				swerr();
+				/* fall through */
 			case M_PASSFP:
 			      ebadmsg:
 				b = ERR_PTR(-EBADMSG);

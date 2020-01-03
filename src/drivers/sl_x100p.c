@@ -1808,8 +1808,8 @@ __xp_timer_stop(struct xp *xp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-		break;
 #endif
+		break;
 	default:
 		swerr();
 		break;

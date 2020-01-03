@@ -8337,9 +8337,9 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 		switch (asid->tag) {
 		case UA_PARM_RC:
 			do {
-				if (__unlikely(asid->len < 4))
+				if (unlikely(asid->len < 4))
 					break;
-				if (__unlikely((asid->len & 0x03) != 0))
+				if (unlikely((asid->len & 0x03) != 0))
 					break;
 				for (rp = tp->gp.gp->rp.list; rp; rp = rp->gp.next)
 					if (rp->as.as->as.asid == asid->val)
@@ -8349,9 +8349,9 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 			break;
 		case UA_PARM_IID:
 			do {
-				if (__unlikely(asid->len < 4))
+				if (unlikely(asid->len < 4))
 					break;
-				if (__unlikely((asid->len & 0x03) != 0))
+				if (unlikely((asid->len & 0x03) != 0))
 					break;
 				for (rp = tp->gp.gp->rp.list; rp; rp = rp->gp.next)
 					if (rp->as.as->as.asid == asid->val)
@@ -8363,7 +8363,7 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 			do {
 				if (!(tp->sp.sp->sp.options.proto.popt & UA_TEXTIID))
 					break;
-				if (__unlikely(asid->len < 1))
+				if (unlikely(asid->len < 1))
 					break;
 				for (rp = tp->gp.gp->rp.list; rp; rp = rp->gp.next)
 					if (strncmp((caddr_t) asid->cp,
@@ -8375,9 +8375,9 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 			break;
 		case UA_PARM_IID_RANGE:
 			do {
-				if (__unlikely((asid->len < 8)))
+				if (unlikely((asid->len < 8)))
 					break;
-				if (__unlikely((asid->len & 0x07) != 0))
+				if (unlikely((asid->len & 0x07) != 0))
 					break;
 				for (i = 0; i < asid->len >> 2; i += 2)
 					if ((uint) ntohl(asid->wp[i]) >
@@ -8966,7 +8966,7 @@ tp_recv_aspt_aspac_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (UA_ECODE_REFUSED_MANAGEMENT_BLOCKING);
 
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_TMODE)) {
-		if (__unlikely(parm.len != 4))
+		if (unlikely(parm.len != 4))
 			return (UA_ECODE_PARAMETER_FIELD_ERROR);
 		switch ((tmode = parm.val)) {
 		case UA_TMODE_OVERRIDE:

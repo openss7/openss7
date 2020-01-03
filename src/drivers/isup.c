@@ -2508,6 +2508,7 @@ cc_cont_report_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 				break;
 			default:
 				swerr();
+				/* fall through */
 			case 0:
 				p->cc_result = ISUP_COT_FAILURE;
 				break;
@@ -18571,7 +18572,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG)
+#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -18676,7 +18677,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG)
+#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -19956,7 +19957,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
       failbusy:
 	return cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_CIRCUIT_BUSY,
 				   CC_CAUS_NO_CCT_AVAILABLE);
-#if defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG)
+#if !defined(_OPTIMIZE_SPEED)&&(defined(CONFIG_STREAMS_SAFE)||defined(CONFIG_STREAMS_DEBUG))
       null_bind:
 	pswerr(("%s: %p: SWERR: null bind pointer in bound state\n", DRV_NAME, cc));
 	goto efault;
