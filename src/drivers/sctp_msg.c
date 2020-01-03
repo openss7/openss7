@@ -423,7 +423,7 @@ trimtail(mblk_t *mp, int len)
  *  according to the pmtu experienced at the time that it is further
  *  fragmented.
  */
-#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(CONFIG_STREAMS_SAFE)
 STATIC void
 sctp_frag_chunk(bq, mp, mps)
 	bufq_t *bq;
@@ -625,7 +625,7 @@ sctp_bundle_data_urgent(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 		ensure(cb->st, continue);
 
-#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(CONFIG_STREAMS_SAFE)
 		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
@@ -710,7 +710,7 @@ sctp_bundle_data_normal(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 		ensure(cb->st, continue);
 
-#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(CONFIG_STREAMS_SAFE)
 		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
