@@ -1820,6 +1820,8 @@ EXPORT_SYMBOL_GPL(setqsched);	/* include/sys/openss7/stream.h */
 STATIC streams_inline streams_fastcall void
 qschedule(queue_t *q)
 {
+	assure(!test_bit(QSVCBUSY_BIT, &q->q_flag));
+
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
 
@@ -2086,6 +2088,7 @@ putbq(register queue_t *q, register mblk_t *mp)
 	qwunlock(q, pl);
 	if (likely(result < 2))
 		return (result);
+	swerr();
 	qenable(q);
 	return (1);
 }
@@ -2515,6 +2518,7 @@ insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 	qwunlock(q, pl);
 	if (likely(result < 2))
 		return (result);
+	swerr();
 	qenable(q);
 	return (1);
 }
