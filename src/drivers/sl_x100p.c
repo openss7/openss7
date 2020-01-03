@@ -8763,6 +8763,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (cmd) {
 		default:
 			ptrace(("%s: ERROR: Unknown IOCTL %d\n", DRV_NAME, cmd));
+			break;
 		case I_STR:
 		case I_LINK:
 		case I_PLINK:
