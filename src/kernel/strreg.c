@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -783,7 +783,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			_ptrace(("Error path taken!\n"));
 			break;
 		}
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				 fops->owner->name, module_refcount(fops->owner)));
@@ -795,7 +795,7 @@ register_xinode(struct cdevsw *cdev, struct devnode *cmaj, major_t major,
 			_ptrace(("Error path taken!\n"));
 			break;
 		}
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		if (fops->owner)
 			_printd(("%s: [%s] count is now %d\n", __FUNCTION__,
 				 fops->owner->name, module_refcount(fops->owner)));

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -522,7 +522,7 @@ static const struct file_operations streams_strinfo_proc_fops = {
 
 /* -------------------------- */
 
-#if defined _DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 
 STATIC void
 seq_streams_stdata_hdr(struct seq_file *m)
@@ -1408,7 +1408,7 @@ static const struct file_operations streams_strapush_proc_fops = {
 	.release = seq_release,
 };
 
-#endif				/* defined _DEBUG */
+#endif				/* defined CONFIG_STREAMS_DEBUG */
 
 #else				/* defined HAVE_KFUNC_PROC_CREATE_DATA */
 
@@ -1992,7 +1992,7 @@ get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
 	}
 }
 
-#if defined _DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 STATIC int
 get_streams_stdata_hdr(char *page, int maxlen)
 {
@@ -2987,7 +2987,7 @@ strprocfs_init(void)
 	proc_create_data("fmodsw", 0444, proc_str, &streams_fmodsw_proc_fops, NULL);
 #endif
 	proc_create_data("strinfo", 0444, proc_str, &streams_strinfo_proc_fops, NULL);
-#if defined _DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 #if 0
 	proc_create_data("cdevsw", 0444, proc_str, &streams_cdevsw_proc_fops, NULL);
 	proc_create_data("fmodsw", 0444, proc_str, &streams_fmodsw_proc_fops, NULL);
@@ -3010,7 +3010,7 @@ strprocfs_init(void)
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
 #endif
 	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
-#if defined _DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 #if 0
 	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
@@ -3041,7 +3041,7 @@ strprocfs_exit(void)
 	remove_proc_entry("fmodsw", proc_str);
 #endif
 	remove_proc_entry("strinfo", proc_str);
-#if defined _DEBUG
+#if defined CONFIG_STREAMS_DEBUG
 #if 0
 	remove_proc_entry("cdevsw", proc_str);
 	remove_proc_entry("fmodsw", proc_str);

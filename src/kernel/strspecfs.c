@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -100,8 +100,8 @@ static char const ident[] = "src/kernel/strspecfs.c (" PACKAGE_ENVR ") " PACKAGE
 
 #define SPECFS_DESCRIP		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION	"OpenSS7 src/kernel/strspecfs.c (" PACKAGE_ENVR ") " PACKAGE_DATE
+#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
+#define SPECFS_REVISION		"OpenSS7 src/kernel/strspecfs.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -416,14 +416,14 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 			ptrace(("Error path taken!\n"));
 			goto put_error;
 		}
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		if (f_op->owner)
 			printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
 				 f_op->owner->name, module_refcount(f_op->owner)));
 		else
 			printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
 #endif
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		if (file->f_op->owner)
 			printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
 				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
