@@ -643,9 +643,9 @@ static int
 seq_streams_shinfo_show(struct seq_file *m, void *v)
 {
 	struct list_head *cur = v;
-	struct strinfo *sh = list_entry(cur, struct shinfo, sh_list);
+	struct shinfo *sh = list_entry(cur, struct shinfo, sh_list);
 	if (sh == list_first_entry(&Strinfo[DYN_STREAM].si_head, struct shinfo, sh_list))
-		 seq_streams_shinfo_hdr(m);
+		 seq_streams_shinfo_data_hdr(m);
 
 	seq_streams_shinfo_data(m, sh);
 	return (0);
@@ -771,7 +771,7 @@ seq_streams_queue_show(struct seq_file *m, void *v)
 {
 	struct list_head *cur = v;
 	struct queinfo *qu = list_entry(cur, struct queinfo, qu_list);
-	if (qu == list_first_entry(&Strinfo[DYN_QUEUE].si_head, struct qeuinfo, qu_list))
+	if (qu == list_first_entry(&Strinfo[DYN_QUEUE].si_head, struct queinfo, qu_list))
 		 seq_streams_queue_data_hdr(m);
 
 	seq_streams_queue_data(m, qu);
@@ -846,7 +846,7 @@ seq_streams_msgb(struct seq_file *m, struct msgb *b)
 }
 
 STATIC void
-seq_streams_msgb_data_hdr(struct seq_file *m)
+seq_streams_mbinfo_data_hdr(struct seq_file *m)
 {
 	seq_printf(m, "m");
 	seq_printf(m, ", m_mblock { ");
@@ -856,7 +856,7 @@ seq_streams_msgb_data_hdr(struct seq_file *m)
 }
 
 STATIC void
-seq_streams_msgb_data(struct seq_file *m, struct mbinfo *mb)
+seq_streams_mbinfo_data(struct seq_file *m, struct mbinfo *mb)
 {
 	seq_printf(m, "m: %p", mb);
 	seq_printf(m, ", m_mblock: { ");
@@ -945,7 +945,7 @@ seq_streams_datab(struct seq_file *m, struct datab *db)
 }
 
 STATIC void
-seq_streams_datab_info_hdr(struct seq_file *m)
+seq_streams_dbinfo_data_hdr(struct seq_file *m)
 {
 	seq_printf(m, "db");
 	seq_printf(m, ", d_dblock { ");
@@ -954,7 +954,7 @@ seq_streams_datab_info_hdr(struct seq_file *m)
 }
 
 STATIC void
-seq_streams_datab_info(struct seq_file *m, struct dbinfo *db)
+seq_streams_dbinfo_data(struct seq_file *m, struct dbinfo *db)
 {
 	seq_printf(m, "%p", db);
 	seq_printf(m, ", { ");
@@ -968,9 +968,9 @@ seq_streams_datab_show(struct seq_file *m, void *v)
 	struct list_head *cur = v;
 	struct dbinfo *db = list_entry(cur, struct dbinfo, db_list);
 	if (db == list_first_entry(&Strinfo[DYN_MDBBLOCK].si_head, struct dbinfo, db_list))
-		 seq_stream_dbinfo_data_hdr(m);
+		 seq_streams_dbinfo_data_hdr(m);
 
-	seq_stream_dbinfo_data(m, db);
+	seq_streams_dbinfo_data(m, db);
 	return (0);
 }
 
@@ -1023,7 +1023,7 @@ seq_streams_linkblk_hdr(struct seq_file *m)
 }
 
 STATIC void
-seq_stream_linkblk(struct seq_file *m, struct linkblk *l)
+seq_streams_linkblk(struct seq_file *m, struct linkblk *l)
 {
 	seq_printf(m, "%p", l);
 	seq_printf(m, ", %p", l->l_qtop);
@@ -1057,7 +1057,7 @@ seq_streams_linkblk_show(struct seq_file *m, void *v)
 	if (li == list_first_entry(&Strinfo[DYN_LINKBLK].si_head, struct linkinfo, li_list))
 		 seq_streams_linkinfo_data_hdr(m);
 
-	seq_stream_linkinfo_data(m, li);
+	seq_streams_linkinfo_data(m, li);
 	return (0);
 }
 
@@ -1124,19 +1124,29 @@ seq_streams_strevent(struct seq_file *m, int type, struct strevent *se)
 	seq_printf(m, "%p", se);
 	switch (type) {
 	case SE_STREAM:
-		seq_printf(m, ", { SE_STREAM %p", se->x.e.procp);
+#ifdef HAVE_KFUNC_PID_NR
+		seq_printf(m, ", { SE_STREAM %d", pid_nr(se->x.e.pid));
+#else
+		seq_printf(m, ", { SE_STREAM %d", se->x.e.pid);
+#endif
 		seq_printf(m, ", %ld }", se->x.e.events);
+		break;
 	case SE_BUFCALL:
 		seq_printf(m, ", { SE_BUFCALL %p", se->x.b.queue);
 		seq_printf(m, ", %p", se->x.b.func);
 		seq_printf(m, ", %ld", se->x.b.arg);
 		seq_printf(m, ", %lu }", (ulong) se->x.b.size);
+		break;
 	case SE_TIMEOUT:
 		seq_printf(m, ", { SE_TIMEOUT %p", se->x.t.queue);
 		seq_printf(m, ", %p", se->x.t.func);
 		seq_printf(m, ", %p", se->x.t.arg);
 		seq_printf(m, ", %d", se->x.t.cpu);
 		seq_printf(m, ", %lu }", se->x.t.timer.expires);
+		break;
+	default:
+		swerr();
+		break;
 	}
 	seq_printf(m, ", %ld", se->se_id);
 }
@@ -1266,9 +1276,9 @@ seq_streams_qband_show(struct seq_file *m, void *v)
 	struct list_head *cur = v;
 	struct qbinfo *qbi = list_entry(cur, struct qbinfo, qbi_list);
 	if (qbi == list_first_entry(&Strinfo[DYN_QBAND].si_head, struct qbinfo, qbi_list))
-		 seq_streams_sbinfo_data_hdr(m);
+		 seq_streams_qbinfo_data_hdr(m);
 
-	seq_streams_sbinfo_data(m, qbi);
+	seq_streams_qbinfo_data(m, qbi);
 	return (0);
 }
 
