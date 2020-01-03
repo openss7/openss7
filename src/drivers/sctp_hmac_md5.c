@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -49,7 +49,6 @@
 
 static char const ident[] = "src/drivers/sctp_hmac_md5.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
-#undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
 
 #ifdef NEED_LINUX_AUTOCONF_H

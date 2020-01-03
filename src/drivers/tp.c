@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -98,7 +98,7 @@ typedef unsigned int socklen_t;
 
 #define TP_DESCRIP	"OSI Transport Provider (TP) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 src/drivers/tp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
@@ -791,7 +791,7 @@ np_alloc(void)
  *  Upper multiplexer TPI state machine.
  *  ------------------------------------
  */
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 tpi_state_name(t_scalar_t state)
 {

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -428,7 +428,7 @@ sctp_update_routes(sp, force_reselect)
 	/* if we have made or need changes then we want to reanalyze routes */
 	if (force_reselect || route_changed || mtu_changed || sp->pmtu != old_pmtu || !sp->taddr
 	    || !sp->raddr) {
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #ifdef SCTP_CONFIG_ERROR_GENERATOR
 		int bad_choice = 0;
 #endif
@@ -436,7 +436,7 @@ sctp_update_routes(sp, force_reselect)
 		sp->taddr = sctp_choose_best(sp, NULL);
 		usual(sp->taddr);
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->taddr == sp->daddr || sp->taddr == sp->daddr->next)
@@ -460,7 +460,7 @@ sctp_update_routes(sp, force_reselect)
 		sp->raddr = sctp_choose_best(sp, sp->taddr);
 		usual(sp->raddr);
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #ifdef SCTP_CONFIG_ERROR_GENERATOR
 		if ((sp->options & SCTP_OPTION_BREAK)
 		    && (sp->raddr == sp->daddr || sp->raddr == sp->daddr->next)

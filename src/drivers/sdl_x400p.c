@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,7 +56,6 @@ static char const ident[] = "src/drivers/sdl_x400p.c (" PACKAGE_ENVR ") " PACKAG
  *  implement a complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#define _DEBUG 1
 #define X400P_DOWNLOAD_FIRMWARE
 
 #include <sys/os7/compat.h>
@@ -80,7 +79,7 @@ static char const ident[] = "src/drivers/sdl_x400p.c (" PACKAGE_ENVR ") " PACKAG
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS Driver"
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS."
 #define SDL_X400P_REVISION	"OpenSS7 src/drivers/sdl_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDL_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDL_X400P_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDL_X400P_LICENSE	"GPL"

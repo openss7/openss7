@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -64,7 +64,7 @@ static char const ident[] = "src/drivers/dl_lapd.c (" PACKAGE_ENVR ") " PACKAGE_
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) Driver"
 #define DL_LAPD_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define DL_LAPD_REVISION	"OpenSS7 src/drivers/dl_lapd.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define DL_LAPD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define DL_LAPD_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LAPD_LICENSE		"GPL"
@@ -396,7 +396,7 @@ STATIC INLINE ulong cd_set_state(struct cd *, ulong);
  *
  *  =========================================================================
  */
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE const char *
 dl_state_name(ulong state)
 {
@@ -470,7 +470,7 @@ dl_set_state(struct dl *dl, ulong newstate)
 	return (newstate);
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE const char *
 cd_state_name(ulong state)
 {

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -948,7 +948,7 @@ vp_wput(queue_t *q, mblk_t *mp)
 	int type;
 
 	prefetch(q->q_ptr);
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	q->q_qinfo->qi_mstat->ms_pcnt++;
 #endif
 	type = mp->b_datap->db_type;
@@ -998,7 +998,7 @@ vp_wsrv(queue_t *q)
 	mblk_t *mp;
 
 	prefetchw(tx);
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	q->q_qinfo->qi_mstat->ms_scnt++;
 #endif
 	if (likely(!!(mp = getq(q)))) {

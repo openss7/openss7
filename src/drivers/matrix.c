@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -144,7 +144,7 @@ static char const ident[] = "src/drivers/matrix.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define MATRIX_DESCRIP		"MATRIX (MX) STREAMS Multiplexing Driver"
 #define MATRIX_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
 #define MATRIX_REVISION	"OpenSS7 src/drivers/matrix.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MATRIX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MATRIX_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define MATRIX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MATRIX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MATRIX_LICENSE		"GPL"
@@ -731,7 +731,7 @@ ch_txprim(struct ch *ch, queue_t *q, mblk_t *msg, mblk_t *mp, const ch_ulong pri
 	switch (__builtin_expect(prim, CH_DATA_REQ)) {
 	case CH_DATA_REQ:
 	case CH_DATA_IND:
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		mi_strlog(ch->oq, STRLOGDA, SL_TRACE, (ch->oq->q_flag & QREADR) ? "<- %s" : "%s ->",
 			  ch_primname(prim));
 #endif
@@ -752,7 +752,7 @@ mx_txprim(struct mx *mx, queue_t *q, mblk_t *msg, mblk_t *mp, const mx_ulong pri
 	switch (__builtin_expect(prim, MX_DATA_REQ)) {
 	case MX_DATA_REQ:
 	case MX_DATA_IND:
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		mi_strlog(mx->oq, STRLOGDA, SL_TRACE, (mx->oq->q_flag & QREADR) ? "<- %s" : "%s ->",
 			  mx_primname(prim));
 #endif
@@ -773,7 +773,7 @@ ch_rxprim(struct ch *ch, queue_t *q, mblk_t *mp, const ch_ulong prim)
 	switch (__builtin_expect(prim, CH_DATA_IND)) {
 	case CH_DATA_REQ:
 	case CH_DATA_IND:
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		mi_strlog(q, STRLOGDA, SL_TRACE, (q->q_flag & QREADR) ? "%s <-" : "-> %s",
 			  ch_primname(prim));
 #endif
@@ -792,7 +792,7 @@ mx_rxprim(struct mx *mx, queue_t *q, mblk_t *mp, const mx_ulong prim)
 	switch (__builtin_expect(prim, MX_DATA_IND)) {
 	case MX_DATA_REQ:
 	case MX_DATA_IND:
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		mi_strlog(q, STRLOGDA, SL_TRACE, (q->q_flag & QREADR) ? "%s <-" : "-> %s",
 			  mx_primname(prim));
 #endif

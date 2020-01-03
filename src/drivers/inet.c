@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -53,9 +53,6 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
    provider (NPI).  It provides a STREAMS-based encapsulation of the Linux IP stack. 
  */
-
-//#define _DEBUG 1
-//#undef _DEBUG
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -692,7 +689,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define SS__DESCRIP	"INET (NET4) STREAMS Driver"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SS__COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SS__COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SS__REVISION	"OpenSS7 src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -87,7 +87,7 @@ static char const ident[] = "src/drivers/tl.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 #define TI_DESCRIP	"SVR 4.2 Transport Layer (TL) STREAMS Driver"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TI_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TI_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TI_REVISION	"OpenSS7 src/drivers/tl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TI_DEVICE	"SVR 4.2 MP STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -367,7 +367,7 @@ tp_alloc(void)
 #define T_USER	    1
 #endif
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 tp_state_name(t_scalar_t state)
 {
@@ -412,7 +412,7 @@ tp_state_name(t_scalar_t state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 
 /* State functions */
 

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -59,9 +59,6 @@ static char const ident[] = "src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_D
  * driver uses the NPI (Network Provider Interface) API.
  */
 
-#define _DEBUG 1
-#undef	_DEBUG
-
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -112,7 +109,7 @@ static char const ident[] = "src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define NP_DESCRIP	"User Datagram Protocol (UDP) Network Provider (NP_UDP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 IP Stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define NP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 src/drivers/np_udp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -723,7 +720,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
 #define N_USER	    1
 #endif
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 np_state_name(np_ulong state)
 {
@@ -768,7 +765,7 @@ np_state_name(np_ulong state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 
 /* State functions */
 

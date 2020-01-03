@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -66,9 +66,6 @@ static char const ident[] = "src/drivers/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DAT
  *  way begin life as a raw-HDLC device but can be configured using the sethdlc utility for Linux.
  */
 
-#define _DEBUG 1
-// #undef _DEBUG
-
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -81,7 +78,7 @@ static char const ident[] = "src/drivers/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define HDLC_DESCRIP	"HDLC STREAMS Multiplexing Driver"
 #define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define HDLC_REVISION	"OpenSS7 src/drivers/hdlc.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define HDLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define HDLC_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"

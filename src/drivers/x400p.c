@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -227,9 +227,6 @@ static char const ident[] = "src/drivers/x400p.c (" PACKAGE_ENVR ") " PACKAGE_DA
  *  layer module.
  */
 
-#define _DEBUG 1
-//#undef _DEBUG
-
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 #define _SUN_SOURCE 1
@@ -259,7 +256,7 @@ static char const ident[] = "src/drivers/x400p.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #define MX_X400P_DESCRIP	"X400P: MX (Multiplex) STREAMS Driver"
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MX_X400P_REVISION	"OpenSS7 src/drivers/x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MX_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define MX_X400P_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the X40XP E1/T1/J1 (Tormenta II/III) PCI boards"
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MX_X400P_LICENSE	"GPL"

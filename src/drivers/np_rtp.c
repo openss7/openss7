@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -77,9 +77,6 @@ static char const ident[] = "src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_D
  *  stream.
  */
 
-#define _DEBUG 1
-#undef	_DEBUG
-
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -130,7 +127,7 @@ static char const ident[] = "src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define NP_DESCRIP	"Real-Time Protocol (RTP) Network Provider (NP) STREAMS Driver"
 #define NP_EXTRA	"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define NP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define NP_REVISION	"OpenSS7 src/drivers/np_rtp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1537,7 +1534,7 @@ nc_alloc(struct np *np, void *tag, np_ulong SERV_type, np_ulong CONIND_number, n
 #define N_USER	    1
 #endif
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 np_state_name(np_ulong state)
 {
@@ -1582,7 +1579,7 @@ np_state_name(np_ulong state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 
 /* State functions */
 

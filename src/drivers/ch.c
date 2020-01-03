@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -57,9 +57,6 @@ static char const ident[] = "src/drivers/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
  * LAPD or LAPM procedures.
  */
 
-#define _DEBUG 1
-// #undef _DEBUG
-
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
@@ -73,7 +70,7 @@ static char const ident[] = "src/drivers/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS Multiplexing Driver"
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define CHMUX_REVISION	"OpenSS7 src/drivers/ch.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CHMUX_LICENSE	"GPL"

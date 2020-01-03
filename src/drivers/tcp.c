@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -125,7 +125,7 @@ static char const ident[] = "src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 
 #define TCP_DESCRIP	"Transport Control Protocol (TCP) STREAMS Driver"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define TCP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TCP_REVISION	"OpenSS7 src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -566,7 +566,7 @@ tpi_alloc(void)
 /*
  *  State changes.
  */
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 tpi_state_name(t_scalar_t state)
 {
@@ -611,7 +611,7 @@ tpi_state_name(t_scalar_t state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 STATIC INLINE streams_fastcall void
 tpi_set_state(struct tpi *tpi, long state)
 {

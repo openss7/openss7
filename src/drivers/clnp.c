@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -158,7 +158,7 @@ static char const ident[] = "src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define CLNS_DESCRIP	"OSI CLNS Network Provider STREAMS Driver"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define CLNS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define CLNS_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define CLNS_REVISION	"OpenSS7 src/drivers/clns.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -782,7 +782,7 @@ STATIC struct df master = {.lock = RW_LOCK_UNLOCKED, };
 #define N_USER	    1
 #endif
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 np_state_name(np_ulong state)
 {
@@ -827,7 +827,7 @@ np_state_name(np_ulong state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 
 STATIC INLINE streams_fastcall __unlikely void
 np_set_state(struct np *np, const np_ulong state)
@@ -861,7 +861,7 @@ np_get_statef(const struct np *np)
 	return (1 << np_get_state(np));
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 dl_state_name(dl_ulong state)
 {
@@ -914,7 +914,7 @@ dl_state_name(dl_ulong state)
 		return ("(unknown)");
 	}
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 
 STATIC INLINE streams_fastcall __unlikely void
 dl_set_state(struct dl *dl, const dl_ulong state)

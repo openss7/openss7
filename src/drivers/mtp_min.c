@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,7 +78,7 @@ static char const ident[] = "src/drivers/mtp_min.c (" PACKAGE_ENVR ") " PACKAGE_
 #define MTP_MIN_DESCRIP		"SS7 Message Transfer Part (MTP) STREAMS Multiplexing Driver"
 #define MTP_MIN_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MTP_MIN_REVISION	"OpenSS7 src/drivers/mtp_min.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define MTP_MIN_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_MIN_LICENSE		"GPL"
@@ -785,7 +785,7 @@ mtp_opt_negotiate(struct mt *mt, struct mtp_opts *ops)
 #define T_PROVIDER  0
 #define T_USER	    1
 #endif
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 static const char *
 state_name(long state)
 {

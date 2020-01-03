@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -54,9 +54,6 @@ static char const ident[] = "src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE
  *  capabilities of the SLI for the E400P-SS7 and T400P-SS7 cards.  This is a
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
-
-//#define _DEBUG 1
-#undef _DEBUG
 
 #define _MPS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -122,7 +119,7 @@ static char const ident[] = "src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS Driver"
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SL_X400P_REVISION	"OpenSS7 src/drivers/sl_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SL_X400P_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"

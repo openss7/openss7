@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -834,7 +834,7 @@ sctp_free_priv(q)
 	unusual(sp->ndups);
 	sp->ndups = 0;
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	if (sp->oooq.q_msgs && sp->oooq.q_head) {
 		mblk_t *mp;
 
@@ -854,7 +854,7 @@ sctp_free_priv(q)
 	unusual(sp->nunds);
 	sp->nunds = 0;
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	if (sp->rtxq.q_msgs && sp->rtxq.q_head) {
 		mblk_t *mp;
 

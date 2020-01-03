@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/drivers/isdn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ISDN_DESCRIP	"Integrated Services Digital Network (ISDN/Q.931) STREAMS Driver"
 #define ISDN_EXTRA	"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define ISDN_REVISION	"OpenSS7 src/drivers/isdn.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ISDN_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ISDN_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISDN_LICENSE	"GPL"
@@ -613,7 +613,7 @@ cc_tst(struct cc *cc, const ulong flags)
 	return (cc->flags & flags);
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 cc_state_name(long state)
 {

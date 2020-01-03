@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -52,9 +52,6 @@ static char const ident[] = "src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
-
-#define _DEBUG	1
-//#undef    _DEBUG
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
@@ -113,7 +110,7 @@ static char const ident[] = "src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 #define ISUA_AS_DESCRIP		"ISUA/SCTP AS MTP STREAMS Multiplexing Driver"
 #define ISUA_AS_EXTRA		"Part of the OpenSS7 ISDN Stack for Linux Fast-STREAMS"
 #define ISUA_AS_REVISION	"OpenSS7 src/drivers/isua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define ISUA_AS_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define ISUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define ISUA_AS_LICENSE		"GPL"

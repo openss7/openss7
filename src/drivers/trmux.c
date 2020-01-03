@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@ static char const ident[] = "src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DA
  * the transaction layer service interface described in ITU-T Q.771.
  */
 
-#define _DEBUG 1
-
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -68,7 +66,7 @@ static char const ident[] = "src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define TRMUX_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Driver"
 #define TRMUX_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TRMUX_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TRMUX_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TRMUX_REVISION	"OpenSS7 src/drivers/trmux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TRMUX_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Driver"
 #define TRMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

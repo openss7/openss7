@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "src/drivers/isup.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define ISUP_DESCRIP	"ISUP STREAMS Multiplexing Driver"
 #define ISUP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define ISUP_REVISION	"OpenSS7 src/drivers/isup.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ISUP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define ISUP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUP_LICENSE	"GPL"
@@ -498,7 +498,7 @@ cc_tst(struct cc *cc, const ulong flags)
 	return (cc->flags & flags);
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC const char *
 cc_state_name(long state)
 {
@@ -18571,7 +18571,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if defined(_SAFE)||defined(_DEBUG)
+#if defined(_SAFE)||defined(CONFIG_STREAMS_DEBUG)
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -18676,7 +18676,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	__ptrace(("%s: %p: ERROR: MTP provider stream already linked\n", DRV_NAME, mtp));
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return (-EINVAL);
-#if defined(_SAFE)||defined(_DEBUG)
+#if defined(_SAFE)||defined(CONFIG_STREAMS_DEBUG)
       ebusy:
 	noenable(mtp->iq);
 	noenable(mtp->oq);
@@ -19956,7 +19956,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
       failbusy:
 	return cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_CIRCUIT_BUSY,
 				   CC_CAUS_NO_CCT_AVAILABLE);
-#if defined(_SAFE)||defined(_DEBUG)
+#if defined(_SAFE)||defined(CONFIG_STREAMS_DEBUG)
       null_bind:
 	pswerr(("%s: %p: SWERR: null bind pointer in bound state\n", DRV_NAME, cc));
 	goto efault;

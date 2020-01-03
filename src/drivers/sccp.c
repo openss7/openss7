@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/drivers/sccp.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define SCCP_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) STREAMS Multiplexing Driver"
 #define SCCP_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_REVISION	"OpenSS7 src/drivers/sccp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SCCP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SCCP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_LICENSE	"GPL"
@@ -13273,7 +13273,7 @@ mtp_addr_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "MTP_ADDR_ACK: MTP provider stream already linked");
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
-#if defined(_SAFE)||defined(_DEBUG)
+#if defined(_SAFE)||defined(CONFIG_STREAMS_DEBUG)
       ebusy:
 	noenable(mt->iq);
 	noenable(mt->oq);
@@ -13377,7 +13377,7 @@ mtp_info_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "MTP_INFO_ACK: MTP provider stream already linked");
 	fixme(("Need to inform layer management to unlink stream\n"));
 	return -EINVAL;
-#if defined(_SAFE)||defined(_DEBUG)
+#if defined(_SAFE)||defined(CONFIG_STREAMS_DEBUG)
       ebusy:
 	noenable(mt->iq);
 	noenable(mt->oq);

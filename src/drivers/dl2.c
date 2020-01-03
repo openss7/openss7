@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,9 +68,6 @@ static char const ident[] = "src/drivers/dl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
  *  This driver is a replacement for the unsupported LDL driver.
  */
 
-#define _DEBUG 1
-//#undef _DEBUG
-/
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 #include <sys/os7/compat.h>
@@ -79,7 +76,7 @@ static char const ident[] = "src/drivers/dl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define ND_DESCRIP	"NETDEV (DL) STREAMS Multiplexing Driver"
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ND_REVISION	"OpenSS7 src/drivers/dl2.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define ND_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define ND_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ND_LICENSE	"GPL"

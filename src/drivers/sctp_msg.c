@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -423,7 +423,7 @@ trimtail(mblk_t *mp, int len)
  *  according to the pmtu experienced at the time that it is further
  *  fragmented.
  */
-#if defined(_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
 STATIC void
 sctp_frag_chunk(bq, mp, mps)
 	bufq_t *bq;
@@ -625,7 +625,7 @@ sctp_bundle_data_urgent(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 		ensure(cb->st, continue);
 
-#if defined(_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
 		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
@@ -710,7 +710,7 @@ sctp_bundle_data_normal(sp, sd, dmps, amps, dpp, mrem, mlen)
 
 		ensure(cb->st, continue);
 
-#if defined(_DEBUG)||defined(_SAFE)
+#if defined(CONFIG_STREAMS_DEBUG)||defined(_SAFE)
 		/* this should only occur if the pmtu is falling */
 		if (amps <= *mrem && plen > amps) {
 			rare();
@@ -1010,7 +1010,7 @@ sctp_transmit_wakeup(sp)
 					ptrace(("sp->nrtxs = %u\n", sp->nrtxs));
 				rare();
 				freechunks(mp);
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 				for (mp = bufq_head(&sp->sndq); mp; mp = mp->b_next) {
 					sctp_tcb_t *cb = SCTP_TCB(mp);
 
@@ -2901,7 +2901,7 @@ sctp_rtt_calc(sd, time)
 	sd->rto = sd->rto_min > sd->rto ? sd->rto_min : sd->rto;	/* RFC 2960 6.3.1 (C6) */
 	sd->rto = sd->rto_max < sd->rto ? sd->rto_max : sd->rto;	/* RFC 2960 6.3.1 (C7) */
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #ifdef SCTP_CONFIG_ERROR_GENERATOR
 	if (sd->retransmits && (sd->sp->options & SCTP_OPTION_BREAK)
 	    && (sd->packets > SCTP_CONFIG_BREAK_GENERATOR_LEVEL))

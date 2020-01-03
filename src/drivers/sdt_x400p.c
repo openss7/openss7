@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -85,7 +85,7 @@ static char const ident[] = "src/drivers/sdt_x400p.c (" PACKAGE_ENVR ") " PACKAG
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS Driver"
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define SDT_X400P_REVISION	"OpenSS7 src/drivers/sdt_x400p.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDT_X400P_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define SDT_X400P_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards"
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_X400P_LICENSE	"GPL"
@@ -1855,7 +1855,7 @@ rx_index8(uint j, uint k)
 	return &rx_table[(j << 8) | k];
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE void
 printb(uint8_t byte)
 {
@@ -3452,7 +3452,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		ptrace(("X400P-SS7: ERROR: out of state: no card pointer\n"));
 		goto lmi_outstate;
 	}
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	if (cp->ifgtype != SDL_GTYPE_E1 && cp->ifgtype != SDL_GTYPE_T1) {
 		ptrace(("X400P-SS7: ERROR: card group type = %lu\n", cp->ifgtype));
 		return m_error(q, EFAULT);
@@ -5924,7 +5924,7 @@ xp_w_prim(queue_t *q, mblk_t *mp)
 	return (QR_PASSFLOW);
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE char *
 mname(mblk_t *mp)
 {

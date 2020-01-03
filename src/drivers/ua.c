@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -52,7 +52,7 @@ static char const ident[] = "src/drivers/ua.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 #define UA_DESCRIP	"SIGTRAN User Adaptation (UA) STREAMS Multiplexing Driver"
 #define UA_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define UA_REVISION	"OpenSS7 src/drivers/ua.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define UA_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define UA_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UA_LICENSE	"GPL"
@@ -86,7 +86,7 @@ MODULE_VERSION(PACKAGE_ENVR);
 
 /* Lock debugging. */
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #define spin_lock_ua(lock) (void)lock
 #define spin_unlock_ua(lock) (void)lock
 #else

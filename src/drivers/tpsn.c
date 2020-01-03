@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -61,9 +61,6 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
  * The TPSN driver can support null network layer (inactive subset) subnetwork interconnection for
  * CLNP. ISO-IP and ISO-UDP in accordance with RFC 1070 operation is also supported.
  */
-
-//#define _DEBUG 1
-//#undef _DEBUG
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -152,7 +149,7 @@ static char const ident[] = "src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define	TP_DESCRIP	"OSI Transport Provider for Subnetworks (TPSN) STREAMS Driver"
 #define TP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Ltd.  All Rights Reserved."
+#define TP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Ltd.  All Rights Reserved."
 #define TP_REVISION	"OpenSS7 src/drivers/tpsn.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TP_DEVICE	"SVR 4.2 MP STREAMS TPI OSI Transport for Subnetworks Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
