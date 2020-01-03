@@ -311,7 +311,7 @@ __ensure(!(__exp),__sta)
 
 #undef  __ctrace
 #define __ctrace(__fnc) \
-	({ printk(KERN_NOTICE "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
+	({ printk(KERN_NOTICE "%s: calling %s at " __FILE__ "+%d\n", __FUNCTION__, #__fnc, __LINE__); __fnc; })
 
 #undef  __printd
 #define __printd(__pkspec) \
