@@ -395,7 +395,7 @@ __ensure(!(__exp),__sta)
 #define   pswerr(__pks)		__pswerr(__pks)
 
 #else				/* defined CONFIG_STREAMS_TEST */
-#if	defined _SAFE
+#if	defined CONFIG_STREAMS_SAFE
 
 #define    never()		do { *(int *)0 = 0; } while(0)
 #define     rare()		_rare()
@@ -418,7 +418,7 @@ __ensure(!(__exp),__sta)
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#else				/* defined _SAFE */
+#else				/* defined CONFIG_STREAMS_SAFE */
 
 #define    never()		_never()
 #define     rare()		_rare()
@@ -441,7 +441,7 @@ __ensure(!(__exp),__sta)
 #define    swerr()		_swerr()
 #define   pswerr(__pks)		_pswerr(__pks)
 
-#endif				/* defined _SAFE */
+#endif				/* defined CONFIG_STREAMS_SAFE */
 
 #endif				/* defined CONFIG_STREAMS_TEST */
 
