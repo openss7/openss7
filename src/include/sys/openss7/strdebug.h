@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -122,7 +122,7 @@
 #undef streams_noinline
 #define streams_noinline noinline
 
-#if defined(_OPTIMIZE_NONE) || defined(_DEBUG)
+#if defined(_OPTIMIZE_NONE) || defined(CONFIG_STREAMS_DEBUG)
 
 #undef prefetchw
 #define prefetchw(__a) ((void)(__a))
@@ -347,7 +347,7 @@ __ensure(!(__exp),__sta)
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#if	defined _DEBUG
+#if	defined CONFIG_STREAMS_DEBUG
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -370,7 +370,7 @@ __ensure(!(__exp),__sta)
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#else				/* defined _DEBUG */
+#else				/* defined CONFIG_STREAMS_DEBUG */
 #if	defined _TEST
 
 #define    never()		__never()
@@ -445,6 +445,6 @@ __ensure(!(__exp),__sta)
 
 #endif				/* defined _TEST */
 
-#endif				/* defined _DEBUG */
+#endif				/* defined CONFIG_STREAMS_DEBUG */
 
 #endif				/* __SYS_OPENSS7_STRDEBUG_H__ */
