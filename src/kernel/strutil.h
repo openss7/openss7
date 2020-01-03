@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -98,7 +98,7 @@ extern streams_fastcall __unlikely bool
 #define streams_local_restore(__flags) \
 	do { (void)__flags; } while (0)
 
-#elif defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#elif defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define streams_spin_lock(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)

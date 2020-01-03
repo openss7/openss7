@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAG
 
 #define SVR4COMP_DESCRIP	"UNIX(R) SVR 4.2 MP Compatibility module for Linux Fast-STREAMS"
 #define SVR4COMP_EXTRA		"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SVR4COMP_REVISION	"OpenSS7 src/kernel/svr4compat.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -96,7 +96,7 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif
 
-#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define spin_lock_str(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
@@ -191,21 +191,21 @@ itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
 
 EXPORT_SYMBOL(itimeout);	/* svr4/ddi.h */
 
-#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+#if defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST
 
 #define pl_base	    0
 #define pl_atomic   2
 #define pl_bh	    3
 #define pl_irq	    6
 
-#else				/* defined CONFIG_STREAMS_NOIRQ || defined _TEST */
+#else				/* defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST */
 
 #define pl_base	    0
 #define pl_atomic   2
 #define pl_bh	    3
 #define pl_irq	    4
 
-#endif				/* defined CONFIG_STREAMS_NOIRQ || defined _TEST */
+#endif				/* defined CONFIG_STREAMS_NOIRQ || defined CONFIG_STREAMS_TEST */
 
 /**
  * slp: - raise priority level
