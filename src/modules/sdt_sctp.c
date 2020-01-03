@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -69,7 +69,7 @@ static char const ident[] = "src/modules/sdt_sctp.c (" PACKAGE_ENVR ") " PACKAGE
 #define SDT_SCTP_DESCRIP	"SS7/SCTP Signalling Data Link (SDT) STREAMS Module"
 #define SDT_SCTP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_SCTP_REVISION	"OpenSS7 src/modules/sdt_sctp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDT_SCTP_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SDT_SCTP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_SCTP_LICENSE	"GPL"
@@ -1677,6 +1677,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (cmd) {
 		default:
 			ptrace(("Unknown IOCTL %x\n", cmd));
+			break;
 		case I_STR:
 		case I_LINK:
 		case I_PLINK:
