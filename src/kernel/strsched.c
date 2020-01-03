@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2017  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -992,7 +992,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 #if !defined _OPTIMIZE_SPEED
 			atomic_inc(&sdi->si_cnt);
 #endif				/* !defined _OPTIMIZE_SPEED */
-#if !defined _NONE
+#if !defined CONFIG_STREAMS_NONE
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
@@ -1066,7 +1066,7 @@ mdbblock_alloc(uint priority, void *func)
 			t->freemblks--;
 			streams_local_restore(flags);
 			{
-#if !defined _OPTIMIZE_SPEED || !defined _NONE
+#if !defined _OPTIMIZE_SPEED || !defined CONFIG_STREAMS_NONE
 				struct strinfo *sdi = &Strinfo[DYN_MDBBLOCK];
 #endif
 
@@ -1080,7 +1080,7 @@ mdbblock_alloc(uint priority, void *func)
 #if !defined _OPTIMIZE_SPEED
 				atomic_inc(&sdi->si_cnt);
 #endif				/* !defined _OPTIMIZE_SPEED */
-#if !defined _NONE
+#if !defined CONFIG_STREAMS_NONE
 				if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 					sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif

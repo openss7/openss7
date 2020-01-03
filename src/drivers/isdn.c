@@ -15607,7 +15607,7 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 {
 	struct ch *ch, **chp;
 
-#ifndef _NONE
+#ifndef CONFIG_STREAMS_NONE
 	struct eg *eg = fg->eg.eg;
 
 	assure(eg == tg->eg.eg);
