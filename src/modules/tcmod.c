@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -49,8 +49,6 @@
 
 static char const ident[] = "src/modules/tcmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
-#define _DEBUG 1
-
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -59,7 +57,7 @@ static char const ident[] = "src/modules/tcmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define TCMOD_DESCRIP	"ITU_T Q.771 TC for ITU-T Q.771 TR (TCMOD) STREAMS Module"
 #define TCMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TCMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TCMOD_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TCMOD_REVISION	"OpenSS7 src/modules/tcmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TCMOD_DEVICE	"ITU-T Q.771 TC modules for ITU-T Q.771 TR"
 #define TCMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -55,8 +55,6 @@ static char const ident[] = "src/modules/tua_as.c (" PACKAGE_ENVR ") " PACKAGE_D
  *  stream.
  */
 
-#define _DEBUG 1
-
 #include <sys/os7/compat.h>
 
 #include <linux/socket.h>
@@ -70,8 +68,8 @@ static char const ident[] = "src/modules/tua_as.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define TUA_AS_DESCRIP		"TUA/SCTP Signalling Link (SL) STREAMS Module"
 #define TUA_AS_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TUA_AS_REVISION	"OpenSS7 src/modules/tua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TUA_AS_REVISION		"OpenSS7 src/modules/tua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
+#define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TUA_AS_LICENSE		"GPL"

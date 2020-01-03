@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@ static char const ident[] = "src/modules/sdt.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS Module"
 #define SDT_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SDT_REVISION	"OpenSS7 src/modules/sdt.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SDT_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SDT_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_LICENSE	"GPL"
@@ -1277,7 +1277,7 @@ rx_index8(uint j, uint k)
 	return &rx_table[(j << 8) | k];
 }
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 #if 0
 STATIC INLINE void
 printb(uint8_t byte)

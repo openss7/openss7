@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,7 @@ static char const ident[] = "src/modules/tdm_ip.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define TDM_IP_DESCRIP		"TDM over IP (TDM-IP) STREAMS Module"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TDM_IP_REVISION	"OpenSS7 src/modules/tdm_ip.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TDM_IP_DEVICE		"SVR 4.2 MP STREAMS TDM-IP MODULE"
 #define TDM_IP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -675,7 +675,7 @@ static inline fastcall int
 mx_txprim(struct tdm *tdm, queue_t *q, mblk_t *msg, mblk_t *mp, mx_ulong prim)
 {
 	if (likely(pcmsg(DB_TYPE(mp)) || bcanputnext(tdm->rq, mp->b_band))) {
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		int level;
 
 		switch (__builtin_expect(prim, MX_DATA_REQ)) {
@@ -687,7 +687,7 @@ mx_txprim(struct tdm *tdm, queue_t *q, mblk_t *msg, mblk_t *mp, mx_ulong prim)
 			break;
 		}
 		mi_strlog(tdm->rq, level, SL_TRACE, "<- %s", mx_primname(prim));
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 		tdm_stripmsg(msg);
 		putnext(tdm->rq, mp);
 		return (0);
@@ -699,7 +699,7 @@ static inline fastcall int
 tp_txprim(struct tdm *tdm, queue_t *q, mblk_t *msg, mblk_t *mp, t_uscalar_t prim)
 {
 	if (likely(pcmsg(DB_TYPE(mp)) || bcanputnext(tdm->wq, mp->b_band))) {
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 		int level;
 
 		switch (__builtin_expect(prim, T_DATA_REQ)) {
@@ -714,7 +714,7 @@ tp_txprim(struct tdm *tdm, queue_t *q, mblk_t *msg, mblk_t *mp, t_uscalar_t prim
 			break;
 		}
 		mi_strlog(tdm->wq, level, SL_TRACE, "%s ->", tp_primname(prim));
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 		tdm_stripmsg(msg);
 		putnext(tdm->wq, mp);
 		return (0);
@@ -726,7 +726,7 @@ tp_txprim(struct tdm *tdm, queue_t *q, mblk_t *msg, mblk_t *mp, t_uscalar_t prim
 static inline fastcall void
 mx_rxprim(struct tdm *tdm, queue_t *q, mblk_t *mp, mx_ulong prim)
 {
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	int level;
 
 	switch (__builtin_expect(prim, MX_DATA_IND)) {
@@ -738,12 +738,12 @@ mx_rxprim(struct tdm *tdm, queue_t *q, mblk_t *mp, mx_ulong prim)
 		break;
 	}
 	mi_strlog(q, level, SL_TRACE, "-> %s", mx_primname(prim));
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 }
 static inline fastcall void
 tp_rxprim(struct tdm *tdm, queue_t *q, mblk_t *mp, t_uscalar_t prim)
 {
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	int level;
 
 	switch (__builtin_expect(prim, T_DATA_IND)) {
@@ -758,7 +758,7 @@ tp_rxprim(struct tdm *tdm, queue_t *q, mblk_t *mp, t_uscalar_t prim)
 		break;
 	}
 	mi_strlog(q, level, SL_TRACE, "%s <-", tp_primname(prim));
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 }
 
 /*

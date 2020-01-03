@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -54,9 +54,6 @@ static char const ident[] = "src/modules/m2pa_sl.c (" PACKAGE_ENVR ") " PACKAGE_
 #define _MPS_SOURCE	1
 #define _SUN_SOURCE	1
 
-//#define _DEBUG 1
-#undef _DEBUG
-
 #include <sys/os7/compat.h>
 
 #undef mi_timer
@@ -80,7 +77,7 @@ static char const ident[] = "src/modules/m2pa_sl.c (" PACKAGE_ENVR ") " PACKAGE_
 #define M2PA_SL_DESCRIP		"M2PA/SCTP Signalling Link (SL) STREAMS Module"
 #define M2PA_SL_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2PA_SL_REVISION	"OpenSS7 src/modules/m2pa_sl.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define M2PA_SL_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define M2PA_SL_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2PA_SL_LICENSE		"GPL"
@@ -270,7 +267,7 @@ STATIC void sl_put(struct sl *sl);
 #define NSF_WACK_DREQ11	(1<<NS_WACK_DREQ11)
 #endif
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 const char *
 sl_n_state_name(int state)
 {
@@ -321,13 +318,13 @@ sl_set_n_state(struct sl *sl, int newstate)
 	m2palogst(sl, "%s <- %s", sl_n_state_name(oldstate), sl_n_state_name(newstate));
 	return ((sl->n_state = newstate));
 }
-#else				/* _DEBUG */
+#else				/* CONFIG_STREAMS_DEBUG */
 STATIC int
 sl_set_n_state(struct sl *sl, int newstate)
 {
 	return ((sl->n_state = newstate));
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 STATIC INLINE int
 sl_get_n_state(struct sl *sl)
 {
@@ -358,7 +355,7 @@ sl_not_n_state(struct sl *sl, int mask)
 #define LMF_DISABLE_PENDING (1<<LMI_DISABLE_PENDING)
 #define LMF_DETACH_PENDING  (1<<LMI_DETACH_PENDING)
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 const char *
 sl_i_state_name(int state)
 {
@@ -391,13 +388,13 @@ sl_set_i_state(struct sl *sl, int newstate)
 	m2palogst(sl, "%s <- %s", sl_i_state_name(newstate), sl_i_state_name(oldstate));
 	return ((sl->info.lm.lmi_state = sl->i_state = newstate));
 }
-#else				/* _DEBUG */
+#else				/* CONFIG_STREAMS_DEBUG */
 STATIC INLINE int
 sl_set_i_state(struct sl *sl, int newstate)
 {
 	return ((sl->i_state = newstate));
 }
-#endif				/* _DEBUG */
+#endif				/* CONFIG_STREAMS_DEBUG */
 STATIC INLINE int
 sl_get_i_state(struct sl *sl)
 {
@@ -1488,7 +1485,7 @@ n_exdata_req(struct sl *sl, queue_t *q, void *qos_ptr, size_t qos_len, mblk_t *d
 #define MS_IN_SERVICE		SLS_IN_SERVICE
 #define MS_PROCESSOR_OUTAGE	SLS_PROCESSOR_OUTAGE
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 const char *
 sl_state_name(int state)
 {
@@ -1675,7 +1672,7 @@ sl_send_status(struct sl *sl, queue_t *q, uint32_t status)
 	mblk_t *mp;
 	N_qos_sel_data_sctp_t qos = { N_QOS_SEL_DATA_SCTP, M2PA_PPI, M2PA_STATUS_STREAM, };
 
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 	switch (status) {
 	case M2PA_STATUS_BUSY_ENDED:
 		m2palogtx(sl, "BUSY-ENDED ->");
@@ -2459,7 +2456,7 @@ STATIC INLINE void
 sl_aerm_start(struct sl *sl, queue_t *q)
 {
 	m2palogst(sl, "Start Proving...");
-#ifndef _DEBUG
+#ifndef CONFIG_STREAMS_DEBUG
 	/* strapped out when debugging: too many console messages */
 	sl_timer_start(sl, t9);
 #endif

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,7 +67,7 @@ static char const ident[] = "src/modules/cd_old.c (" PACKAGE_ENVR ") " PACKAGE_D
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS Module"
 #define HDLC_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define HDLC_REVISION	"OpenSS7 src/modules/cd_old.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define HDLC_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define HDLC_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
@@ -354,7 +354,7 @@ cd_alloc_priv(queue_t *q, struct str **stp, dev_t *devp, cred_t *crp, ulong type
 /*
  *  CD State Changes
  */
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE const char *
 cd_state_name(ulong state)
 {
@@ -412,7 +412,7 @@ cd_set_state(struct cd *cd, ulong newstate)
 /*
  *  CH State Changes
  */
-#ifdef _DEBUG
+#ifdef CONFIG_STREAMS_DEBUG
 STATIC INLINE const char *
 ch_state_name(ulong state)
 {

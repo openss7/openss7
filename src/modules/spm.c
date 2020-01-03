@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@ static char const ident[] = "src/modules/spm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
  *  a directly connected pair of SDL drivers.
  */
 
-#define _DEBUG 1
-
 #include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
@@ -69,7 +67,7 @@ static char const ident[] = "src/modules/spm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS Pipe Module"
 #define SPM_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SPM_REVISION	"OpenSS7 src/modules/spm.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define SPM_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define SPM_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPM_LICENSE	"GPL"

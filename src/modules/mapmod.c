@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -64,8 +64,6 @@ static char const ident[] = "src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_D
  * interace.
  */
 
-#define _DEBUG 1
-
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -81,8 +79,8 @@ static char const ident[] = "src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 
 #define MCMOD_DESCRIP		"GSM 29.002 MAP Common Services for ITU-T Q.771 TC STREAMS Module"
 #define MCMOD_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
-#define MCMOD_REVISION	"OpenSS7 src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
+#define MCMOD_COPYRIGHT		"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
+#define MCMOD_REVISION		"OpenSS7 src/modules/mapmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MCMOD_LICENSE		"GPL"

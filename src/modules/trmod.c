@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -56,8 +56,6 @@ static char const ident[] = "src/modules/trmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
  * the transaction layer service interface described in ITU-T Q.771.
  */
 
-#define _DEBUG 1
-
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
 
@@ -68,7 +66,7 @@ static char const ident[] = "src/modules/trmod.c (" PACKAGE_ENVR ") " PACKAGE_DA
 
 #define TRMOD_DESCRIP	"TCAP Q.771 Transaction Sublayer (TR) STREAMS Module"
 #define TRMOD_EXTRA	"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TRMOD_COPYRIGHT	"Copyright (c) 2008-2015  Monavacon Limited.  All Rights Reserved."
+#define TRMOD_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define TRMOD_REVISION	"OpenSS7 src/modules/trmod.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #define TRMOD_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Module"
 #define TRMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

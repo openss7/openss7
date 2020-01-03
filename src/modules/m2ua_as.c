@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2019  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,9 +78,6 @@ static char const ident[] = "src/modules/m2ua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
 
-#define _DEBUG 1
-//#undef _DEBUG
-
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
 
@@ -117,7 +114,7 @@ static char const ident[] = "src/modules/m2ua_as.c (" PACKAGE_ENVR ") " PACKAGE_
 #define M2UA_AS_DESCRIP		"M2UA/SCTP Signalling Link (SL) STREAMS Module"
 #define M2UA_AS_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define M2UA_AS_REVISION	"OpenSS7 src/modules/m2ua_as.c (" PACKAGE_ENVR ") " PACKAGE_DATE
-#define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2019  Monavacon Limited.  All Rights Reserved."
+#define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_AS_LICENSE		"GPL"
