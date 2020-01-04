@@ -2394,8 +2394,6 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    if test :"${linux_cv_optimize:-auto}" != :quick
 	    then
 		linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
-	    else
-		linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE"
 	    fi
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror${WFLAGS:+ }${WFLAGS}"
 	fi
