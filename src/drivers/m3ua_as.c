@@ -4998,7 +4998,7 @@ mtp_status_ind(struct up *up, queue_t *q, mblk_t *msg, struct mtp_addr *addr, mt
 			p->mtp_type = type;
 			p->mtp_status = status;
 			mp->b_wptr += sizeof(*p);
-			bcopy(&addr, mp->b_wptr, sizeof(*addr));
+			bcopy(addr, mp->b_wptr, sizeof(*addr));
 			mp->b_wptr += sizeof(*addr);
 			freemsg(msg);
 			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- MTP_STATUS_IND");
