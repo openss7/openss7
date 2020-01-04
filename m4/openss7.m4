@@ -914,7 +914,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    CFLAGS="-g -O0${CFLAGS:+ $CFLAGS}"
+	    CFLAGS="-g -O1${CFLAGS:+ $CFLAGS}"
 	    CFLAGS="${CFLAGS:+$CFLAGS }-finline"
 	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-inline-functions"
 	    CFLAGS="${CFLAGS:+$CFLAGS }-fno-keep-static-consts"
@@ -943,10 +943,7 @@ dnl USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-trigraphs"
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CFLAGS="-Wall${USER_CFLAGS:+ $USER_CFLAGS}"
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    if test :"${with_optimize:-auto}" != :quick
-	    then
-		USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
-	    fi
+	    USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-system-headers"
 dnl	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wundef"
@@ -1049,7 +1046,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_CXXFLAGS], [dnl
 	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    CXXFLAGS="-g -O0${CXXFLAGS:+ $CXXFLAGS}"
+	    CXXFLAGS="-g -O1${CXXFLAGS:+ $CXXFLAGS}"
 	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-finline"
 	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-fno-keep-inline-functions"
 	    CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }-fno-keep-static-consts"
@@ -1078,10 +1075,7 @@ dnl USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-trigraphs"
 	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CXXFLAGS="-Wall${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
 	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    if test :"${with_optimize:-auto}" != :quick
-	    then
-		USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
-	    fi
+	    USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-system-headers"
 dnl	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wundef"
@@ -1164,7 +1158,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_GCJFLAGS], [dnl
 	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -f(no-)?strict-aliasing,,g'`
 	    ;;
 	(quick)
-	    GCJFLAGS="-g -O0${GCJFLAGS:+ $GCJFLAGS}"
+	    GCJFLAGS="-g -O1${GCJFLAGS:+ $GCJFLAGS}"
 	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-finline"
 	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fno-keep-inline-functions"
 	    GCJFLAGS="${GCJFLAGS:+$GCJFLAGS }-fno-keep-static-consts"
@@ -1193,10 +1187,7 @@ dnl USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-trigraphs"
 	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_GCJFLAGS="-Wall${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
 	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    if test :"${with_optimize:-auto}" != :quick
-	    then
-		USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
-	    fi
+	    USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-system-headers"
 dnl	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wundef"

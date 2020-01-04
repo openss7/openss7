@@ -2345,7 +2345,7 @@ dnl		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-inline-functions-called-o
 		linux_cv_optimize='normal'
 		;;
 	    (quick)
-		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g"
+		linux_cflags="$linux_cflags${linux_cflags:+ }-O1 -g"
 		linux_cv_debug_default="_TEST"
 		linux_cv_optimize='quick'
 dnl
@@ -2391,10 +2391,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wnested-externs"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
-	    if test :"${linux_cv_optimize:-auto}" != :quick
-	    then
-		linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
-	    fi
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror${WFLAGS:+ }${WFLAGS}"
 	fi
 	AC_ARG_ENABLE([k-inline],
@@ -2458,7 +2455,7 @@ dnl
 	    ;;
 	(quick)
 	    AC_DEFINE([_OPTIMIZE_NONE], [1], [Define for kernel image
-		testing (profiling).  This has the effect of -O0 -g, and
+		testing (profiling).  This has the effect of -O1 -g, and
 		setting assertions to TEST.])
 	    ;;
     esac
