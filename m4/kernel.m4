@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -2391,7 +2391,12 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wnested-externs"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
-	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
+	    if test :"${linux_cv_optimize:-auto}" != :quick
+	    then
+		linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
+	    else
+		linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE"
+	    fi
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror${WFLAGS:+ }${WFLAGS}"
 	fi
 	AC_ARG_ENABLE([k-inline],
@@ -3500,7 +3505,7 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

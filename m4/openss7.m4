@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -170,7 +170,7 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
 BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 =============================================================================
 
-Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -942,8 +942,13 @@ dnl USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-trigraphs"
     then
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CFLAGS="-Wall${USER_CFLAGS:+ $USER_CFLAGS}"
-	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    if test :"${with_optimize:-auto}" != :quick
+	    then
+		USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
+	    else
+		USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE${USER_CFLAGS:+ $USER_CFLAGS}"
+	    fi
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-system-headers"
 dnl	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wundef"
@@ -1074,8 +1079,13 @@ dnl USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-trigraphs"
     then
 	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CXXFLAGS="-Wall${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
-	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    if test :"${with_optimize:-auto}" != :quick
+	    then
+		USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+	    else
+		USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+	    fi
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-system-headers"
 dnl	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wundef"
@@ -1186,8 +1196,13 @@ dnl USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-trigraphs"
     then
 	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_GCJFLAGS="-Wall${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
-	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% -Wp,-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
+	    if test :"${with_optimize:-auto}" != :quick
+	    then
+		USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+	    else
+		USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+	    fi
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-system-headers"
 dnl	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wundef"
@@ -1286,7 +1301,7 @@ AC_DEFUN([_OPENSS7], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2008-2015  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2020  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
