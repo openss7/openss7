@@ -357,14 +357,19 @@ extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
 /* dst_pmtu should be already defined */
 /* Define if function ip_rt_update_pmtu takes 4 arguments. */
 #undef HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
+/* Define if function ip_rt_update_pmtu takes 5 arguments. */
+#undef HAVE_KFUNC_IP_RT_UPDATE_PMTU_5_ARGS
 static __inline__ void
 dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 {
-#ifdef HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
-	if (dst->ops->update_pmtu)
+#if defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_5_ARGS
+	if (dst && dst->ops->update_pmtu)
+		dst->ops->update_pmtu(dst, NULL, NULL, mtu, true);
+#elif defined HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
+	if (dst && dst->ops->update_pmtu)
 		dst->ops->update_pmtu(dst, NULL, NULL, mtu);
 #else
-	if (dst->ops->update_pmtu)
+	if (dst && dst->ops->update_pmtu)
 		dst->ops->update_pmtu(dst, mtu);
 #endif
 }

@@ -2596,6 +2596,32 @@ dnl----------------------------------------------------------------------------
     ])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel ip_rt_update_pmtu takes 5 arguments], [linux_cv_ip_rt_update_pmtu_5_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif]],
+		    [[void (*my_autoconf_function_pointer)(struct dst_entry *, struct sock *, struct sk_buff *, u32, bool) = NULL;
+		      struct dst_ops my_autoconf_ops = { .update_pmtu = my_autoconf_function_pointer, };]]) ],
+		    [linux_cv_ip_rt_update_pmtu_5_args=yes],
+		    [linux_cv_ip_rt_update_pmtu_5_args=no])
+	])
+	if test :$linux_cv_ip_rt_update_pmtu_5_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_RT_UPDATE_PMTU_5_ARGS], [1], [Define if
+		function ip_rt_update_pmtu takes 5 arguments.])
+	fi
+    ])
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel ICMP_INC_STATS_BH with 2 args], [linux_cv_icmp_inc_stats_bh_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
