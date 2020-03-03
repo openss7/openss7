@@ -10,21 +10,21 @@ set -x
 
 case "`uname -m`" in
 	i686)
-		CPPFLAGS="-D_FORTIFY_SOURCE"
-		CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		GCJFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro"
+		CPPFLAGS="-D_FORTIFY_SOURCE=2"
+		CFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt"
+		CXXFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt"
+		GCJFLAGS="-march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt"
+		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
 		DEBUG_CFLAGS="-g -ggdb -fvar-tracking-assignments"
 		DEBUG_CXXFLAGS="-g -ggdb -fvar-tracking-assignments"
 		DEBUG_GCJFLAGS="-g -ggdb -fvar-tracking-assignments"
 	;;
 	x86_64)
 		CPPFLAGS="-D_FORTIFY_SOURCE=2"
-		CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		GCJFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4"
-		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro"
+		CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fno-plt"
+		CXXFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fno-plt"
+		GCJFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fno-plt"
+		LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
 		DEBUG_CFLAGS="-g -ggdb -fvar-tracking-assignments"
 		DEBUG_CXXFLAGS="-g -ggdb -fvar-tracking-assignments"
 		DEBUG_GCJFLAGS="-g -ggdb -fvar-tracking-assignments"
@@ -39,10 +39,19 @@ esac
 #KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts414|awk '/^Version/{print$3}')-lts414"
 #KCC="gcc"
+#_kvr="$(pacman -Qi linux-lts419|awk '/^Version/{print$3}')-lts419"
+#KCC="gcc"
 #_kvr="$(pacman -Qi linux-lts|awk '/^Version/{print$3}')-lts"
 #KCC="gcc"
 _kvr="$(pacman -Qi linux|awk '/^Version/{print$3}'|sed 's,\.arch,-arch,')"
 KCC="gcc"
+
+#_opt="size"
+#_opt="speed"
+_opt="normal"
+#_opt="quick"
+#CPPFLAGS=""
+#_opt="auto"
 
 ./configure \
 	KCC="$KCC" \
@@ -77,8 +86,8 @@ KCC="gcc"
 	--enable-k-weak-modules \
 	--disable-specfs-lock \
 	--with-k-release=$_kvr \
-	--with-k-optimize=speed \
-	--with-optimize=speed \
+	--with-k-optimize=$_opt \
+	--with-optimize=$_opt \
 	--with-gnu-ld
 #	--disable-docs \
 #	--disable-tools \
