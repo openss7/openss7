@@ -5895,7 +5895,9 @@ kstreamd_fn(unsigned int cpu)
 #else
 		rcu_note_context_switch(cpu);
 #endif
+#if !defined(CONFIG_PREEMPT) && !defined(CONFIG_PREEMPTION)
 		cond_resched();
+#endif
 		return;
 	}
 	preempt_enable();
@@ -6088,7 +6090,9 @@ kstreamd(void *__bind_cpu)
 		preempt_enable_no_resched();
 		__runqueues();
 
+#if !defined(CONFIG_PREEMPT) && !defined(CONFIG_PREEMPTION)
 		cond_resched();
+#endif
 		preempt_disable();
 		preempt_enable();
 		prefetchw(t);
