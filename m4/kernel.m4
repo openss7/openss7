@@ -577,7 +577,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     _BLD_FIND_DIR([for kernel modules directory], [linux_cv_k_moddir], [
 	    ${rootdir}/usr/lib/modules/${kversion}
 	    ${rootdir}/lib/modules/${kversion}
-    ], [modules.dep], [], [dnl
+    ], [modules.dep], [${rootdir}/lib/modules/${kversion}], [dnl
 		AC_MSG_WARN([
 ***
 *** Strange, the modules directory is $kmoduledir
@@ -1736,7 +1736,9 @@ dnl string containing two parentheses: this is common to all.
 dnl
 dnl Debian added a blank between the last and extra parentheses.
 dnl
-	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),;s,) ).*[$],) ,' 2>/dev/null`
+dnl RedHat/CentOS 7.7 placing extraneous blank at end of line.
+dnl
+	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),;s,) ).*[$],) ,;s,  *$,,' 2>/dev/null`
 	else
 dnl
 dnl	    not all distros leave this hanging around
