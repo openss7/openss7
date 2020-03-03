@@ -637,9 +637,7 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 [	case "${$8:-search}" in
 	    (no) $2=no ;;
 	    (yes|search) ;;
-	    (*) m4_if([$4], [],
-		[if test -d "${$8}" ; then $2="${$8}" ; fi ;;],
-		[if test -f "${$8}/$4" ; then $2="${$8}" ; fi ;;])
+	    (*) bld_dir="${$8}" ; if test -d "$bld_dir" $9; then $2="$bld_dir" ; fi ;;
 	esac])
 	if test -z "${$2}" ; then
 	    eval "bld_search_path=\"$3\""
@@ -672,18 +670,19 @@ AC_DEFUN([_BLD_FIND_DIR], [dnl
 			break 2
 		    done])
 		fi
+		$2=
 		AC_MSG_RESULT([no])
 	    done
-	    if test -z "${$2}" ; then
-		$2="$5"
-		m4_if([$6], [], [:], [$6])
-		eval "[$2]_eval=\"${$2}\""
-	    else
-		eval "[$2]_eval=\"${$2}\""
-		bld_path_check "[$2]_eval" "$4"
-		m4_if([$7], [], [:], [$7])
-	    fi
 	    AC_MSG_CHECKING([for $1])
+	fi
+	if test -z "${$2}" ; then
+	    $2="$5"
+	    m4_if([$6], [], [:], [$6])
+	    eval "[$2]_eval=\"${$2}\""
+	else
+	    eval "[$2]_eval=\"${$2}\""
+	    bld_path_check "[$2]_eval" "$4"
+	    m4_if([$7], [], [:], [$7])
 	fi
     ])
 ])# _BLD_FIND_DIR
