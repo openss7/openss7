@@ -2085,6 +2085,58 @@ dnl----------------------------------------------------------------------------
 #else
 #define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
 #endif])dnl
+	AC_CACHE_CHECK([for kernel __wake_up_sync takes 2 arguments],
+		       [linux_cv___wake_up_sync_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
+#include NEED_LINUX_AUTOCONF_H
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[void (*my_autoconf_function_pointer)
+			(wait_queue_head_t *,unsigned int) = &__wake_up_sync;]]) ],
+		[linux_cv___wake_up_sync_2_args='yes'],
+		[linux_cv___wake_up_sync_2_args='no'])
+	    ])
+	if test :$linux_cv___wake_up_sync_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC___WAKE_UP_SYNC_2_ARGS], [1], [Define if
+		function __wake_up_sync takes 2 arguments.])
+	fi
 	    ])
     at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
     AC_SUBST([at_ioctl_getmsg])dnl

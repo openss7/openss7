@@ -532,8 +532,13 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 
 EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
 #if   defined HAVE___WAKE_UP_SYNC_SYMBOL
+#ifdef HAVE_KFUNC___WAKE_UP_SYNC_2_ARGS
+extern void __wake_up_sync(wait_queue_head_t *q, unsigned int mode);
+#define __wake_up_sync(a,b) __wake_up_sync(a,b)
+#else
 extern void __wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr);
 #define __wake_up_sync(a,b,c) __wake_up_sync(a,b,c)
+#endif
 #else
 #undef	__wake_up_sync
 #define __wake_up_sync __wake_up
