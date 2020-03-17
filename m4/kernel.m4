@@ -1750,7 +1750,7 @@ dnl
 		do
 		    if test -f $linux_file
 		    then
-			linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's,^.*gcc version,gcc version,;s,"[[^"]]*[$],,' 2>/dev/null`
+			linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's,^.*gcc version,gcc version,;s,"[[^"]]*[$],,;s,  *$,,' 2>/dev/null`
 			break 2
 		    fi
 		done
@@ -1770,7 +1770,7 @@ dnl
 			    fi
 			    if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
 			    then
-				linux_cv_k_compiler=`echo "$linux_com" | sed -e 's,^GCC: (GNU) ,gcc version ,'`
+				linux_cv_k_compiler=`echo "$linux_com" | sed -e 's,^GCC: (GNU) ,gcc version ,;s,  *$,,'`
 				break
 			    fi
 			fi
