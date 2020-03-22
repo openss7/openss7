@@ -171,6 +171,7 @@ streams_init(void)
 #else
 	printk(KERN_INFO STREAMS_SPLASH);	/* console splash */
 #endif
+	specfs_register();			/* ignore errors here */
 	if (!specfs_mount())
 		goto no_specfs;
 	if ((result = strprocfs_init()))
@@ -206,6 +207,7 @@ streams_exit(void)
 	strsysctl_exit();
 	strprocfs_exit();
 	specfs_umount();
+	specfs_unregister();
 }
 
 #ifdef CONFIG_STREAMS_MODULE

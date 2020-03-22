@@ -1713,6 +1713,21 @@ STATIC DEFINE_SEMAPHORE(specfs_sem);
 #endif
 STATIC int specfs_count = 0;
 
+streams_fastcall int
+specfs_register(void)
+{
+	return register_filesystem(&spec_fs_type);
+}
+
+EXPORT_SYMBOL_GPL(specfs_register);
+
+streams_fastcall void
+specfs_unregister(void)
+{
+	unregister_filesystem(&spec_fs_type);
+}
+
+EXPORT_SYMBOL_GPL(specfs_unregister);
 
 streams_fastcall struct vfsmount *
 specfs_mount(void)
@@ -1831,13 +1846,13 @@ specfs_init(void)
 		goto no_locks;
 	if ((result = specfs_init_cache()))
 		goto no_cache;
-	if ((result = register_filesystem(&spec_fs_type)))
+	if ((result = specfs_register()))
 		goto no_specfs;
 	if ((result = strlookup_init()))
 		goto no_lookup;
 	return (0);
       no_lookup:
-	unregister_filesystem(&spec_fs_type);
+	specfs_unregister();
       no_specfs:
 	specfs_term_cache();
       no_cache:
@@ -1857,7 +1872,7 @@ void __exit
 specfs_exit(void)
 {
 	strlookup_exit();
-	unregister_filesystem(&spec_fs_type);
+	specfs_unregister();
 	specfs_term_cache();
 	strlock_exit();
 }

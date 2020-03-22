@@ -79,6 +79,9 @@ struct spec_sb_info {
 
 // extern struct file_operations spec_dev_f_ops;
 
+__STREAMS_EXTERN int specfs_register(void);
+__STREAMS_EXTERN void specfs_unregister(void);
+
 __STREAMS_EXTERN struct vfsmount *specfs_mount(void);
 __STREAMS_EXTERN void specfs_umount(void);
 
