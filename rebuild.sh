@@ -3,6 +3,8 @@
 # a little script to rebuild the package in your working directory
 
 rm -f cscope.*
+rm -f *.cache
+rm -f *.site
 ./autogen.sh
 ./configure.sh
 #make clean
