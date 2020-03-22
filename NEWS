@@ -1,4 +1,4 @@
-OpenSS7 -- history of user visible changes.  2020-01-02
+OpenSS7 -- history of user visible changes.  2020-03-03
 $Id$
 Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 'OpenSS7' package.
 
-Major changes for release openss7-1.1.8.20200102
+Major changes for release openss7-1.1.8.20200303
 ------------------------------------------------
 
 This is the seventh release of the 'OpenSS7' package.  This is a
@@ -537,8 +537,8 @@ and DEBs for popular distributions.  See the package page
 DEBs.  See the repository page (http://www.openss7.org/repos.html) for
 information concerning network installation and update sources.
 
-See <http://www.openss7.org/codefiles/openss7-1.1.8.20200102/ChangeLog>
-and <http://www.openss7.org/codefiles/openss7-1.1.8.20200102/NEWS> in
+See <http://www.openss7.org/codefiles/openss7-1.1.8.20200303/ChangeLog>
+and <http://www.openss7.org/codefiles/openss7-1.1.8.20200303/NEWS> in
 the release for more information.  Also, see the 'openss7.pdf' manual in
 the release (also in html (http://www.openss7.org/openss7_manual.html)).
 
@@ -639,8 +639,8 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see
 the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See <http://www.openss7.org/codefiles/openss7-1.1.8.20200102/ChangeLog>
-and <http://www.openss7.org/codefiles/openss7-1.1.8.20200102/NEWS> in
+See <http://www.openss7.org/codefiles/openss7-1.1.8.20200303/ChangeLog>
+and <http://www.openss7.org/codefiles/openss7-1.1.8.20200303/NEWS> in
 the release for more information.  Also, see the 'openss7.pdf' manual in
 the release (also in html <http://www.openss7.org/openss7_manual.html>).
 
