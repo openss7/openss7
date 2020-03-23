@@ -1734,9 +1734,14 @@ specfs_mount(void)
 {
 	down(&specfs_sem);
 	if (!specfs_mnt) {
+		struct module *owner;
+
+		owner = spec_fs_type.owner;
+		spec_fs_type.owner = NULL;
 		specfs_mnt = kern_mount(&spec_fs_type);
 		if (IS_ERR(specfs_mnt))
 			specfs_mnt = NULL;
+		spec_fs_type.owner = owner;
 	}
 	if (specfs_mnt != NULL)
 		specfs_count++;
@@ -1760,8 +1765,13 @@ specfs_umount(void)
 		if (specfs_mnt && specfs_count > 0)
 			specfs_count--;
 		if (specfs_count == 0 && specfs_mnt != NULL) {
+			struct module *owner;
+
+			owner = spec_fs_type.owner;
+			spec_fs_type.owner = NULL;
 			kern_umount(specfs_mnt);
 			specfs_mnt = NULL;
+			spec_fs_type.owner = owner;
 		}
 		up(&specfs_sem);
 	}
